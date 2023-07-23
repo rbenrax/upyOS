@@ -1,8 +1,0 @@
-Hello, User!
-
-This is a sample file. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Donec tincidunt tortor non efficitur egestas. Integer maximus dui ut porta efficitur.
-Nullam consectetur tincidunt scelerisque. In facilisis varius ullamcorper.
-Phasellus nibh odio, vehicula non commodo vel, ullamcorper eu quam. Nunc at congue elit, ac gravida velit.
-
-End of file
