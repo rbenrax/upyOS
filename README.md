@@ -3,6 +3,7 @@
 smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266, RP2040, ESP32-C3, ETC.) giving the user POSIX-like environment to play by Krzysztof Krystian Jankowski.
 
 [smolOS original github site](https://github.com/w84death/smolOS/tree/main)
+
 [́smolos docs site](http://smol.p1x.in/os/)
 
 This is a simple test implementation with some modifications of smolOS over ESP32-C3/YD-RP2040 by rbenrax.
