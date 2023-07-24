@@ -17,8 +17,8 @@ VCC-GND Studio YD-2040
 ![luatos on esp32-c3](media/smolos_01.png )
 
 TODO List:
-- Create .board file in grub.py in directory /etc, read in boot
-- Add board caracteristics, including digital pins, ADC pins, PWM pins, i2c pins and SPI pins, etc, and losting in lshw
+- Create .board file in grub.py in /etc directory, stops boot, configure it and read in boot.
+- Add board caracteristics, including digital pins, ADC pins, PWM pins, i2c pins and SPI pins, etc, and list in lshw
 - Enhance ls command
 - Editor to external .py
 - Add regexp and directories to file managements
