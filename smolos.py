@@ -9,6 +9,7 @@ import gc
 import utime
 import sys
 import json
+import utls
 
 class smolOS:
     def __init__(self):
@@ -57,7 +58,7 @@ class smolOS:
             print(ex)
 
         #self.thread_running = False
-        self.protected_files = { "boot.py","main.py" }
+        self.protected_files = { "boot.py","main.py", "grub.py", "smolos.py", "utls.py" }
 
         self.user_commands = {
             "help": self.help,
@@ -157,8 +158,9 @@ class smolOS:
             except Exception as ex:
                 self.print_err("cmd error, " + str(ex))
                 pass
-            
-            
+ 
+ # - - - - - - - -
+ 
     def banner(self):
         print("\033[1;33;44m                                 ______  _____")
         print("           _________ ___  ____  / / __ \/ ___/")
@@ -217,13 +219,45 @@ class smolOS:
             self.info(file)
 
     def info(self,filename=""):
-        if filename == "":
-            self.print_err("No file")
-            return
-        additional = ""
-        file_size = uos.stat(filename)[6]
-        if filename in self.protected_files: additional = "protected system file"
-        print("\t\033[4m"+filename+"\033[0m\t", file_size, "bytes", "\t"+additional)
+        #if not utls.file_exists(filename):
+        #    self.print_err("File not found")
+        #    return
+        #additional = ""
+        #file_size = uos.stat(filename)[6]
+        #if filename in self.protected_files: additional = "protected system file"
+        #if utls.isdir(filename):
+        #    print("d - \033[4m"+filename+"\033[0m\t", file_size, "bytes", "\t"+additional)
+        #else:
+        #    print("  - \033[4m"+filename+"\033[0m\t", file_size, "bytes", "\t"+additional)
+            
+        stat = utls.get_stat(filename)
+        mode = stat[0]
+        if utls.isdir(filename):
+            mode_str = '/'
+        else:
+            mode_str = ''
+        size = stat[6]
+        mtime = stat[8]
+        localtime = utime.localtime(mtime)
+
+        if utls.isdir(filename):
+            fattr= "d"
+        else:
+            fattr= " "
+
+        if filename in self.protected_files:
+            fattr += "r-"
+        else:
+            fattr += "rw"
+
+        if ".py" in filename:
+            fattr += 'x'
+        else:
+            fattr += '-'
+            
+        print('%s %6d %s %2d %02d:%02d %s%s' % (fattr, size, utls.MONTH[localtime[1]],
+              localtime[2], localtime[4], localtime[5], filename, mode_str))
+
 
     def cat(self,filename=""):
         if filename == "":
