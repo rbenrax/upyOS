@@ -4,12 +4,12 @@ import sys
 try:
     wait=5
 
-    print("\033[2J")
-    print("\033[H")
+    print("\033[2J") # Clear screen
+    print("\033[H")  # Goto 0,0
+    
     print("\nsmolOS grub\n")
     for t in range(wait):
-        print("\033[H     ")
-        #print("\033[1J     ")
+        print("\033[4;1H")
         print(t)
         utime.sleep(1)
 

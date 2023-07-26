@@ -184,11 +184,16 @@ class smolOS:
             self.print_err("Man not available for command " + cmd)
 
     def help(self):
-        print(self.name+ " version "+self.version+" user commands:\n")
-        #self.man(self.user_commands_manual)
-        for cmd,desc in self.user_commands_manual.items():
-            print("\t\033[7m"+cmd+"\033[0m -",desc)
-        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski.")
+        print(self.name + " version " + self.version + " user commands:\n")
+
+        # Ordering
+        ok = list(self.user_commands_manual.keys())
+        ok.sort()
+        
+        for k in ok:
+            print("\t\033[7m" + k + "\033[0m -", self.user_commands_manual[k])
+        
+        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski, rbenrax.")
         print("Source code available at \033[4msmol.p1x.in/os/\033[0m")
 
     def print_err(self, error):
@@ -213,29 +218,23 @@ class smolOS:
 
     def cls(self):
          print("\033[2J")
+         print("\033[H")
 
     def ls(self):
+        tsize=0
         for file in uos.listdir():
-            self.info(file)
+            tsize += self.info(file)
 
+        print("\nTotal: " + str(tsize) + " bytes")
+        
     def info(self,filename=""):
-        #if not utls.file_exists(filename):
-        #    self.print_err("File not found")
-        #    return
-        #additional = ""
-        #file_size = uos.stat(filename)[6]
-        #if filename in self.protected_files: additional = "protected system file"
-        #if utls.isdir(filename):
-        #    print("d - \033[4m"+filename+"\033[0m\t", file_size, "bytes", "\t"+additional)
-        #else:
-        #    print("  - \033[4m"+filename+"\033[0m\t", file_size, "bytes", "\t"+additional)
+        if not utls.file_exists(filename):
+            self.print_err("File not found")
+            return
             
         stat = utls.get_stat(filename)
+        
         mode = stat[0]
-        if utls.isdir(filename):
-            mode_str = '/'
-        else:
-            mode_str = ''
         size = stat[6]
         mtime = stat[8]
         localtime = utime.localtime(mtime)
@@ -255,9 +254,10 @@ class smolOS:
         else:
             fattr += '-'
             
-        print('%s %6d %s %2d %02d:%02d %s%s' % (fattr, size, utls.MONTH[localtime[1]],
-              localtime[2], localtime[4], localtime[5], filename, mode_str))
+        print('%s %6d %s %2d %02d:%02d %s' % (fattr, size, utls.MONTH[localtime[1]],
+              localtime[2], localtime[4], localtime[5], filename))
 
+        return size
 
     def cat(self,filename=""):
         if filename == "":
@@ -267,16 +267,24 @@ class smolOS:
             content = file.read()
             print(content)
 
-    def cp(self,fno="", fnd=""):
-        if fno == "" or fnd=="":
+    def cp(self, fns="", fnd=""):
+        if fns == "" or fnd=="":
             self.print_err("Invalid file(s). Failed to copy the file.")
             return
+        if not utls.file_exists(fns):
+            self.print_err("File source not exists.")
+            return            
         if fnd in self.protected_files:
             self.print_err("Can not overwrite system file!")
         else:
-            with open(fno, "rb") as of:
-                with open(fnd, "w") as df:
-                    df.write(of.read())
+            with open(fns, 'rb') as fs:
+                with open(fnd, "wb") as fd:
+                    while True:
+                        buf = fs.read(256)
+                        if not buf:
+                            break
+                        fd.write(buf)
+            
             self.print_msg("File copied successfully.")
 
     def mv(self,path_o="", path_d=""):
