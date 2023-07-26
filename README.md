@@ -24,6 +24,8 @@ TODO List:
 - Add regexp and directories to file managements
 - Add Wifi client and AP
 - Add grep, du, diff, find, tar, ping, ip, uname, hostname and wget.
--
+- Hidden files
+- /etc/rc.local
+- 
 
 Wishlist is open ;)
