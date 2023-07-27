@@ -18,6 +18,7 @@ class BoardDef():
                     "dac"   : {"adc0": 1, "adc1": 2},
                     "pwmp"  : [],
                     "gpio"  : {"gpio0": 2, "gpio1": 3},
+                    "ints"  : {"int1": 0, "int2": 0},
                     "i2c"   : [{"scl1": 0, "sda1": 0}],
                     "spi"   : [{"mosi1": 0, "miso1": 0, "cs1": 0, "ck1": 0}],
                     "usart" : [{"tx1": 0, "rx1": 0, "cts1": 0, "rts1": 0}],
