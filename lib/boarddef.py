@@ -36,7 +36,7 @@ class BoardDef():
     def getBoard(self):
         return self.board
     
-    def dump(self):
+    def dumps(self):
         return json.dumps(self.board)
     
     def loads(self, data):
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     print("Original")
     print(b.getBoard())
 
-    s=b.dump()
+    s=b.dumps()
     print("Codificada")
     print(s)
 
