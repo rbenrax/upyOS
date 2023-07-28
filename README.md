@@ -17,12 +17,13 @@ VCC-GND Studio YD-2040
 ![luatos on esp32-c3](media/smolos_01.png )
 
 TODO List:
-- Grub will be the first process in boot, will create .board file in /etc directory, if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, system process smolos wlil read its content and will enable the resources to be used the system andmodules.
-- Add board caracteristics, including digital pins, ADC pins, PWM pins, i2c pins and SPI pins, etc, and list in lshw
+- Grub will be the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, system process smolos wlil read its content and will enable the resources to be used the system, modules, lshw, etc.
+  
 - Add /lib/mod, will contain all modules inherit from basemod.py and will recieve refs from kernel, ex. board resources, wifi, etc.
 When system boots will call the modules to test resources available y the board definition.
 
--  
+- add smolos.conf in /etc directory, will contain system configutation parameters.
+  
 - Enhance ls command
 - Editor to external .py
 - Add regexp and directories to file managements
