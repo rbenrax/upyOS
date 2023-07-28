@@ -338,11 +338,21 @@ class smolOS:
         p = '{0:.2f}%'.format(f/t*100)
         print('\t\033[0mTotal: \033[1m{0} \033[0mAlloc: \033[1m{1} \033[0mFree: \033[1m{2} ({3})'.format(t,a,f,p))
         
-    def df(self):
-        s = uos.statvfs('//')
-        print("\t\033[0mUsed space:\033[1m",uos.stat("/")[0],"bytes")
-        print("\t\033[0mFree space:\033[1m",s[0]*s[3],"bytes")
-        
+    def df(self, path"/"):
+        bit_tuple = os.statvfs(path)
+        blksize = bit_tuple[0]  # system block size
+        total = bit_tuple[2] * blksize
+        free = bit_tuple[3] * blksize
+        used = total - free
+
+        print("\t\033[0mTotal space:\033[1m", total, "bytes")
+        print("\t\033[0mUsed space:\033[1m", used, "bytes")
+        print("\t\033[0mFree space:\033[1m", free, "bytes")
+
+        #s = uos.statvfs('//')
+        #print("\t\033[0mUsed space:\033[1m",uos.stat("/")[0],"bytes")
+        #print("\t\033[0mFree space:\033[1m",s[0]*s[3],"bytes")
+    
     def lshw(self):
         print("\t\033[0mBoard:\033[1m",self.board)
         print("\t\033[0mMicroPython:\033[1m",uos.uname().release)
