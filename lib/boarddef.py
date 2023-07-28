@@ -18,11 +18,11 @@ class BoardDef():
                     "gndp"  : [],
                     "enap"  : [],
                     "rstp"  : [],
-                    "adc"   : {"adc0": 1, "adc1": 2},
-                    "dac"   : {"adc0": 1, "adc1": 2},
+                    "adc"   : [{"adc0": 1, "adc1": 2}],
+                    "dac"   : [{"adc0": 1, "adc1": 2}],
                     "pwmp"  : [],
-                    "gpio"  : {"gpio0": 2, "gpio1": 3},
-                    "ints"  : {"int1": 0, "int2": 0},
+                    "gpio"  : [{"gpio0": 2, "gpio1": 3}],
+                    "ints"  : [{"int1": 0, "int2": 0}],
                     "i2c"   : [{"scl1": 0, "sda1": 0}],
                     "spi"   : [{"mosi1": 0, "miso1": 0, "cs1": 0, "ck1": 0}],
                     "usart" : [{"tx1": 0, "rx1": 0, "cts1": 0, "rts1": 0}],
@@ -30,12 +30,12 @@ class BoardDef():
                     "can"   : [{"tx1": 0, "rx1": 0}],
                     "usb"   : [{"D+1": 0, "D-1": 0}],
                     "sdio"  : [{"clk": 0, "cmd": 0, "data0": 0, "data1": 0, "data2": 0, "data3": 0 }],
-                    "touch" : {"t1": 0, "t2": 0},
-                    "other" : {"vout": 0, "vin": 0, "usrkey": 0, "vref": 0, "flash": 0, "wake": 0, "run": 0, "vbat": 0 },
+                    "touch" : [{"t1": 0, "t2": 0}],
+                    "other" : [{"vout": 0, "vin": 0, "usrkey": 0, "vref": 0, "flash": 0, "wake": 0, "run": 0, "vbat": 0 }],
                     "ncp"   : [],
                     "resvp" : [],
-                    "ledp"  : {"gpio2": 12, "gpio3": 13},
-                    "rgblp" : {"gpio23": 25}
+                    "ledp"  : [{"gpio2": 12, "gpio3": 13}],
+                    "rgblp" : [{"gpio23": 25}]
                     }
 
 
