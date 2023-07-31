@@ -192,7 +192,7 @@ class smolOS:
             print("\033[1m" + k + "\033[0m -", self.user_commands_manual[k])
         
         print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski, Mods by rbenrax.")
-        print("Source code available at \033[4msmol.p1x.in/os/\033[0m")
+        print("Source code available at \033[4msmol.p1x.in/os/")
         print("Source code available at \033[4https://github.com/rbenrax/smolOS\033[0m")
 
     def print_err(self, error):
@@ -335,27 +335,38 @@ class smolOS:
         with open(filename, "a") as file:
             file.write(c1+c2+c3+"\n")
 
-    def free(self):
+    def free(self, mode="-h"):
         gc.collect()
         
         f = gc.mem_free()
         a = gc.mem_alloc()
         t = f+a
-        print('\033[0mTotal.:\033[1m %7d bytes' % (t))
-        print('\033[0mAlloc.:\033[1m %7d bytes' % (a))
-        print('\033[0mFree..:\033[1m %7d bytes' % (f), '({0:.2f}%)'.format(f/t*100))
+        p = '({0:.2f}%)'.format(f/t*100)
         
-    def df(self, path="/"):
+        if mode=="-h":
+            print('\033[0mTotal.:\033[1m %7d bytes' % (t))
+            print('\033[0mAlloc.:\033[1m %7d bytes' % (a))
+            print('\033[0mFree..:\033[1m %7d bytes' % (f), p)
+        else:
+            d={"total": t, "alloc": a, "free": f, "%": p}
+            print(d)
+            
+    def df(self, mode="-h", path="/"):
+        
         bit_tuple = uos.statvfs(path)
         blksize = bit_tuple[0]  # system block size
-        total = bit_tuple[2] * blksize
-        free = bit_tuple[3] * blksize
-        used = total - free
+        t = bit_tuple[2] * blksize
+        f = bit_tuple[3] * blksize
+        u = t - f
         
-        print('\033[0mTotal space:\033[1m %8d bytes' % (total))
-        print('\033[0mUsed space.:\033[1m %8d bytes' % (used))
-        print('\033[0mFree space.:\033[1m %8d bytes' % (free))
-    
+        if mode=="-h":
+            print('\033[0mTotal space:\033[1m %8d bytes' % (t))
+            print('\033[0mUsed space.:\033[1m %8d bytes' % (u))
+            print('\033[0mFree space.:\033[1m %8d bytes' % (f))
+        else:
+            d={"total": t, "used": u, "free": f}
+            print(d)
+            
     def lshw(self):
         print("\033[0mBoard:\033[1m",self.board)
         print("\033[0mMicroPython:\033[1m",uos.uname().release)
