@@ -4,30 +4,35 @@
 import utime
 import uos
 import utls
+import sysdata
 
 def init():
 
     if not utls.file_exists("/etc"):
         uos.mkdir("/etc")
 
-    name = "smolOS-" + uos.uname()[0]
-    board = uos.uname()[4]
-    
-    if not utls.file_exists("/etc/" + name + ".board"):
+    # Create sysconfig
+    try:
+
+        name = "smolOS-" + uos.uname()[0]
+        board = uos.uname()[4]
+        sco = sysdata.SysData(board)
         
-        # Create/Load board config
-        try:
-            
-            with open("/etc/" + name + ".board", "w") as cf:
-                cf.write("Board=" + board + "\n")
-                cf.write("Leds pins=" + "[25]" + "\n")
-                cf.write("Speed range=" + '{"slow": 80, "turbo": 80}'+ "\n")
-                cf.write("Turbo=" + "false" + "\n")
-                cf.write("Aliases=" + '{"h": "help", "show": "cat", "remove": "rm", "edit": "vi", "list": "ls"}' + "\n")
+        if not utls.file_exists("/etc/" + name + ".board"):
+            with open("/etc/" + name + ".board", "w") as bcf:
+                utls.dump(sco.getBoard(), bcf)
+
             print("Board config generated, you may config before continue.")
-        
-        except Exception as ex:
-            print(ex)
+            
+        if not utls.file_exists("/etc/system.conf"):
+            with open("/etc/system.conf", "w") as scf:
+                utls.dump(sco.getSysConf(), scf)
+
+            print("Sysconf creado.")
+            
+    
+    except Exception as ex:
+        print(ex)
 
 try:
     wait=5

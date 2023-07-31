@@ -18,39 +18,46 @@ class smolOS:
         self.version = "0.8d"
            
         # Serializable ->
-        self.system_leds_pins=[25]
-        self.cpu_speed_range = {"slow":80,"turbo":80} # Mhz
-        self.turbo = False
+        #self.system_leds_pins=[12, 13]
+        #self.cpu_speed_range = {"slow":80,"turbo":80} # Mhz
+        #self.turbo = False
 
-        self.user_commands_aliases = {
-            "h": "help",
-            "list": "ls",
-            "show": "cat",
-            "remove": "rm",
-            "edit": "vi"         
-        }
+        #self.user_commands_aliases = {
+        #    "h": "help",
+        #    "list": "ls",
+        #    "show": "cat",
+        #    "remove": "rm",
+        #    "edit": "vi"         
+        #}
         # <- 
         
         # Load board config
         try:
-            with open("/etc/" + self.name + ".board", "r") as cf:
+            with open("/etc/" + self.name + ".board", "r") as bcf:
+                obj=utls.load(bcf)
+
+                self.cpu_speed_range = obj["mcu"]["speed"] # Mhz
+                #print(self.cpu_speed_range)
                 
-                for line in cf.read().split("\n"):
-                    item=line.split("=")
-                    #print(item)
-                    if item[0]=="Leds pins":
-                        self.system_leds_pins = json.loads(item[1])
-                    if item[0]=="Speed range":
-                        self.cpu_speed_range = json.loads(item[1])
-                    if item[0]=="Turbo":
-                        self.turbo = json.loads(item[1])
-                    if item[0]=="Aliases":
-                        self.user_commands_aliases = json.loads(item[1])
+                self.system_leds_pins=obj["ledio"][0].values()
+                #print(self.system_leds_pins)
+                #...
+
+            with open("/etc/system.conf", "r") as scf:
+                obj=utls.load(scf)
+
+                self.turbo = obj["turbo"]
+                #print(self.turbo)
+                
+                self.user_commands_aliases = obj["aliases"]
+                #print(self.user_commands_aliases)
+                #...
+                
             print("Board config loaded.")
         except OSError as ex:
             print("Problem loading board config. " + str(ex))
-        except Exception as ex:
-            print(ex)
+        #except Exception as ex:
+        #    print(ex)
 
         #self.thread_running = False
         self.protected_files = { "boot.py","main.py", "grub.py" }
@@ -121,7 +128,6 @@ class smolOS:
         self.boot()
 
     def boot(self):
-        
         if self.turbo:
             machine.freq(self.cpu_speed_range["turbo"] * 1000000)
         
@@ -168,16 +174,16 @@ class smolOS:
         self.banner()
         self.lshw()
         
-        print("\n\t\033[1mMemory:")
+        print("\n\033[1mMemory:")
         self.free()
-        print("\n\t\033[1mStorage:")
+        print("\n\033[1mStorage:")
         self.df()
         self.print_msg("Type 'help' for a smol manual.")
 
     def man(self,cmd=""):
         try:
             desc = self.user_commands_manual[cmd]
-            print("\t\033[7m"+cmd+"\033[0m -",desc)
+            print("\033[1m" + cmd + "\033[0m -", desc)
         except:
             self.print_err("Man not available for command " + cmd)
 
@@ -189,17 +195,18 @@ class smolOS:
         ok.sort()
         
         for k in ok:
-            print("\t\033[7m" + k + "\033[0m -", self.user_commands_manual[k])
+            print("\033[1m" + k + "\033[0m -", self.user_commands_manual[k])
         
-        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski, rbenrax.")
-        print("Source code available at \033[4msmol.p1x.in/os/\033[0m")
+        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski, Mods by rbenrax.")
+        print("Source code available at \033[4msmol.p1x.in/os/")
+        print("Source code available at \033[4https://github.com/rbenrax/smolOS\033[0m")
 
     def print_err(self, error):
-        print("\n\033[1;37;41m\t<!>",error,"<!>\t\033[0m")
+        print("\n\033[1;37;41m<!>",error,"<!>\033[0m")
         utime.sleep(1)
 
     def print_msg(self, message):
-        print("\n\033[1;34;47m\t->",message,"\t\033[0m")
+        print("\n\033[1;34;47m->",message,"\033[0m")
         utime.sleep(0.5)
 
     def unknown_function(self):
@@ -334,34 +341,47 @@ class smolOS:
         with open(filename, "a") as file:
             file.write(c1+c2+c3+"\n")
 
-    def free(self):
+    def free(self, mode="-h"):
+        gc.collect()
+        
         f = gc.mem_free()
         a = gc.mem_alloc()
         t = f+a
-        print('\t\033[0mTotal.:\033[1m %7d bytes' % (t))
-        print('\t\033[0mAlloc.:\033[1m %7d bytes' % (a))
-        print('\t\033[0mFree..:\033[1m %7d bytes' % (f), '({0:.2f}%)'.format(f/t*100))
+        p = '({0:.2f}%)'.format(f/t*100)
         
-    def df(self, path="/"):
+        if mode=="-h":
+            print('\033[0mTotal.:\033[1m %7d bytes' % (t))
+            print('\033[0mAlloc.:\033[1m %7d bytes' % (a))
+            print('\033[0mFree..:\033[1m %7d bytes' % (f), p)
+        else:
+            d={"total": t, "alloc": a, "free": f, "%": p}
+            print(d)
+            
+    def df(self, mode="-h", path="/"):
+        
         bit_tuple = uos.statvfs(path)
         blksize = bit_tuple[0]  # system block size
-        total = bit_tuple[2] * blksize
-        free = bit_tuple[3] * blksize
-        used = total - free
+        t = bit_tuple[2] * blksize
+        f = bit_tuple[3] * blksize
+        u = t - f
         
-        print('\t\033[0mTotal space:\033[1m %8d bytes' % (total))
-        print('\t\033[0mUsed space.:\033[1m %8d bytes' % (used))
-        print('\t\033[0mFree space.:\033[1m %8d bytes' % (free))
-    
+        if mode=="-h":
+            print('\033[0mTotal space:\033[1m %8d bytes' % (t))
+            print('\033[0mUsed space.:\033[1m %8d bytes' % (u))
+            print('\033[0mFree space.:\033[1m %8d bytes' % (f))
+        else:
+            d={"total": t, "used": u, "free": f}
+            print(d)
+            
     def lshw(self):
-        print("\t\033[0mBoard:\033[1m",self.board)
-        print("\t\033[0mMicroPython:\033[1m",uos.uname().release)
-        print("\t\033[0m"+ self.name + ":\033[1m",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
-        print("\t\033[0mFirmware:\033[1m",uos.uname().version)
+        print("\033[0mBoard:\033[1m",self.board)
+        print("\033[0mMicroPython:\033[1m",uos.uname().release)
+        print("\033[0m"+ self.name + ":\033[1m",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
+        print("\033[0mFirmware:\033[1m",uos.uname().version)
         turbo_msg = "\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
         if self.turbo:
             turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` for slow mode."
-        print("\t\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz",turbo_msg)
+        print("\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz",turbo_msg)
         
     def led(self,cmd="on",lna="0"):
         ln=int(lna)
@@ -403,7 +423,7 @@ class smolOS:
                         end_index = min(start_index + self.page_size,line_count)
                         print_lines = lines[start_index:end_index]
 
-                        print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\t\033[0m")
+                        print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\033[0m")
 
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
                             print(line_num,":",line.strip())
