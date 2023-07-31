@@ -1,4 +1,4 @@
-# by default python looks for modules in /lib dlrectory
+# by default python looks for modules in /lib directory
 # import sys
 # print(sys.path)
 
