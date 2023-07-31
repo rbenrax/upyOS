@@ -167,7 +167,10 @@ class smolOS:
     def welcome(self):
         self.banner()
         self.lshw()
+        
+        print("\n\t\033[1mMemory:")
         self.free()
+        print("\n\t\033[1mStorage:")
         self.df()
         self.print_msg("Type 'help' for a smol manual.")
 
@@ -253,7 +256,7 @@ class smolOS:
         else:
             fattr += '-'
             
-        print('%s %6d %s %2d %02d:%02d %s' % (fattr, size, utls.MONTH[localtime[1]],
+        print('%s %7d %s %2d %02d:%02d %s' % (fattr, size, utls.MONTH[localtime[1]],
               localtime[2], localtime[4], localtime[5], filename))
 
         return size
@@ -335,23 +338,20 @@ class smolOS:
         f = gc.mem_free()
         a = gc.mem_alloc()
         t = f+a
-        p = '{0:.2f}%'.format(f/t*100)
-        print('\t\033[0mTotal: \033[1m{0} \033[0mAlloc: \033[1m{1} \033[0mFree: \033[1m{2} ({3})'.format(t,a,f,p))
+        print('\t\033[0mTotal.:\033[1m %7d bytes' % (t))
+        print('\t\033[0mAlloc.:\033[1m %7d bytes' % (a))
+        print('\t\033[0mFree..:\033[1m %7d bytes' % (f), '({0:.2f}%)'.format(f/t*100))
         
-    def df(self, path"/"):
-        bit_tuple = os.statvfs(path)
+    def df(self, path="/"):
+        bit_tuple = uos.statvfs(path)
         blksize = bit_tuple[0]  # system block size
         total = bit_tuple[2] * blksize
         free = bit_tuple[3] * blksize
         used = total - free
-
-        print("\t\033[0mTotal space:\033[1m", total, "bytes")
-        print("\t\033[0mUsed space:\033[1m", used, "bytes")
-        print("\t\033[0mFree space:\033[1m", free, "bytes")
-
-        #s = uos.statvfs('//')
-        #print("\t\033[0mUsed space:\033[1m",uos.stat("/")[0],"bytes")
-        #print("\t\033[0mFree space:\033[1m",s[0]*s[3],"bytes")
+        
+        print('\t\033[0mTotal space:\033[1m %8d bytes' % (total))
+        print('\t\033[0mUsed space.:\033[1m %8d bytes' % (used))
+        print('\t\033[0mFree space.:\033[1m %8d bytes' % (free))
     
     def lshw(self):
         print("\t\033[0mBoard:\033[1m",self.board)
