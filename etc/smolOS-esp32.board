@@ -1,0 +1,5 @@
+Board=ESP32C3 module with ESP32C3
+Leds pins=[12, 13]
+Speed range={"slow": 80, "turbo": 160}
+Turbo=false
+Aliases={"h": "help", "show": "cat", "remove": "rm", "edit": "vi", "list": "ls"}

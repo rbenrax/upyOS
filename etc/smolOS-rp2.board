@@ -1,0 +1,5 @@
+Board=Arduino Nano RP2040 Connect with RP2040
+Leds pins=[25]
+Speed range={"slow": 125, "turbo": 133}
+Turbo=false
+Aliases={"h": "help", "show": "cat", "remove": "rm", "edit": "vi", "list": "ls"}
