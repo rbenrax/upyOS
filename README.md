@@ -27,7 +27,7 @@ When system boots will call the modules to test resources available in the board
 
 X add smolos.conf in /etc directory, will contain system configutation parameters.
   
-- Enhance ls command
+- Enhance ls, cp, mv commands
 - Editor to external .py
 - Add regexp and directories to file managements
 - Add Wifi client and AP
