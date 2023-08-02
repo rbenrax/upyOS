@@ -34,25 +34,25 @@ class smolOS:
         # Load board config
         try:
             with open("/etc/" + self.name + ".board", "r") as bcf:
-                obj=utls.load(bcf)
+                bc=utls.load(bcf)
 
-                self.cpu_speed_range = obj["mcu"]["speed"] # Mhz
+                self.cpu_speed_range = bc["mcu"]["speed"] # Mhz
                 #print(self.cpu_speed_range)
                 
-                self.system_leds_pins=obj["ledio"][0].values()
+                self.system_leds_pins=bc["ledio"][0].values()
                 #print(self.system_leds_pins)
                 
-                self.rgb_led_pins=obj["rgbio"][0].values()
+                self.rgb_led_pins=bc["rgbio"][0].values()
                 #print(self.rgb_led_pins)
                 #...
 
             with open("/etc/system.conf", "r") as scf:
-                obj=utls.load(scf)
+                sc=utls.load(scf)
 
-                self.turbo = obj["turbo"]
+                self.turbo = sc["turbo"]
                 #print(self.turbo)
                 
-                self.user_commands_aliases = obj["aliases"]
+                self.user_commands_aliases = sc["aliases"]
                 #print(self.user_commands_aliases)
                 #...
                 
@@ -65,7 +65,7 @@ class smolOS:
         #pass
 
         #self.thread_running = False
-        self.protected_files = { "boot.py","main.py", "grub.py" }
+        self.protected_files = ["boot.py","main.py", "grub.py"]
 
         self.user_commands = {
             "help": self.help,
@@ -89,7 +89,8 @@ class smolOS:
             "touch": self.touch,
             "free" : self.free,
             "df" : self.df,
-            "lshw" : self.lshw
+            "lshw" : self.lshw,
+            "exit" : self.exit
             
         }
         self.user_commands_manual = {
@@ -115,6 +116,7 @@ class smolOS:
             "free" : "Show ram status",
             "df" : "Show storage status",
             "lshw" : "Show hardware",
+            "exit" : "Exit to Micropython shell"
         }
         self.ed_commands_manual = {
             "help": "this help",
@@ -126,38 +128,35 @@ class smolOS:
             "quit": "quit"
         }
 
-        self.system_leds = []
-        for ln in self.system_leds_pins: #Leds Pins
-            self.system_leds.append(machine.Pin(ln,machine.Pin.OUT))
-
         self.boot()
 
     def boot(self):
         if self.turbo:
             machine.freq(self.cpu_speed_range["turbo"] * 1000000)
-        
+
+        #TODO: Load modules
+        self.system_leds = []
+        for ln in self.system_leds_pins: #Leds Pins
+            self.system_leds.append(machine.Pin(ln,machine.Pin.OUT))
+            
+        ## Endd modules
+
         self.cls()
         self.welcome()
+
         self.led("boot", 0)
-        self.led("rgb", 1)
+        #self.led("rgb", 1)
         
+        #/etc/rc.local
+        print("\n\033[0mLaunching rc.local commands:\n")
+        self.run_sh_script("/etc/rc.local")
+        
+        self.print_msg("Type 'help' for a smol manual.")
+
         while True:
             try:
                 user_input = input("\n" + uos.getcwd() + " $: ")
-                parts = user_input.split()
-                if len(parts) > 0:
-                    command = parts[0]
-                    if command in self.user_commands_aliases: # aliases support
-                        command=self.user_commands_aliases[command]
-                    if command in self.user_commands:
-                        if len(parts) > 1:
-                            arguments = parts[1:]
-                            self.user_commands[command](*arguments)
-                        else:
-                            self.user_commands[command]()
-                    else:
-                        self.unknown_function()
-                        
+                self.run_cmd(user_input)
             except KeyboardInterrupt:
                  self.print_msg("Shutdown smolOS..., bye.")
                  sys.exit()
@@ -167,6 +166,29 @@ class smolOS:
       #          pass
  
  # - - - - - - - -
+ 
+    def run_cmd(self, cmd):
+        parts = cmd.split()
+        if len(parts) > 0:
+            command = parts[0]
+            if command in self.user_commands_aliases: # aliases support
+                command=self.user_commands_aliases[command]
+            if command in self.user_commands:
+                if len(parts) > 1:
+                    arguments = parts[1:]
+                    self.user_commands[command](*arguments)
+                else:
+                    self.user_commands[command]()
+            else:
+                self.unknown_function()
+ 
+    def run_sh_script(self, ssf):
+        if utls.file_exists(ssf):
+            with open(ssf,'r') as f:
+                cont = f.read()
+                for cmd in cont.split("\n"):
+                    if len(cmd)>1 and cmd[0]=="#": continue
+                    self.run_cmd(cmd)
  
     def banner(self):
         print("\033[1;33;44m                                 ______  _____")
@@ -184,7 +206,6 @@ class smolOS:
         self.free()
         print("\n\033[1mStorage:")
         self.df()
-        self.print_msg("Type 'help' for a smol manual.")
 
     def man(self,cmd=""):
         try:
@@ -332,6 +353,9 @@ class smolOS:
             return
         exec(open(filename+".py").read())
 
+    def exit(self):
+        raise SystemExit
+
     def exe(self,command):
         exec(command)
 
@@ -385,7 +409,7 @@ class smolOS:
             d={"total": t, "used": u, "free": f}
             print(d)
             
-    def lshw(self):
+    def lshw(self, mode="-b"):
         print(f"\033[0mBoard:\033[1m {self.board}")
         print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
         print(f"\033[0m{self.name} :\033[1m {self.version} (size: {uos.stat('main.py')[6]} bytes)")
@@ -396,6 +420,28 @@ class smolOS:
             turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` for slow mode."
         
         print(f"\033[0mCPU Speed:\033[1m{machine.freq()*0.000001}MHz {turbo_msg}")
+        
+        # Full hardware       
+        if mode=="-f":
+            try:
+                with open("/etc/" + self.name + ".board", "r") as bcf:
+                    bc=utls.load(bcf)
+                    for e in bc.keys():
+                        i=bc[e]
+                        #TODO prettify
+                        #print(f"{type(i)}")
+                        #if type(i) is dict:
+                        #    print(f"{e}: {i}")
+                        #if type(i) is list:
+                        #    print(f"{e}: {i}")
+                        #else:
+                        #    print(f"{e}: {i}")
+                            
+                        print(f"{e}: {i}")
+
+            except Exception as ex:
+                self.print_err("lshw error, " + str(ex))
+                pass
         
     def led(self, cmd="on", lna="0"):
         ln=int(lna)
