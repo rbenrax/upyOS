@@ -15,7 +15,7 @@ class smolOS:
     def __init__(self):
         self.board = uos.uname()[4]
         self.name = "smolOS-" + uos.uname()[0]
-        self.version = "0.8d"
+        self.version = "0.2 rbenrax"
            
         # Serializable ->
         #self.system_leds_pins=[12, 13]
@@ -41,6 +41,9 @@ class smolOS:
                 
                 self.system_leds_pins=obj["ledio"][0].values()
                 #print(self.system_leds_pins)
+                
+                self.rgb_led_pins=obj["rgbio"][0].values()
+                #print(self.rgb_led_pins)
                 #...
 
             with open("/etc/system.conf", "r") as scf:
@@ -56,8 +59,10 @@ class smolOS:
             print("Board config loaded.")
         except OSError as ex:
             print("Problem loading board config. " + str(ex))
+            
         #except Exception as ex:
         #    print(ex)
+        #pass
 
         #self.thread_running = False
         self.protected_files = { "boot.py","main.py", "grub.py" }
@@ -134,6 +139,7 @@ class smolOS:
         self.cls()
         self.welcome()
         self.led("boot", 0)
+        self.led("rgb", 1)
         
         while True:
             try:
@@ -156,9 +162,9 @@ class smolOS:
                  self.print_msg("Shutdown smolOS..., bye.")
                  sys.exit()
                  
-            except Exception as ex:
-                self.print_err("cmd error, " + str(ex))
-                pass
+      #      except Exception as ex:
+      #          self.print_err("cmd error, " + str(ex))
+      #          pass
  
  # - - - - - - - -
  
@@ -183,7 +189,7 @@ class smolOS:
     def man(self,cmd=""):
         try:
             desc = self.user_commands_manual[cmd]
-            print("\033[1m" + cmd + "\033[0m -", desc)
+            print(f"\033[1m{cmd}\033[0m - {desc}")
         except:
             self.print_err("Man not available for command " + cmd)
 
@@ -195,18 +201,18 @@ class smolOS:
         ok.sort()
         
         for k in ok:
-            print("\033[1m" + k + "\033[0m -", self.user_commands_manual[k])
+            print(f"\033[1m{k}\033[0m -{self.user_commands_manual[k]}")
         
         print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski, Mods by rbenrax.")
         print("Source code available at \033[4msmol.p1x.in/os/")
         print("Source code available at \033[4https://github.com/rbenrax/smolOS\033[0m")
 
     def print_err(self, error):
-        print("\n\033[1;37;41m<!>",error,"<!>\033[0m")
+        print(f"\n\033[1;37;41m<!>{error}<!>\033[0m")
         utime.sleep(1)
 
     def print_msg(self, message):
-        print("\n\033[1;34;47m->",message,"\033[0m")
+        print(f"\n\033[1;34;47m->{message}\033[0m")
         utime.sleep(0.5)
 
     def unknown_function(self):
@@ -262,9 +268,13 @@ class smolOS:
             fattr += 'x'
         else:
             fattr += '-'
-            
-        print('%s %7d %s %2d %02d:%02d %s' % (fattr, size, utls.MONTH[localtime[1]],
-              localtime[2], localtime[4], localtime[5], filename))
+        
+        #TODO: Check show speed
+        print(f"{fattr} {size:7} {utls.MONTH[localtime[1]]} " + \
+              f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename}")
+              
+        #print('%s %7d %s %2d %02d:%02d %s' % (fattr, size, utls.MONTH[localtime[1]],
+        #      localtime[2], localtime[4], localtime[5], filename))
 
         return size
 
@@ -314,7 +324,7 @@ class smolOS:
             self.print_err("Can not remove system file!")
         else:
             uos.remove(filename)
-            self.print_msg("File '{}' removed successfully.".format(filename))
+            self.print_msg(f"File {filename} removed successfully.")
 
     def py(self,filename=""):
         if filename == "":
@@ -347,12 +357,14 @@ class smolOS:
         f = gc.mem_free()
         a = gc.mem_alloc()
         t = f+a
-        p = '({0:.2f}%)'.format(f/t*100)
+        #p = '({0:.2f}%)'.format(f/t*100)
+        p = f'({f/t*100:.2f}%)'
         
         if mode=="-h":
-            print('\033[0mTotal.:\033[1m %7d bytes' % (t))
-            print('\033[0mAlloc.:\033[1m %7d bytes' % (a))
-            print('\033[0mFree..:\033[1m %7d bytes' % (f), p)
+            #print('\033[0mTotal.:\033[1m %7d bytes' % (t))
+            print(f'\033[0mTotal.:\033[1m {t:7} bytes')
+            print(f'\033[0mAlloc.:\033[1m {a:7} bytes')
+            print(f'\033[0mFree..:\033[1m {f:7} bytes {p}')
         else:
             d={"total": t, "alloc": a, "free": f, "%": p}
             print(d)
@@ -366,25 +378,48 @@ class smolOS:
         u = t - f
         
         if mode=="-h":
-            print('\033[0mTotal space:\033[1m %8d bytes' % (t))
-            print('\033[0mUsed space.:\033[1m %8d bytes' % (u))
-            print('\033[0mFree space.:\033[1m %8d bytes' % (f))
+            print(f'\033[0mTotal space:\033[1m {t:8} bytes')
+            print(f'\033[0mUsed space.:\033[1m {u:8} bytes')
+            print(f'\033[0mFree space.:\033[1m {f:8} bytes')
         else:
             d={"total": t, "used": u, "free": f}
             print(d)
             
     def lshw(self):
-        print("\033[0mBoard:\033[1m",self.board)
-        print("\033[0mMicroPython:\033[1m",uos.uname().release)
-        print("\033[0m"+ self.name + ":\033[1m",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
-        print("\033[0mFirmware:\033[1m",uos.uname().version)
-        turbo_msg = "\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
+        print(f"\033[0mBoard:\033[1m {self.board}")
+        print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
+        print(f"\033[0m{self.name} :\033[1m {self.version} (size: {uos.stat('main.py')[6]} bytes)")
+        print(f"\033[0mFirmware:\033[1m{uos.uname().version}")
+        
+        turbo_msg = f"\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
         if self.turbo:
             turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` for slow mode."
-        print("\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz",turbo_msg)
         
-    def led(self,cmd="on",lna="0"):
+        print(f"\033[0mCPU Speed:\033[1m{machine.freq()*0.000001}MHz {turbo_msg}")
+        
+    def led(self, cmd="on", lna="0"):
         ln=int(lna)
+        
+        # Test rgb leds pins with ln leds in each strip
+        if cmd=="rgb":
+            if ln < 1: return
+            import neopixel
+            for pn in self.rgb_led_pins:
+                np = neopixel.NeoPixel(machine.Pin(pn), ln, bpp=4)
+                for i in range(ln):
+                    np[i] = (255, 0, 0, 5)
+                    np.write()                
+                    utime.sleep(.200)
+                    np[i] = (0, 255, 0, 5)
+                    np.write()                
+                    utime.sleep(.200)
+                    np[i] = (0, 0, 255, 5)
+                    np.write()                
+                    utime.sleep(.200)
+                    np[i] = (0, 0, 0, 0)
+                    np.write()
+            return
+        
         if ln < 0 or ln>len(self.system_leds)-1:
             self.print_err("Led not found.")
             return
@@ -402,7 +437,7 @@ class smolOS:
                     led.value(0)
                     utime.sleep(0.05)
             return
-
+        
    # smolEDitor
     # Minimum viable text editor
     def ed(self, filename=""):
