@@ -41,6 +41,20 @@ def dumps(obj):
 def loads(data):
     return json.loads(data)
 
+def load_conf_file(path):
+    with open(path, "r") as bcf:
+        return load(bcf)
+
+# ---
+
+def human(bytes):
+    if bytes > 1024:
+        if bytes > 1024 * 1024:
+            return f"{bytes / (1024 * 1024):.2f}MB"
+        else:
+            return f"{bytes / 1024:.2f}KB"
+    return f"{bytes}B"
+
 # ---
 
 import sysdata

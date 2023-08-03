@@ -13,6 +13,9 @@ import utls
 
 class smolOS:
     def __init__(self):
+        
+        sys.path.append("/bin")
+        
         self.board = uos.uname()[4]
         self.name = "smolOS-" + uos.uname()[0]
         self.version = "0.2 rbenrax"
@@ -32,29 +35,33 @@ class smolOS:
         # <- 
         
         # Load board config
+        # TODO: Move to utls file management
         try:
-            with open("/etc/" + self.name + ".board", "r") as bcf:
-                bc=utls.load(bcf)
-
-                self.cpu_speed_range = bc["mcu"]["speed"] # Mhz
-                #print(self.cpu_speed_range)
+            #with open("/etc/" + self.name + ".board", "r") as bcf:
+            #    bc=utls.load(bcf)
                 
-                self.system_leds_pins=bc["ledio"][0].values()
-                #print(self.system_leds_pins)
-                
-                self.rgb_led_pins=bc["rgbio"][0].values()
-                #print(self.rgb_led_pins)
-                #...
+            bc=utls.load_conf_file("/etc/" + self.name + ".board")
+            
+            self.cpu_speed_range = bc["mcu"]["speed"] # Mhz
+            #print(self.cpu_speed_range)
+            
+            self.system_leds_pins=bc["ledio"][0].values()
+            #print(self.system_leds_pins)
+            
+            self.rgb_led_pins=bc["rgbio"][0].values()
+            #print(self.rgb_led_pins)
+            #...
 
-            with open("/etc/system.conf", "r") as scf:
-                sc=utls.load(scf)
+            #with open("/etc/system.conf", "r") as scf:
+            #    sc=utls.load(scf)
 
-                self.turbo = sc["turbo"]
-                #print(self.turbo)
-                
-                self.user_commands_aliases = sc["aliases"]
-                #print(self.user_commands_aliases)
-                #...
+            sc=utls.load_conf_file("/etc/system.conf")
+            self.turbo = sc["turbo"]
+            #print(self.turbo)
+            
+            self.user_commands_aliases = sc["aliases"]
+            #print(self.user_commands_aliases)
+            #...
                 
             print("Board config loaded.")
         except OSError as ex:
@@ -143,7 +150,6 @@ class smolOS:
 
         self.cls()
         self.welcome()
-
         self.led("boot", 0)
         #self.led("rgb", 1)
         
@@ -171,8 +177,10 @@ class smolOS:
         parts = cmd.split()
         if len(parts) > 0:
             command = parts[0]
+            
             if command in self.user_commands_aliases: # aliases support
                 command=self.user_commands_aliases[command]
+            
             if command in self.user_commands:
                 if len(parts) > 1:
                     arguments = parts[1:]
@@ -180,8 +188,31 @@ class smolOS:
                 else:
                     self.user_commands[command]()
             else:
-                self.unknown_function()
- 
+    
+                if utls.file_exists("/bin/" + command + ".py"):
+                    
+                    if len(command.split(".")) > 1:
+                        command = command[:-3]
+                    
+                    try:
+                        ins = __import__(command)
+                        if '__main__' in dir(ins):
+                            if len(parts) > 1:
+                                args = parts[1:]
+                                ins.__main__(args)
+                            else:
+                                ins.__main__(None)
+
+                    except Exception as e:
+                        print(f"Error executing script {command}")
+                        sys.print_exception(e)
+                    
+                    finally:
+                        del sys.modules[command]
+                            
+                else:
+                    self.unknown_function()
+
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
@@ -257,8 +288,11 @@ class smolOS:
         for file in uos.listdir():
             tsize += self.info(file, mode)
 
-        print("\nTotal: " + str(tsize) + " bytes")
-        
+        if 'h' in mode:
+            print(f"\nTotal: {utls.human(tsize)}")
+        else:
+            print(f"\nTotal: {tsize} bytes")
+            
     def info(self,filename="", mode="-a"):
         if not utls.file_exists(filename):
             self.print_err("File not found")
@@ -270,7 +304,7 @@ class smolOS:
         
         stat = utls.get_stat(filename)
         
-        mode = stat[0]
+        #mode = stat[0]
         size = stat[6]
         mtime = stat[8]
         localtime = utime.localtime(mtime)
