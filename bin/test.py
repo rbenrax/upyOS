@@ -1,5 +1,5 @@
 
-import time, sys, utls
+import time, sys, utls, sdata
 
 def __main__(args):
     
@@ -10,3 +10,5 @@ def __main__(args):
     print(utls.human(12274))
 
     time.sleep(1)
+    
+    print(sdata.sysconfig)
