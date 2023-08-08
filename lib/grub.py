@@ -1,10 +1,11 @@
 
 #print(sys.path)
 
+import sys
 import utime
 import uos
 import utls
-import sysdata
+import syscfg
 
 def init():
 
@@ -12,30 +13,21 @@ def init():
         uos.mkdir("/etc")
 
     # Create sysconfig
-    try:
 
-        name = "smolOS-" + uos.uname()[0]
-        board = uos.uname()[4]
-        sco = sysdata.SysData(board)
-        
-        if not utls.file_exists("/etc/" + name + ".board"):
-            with open("/etc/" + name + ".board", "w") as bcf:
-                utls.dump(sco.getBoard(), bcf)
-
-            print("Board config generated, you may config before continue.")
-            
-        if not utls.file_exists("/etc/system.conf"):
-            with open("/etc/system.conf", "w") as scf:
-                utls.dump(sco.getSysConf(), scf)
-
-            print("Sysconf creado.")
-            
+    file = "/etc/smolOS-" + uos.uname()[0] + ".board"
+    board = uos.uname()[4]
+    sco = syscfg.SysCfg(board)
     
-    except Exception as ex:
-        print(ex)
-
+    if not utls.file_exists(file):
+        utls.save_conf_file(sco.getBoard(), file)
+        print("Board config generated, you may config before continue.")
+        
+    if not utls.file_exists("/etc/system.conf"):
+        utls.save_conf_file(sco.getSysConf(), "/etc/system.conf")
+        print("Sysconf creado.")
+    
 try:
-    wait=5
+    wait=2
 
     print("\033[2J") # Clear screen
     print("\033[H")  # Goto 0,0
@@ -56,8 +48,8 @@ except KeyboardInterrupt:
      print("Grub canceled, smolOS booting aborted.")
      sys.exit()
      
-#except Exception as ex:
-#     print("Error: " + ex)
-
+except Exception as ex:
+    print(ex)
+    sys.print_exception()
 
         

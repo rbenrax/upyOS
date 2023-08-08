@@ -3,6 +3,7 @@
 
 # Mods by rbenrax
 
+import sdata
 import machine
 import uos
 import gc
@@ -14,57 +15,40 @@ import utls
 class smolOS:
     def __init__(self):
         
+        #del sys.modules[command]
+        #print(sys.modules)
+        
         sys.path.append("/bin")
         
         self.board = uos.uname()[4]
         self.name = "smolOS-" + uos.uname()[0]
         self.version = "0.2 rbenrax"
-           
-        # Serializable ->
-        #self.system_leds_pins=[12, 13]
-        #self.cpu_speed_range = {"slow":80,"turbo":80} # Mhz
-        #self.turbo = False
-
-        #self.user_commands_aliases = {
-        #    "h": "help",
-        #    "list": "ls",
-        #    "show": "cat",
-        #    "remove": "rm",
-        #    "edit": "vi"         
-        #}
-        # <- 
         
         # Load board config
-        # TODO: Move to utls file management
         try:
-            #with open("/etc/" + self.name + ".board", "r") as bcf:
-            #    bc=utls.load(bcf)
-                
-            bc=utls.load_conf_file("/etc/" + self.name + ".board")
-            
-            self.cpu_speed_range = bc["mcu"]["speed"] # Mhz
-            #print(self.cpu_speed_range)
-            
-            self.system_leds_pins=bc["ledio"][0].values()
-            #print(self.system_leds_pins)
-            
-            self.rgb_led_pins=bc["rgbio"][0].values()
-            #print(self.rgb_led_pins)
+            sdata.board=utls.load_conf_file("/etc/" + self.name + ".board")
+            self.cpu_speed_range = sdata.board["mcu"]["speed"] # Mhz
+            self.system_leds_pins=sdata.board["ledio"][0].values()
+            self.rgb_led_pins=sdata.board["rgbio"][0].values()
             #...
-
-            #with open("/etc/system.conf", "r") as scf:
-            #    sc=utls.load(scf)
-
-            sc=utls.load_conf_file("/etc/system.conf")
-            self.turbo = sc["turbo"]
-            #print(self.turbo)
-            
-            self.user_commands_aliases = sc["aliases"]
-            #print(self.user_commands_aliases)
-            #...
-                
             print("Board config loaded.")
+            
+            sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
+            self.turbo = sdata.sysconfig["turbo"]
+            self.user_commands_aliases = sdata.sysconfig["aliases"]
+            self.protected_files = sdata.sysconfig["pfiles"]
+            #...
+            print("System config loaded.")
+            
         except OSError as ex:
+            self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
+            self.system_leds_pins=[12, 13]
+            self.rgb_led_pins=[0]
+
+            self.turbo = False
+            self.user_commands_aliases = {"h": "help"}
+            self.protected_files = ["boot.py","main.py"]
+            
             print("Problem loading board config. " + str(ex))
             
         #except Exception as ex:
@@ -72,7 +56,6 @@ class smolOS:
         #pass
 
         #self.thread_running = False
-        self.protected_files = ["boot.py","main.py", "grub.py"]
 
         self.user_commands = {
             "help": self.help,
@@ -84,9 +67,8 @@ class smolOS:
             "rm": self.rm,
             "clear": self.cls,
             "turbo": self.toggle_turbo,
-            "vi": self.ed,
             "info": self.info,
-            "py": self.py,
+            "run": self.run,
             "led": self.led,
             "exe": self.exe,
             "pwd": self.pwd,
@@ -112,7 +94,7 @@ class smolOS:
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "vi": "text editor, filename is optional",
             "info": "information about a file",
-            "py": "runs user program",
+            "run": "runs external program",
             "led": "led <command> <led number>, manipulating on-board LED. Commands: `on`, `off`, Led number: [0,1,...]",
             "exe": "Running exec(code)",
             "pwd": "Show current directory",
@@ -124,15 +106,6 @@ class smolOS:
             "df" : "Show storage status",
             "lshw" : "Show hardware",
             "exit" : "Exit to Micropython shell"
-        }
-        self.ed_commands_manual = {
-            "help": "this help",
-            ">": "next page",
-            "<": "previous page",
-            "10 <line of text>": "replacing 10-th line with a line of text",
-            "append <lines>": "append new line(s) at the end of a file, default 1",
-            "write or save": "write changes to a file (not implemented yet)",
-            "quit": "quit"
         }
 
         self.boot()
@@ -146,7 +119,7 @@ class smolOS:
         for ln in self.system_leds_pins: #Leds Pins
             self.system_leds.append(machine.Pin(ln,machine.Pin.OUT))
             
-        ## Endd modules
+        ## End modules
 
         self.cls()
         self.welcome()
@@ -188,28 +161,42 @@ class smolOS:
                 else:
                     self.user_commands[command]()
             else:
-    
-                if utls.file_exists("/bin/" + command + ".py"):
-                    
-                    if len(command.split(".")) > 1:
-                        command = command[:-3]
+                tmp = command.split(".")
+                if len(tmp) == 2:
+                    cmd = tmp[0]
+                    ext = tmp[1]
+                else:
+                    cmd = command
+                    ext = ""
+
+                #print(line)
+                
+                if utls.file_exists("/bin/" + cmd + ".py"):
                     
                     try:
-                        ins = __import__(command)
+                        ins = __import__(cmd)
                         if '__main__' in dir(ins):
                             if len(parts) > 1:
                                 args = parts[1:]
                                 ins.__main__(args)
                             else:
-                                ins.__main__(None)
+                                ins.__main__("")
 
                     except Exception as e:
                         print(f"Error executing script {command}")
                         sys.print_exception(e)
                     
                     finally:
-                        del sys.modules[command]
-                            
+                        del sys.modules[cmd]
+
+                elif ext=="sh":
+                    
+                    try:
+                        self.run_sh_script("/bin/" + cmd + ".sh")
+                    except Exception as e:
+                        print(f"Error executing script {command}")
+                        sys.print_exception(e)
+                    
                 else:
                     self.unknown_function()
 
@@ -381,11 +368,15 @@ class smolOS:
             uos.remove(filename)
             self.print_msg(f"File {filename} removed successfully.")
 
-    def py(self,filename=""):
-        if filename == "":
-            self.print_err("Specify a file name to run (without .py).")
+    def run(self, fn=""):
+        if fn == "":
+            self.print_err("Specify a file name to run.")
             return
-        exec(open(filename+".py").read())
+        
+        if utls.file_exists(fn):
+            exec(open(fn).read())
+        else:
+            self.print_err(f"{fn} does not exists.")
 
     def exit(self):
         raise SystemExit
@@ -517,94 +508,6 @@ class smolOS:
                     led.value(0)
                     utime.sleep(0.05)
             return
-        
-   # smolEDitor
-    # Minimum viable text editor
-    def ed(self, filename=""):
-        self.page_size = 10
-        self.file_edited = False
-        print("Welcome to \033[7msmolEDitor\033[0m\nMinimum viable text editor for smol operating system")
-        try:
-            with open(filename,'r+') as file:
-                if filename in self.protected_files:
-                    self.print_err("Protected file. View only.")
-                self.print_msg("Loaded existing "+filename+" file.")
-                lines = file.readlines()
-                line_count = len(lines)
-                start_index = 0
 
-                while True:
-                    if start_index < line_count:
-                        end_index = min(start_index + self.page_size,line_count)
-                        print_lines = lines[start_index:end_index]
-
-                        print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\033[0m")
-
-                        for line_num,line in enumerate(print_lines,start=start_index + 1):
-                            print(line_num,":",line.strip())
-
-                    user_ed_input = input("\ned $: ")
-
-                    if user_ed_input =="quit":
-                        if self.file_edited:
-                            self.print_msg("file was edited, `save` it first or write `quit!`")
-                        else:
-                            self.print_msg("smolEDitor closed")
-                            break
-
-                    if user_ed_input == "quit!":
-                        self.print_msg("smolEDitor closed")
-                        break
-
-                    if user_ed_input == "help":
-                        self.man(self.ed_commands_manual)
-
-                    if user_ed_input == "append":
-                        line_count += 1
-                        lines.append("")
-
-                    if user_ed_input == ">":
-                        if start_index+self.page_size < line_count:
-                            start_index += self.page_size
-                        else:
-                            self.print_msg("There is no next page. This is the last page.")
-
-                    if user_ed_input == "<":
-                        if start_index-self.page_size >= 0:
-                            start_index -= self.page_size
-                        else:
-                            self.print_msg("Can not go back, it is a first page already.")
-
-                    if user_ed_input in ("save","write"):
-                        if filename in self.protected_files:
-                            self.print_err("Protected file")
-                        else:
-                            self.print_err("Saving not implemented yet")
-
-                    parts = user_ed_input.split(" ",1)
-                    if len(parts) == 2:
-                        if parts[0] == "append":
-                            new_lines = int(parts[1])
-                            line_count += new_lines
-                            for _ in range(new_lines):
-                                lines.append("")
-                        else:
-                            if filename in self.protected_files:
-                                self.print_err("Protected file")
-                            else:
-                                line_number = int(parts[0])
-                                new_content = parts[1]                                
-                                if line_number > 0 and line_number < line_count:
-                                    lines[line_number - 1] = new_content + "\n"
-                                else:
-                                    self.print_err("Invalid line number")
-                        self.file_edited = True
-
-        except OSError:
-            if filename == "":
-                self.print_err("Provide an existing file name after the `ed` command.")
-            else:
-                self.print_err("Failed to open the file.")
-            pass
 
 smol = smolOS()

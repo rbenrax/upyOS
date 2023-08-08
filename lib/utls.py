@@ -42,8 +42,12 @@ def loads(data):
     return json.loads(data)
 
 def load_conf_file(path):
-    with open(path, "r") as bcf:
-        return load(bcf)
+    with open(path, "r") as cf:
+        return load(cf)
+
+def save_conf_file(obj, path):
+    with open(path, "w") as cf:
+        dump(obj, cf)
 
 # ---
 
@@ -57,28 +61,21 @@ def human(bytes):
 
 # ---
 
-import sysdata
-if __name__ == "__main__":      
-    b=sysdata.SysData("ESP32C3 module with ESP32C3")
-
-    print(b.getBoard())
-
-    s=dumps(b.getBoard())
-    print(s)
-
-    o = loads(s)
-    b.setBoard(o)
-    
-    print(b.getBoard())
-    
-    with open("board.board", "w") as f:
-        s=dump(b.getBoard(), f)
-        print(s)
-        
-    with open("board.board", "e") as f:
-        o=load(f)
-        b.setBoard(o)
-        
-        print(b.getBoard())
+#import sysdata
+#if __name__ == "__main__":      
+#    b=sysdata.SysData("ESP32C3 module with ESP32C3")
+#    print(b.getBoard())
+#    s=dumps(b.getBoard())
+#    print(s)
+#    o = loads(s)
+#    b.setBoard(o)
+#    print(b.getBoard())
+#    with open("board.board", "w") as f:
+#        s=dump(b.getBoard(), f)
+#        print(s)
+#    with open("board.board", "e") as f:
+#        o=load(f)
+#        b.setBoard(o)
+#        print(b.getBoard())
         
     
