@@ -10,10 +10,10 @@ led rgb 1
 led off 0
 
 # List files in current directory (hidden files included and human readable)
-#ls -lah
+ls -lah
 
 # List board hardware
-#lshw -f
+lshw -f
 
 # Scan for i2c devices
 #i2cscan
