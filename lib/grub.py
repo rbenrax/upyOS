@@ -50,6 +50,6 @@ except KeyboardInterrupt:
      
 except Exception as ex:
     print(ex)
-    sys.print_exception()
+    #sys.print_exception()
 
         

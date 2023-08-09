@@ -28,8 +28,8 @@ class smolOS:
         try:
             sdata.board=utls.load_conf_file("/etc/" + self.name + ".board")
             self.cpu_speed_range = sdata.board["mcu"]["speed"] # Mhz
-            self.system_leds_pins=sdata.board["ledio"][0].values()
-            self.rgb_led_pins=sdata.board["rgbio"][0].values()
+            self.system_leds_io=sdata.board["led"][0].values()
+            self.rgb_led_io=sdata.board["rgb"][0].values()
             #...
             print("Board config loaded.")
             
@@ -42,8 +42,8 @@ class smolOS:
             
         except OSError as ex:
             self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
-            self.system_leds_pins=[12, 13]
-            self.rgb_led_pins=[0]
+            self.system_leds_io=[12, 13]
+            self.rgb_led_io=[0]
 
             self.turbo = False
             self.user_commands_aliases = {"h": "help"}
@@ -116,7 +116,7 @@ class smolOS:
 
         #TODO: Load modules
         self.system_leds = []
-        for ln in self.system_leds_pins: #Leds Pins
+        for ln in self.system_leds_io: #Leds gpios
             self.system_leds.append(machine.Pin(ln,machine.Pin.OUT))
             
         ## End modules
@@ -471,11 +471,11 @@ class smolOS:
     def led(self, cmd="on", lna="0"):
         ln=int(lna)
         
-        # Test rgb leds pins with ln leds in each strip
+        # Test rgb leds gpios with ln leds in each strip
         if cmd=="rgb":
             if ln < 1: return
             import neopixel
-            for pn in self.rgb_led_pins:
+            for pn in self.rgb_led_io:
                 np = neopixel.NeoPixel(machine.Pin(pn), ln, bpp=4)
                 for i in range(ln):
                     np[i] = (255, 0, 0, 5)
