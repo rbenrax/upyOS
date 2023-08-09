@@ -19,6 +19,7 @@ class smolOS:
         #print(sys.modules)
         
         sys.path.append("/bin")
+        sys.path.append("/extlib")
         
         self.board = uos.uname()[4]
         self.name = "smolOS-" + uos.uname()[0]
