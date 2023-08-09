@@ -1,4 +1,4 @@
 led rgb 1
 ls
-#lshw -f
+lshw -f
 #exit
