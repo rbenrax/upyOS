@@ -24,9 +24,10 @@ Actual Development:
 
 - Also can call simple shell scripts, including /etc/rc.local, the start up script, every script can share argument stored in sdata.sysconfig[env] dictionary.
 
+- Added editor from https://github.com/octopusengine/micropython-shell/tree/master
+
 TODO List:
 - Enhance an make external ls, cp, mv, etc. commands
-- Editor, pending a external command as editor
 - Add regexp and directories to file managements
 - Add grep, du, diff, find, tar, ping, ip, uname and hostname.
 - Revise protected files and directories
