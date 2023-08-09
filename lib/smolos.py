@@ -22,7 +22,7 @@ class smolOS:
         
         self.board = uos.uname()[4]
         self.name = "smolOS-" + uos.uname()[0]
-        self.version = "0.2 rbenrax"
+        self.version = "0.3 rbenrax"
         
         # Load board config
         try:
@@ -111,9 +111,12 @@ class smolOS:
         self.boot()
 
     def boot(self):
+
         if self.turbo:
             machine.freq(self.cpu_speed_range["turbo"] * 1000000)
-
+        else:
+            machine.freq(self.cpu_speed_range["slow"] * 1000000)
+            
         #TODO: Load modules
         self.system_leds = []
         for ln in self.system_leds_io: #Leds gpios
@@ -139,7 +142,8 @@ class smolOS:
             except KeyboardInterrupt:
                  self.print_msg("Shutdown smolOS..., bye.")
                  sys.exit()
-                 
+      
+      # TODO: Enable next lines at end o development
       #      except Exception as ex:
       #          self.print_err("cmd error, " + str(ex))
       #          pass
@@ -280,7 +284,7 @@ class smolOS:
         else:
             print(f"\nTotal: {tsize} bytes")
             
-    def info(self,filename="", mode="-a"):
+    def info(self, filename="", mode="-a"):
         if not utls.file_exists(filename):
             self.print_err("File not found")
             return
@@ -311,13 +315,14 @@ class smolOS:
         else:
             fattr += '-'
         
-        #TODO: Check show speed
-        print(f"{fattr} {size:7} {utls.MONTH[localtime[1]]} " + \
+        if "h" in mode:
+            ssize = f"{utls.human(size)}"
+        else:
+            ssize = f"{size:7}"
+            
+        print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} " + \
               f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename}")
               
-        #print('%s %7d %s %2d %02d:%02d %s' % (fattr, size, utls.MONTH[localtime[1]],
-        #      localtime[2], localtime[4], localtime[5], filename))
-
         return size
 
     def cat(self,filename=""):

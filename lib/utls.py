@@ -54,28 +54,15 @@ def save_conf_file(obj, path):
 def human(bytes):
     if bytes > 1024:
         if bytes > 1024 * 1024:
-            return f"{bytes / (1024 * 1024):.2f}MB"
+            return f"{bytes / (1024 * 1024):7.2f}MB"
         else:
-            return f"{bytes / 1024:.2f}KB"
-    return f"{bytes}B"
+            return f"{bytes / 1024:7.2f}KB"
+    return f"{bytes:7}B"
 
 # ---
 
-#import sysdata
-#if __name__ == "__main__":      
-#    b=sysdata.SysData("ESP32C3 module with ESP32C3")
-#    print(b.getBoard())
-#    s=dumps(b.getBoard())
-#    print(s)
-#    o = loads(s)
-#    b.setBoard(o)
-#    print(b.getBoard())
-#    with open("board.board", "w") as f:
-#        s=dump(b.getBoard(), f)
-#        print(s)
-#    with open("board.board", "e") as f:
-#        o=load(f)
-#        b.setBoard(o)
-#        print(b.getBoard())
+
+if __name__ == "__main__":      
+    print(human(1257))
         
     
