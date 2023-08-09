@@ -18,11 +18,11 @@ VCC-GND Studio YD-2040
 
 Actual Development:
 
-- /lib/grubs.py the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, smolos process smolos will read its content and will enable the resources to be used by the system, modules, external commands, etc.
+- /lib/grubs.py the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, smolos process will read its content and will enable the resources to be used by the system, modules, external commands, etc.
 
-- /lib/smolos.py in the next load, is the OS core, has internal and external commands (/bin directory), all commands shold be moved to external commands to reduce the memory use.
+- /lib/smolos.py is the next load, is the OS core, has internal and external commands (/bin directory), all commands will be moved to external commands to reduce the memory use.
 
-- Also can call simple shell scripts, including /etc/rc.local, the start up script, every script can share argument stored in sdata.sysconfig[env] dictionary.
+- Actual implementation also can call simple shell scripts, including /etc/rc.local, the start up script, every script can share argument stored in sdata.sysconfig[env] dictionary.
 
 - Added editor from https://github.com/octopusengine/micropython-shell/tree/master
 
