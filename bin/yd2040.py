@@ -1,3 +1,6 @@
+
+# test PIO for rpi board yd2040 
+
 import machine
 import utime
 
