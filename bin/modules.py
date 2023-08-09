@@ -1,5 +1,9 @@
 import sys
 import sdata
 
+#TODO: Prettify
+
 def __main__(args):
-    print(sys.modules)
+    
+    for k , v in sys.modules.items():
+        print(f"{k}\t\t{v}")

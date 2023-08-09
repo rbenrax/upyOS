@@ -31,9 +31,9 @@ def __main__(args):
         sta_if.active(False)
     elif cmd == "status":
         print (f'WiFi is {"Active" if sta_if.active() == True else "Inactive"}')
-        print ("fStatus {sta_if.status()}")
+        print (f"Status {sta_if.status()}")
         if sta_if.isconnected():
-            print (f'"WiFi connection is {"Established" if sta_if.isconnected() else "Not connected"}')
+            print (f'WiFi connection is {"Established" if sta_if.isconnected() else "Not connected"}')
     elif cmd == "scan":
         for net in sta_if.scan():
             print ("SSID\tUnknown\tCHN\tSignal")
