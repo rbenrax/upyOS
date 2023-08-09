@@ -30,6 +30,7 @@ TODO List:
 - Add regexp and directories to file managements
 - Add grep, du, diff, find, tar, ping, ip, uname and hostname.
 - Revise protected files and directories
+- List external commands
 
 Wishlist is open ;)
 
