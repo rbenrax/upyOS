@@ -1,6 +1,34 @@
+# Simple rc.local script for testing 
+
+# Turn on led 0
+led on 0
+
+# Test rgb led in board (if board has one)
 led rgb 1
-ls
+
+# Turn off led 0
+led off 0
+
+# List files in current directory (hidden files included and human readable)
+#ls -lah
+
+# List board hardware
 #lshw -f
-#ifconfig
-i2cscan
-exit
+
+# Scan for i2c devices
+#i2cscan
+
+# Turn off wifi in cliente mode
+wifi off
+
+# Turn on wifi in cliente mode
+wifi on
+
+# Connect to wifi router
+#wifi connect <SSID> <PASS>	
+
+# Show Ip data
+ifconfig
+
+# Exit form OS tu python REPL
+#exit
