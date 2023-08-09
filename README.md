@@ -16,25 +16,20 @@ VCC-GND Studio YD-2040
 ![VCC-GND Studio](media/YD-2040-PIN.png)
 ![luatos on esp32-c3](media/smolos_01.png )
 
+Actual Development:
+
+- /lib/grubs.py the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, smolos process smolos will read its content and will enable the resources to be used by the system, modules, external commands, etc.
+
+- /lib/smolos.py in the next load, is the OS core, has internal and external commands (/bin directory), all commands shold be moved to external commands to reduce the memory use.
+
+- Also can call simple shell scripts, including /etc/rc.local, the start up script, every script can share argument stored in sdata.sysconfig[env] dictionary.
+
 TODO List:
-
-X Grub will be the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, system process smolos will read its content and will enable the resources to be used by the system, modules, lshw, etc.
-
-- Add smolos base class for programs and modules.
-  
-- Add /lib/mod, will contain all modules inherit from basemod.py and will recieve refs from kernel, ex. board resources, wifi, etc.
-When system boots will call the modules to test resources available in the board definition.
-
-X add smolos.conf in /etc directory, will contain system configutation parameters.
-  
-- Enhance ls, cp, mv commands
-- Editor to external .py
+- Enhance an make external ls, cp, mv, etc. commands
+- Editor, pending a external command as editor
 - Add regexp and directories to file managements
-- Add Wifi client and AP
-- Add grep, du, diff, find, tar, ping, ip, uname, hostname and wget.
-- Hidden files
-- /etc/rc.local
-- 
+- Add grep, du, diff, find, tar, ping, ip, uname and hostname.
+- Revise protected files and directories
 
 Wishlist is open ;)
 
