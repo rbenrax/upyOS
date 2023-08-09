@@ -25,7 +25,7 @@ wifi off
 wifi on
 
 # Connect to wifi router
-#wifi connect <SSID> <PASS>	
+#wifi connect <SSID> <PASS>
 
 # Show Ip data
 ifconfig
