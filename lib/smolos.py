@@ -13,9 +13,13 @@ import sys
 
 class smolOS:
     def __init__(self):
-        
-        #del sys.modules[command]
-        #print(sys.modules)
+
+        try:
+            del sys.modules["syscfg"]
+            del sys.modules["grub"]
+            #print(sys.modules)
+        except:
+            pass
         
         sys.path.append("/bin")
         sys.path.append("/extlib")
