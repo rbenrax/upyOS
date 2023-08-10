@@ -47,7 +47,8 @@ class smolOS:
             self.protected_files = ["boot.py","main.py"]
             
             print("Problem loading board config. " + str(ex))
-            
+        
+        # At end of develpment, enable next lines
         #except Exception as ex:
         #    print(ex)
         #pass
