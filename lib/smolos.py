@@ -29,8 +29,6 @@ class smolOS:
         try:
             sdata.board=utls.load_conf_file("/etc/" + self.name + ".board")
             self.cpu_speed_range = sdata.board["mcu"]["speed"] # Mhz
-            self.system_leds_io=sdata.board["led"][0].values()
-            self.rgb_led_io=sdata.board["rgb"][0].values()
             #...
             print("Board config loaded.")
             
@@ -43,8 +41,6 @@ class smolOS:
             
         except OSError as ex:
             self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
-            self.system_leds_io=[12, 13]
-            self.rgb_led_io=[0]
 
             self.turbo = False
             self.user_commands_aliases = {"h": "help"}
@@ -70,7 +66,6 @@ class smolOS:
             "turbo": self.toggle_turbo,
             "info": self.info,
             "run": self.run,
-            "led": self.led,
             "exe": self.exe,
             "pwd": self.pwd,
             "mkdir": self.mkdir,
@@ -95,7 +90,6 @@ class smolOS:
             "vi": "text editor, filename is optional",
             "info": "information about a file",
             "run": "runs external program",
-            "led": "led <command> <led number>, manipulating on-board LED. Commands: `on`, `off`, Led number: [0,1,...]",
             "exe": "Running exec(code)",
             "pwd": "Show current directory",
             "mkdir": "Make directory",
@@ -116,18 +110,13 @@ class smolOS:
         else:
             machine.freq(self.cpu_speed_range["slow"] * 1000000)
             
-        #TODO: Load modules
-        self.system_leds = []
-        for ln in self.system_leds_io: #Leds gpios
-            self.system_leds.append(machine.Pin(ln,machine.Pin.OUT))
+        ##TODO: Load modules
             
         ## End modules
 
         self.cls()
         self.welcome()
-        self.led("boot", 0)
-        #self.led("rgb", 1)
-        
+
         #/etc/rc.local
         print("\n\033[0mLaunching rc.local commands:\n")
         self.run_sh_script("/etc/rc.local")
@@ -468,46 +457,5 @@ class smolOS:
                 self.print_err("lshw error, " + str(ex))
                 pass
         
-    def led(self, cmd="on", lna="0"):
-        ln=int(lna)
-        
-        # Test rgb leds gpios with ln leds in each strip
-        if cmd=="rgb":
-            if ln < 1: return
-            import neopixel
-            for pn in self.rgb_led_io:
-                np = neopixel.NeoPixel(machine.Pin(pn), ln, bpp=4)
-                for i in range(ln):
-                    np[i] = (255, 0, 0, 5)
-                    np.write()                
-                    utime.sleep(.200)
-                    np[i] = (0, 255, 0, 5)
-                    np.write()                
-                    utime.sleep(.200)
-                    np[i] = (0, 0, 255, 5)
-                    np.write()                
-                    utime.sleep(.200)
-                    np[i] = (0, 0, 0, 0)
-                    np.write()
-            return
-        
-        if ln < 0 or ln>len(self.system_leds)-1:
-            self.print_err("Led not found.")
-            return
-        if cmd in ("on",""):
-            self.system_leds[ln].value(1)
-            return
-        if cmd=="off":
-            self.system_leds[ln].value(0)
-            return
-        if cmd=="boot":
-            for led in self.system_leds:
-                for _ in range(2):
-                    led.value(1)
-                    utime.sleep(0.1)
-                    led.value(0)
-                    utime.sleep(0.05)
-            return
-
 
 smol = smolOS()
