@@ -21,14 +21,14 @@ class smolOS:
         sys.path.append("/bin")
         sys.path.append("/extlib")
         
-        self.board = uos.uname()[4]
-        self.name = "smolOS-" + uos.uname()[0]
-        self.version = "0.3 rbenrax"
+        sdata.name    = "smolOS-" + uos.uname()[0]
+        sdata.version = "0.3 rbenrax"
         
         # Load board config
         try:
-            sdata.board=utls.load_conf_file("/etc/" + self.name + ".board")
+            sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
             self.cpu_speed_range = sdata.board["mcu"]["speed"] # Mhz
+            #print(sdata.board)
             #...
             print("Board config loaded.")
             
@@ -73,7 +73,6 @@ class smolOS:
             "cd": self.chdir,
             "free" : self.free,
             "df" : self.df,
-            "lshw" : self.lshw,
             "exit" : self.exit
             
         }
@@ -97,7 +96,6 @@ class smolOS:
             "cd": "Change default directory",
             "free" : "Show ram status",
             "df" : "Show storage status",
-            "lshw" : "Show hardware",
             "exit" : "Exit to Micropython shell"
         }
 
@@ -210,7 +208,7 @@ class smolOS:
 
     def welcome(self):
         self.banner()
-        self.lshw()
+        self.run_cmd("lshw.py -b")
         
         print("\n\033[1mMemory:")
         self.free()
@@ -225,7 +223,7 @@ class smolOS:
             self.print_err("Man not available for command " + cmd)
 
     def help(self):
-        print(self.name + " version " + self.version + " user commands:\n")
+        print(sdata.name + " version " + sdata.version + " user commands:\n")
 
         # Ordering
         ok = list(self.user_commands_manual.keys())
@@ -395,14 +393,12 @@ class smolOS:
         f = gc.mem_free()
         a = gc.mem_alloc()
         t = f+a
-        #p = '({0:.2f}%)'.format(f/t*100)
         p = f'({f/t*100:.2f}%)'
         
         if mode=="-h":
-            #print('\033[0mTotal.:\033[1m %7d bytes' % (t))
             print(f'\033[0mTotal.:\033[1m {t:7} bytes')
             print(f'\033[0mAlloc.:\033[1m {a:7} bytes')
-            print(f'\033[0mFree..:\033[1m {f:7} bytes {p}')
+            print(f'\033[0mFree..:\033[1m {f:7} bytes {p}\033[0m')
         else:
             d={"total": t, "alloc": a, "free": f, "%": p}
             print(d)
@@ -418,44 +414,10 @@ class smolOS:
         if mode=="-h":
             print(f'\033[0mTotal space:\033[1m {t:8} bytes')
             print(f'\033[0mUsed space.:\033[1m {u:8} bytes')
-            print(f'\033[0mFree space.:\033[1m {f:8} bytes')
+            print(f'\033[0mFree space.:\033[1m {f:8} bytes\033[0m')
         else:
             d={"total": t, "used": u, "free": f}
             print(d)
             
-    def lshw(self, mode="-b"):
-        print(f"\033[0mBoard:\033[1m {self.board}")
-        print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
-        print(f"\033[0m{self.name} :\033[1m {self.version} (size: {uos.stat('main.py')[6]} bytes)")
-        print(f"\033[0mFirmware:\033[1m{uos.uname().version}")
-        
-        turbo_msg = f"\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
-        if self.turbo:
-            turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` for slow mode."
-        
-        print(f"\033[0mCPU Speed:\033[1m{machine.freq()*0.000001}MHz {turbo_msg}")
-        
-        # Full hardware       
-        if mode=="-f":
-            try:
-                with open("/etc/" + self.name + ".board", "r") as bcf:
-                    bc=utls.load(bcf)
-                    for e in bc.keys():
-                        i=bc[e]
-                        #TODO prettify
-                        #print(f"{type(i)}")
-                        #if type(i) is dict:
-                        #    print(f"{e}: {i}")
-                        #if type(i) is list:
-                        #    print(f"{e}: {i}")
-                        #else:
-                        #    print(f"{e}: {i}")
-                            
-                        print(f"{e}: {i}")
-
-            except Exception as ex:
-                self.print_err("lshw error, " + str(ex))
-                pass
-        
 
 smol = smolOS()

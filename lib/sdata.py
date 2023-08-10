@@ -1,2 +1,5 @@
+name    = ""
+version = ""
+
 board={}
 sysconfig={}
