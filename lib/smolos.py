@@ -318,7 +318,10 @@ class smolOS:
 
     def ls(self, mode="-l"):
         tsize=0
-        for file in uos.listdir():
+        
+        tmp=uos.listdir()
+        tmp.sort()
+        for file in tmp:
             tsize += self.info(file, mode)
 
         if 'h' in mode:
@@ -352,7 +355,7 @@ class smolOS:
         else:
             fattr += "rw"
 
-        if ".py" in filename:
+        if ".py" in filename:?
             fattr += 'x'
         else:
             fattr += '-'
