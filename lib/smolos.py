@@ -4,13 +4,12 @@
 # Mods by rbenrax
 
 import sdata
+import utls
 import machine
 import uos
 import gc
 import utime
 import sys
-import json
-import utls
 
 class smolOS:
     def __init__(self):
