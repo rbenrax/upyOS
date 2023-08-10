@@ -199,6 +199,69 @@ class smolOS:
                     if len(cmd)>1 and cmd[0]=="#": continue
                     self.run_cmd(cmd)
  
+    def run(self, fn=""):
+        if fn == "":
+            self.print_err("Specify a file name to run.")
+            return
+        
+        if utls.file_exists(fn):
+            exec(open(fn).read())
+        else:
+            self.print_err(f"{fn} does not exists.")
+
+    def exe(self,command):
+        exec(command)
+        
+    def exit(self):
+        raise SystemExit
+ 
+    def free(self, mode="-h"):
+        gc.collect()
+        
+        f = gc.mem_free()
+        a = gc.mem_alloc()
+        t = f+a
+        p = f'({f/t*100:.2f}%)'
+        
+        if mode=="-h":
+            print(f'\033[0mTotal.:\033[1m {t:7} bytes')
+            print(f'\033[0mAlloc.:\033[1m {a:7} bytes')
+            print(f'\033[0mFree..:\033[1m {f:7} bytes {p}\033[0m')
+        else:
+            d={"total": t, "alloc": a, "free": f, "%": p}
+            print(d)
+            
+    def df(self, mode="-h", path="/"):
+        
+        bit_tuple = uos.statvfs(path)
+        blksize = bit_tuple[0]  # system block size
+        t = bit_tuple[2] * blksize
+        f = bit_tuple[3] * blksize
+        u = t - f
+        
+        if mode=="-h":
+            print(f'\033[0mTotal space:\033[1m {t:8} bytes')
+            print(f'\033[0mUsed space.:\033[1m {u:8} bytes')
+            print(f'\033[0mFree space.:\033[1m {f:8} bytes\033[0m')
+        else:
+            d={"total": t, "used": u, "free": f}
+            print(d) 
+ 
+    def toggle_turbo(self):
+        self.turbo = not self.turbo
+        if self.turbo:
+            freq = self.cpu_speed_range["turbo"]
+        else:
+            freq = self.cpu_speed_range["slow"]
+        machine.freq(freq * 1000000)
+        self.print_msg("CPU speed set to "+str(freq)+" Mhz")
+
+    def cls(self):
+         print("\033[2J")
+         print("\033[H")
+ 
+ # - - -
+ 
     def banner(self):
         print("\033[1;33;44m                                 ______  _____")
         print("           _________ ___  ____  / / __ \/ ___/")
@@ -248,18 +311,7 @@ class smolOS:
     def unknown_function(self):
         self.print_err("unknown function. Try 'help'.")
 
-    def toggle_turbo(self):
-        self.turbo = not self.turbo
-        if self.turbo:
-            freq = self.cpu_speed_range["turbo"]
-        else:
-            freq = self.cpu_speed_range["slow"]
-        machine.freq(freq * 1000000)
-        self.print_msg("CPU speed set to "+str(freq)+" Mhz")
-
-    def cls(self):
-         print("\033[2J")
-         print("\033[H")
+# - - 
 
     def ls(self, mode="-l"):
         tsize=0
@@ -360,22 +412,6 @@ class smolOS:
             uos.remove(filename)
             self.print_msg(f"File {filename} removed successfully.")
 
-    def run(self, fn=""):
-        if fn == "":
-            self.print_err("Specify a file name to run.")
-            return
-        
-        if utls.file_exists(fn):
-            exec(open(fn).read())
-        else:
-            self.print_err(f"{fn} does not exists.")
-
-    def exit(self):
-        raise SystemExit
-
-    def exe(self,command):
-        exec(command)
-
     def pwd(self):
         print(uos.getcwd())
        
@@ -387,38 +423,5 @@ class smolOS:
         
     def chdir(self, path=""):
         uos.chdir(path)
-        
-    def free(self, mode="-h"):
-        gc.collect()
-        
-        f = gc.mem_free()
-        a = gc.mem_alloc()
-        t = f+a
-        p = f'({f/t*100:.2f}%)'
-        
-        if mode=="-h":
-            print(f'\033[0mTotal.:\033[1m {t:7} bytes')
-            print(f'\033[0mAlloc.:\033[1m {a:7} bytes')
-            print(f'\033[0mFree..:\033[1m {f:7} bytes {p}\033[0m')
-        else:
-            d={"total": t, "alloc": a, "free": f, "%": p}
-            print(d)
-            
-    def df(self, mode="-h", path="/"):
-        
-        bit_tuple = uos.statvfs(path)
-        blksize = bit_tuple[0]  # system block size
-        t = bit_tuple[2] * blksize
-        f = bit_tuple[3] * blksize
-        u = t - f
-        
-        if mode=="-h":
-            print(f'\033[0mTotal space:\033[1m {t:8} bytes')
-            print(f'\033[0mUsed space.:\033[1m {u:8} bytes')
-            print(f'\033[0mFree space.:\033[1m {f:8} bytes\033[0m')
-        else:
-            d={"total": t, "used": u, "free": f}
-            print(d)
-            
 
 smol = smolOS()
