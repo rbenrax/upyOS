@@ -76,7 +76,6 @@ class smolOS:
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
             "cd": self.chdir,
-            "touch": self.touch,
             "free" : self.free,
             "df" : self.df,
             "lshw" : self.lshw,
@@ -102,7 +101,6 @@ class smolOS:
             "mkdir": "Make directory",
             "rmdir": "Remove directory",
             "cd": "Change default directory",
-            "touch": "touch <filename> <line content1> <line content2> <line content3>, Create or add a line to a file with three fields",
             "free" : "Show ram status",
             "df" : "Show storage status",
             "lshw" : "Show hardware",
@@ -402,10 +400,6 @@ class smolOS:
     def chdir(self, path=""):
         uos.chdir(path)
         
-    def touch(self, filename="", c1="", c2="", c3=""):
-        with open(filename, "a") as file:
-            file.write(c1+c2+c3+"\n")
-
     def free(self, mode="-h"):
         gc.collect()
         
