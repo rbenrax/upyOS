@@ -59,10 +59,21 @@ def human(bytes):
             return f"{bytes / 1024:7.2f}KB"
     return f"{bytes:7}B"
 
+def tspaces(t, n=12, ab="a", fc=" "):
+    """Fill a text(t) with a number (n) of spaces after or before (ab) with a fill character (fc)"""
+    tl=len(t)
+    f=n-tl
+    if f < 2: return t
+    if ab == "a":
+        t = t + (fc*f)
+    else:
+        t = (fc*f) + t
+    return t
+
 # ---
 
 
 if __name__ == "__main__":      
     print(human(1257))
-        
+    print(tspaces("rafa", 12, "b", " "))
     

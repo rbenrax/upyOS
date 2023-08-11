@@ -1,4 +1,5 @@
 import sys
+import utls
 import sdata
 
 #TODO: Prettify
@@ -6,4 +7,4 @@ import sdata
 def __main__(args):
     
     for k , v in sys.modules.items():
-        print(f"{k}\t\t{v}")
+        print(f"{utls.tspaces(k, 12, "a")}{v}")

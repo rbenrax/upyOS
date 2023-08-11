@@ -51,7 +51,6 @@ class smolOS:
             
             print("Problem loading board config. " + str(ex))
         
-        # At end of develpment, enable next lines
         #except Exception as ex:
         #    print(ex)
         #pass
@@ -134,9 +133,9 @@ class smolOS:
                  sys.exit()
       
       # TODO: Enable next lines at end o development
-      #      except Exception as ex:
-      #          self.print_err("cmd error, " + str(ex))
-      #          pass
+            except Exception as ex:
+                self.print_err("cmd error, " + str(ex))
+                pass
  
  # - - - - - - - -
  
@@ -431,3 +430,4 @@ class smolOS:
         uos.chdir(path)
 
 smol = smolOS()
+

@@ -12,3 +12,5 @@ def __main__(args):
     time.sleep(1)
     
     print(sdata.sysconfig)
+
+    print(utls.tspaces("rafa", 20, "a"))
