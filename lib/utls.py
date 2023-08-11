@@ -54,10 +54,19 @@ def save_conf_file(obj, path):
 def human(bytes):
     if bytes > 1024:
         if bytes > 1024 * 1024:
-            return f"{bytes / (1024 * 1024):7.2f}MB"
+            tspaces("rafa", 12, "b", " ")
+            return f"{bytes / (1024 * 1024):7.2b}M"
         else:
-            return f"{bytes / 1024:7.2f}KB"
-    return f"{bytes:7}B"
+            return f"{bytes / 1024:7.2f}K"
+    return f"{bytes:7} "
+
+#def human(bytes):
+#    if bytes > 1024:
+#        if bytes > 1024 * 1024:
+#            return tspaces(f"{bytes / (1024 * 1024):7.2b}MB", 12, "b")
+#        else:
+#            return tspaces(f"{bytes / 1024:7.2f}KB", 12, "b")
+#    return tspaces(f"{bytes:7}B", 12, "b")
 
 def tspaces(t, n=12, ab="a", fc=" "):
     """Fill a text(t) with a number (n) of spaces after or before (ab) with a fill character (fc)"""

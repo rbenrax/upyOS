@@ -10,10 +10,11 @@ led rgb 1
 led off 0
 
 # List files in current directory (hidden files included and human readable)
+cd bin
 ls -lah
 
 # List board hardware
-lshw -f
+#lshw -f
 
 # Scan for i2c devices
 #i2cscan
@@ -29,6 +30,8 @@ wifi on
 
 # Show Ip data
 ifconfig
+
+#test
 
 # Exit form OS tu python REPL
 #exit
