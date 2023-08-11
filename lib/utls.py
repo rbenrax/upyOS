@@ -54,7 +54,6 @@ def save_conf_file(obj, path):
 def human(bytes):
     if bytes > 1024:
         if bytes > 1024 * 1024:
-            tspaces("rafa", 12, "b", " ")
             return f"{bytes / (1024 * 1024):7.2b}M"
         else:
             return f"{bytes / 1024:7.2f}K"
