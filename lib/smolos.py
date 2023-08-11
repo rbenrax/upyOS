@@ -5,9 +5,8 @@
 
 import sdata
 import utls
-import machine
+from machine import freq
 import uos
-import gc
 import utime
 import sys
 
@@ -74,8 +73,6 @@ class smolOS:
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
             "cd": self.chdir,
-            "free" : self.free,
-            "df" : self.df,
             "exit" : self.exit
             
         }
@@ -93,12 +90,11 @@ class smolOS:
             "info": "information about a file",
             "run": "runs external program",
             "exe": "Running exec(code)",
+            "run": "Run python module",
             "pwd": "Show current directory",
             "mkdir": "Make directory",
             "rmdir": "Remove directory",
             "cd": "Change default directory",
-            "free" : "Show ram status",
-            "df" : "Show storage status",
             "exit" : "Exit to Micropython shell"
         }
 
@@ -107,9 +103,9 @@ class smolOS:
     def boot(self):
 
         if self.turbo:
-            machine.freq(self.cpu_speed_range["turbo"] * 1000000)
+            freq(self.cpu_speed_range["turbo"] * 1000000)
         else:
-            machine.freq(self.cpu_speed_range["slow"] * 1000000)
+            freq(self.cpu_speed_range["slow"] * 1000000)
             
         ##TODO: Load modules
             
@@ -217,46 +213,14 @@ class smolOS:
     def exit(self):
         raise SystemExit
  
-    def free(self, mode="-h"):
-        gc.collect()
-        
-        f = gc.mem_free()
-        a = gc.mem_alloc()
-        t = f+a
-        p = f'({f/t*100:.2f}%)'
-        
-        if mode=="-h":
-            print(f'\033[0mTotal.:\033[1m {t:7} bytes')
-            print(f'\033[0mAlloc.:\033[1m {a:7} bytes')
-            print(f'\033[0mFree..:\033[1m {f:7} bytes {p}\033[0m')
-        else:
-            d={"total": t, "alloc": a, "free": f, "%": p}
-            print(d)
-            
-    def df(self, mode="-h", path="/"):
-        
-        bit_tuple = uos.statvfs(path)
-        blksize = bit_tuple[0]  # system block size
-        t = bit_tuple[2] * blksize
-        f = bit_tuple[3] * blksize
-        u = t - f
-        
-        if mode=="-h":
-            print(f'\033[0mTotal space:\033[1m {t:8} bytes')
-            print(f'\033[0mUsed space.:\033[1m {u:8} bytes')
-            print(f'\033[0mFree space.:\033[1m {f:8} bytes\033[0m')
-        else:
-            d={"total": t, "used": u, "free": f}
-            print(d) 
- 
     def toggle_turbo(self):
         self.turbo = not self.turbo
         if self.turbo:
-            freq = self.cpu_speed_range["turbo"]
+            f = self.cpu_speed_range["turbo"]
         else:
-            freq = self.cpu_speed_range["slow"]
-        machine.freq(freq * 1000000)
-        self.print_msg("CPU speed set to "+str(freq)+" Mhz")
+            f = self.cpu_speed_range["slow"]
+        freq(f * 1000000)
+        self.print_msg("CPU speed set to "+str(f)+" Mhz")
 
     def cls(self):
          print("\033[2J")
@@ -277,9 +241,9 @@ class smolOS:
         self.run_cmd("lshw.py -b")
         
         print("\n\033[1mMemory:")
-        self.free()
+        self.run_cmd("free")
         print("\n\033[1mStorage:")
-        self.df()
+        self.run_cmd("df")
 
     def man(self,cmd=""):
         try:
