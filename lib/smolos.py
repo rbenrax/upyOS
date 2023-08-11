@@ -49,6 +49,9 @@ class smolOS:
             self.protected_files = ["boot.py","main.py"]
             
             print("Problem loading board config. " + str(ex))
+            
+            if sdata.debug:
+                sys.print_exception(ex)
         
         #except Exception as ex:
         #    print(ex)
@@ -86,11 +89,9 @@ class smolOS:
             "rm": "rm <file>, remove a file (be careful!)",
             "clear": "clears the screen",
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
-            "vi": "text editor, filename is optional",
             "info": "information about a file",
             "run": "runs external program",
             "exe": "Running exec(code)",
-            "run": "Run python module",
             "pwd": "Show current directory",
             "mkdir": "Make directory",
             "rmdir": "Remove directory",
@@ -128,9 +129,10 @@ class smolOS:
                  self.print_msg("Shutdown smolOS..., bye.")
                  sys.exit()
       
-      # TODO: Enable next lines at end o development
             except Exception as ex:
                 self.print_err("cmd error, " + str(ex))
+                if sdata.debug:
+                    sys.print_exception(ex)
                 pass
  
  # - - - - - - - -
