@@ -355,7 +355,7 @@ class smolOS:
         else:
             fattr += "rw"
 
-        if ".py" in filename:?
+        if ".py" in filename:
             fattr += 'x'
         else:
             fattr += '-'
