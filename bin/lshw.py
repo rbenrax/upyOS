@@ -14,7 +14,7 @@ def __main__(args):
 
     print(f"\033[0mBoard:\033[1m {uos.uname()[4]}")
     print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
-    print(f"\033[0m{name} :\033[1m {sdata.version} (size: {uos.stat('main.py')[6]} bytes)")
+    print(f"\033[0m{sdata.name} :\033[1m {sdata.version} (size: {uos.stat('/lib/smolos.py')[6]} bytes)")
     print(f"\033[0mFirmware:\033[1m{uos.uname().version}")
     
     turbo_msg = f"\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
