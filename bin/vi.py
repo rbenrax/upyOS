@@ -11,3 +11,6 @@ def __main__(args):
         return
     
     editor.edit(args[0])
+    del sys.modules["editstr"]
+    del sys.modules["terminal"]
+    del sys.modules["editor"]

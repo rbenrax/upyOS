@@ -1,6 +1,7 @@
 import machine
 import utime
 import sdata
+import sys
 
 def __main__(args):
 
@@ -15,9 +16,9 @@ def __main__(args):
 
     # Test rgb leds gpios with ln leds in each strip
     if cmd=="rgb":
-       if ln < 1: return
-       import neopixel
-       for pn in sdata.board["rgb"][0].values():
+        if ln < 1: return
+        import neopixel
+        for pn in sdata.board["rgb"][0].values():
            np = neopixel.NeoPixel(machine.Pin(pn), ln, bpp=4)
            for i in range(ln):
                np[i] = (255, 0, 0, 5)
@@ -31,7 +32,9 @@ def __main__(args):
                utime.sleep(.200)
                np[i] = (0, 0, 0, 0)
                np.write()
-       return
+        np=None
+        del sys.modules["neopixel"]
+        return
 
     system_leds = []
     for pn in sdata.board["led"][0].values(): #Leds gpios
