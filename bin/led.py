@@ -18,7 +18,7 @@ def __main__(args):
     if cmd=="rgb":
         if ln < 1: return
         import neopixel
-        for pn in sdata.board["rgb"][0].values():
+        for pn in sdata.board["rgbio"][0].values():
            np = neopixel.NeoPixel(machine.Pin(pn), ln, bpp=4)
            for i in range(ln):
                np[i] = (255, 0, 0, 5)
@@ -37,7 +37,7 @@ def __main__(args):
         return
 
     system_leds = []
-    for pn in sdata.board["led"][0].values(): #Leds gpios
+    for pn in sdata.board["ledio"][0].values(): #Leds gpios
        system_leds.append(machine.Pin(pn, machine.Pin.OUT))
 
     if ln < 0 or ln>len(system_leds)-1:
