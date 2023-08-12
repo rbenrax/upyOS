@@ -17,7 +17,7 @@ ls -lah
 #lshw -f
 
 # Scan for i2c devices
-#i2cscan
+i2cscan
 
 # Turn off wifi in cliente mode
 wifi off
@@ -34,4 +34,4 @@ ifconfig
 #test
 
 # Exit form OS tu python REPL
-#exit
+exit

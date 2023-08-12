@@ -29,7 +29,8 @@ class smolOS:
         # Load board config
         try:
             sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
-            self.cpu_speed_range = sdata.board["mcu"]["speed"] # Mhz
+            self.cpu_speed_range = sdata.board["mcu"][0]["speed"] # speed of cpu 0
+
             #print(sdata.board)
             #...
             print("Board config loaded.")
@@ -52,10 +53,12 @@ class smolOS:
             
             if sdata.debug:
                 sys.print_exception(ex)
-        
-        #except Exception as ex:
-        #    print(ex)
-        #pass
+
+        except Exception as ex:
+            #print(ex)
+            if sdata.debug:
+                sys.print_exception(ex)
+            pass
 
         #self.thread_running = False
 

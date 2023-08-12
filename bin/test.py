@@ -10,8 +10,15 @@ def __main__(args):
     #time.sleep(1)
     
     print(sdata.sysconfig)
-    a={"a":1, "b":2, "c", 3}
+    
+    a={"a":1, "b":2, "c": 3}
     print(a)
-    for key, value in a.items():
-       if value == 2:
-          print(key)
+    for k, v in a.items():
+        if v == 2:
+            print(k)
+
+if __name__ == "__main__":
+
+    args =["aaaa"]
+    __main__(args)
+        

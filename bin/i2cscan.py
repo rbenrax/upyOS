@@ -1,10 +1,19 @@
 import machine
 import sdata
+import utls
 
 #print(sdata.board["i2c"])
-TODO: Get gpios from board pins
-scl1=sdata.board["i2c"][0]["scl"]
-sda1=sdata.board["i2c"][0]["sda"]
+#TODO: Get gpios from board pins
+#scl1=sdata.board["i2c"][0]["scl"]
+#sda1=sdata.board["i2c"][0]["sda"]
+
+#TODO: check
+gpios = sdata.getgpio("i2c", 0)
+print(gpios)
+
+#TODO: check, get string???
+scl1=gpios["scl"]
+sda1=gpios["sda"]
 
 print(scl1)
 print(sda1)
