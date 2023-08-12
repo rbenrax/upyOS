@@ -1,8 +1,6 @@
-import sys
-import sdata
 import uos
+import utls
 
-"""Show ram status"""
 def __main__(args):
 
     mode=""
@@ -14,8 +12,8 @@ def __main__(args):
         mode=args[0]
         path=args[1]
     
-    if mode == "-h":
-        print("df <options>, options -h -p")
+    if mode == "--h":
+        print("Show starege status, df <options>: options --h -h -p")
         return
     
     bit_tuple = uos.statvfs(path)
@@ -27,12 +25,17 @@ def __main__(args):
     if mode=="-p":
         d={"total": t, "used": u, "free": f}
         print(d) 
+    elif mode=="-h":
+        print(f'\033[0mTotal space:\033[1m {utls.human(t)}')
+        print(f'\033[0mUsed space.:\033[1m {utls.human(u)}')
+        print(f'\033[0mFree space.:\033[1m {utls.human(f)}\033[0m')
     else:
         print(f'\033[0mTotal space:\033[1m {t:8} bytes')
         print(f'\033[0mUsed space.:\033[1m {u:8} bytes')
         print(f'\033[0mFree space.:\033[1m {f:8} bytes\033[0m')
-    
+
 if __name__ == "__main__":
+
     args =[""]
     __main__(args)
         
