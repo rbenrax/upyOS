@@ -2,7 +2,7 @@ import machine
 import sdata
 
 #print(sdata.board["i2c"])
-
+TODO: Get gpios from board pins
 scl1=sdata.board["i2c"][0]["scl"]
 sda1=sdata.board["i2c"][0]["sda"]
 
