@@ -5,12 +5,13 @@ def __main__(args):
     
     print (f"Prueba de llamada {args}")
     
-    print(sys.modules)
-    
-    print(utls.human(12274))
+    #print(sys.modules)
 
-    time.sleep(1)
+    #time.sleep(1)
     
     print(sdata.sysconfig)
-
-    print(utls.tspaces("rafa", 20, "a"))
+    a={"a":1, "b":2, "c", 3}
+    print(a)
+    for key, value in a.items():
+       if value == 2:
+          print(key)
