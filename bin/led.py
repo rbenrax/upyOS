@@ -57,4 +57,10 @@ def __main__(args):
                led.value(0)
                utime.sleep(0.05)
        return
+    
+
+if __name__ == "__main__":
+
+    args =["rgb", "1"]
+    __main__(args)
 
