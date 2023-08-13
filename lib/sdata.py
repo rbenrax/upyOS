@@ -15,10 +15,13 @@ sysconfig={}
 def getgpio(cat, ins):
     gps={}
     gpios=board["gpio"][0]
+    #print(gpios)
     for kps, vps in board[cat][ins].items():
         for k, v in gpios.items():
+            #print(type(k), type(v))
             if v == vps:
-                gps[kps]=k
+                gps[kps]=int(k)
+                #print(kps, k)
     return gps
 
 if __name__ == "__main__":

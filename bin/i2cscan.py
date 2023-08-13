@@ -8,17 +8,14 @@ import utls
 #sda1=sdata.board["i2c"][0]["sda"]
 
 #TODO: check
-gpios = sdata.getgpio("i2c", 0)
-print(gpios)
 
-#TODO: check, get string???
+i2c_id=0
+gpios = sdata.getgpio("i2c", i2c_id)
+print(gpios)
 scl1=gpios["scl"]
 sda1=gpios["sda"]
 
-print(scl1)
-print(sda1)
-
-i2c = machine.I2C(scl=machine.Pin(scl1), sda=machine.Pin(sda1))
+i2c = machine.I2C(id=i2c_id, scl=machine.Pin(scl1), sda=machine.Pin(sda1))
 
 print('Scan i2c bus...')
 devices = i2c.scan()

@@ -74,6 +74,7 @@ class smolOS:
             "turbo": self.toggle_turbo,
             "info": self.info,
             "run": self.run,
+            "sh" : self.sh,
             "exe": self.exe,
             "pwd": self.pwd,
             "mkdir": self.mkdir,
@@ -93,7 +94,8 @@ class smolOS:
             "clear": "clears the screen",
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "info": "information about a file",
-            "run": "runs external program",
+            "run": "runs external python program",
+            #"sh" : "run external sh script",
             "exe": "Running exec(code)",
             "pwd": "Show current directory",
             "mkdir": "Make directory",
@@ -198,9 +200,10 @@ class smolOS:
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
                 cont = f.read()
-                for cmd in cont.split("\n"):
-                    if len(cmd)>1 and cmd[0]=="#": continue
-                    self.run_cmd(cmd)
+                for lin in cont.split("\n"):
+                    if len(lin)>1 and lin[0]=="#": continue
+                    cmd=lin.split("#")
+                    self.run_cmd(cmd[0])
  
     def run(self, fn=""):
         if fn == "":
@@ -211,6 +214,9 @@ class smolOS:
             exec(open(fn).read())
         else:
             self.print_err(f"{fn} does not exists.")
+
+    def sh(self, shsf):
+        self.run_sh_script(shsf)
 
     def exe(self,command):
         exec(command)
