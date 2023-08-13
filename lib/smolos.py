@@ -24,7 +24,7 @@ class smolOS:
         sys.path.append("/extlib")
         
         sdata.name    = "smolOS-" + uos.uname()[0]
-        sdata.version = "0.3 rbenrax"
+        sdata.version = "0.4 rbenrax"
         
         # Load board config
         try:
@@ -85,7 +85,7 @@ class smolOS:
         }
         self.user_commands_manual = {
             "help": "This help",
-            "man" : "Single command help",
+            "man": "Single command help",
             "ls": "List files",
             "cat": "print filename content",
             "cp": "cp <file source> <file destination>, copy a single file",
@@ -95,7 +95,7 @@ class smolOS:
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "info": "information about a file",
             "run": "runs external python program",
-            #"sh" : "run external sh script",
+            "sh" : "run external sh script",
             "exe": "Running exec(code)",
             "pwd": "Show current directory",
             "mkdir": "Make directory",
