@@ -10,9 +10,8 @@ def __main__(args):
     
     with open(args[0], "wt") as fp:
       while (True):
-        line = input(">")
-        #for c in line:
-        #   print(hex(ord(c)))
-        if not line:
+        try:
+            line = input(">")
+            fp.write(line + "\n")
+        except EOFError:
             break
-        fp.write(line + "\n")
