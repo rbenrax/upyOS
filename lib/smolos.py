@@ -136,7 +136,10 @@ class smolOS:
             except KeyboardInterrupt:
                  self.print_msg("Shutdown smolOS..., bye.")
                  sys.exit()
-      
+
+            except EOFError:
+                 self.print_msg("Send EOF")
+
             except Exception as ex:
                 self.print_err("cmd error, " + str(ex))
                 if sdata.debug:
