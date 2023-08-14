@@ -268,7 +268,7 @@ class smolOS:
     def help(self):
         print(sdata.name + " version " + sdata.version + "\n")
 
-        # Ordering
+        # Ordering files
         ok = list(self.user_commands_manual.keys())
         ok.sort()
         
@@ -282,7 +282,10 @@ class smolOS:
         tmp.sort()
         buf="\033[1m"
         for ecmd in tmp:
-            buf += ecmd[:-3] + ", "
+            if ecmd.endswith(".py"):
+                buf += ecmd[:-3] + ", "
+            else:
+                buf += ecmd + ", "
         
         print(buf[:-2])
         buf+="\033[0m"
@@ -418,5 +421,5 @@ class smolOS:
     def chdir(self, path=""):
         uos.chdir(path)
 
-smol = smolOS()
+#smol = smolOS()
 
