@@ -20,6 +20,9 @@ class smolOS:
         except:
             pass
         
+        if not utls.file_exists("/tmp"):
+            uos.mkdir("/tmp")
+        
         sys.path.append("/bin")
         sys.path.append("/extlib")
         
@@ -271,7 +274,7 @@ class smolOS:
         
         print("Internal commands:\n")
         for k in ok:
-            print(f"\033[1m{k}\033[0m -{self.user_commands_manual[k]}")
+            print(f"\033[1m{utls.tspaces(k, 10, "a")}\033[0m{self.user_commands_manual[k]}")
         
         print("\nExternal commands:\n")
         
@@ -280,12 +283,12 @@ class smolOS:
         buf="\033[1m"
         for ecmd in tmp:
             buf += ecmd[:-3] + ", "
-        buf+="\033[0m"
         
         print(buf[:-2])
+        buf+="\033[0m"
 
-        print("\n\n\033[1mAdapted by rbenrax, source available in https://github.com/rbenrax/smolOS")
-        print("Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/\033[0m")
+        print("\n\n\033[1mAdapted by rbenrax, source available in https://github.com/rbenrax/smolOS\033[0m")
+        print("Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/")
 
 
     def print_err(self, error):
