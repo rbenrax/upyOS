@@ -250,7 +250,6 @@ class smolOS:
     def welcome(self):
         self.banner()
         self.run_cmd("lshw.py -b")
-        
         print("\n\033[1mMemory:")
         self.run_cmd("free")
         print("\n\033[1mStorage:")
