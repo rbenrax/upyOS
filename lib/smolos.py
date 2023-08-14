@@ -421,5 +421,7 @@ class smolOS:
     def chdir(self, path=""):
         uos.chdir(path)
 
-#smol = smolOS()
+# Module test
+if __name__ == "__main__":
+    smol = smolOS()
 
