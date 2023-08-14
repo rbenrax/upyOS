@@ -25,31 +25,35 @@ def init():
     if not utls.file_exists("/etc/system.conf"):
         utls.save_conf_file(sco.getSysConf(), "/etc/system.conf")
         print("Sysconf creado.")
-    
-try:
-    wait=2
 
-    print("\033[2J") # Clear screen
-    print("\033[H")  # Goto 0,0
-    print("smolOS grub\n")
+if __name__ == "__main__":
     
-    print("Initializing...")
-    init()
-    
-    for t in range(wait):
-        print("\033[5;0H")
-        print(t)
-        utime.sleep(1)
+    try:
+        wait=2
 
-    print("Booting smolOS...")
-    import smolos
-    
-except KeyboardInterrupt:
-     print("Grub canceled, smolOS booting aborted.")
-     sys.exit()
-     
-except Exception as ex:
-    print(ex)
-    #sys.print_exception()
+        print("\033[2J") # Clear screen
+        print("\033[H")  # Goto 0,0
+        print("smolOS grub\n")
+        
+        print("Initializing...")
+        init()
+        
+        for t in range(wait):
+            print("\033[5;0H")
+            print(t)
+            utime.sleep(1)
+
+        print("Booting smolOS...")
+        
+        import smolos
+        smol = smolos.smolOS()
+        
+    except KeyboardInterrupt:
+         print("Grub canceled, smolOS booting aborted.")
+         sys.exit()
+         
+    except Exception as ex:
+        print(ex)
+        #sys.print_exception()
 
         
