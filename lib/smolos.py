@@ -24,7 +24,7 @@ class smolOS:
         sys.path.append("/extlib")
         
         sdata.name    = "smolOS-" + uos.uname()[0]
-        sdata.version = "0.4 rbenrax"
+        sdata.version = "0.4a rbenrax"
         
         # Load board config
         try:
@@ -263,18 +263,30 @@ class smolOS:
             self.print_err("Man not available for command " + cmd)
 
     def help(self):
-        print(sdata.name + " version " + sdata.version + " user commands:\n")
+        print(sdata.name + " version " + sdata.version + "\n")
 
         # Ordering
         ok = list(self.user_commands_manual.keys())
         ok.sort()
         
+        print("Internal commands:\n")
         for k in ok:
             print(f"\033[1m{k}\033[0m -{self.user_commands_manual[k]}")
         
-        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski, Mods by rbenrax.")
-        print("Source code available at \033[4msmol.p1x.in/os/")
-        print("Source code available at \033[4https://github.com/rbenrax/smolOS\033[0m")
+        print("\nExternal commands:\n")
+        
+        tmp=uos.listdir("/bin")
+        tmp.sort()
+        buf="\033[1m"
+        for ecmd in tmp:
+            buf += ecmd[:-3] + ", "
+        buf+="\033[0m"
+        
+        print(buf[:-2])
+
+        print("\n\n\033[1mAdapted by rbenrax, source available in https://github.com/rbenrax/smolOS")
+        print("Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/\033[0m")
+
 
     def print_err(self, error):
         print(f"\n\033[1;37;41m<!>{error}<!>\033[0m")
