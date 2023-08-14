@@ -14,7 +14,6 @@ led off 0            # Turn off led 0
 wifi off                        # Turn off wifi in cliente mode
 wifi on                         # Turn on wifi in cliente mode
 #wifi connect <SSID> <PASS>     # Connect to wifi router
-wifi connect RBM32 goww0267
 
 utelnetd start
 
