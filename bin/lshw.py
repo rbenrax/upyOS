@@ -16,10 +16,11 @@ def __main__(args):
     print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
     print(f"\033[0m{sdata.name} :\033[1m {sdata.version} (size: {uos.stat('/lib/smolos.py')[6]} bytes)")
     print(f"\033[0mFirmware:\033[1m{uos.uname().version}")
-    
-    turbo_msg = f"\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
+
     if sdata.sysconfig["turbo"]:
         turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` for slow mode."
+    else:
+        turbo_msg = f"\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
     
     print(f"\033[0mCPU Speed:\033[1m{machine.freq()*0.000001}MHz {turbo_msg}")
 

@@ -89,7 +89,7 @@ class SysCfg():
         self.sysconf={"ver"     : 1.0,
                       "aliases" : {"edit": "vi"},
                       "turbo"   : False,
-                      "pfiles"  : ["boot.py","main.py", "grub.py", "/lib"],
+                      "pfiles"  : ["/boot.py","/main.py"],
                       "env"     : [{"$?": ""}, {"$0": ""}, {"$1": ""}, {"$2": ""}, {"$3": ""}]
                      }
 

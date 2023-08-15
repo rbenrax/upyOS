@@ -237,7 +237,8 @@ class smolOS:
         else:
             f = self.cpu_speed_range["slow"]
         freq(f * 1000000)
-        self.print_msg("CPU speed set to "+str(f)+" Mhz")
+        sdata.sysconfig["turbo"]=self.turbo
+        self.print_msg("CPU speed set to " + str(f) + " Mhz")
 
     def cls(self):
          print("\033[2J")
@@ -372,18 +373,27 @@ class smolOS:
             content = file.read()
             print(content)
 
-    def cp(self, fns="", fnd=""):
-        if fns == "" or fnd=="":
+    def cp(self, spath="", dpath=""):
+        if spath == "" or dpath=="":
             self.print_err("Invalid file(s). Failed to copy the file.")
             return
-        if not utls.file_exists(fns):
+        
+        if not utls.file_exists(spath):
             self.print_err("File source not exists.")
-            return            
-        if fnd in self.protected_files:
+            return
+        
+        sfile = spath.split("/")[-1]
+        try:
+            uos.listdir(dpath)
+            dpath += "/" + sfile
+        except OSError:
+            pass  
+        
+        if dpath in self.protected_files:
             self.print_err("Can not overwrite system file!")
-        else:
-            with open(fns, 'rb') as fs:
-                with open(fnd, "wb") as fd:
+        else:                  
+            with open(spath, 'rb') as fs:
+                with open(dpath, "wb") as fd:
                     while True:
                         buf = fs.read(256)
                         if not buf:
@@ -396,8 +406,20 @@ class smolOS:
         if spath == "" or dpath == "":
             self.print_err("Invalid file(s). Failed to move the file.")
             return
+
+        if not utls.file_exists(spath):
+            self.print_err("File source not exists.")
+            return
+
+        sfile = spath.split("/")[-1]
+        try:
+            uos.listdir(dpath)
+            dpath += "/" + sfile
+        except OSError:
+            pass
+
         if spath in self.protected_files:
-            self.print_err("Can not move system file!")
+            self.print_err("Can not move system files!")
         else:
             uos.rename(spath, dpath)
             self.print_msg("File moved successfully.")
