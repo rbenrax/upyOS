@@ -76,9 +76,9 @@ class smolOS:
             "clear": self.cls,
             "turbo": self.toggle_turbo,
             "info": self.info,
-            "run": self.run,
-            "sh" : self.sh,
-            "exe": self.exe,
+            "run": self.run_py_file,
+            "sh" : self.run_sh_script,
+            "py": self.py,
             "pwd": self.pwd,
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
@@ -98,8 +98,8 @@ class smolOS:
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "info": "information about a file",
             "run": "runs external python program",
-            "sh" : "run external sh script",
-            "exe": "Running exec(code)",
+            "sh": "run external sh script",
+            "py": "Run python code",
             "pwd": "Show current directory",
             "mkdir": "Make directory",
             "rmdir": "Remove directory",
@@ -211,7 +211,7 @@ class smolOS:
                     cmd=lin.split("#")
                     self.run_cmd(cmd[0])
  
-    def run(self, fn=""):
+    def run_py_file(self, fn=""):
         if fn == "":
             self.print_err("Specify a file name to run.")
             return
@@ -221,10 +221,7 @@ class smolOS:
         else:
             self.print_err(f"{fn} does not exists.")
 
-    def sh(self, shsf):
-        self.run_sh_script(shsf)
-
-    def exe(self,command):
+    def py(self, command):
         exec(command)
         
     def exit(self):
@@ -309,14 +306,33 @@ class smolOS:
     def unknown_function(self):
         self.print_err("unknown function. Try 'help'.")
 
-# - - 
+# - -  
 
-    def ls(self, mode="-l"):
+    def protected(self, path):
+        
+        if not "/" in path:
+            path = uos.getcwd() + path
+            
+        if path in self.protected_files:
+            return True
+        
+        return False
+
+    def ls(self, path="", mode="-l"):
+        
         tsize=0
         
-        tmp=uos.listdir()
+        if utls.isdir(path):
+            path = uos.getcwd() + path
+        
+        tmp=uos.listdir(path)
         tmp.sort()
+        
         for file in tmp:
+            #TODO: revisar cd tmo; ls /
+            if "/" in path and len(path) > 1:
+                file = path + "/" + file
+    
             tsize += self.info(file, mode)
 
         if 'h' in mode:
@@ -345,7 +361,7 @@ class smolOS:
         else:
             fattr= " "
 
-        if filename in self.protected_files:
+        if self.protected(filename):
             fattr += "r-"
         else:
             fattr += "rw"
@@ -361,7 +377,7 @@ class smolOS:
             ssize = f"{size:7}"
             
         print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} " + \
-              f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename}")
+              f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename.split("/")[-1]}")
               
         return size
 
@@ -389,7 +405,7 @@ class smolOS:
         except OSError:
             pass  
         
-        if dpath in self.protected_files:
+        if self.protected(dpath):
             self.print_err("Can not overwrite system file!")
         else:                  
             with open(spath, 'rb') as fs:
@@ -418,17 +434,17 @@ class smolOS:
         except OSError:
             pass
 
-        if spath in self.protected_files:
+        if self.protected(spath):
             self.print_err("Can not move system files!")
         else:
             uos.rename(spath, dpath)
             self.print_msg("File moved successfully.")
 
-    def rm(self,filename=""):
+    def rm(self, filename=""):
         if filename == "":
             self.print_err("Failed to remove the file.")
             return
-        if filename in self.protected_files:
+        if self.protected(filename):
             self.print_err("Can not remove system file!")
         else:
             uos.remove(filename)
