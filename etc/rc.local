@@ -15,7 +15,7 @@ wifi off                        # Turn off wifi in cliente mode
 wifi on                         # Turn on wifi in cliente mode
 #wifi connect <SSID> <PASS>     # Connect to wifi router
 
-utelnetd start
+#utelnetd start
 
 ifconfig             # Show Ip data
 
