@@ -55,8 +55,7 @@ class SysCfg():
                       "aliases" : {"edit": "vi"},
                       "turbo"   : False,
                       "pfiles"  : ["/boot.py","/main.py"],
-                      "env"     : [{"$?": ""}, {"$0": ""}, {"$1": ""}, {"$2": ""}, {"$3": ""}],
-                      "srvs"    : {"rc": True}
+                      "env"     : [{"$?": ""}, {"$0": ""}, {"$1": ""}, {"$2": ""}, {"$3": ""}]
                      }
 
     def getBoard(self):
