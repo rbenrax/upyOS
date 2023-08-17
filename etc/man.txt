@@ -1,3 +1,7 @@
+smolOS Help:
+
+Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS 
+Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
 
 help: This help
 ls: List files

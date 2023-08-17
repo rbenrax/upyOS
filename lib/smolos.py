@@ -22,14 +22,20 @@ class smolOS:
         
         sdata.name    = "smolOS-" + uos.uname()[0]
         sdata.version = "0.5 rbenrax"
-        
+
+        if not utls.file_exists("/tmp"): # Temp directory
+            uos.mkdir("/tmp")
+            
+        if not utls.file_exists("/opt"): # Specific solutions directory
+            uos.mkdir("/opt")
+            
         sys.path.append("/bin")
         sys.path.append("/extlib")
+        sys.path.append("/opt")
 
-        if not utls.file_exists("/tmp"):
-            uos.mkdir("/tmp")
+        self.clear()
 
-        # Load board config
+        # Load board and system configuration
         try:
             sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
             self.cpu_speed_range = sdata.board["mcu"][0]["speed"] # speed of cpu 0
@@ -54,7 +60,7 @@ class smolOS:
             self.user_commands_aliases = {"h": "help"}
             self.protected_files = ["boot.py","main.py"]
             
-            print("Problem loading board config. " + str(ex))
+            print("Problem loading configuration" + str(ex))
             
             if sdata.debug:
                 sys.print_exception(ex)
@@ -65,8 +71,7 @@ class smolOS:
                 sys.print_exception(ex)
             pass
 
-        #Internal Commands def
-
+        # Internal Commands def
         self.user_commands = {
             "help": self.help,
             "ls": self.ls,
@@ -74,18 +79,17 @@ class smolOS:
             "cp" : self.cp,
             "mv" : self.mv,
             "rm": self.rm,
-            "clear": self.cls,
+            "clear": self.clear,
             "turbo": self.toggle_turbo,
             "info": self.info,
             "run": self.run_py_file,
             "sh" : self.run_sh_script,
-            "py": self.py,
+            "py": self.run_py_code,
             "pwd": self.pwd,
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
             "cd": self.chdir,
             "exit" : self.exit
-            
         }
 
         self.boot()
@@ -103,9 +107,9 @@ class smolOS:
             self.print_msg("Normal node boot")
             
             #/etc/init.sh
-            self.run_sh_script("/etc/init.sh")
+            self.run_cmd("sh /etc/init.sh")
                       
-            #self.cls()
+            #self.clear()
             #self.welcome()
             #self.banner()
             #self.run_cmd("lshw.py -b")
@@ -115,8 +119,8 @@ class smolOS:
             #self.run_cmd("df")
 
             #/etc/rc.local
-            print("\n\033[0mLaunching rc.local commands:\n")
-            self.run_sh_script("/etc/rc.local")
+            print("Launching rc.local:\n")
+            self.run_cmd("sh /etc/rc.local")
         else:
             self.print_msg("Recovery mode boot")
             
@@ -218,7 +222,7 @@ class smolOS:
         else:
             self.print_err(f"{fn} does not exists.")
 
-    def py(self, command):
+    def run_py_code(self, command):
         exec(command)
         
     def exit(self):
@@ -234,7 +238,7 @@ class smolOS:
         sdata.sysconfig["turbo"]=self.turbo
         self.print_msg("CPU speed set to " + str(f) + " Mhz")
 
-    def cls(self):
+    def clear(self):
          print("\033[2J")
          print("\033[H")
  
@@ -261,10 +265,6 @@ class smolOS:
                 buf += ecmd + ", "
         
         print(buf[:-2])
-
-        print("\n\n\033[1mAdapted by rbenrax, source available in https://github.com/rbenrax/smolOS\033[0m")
-        print("Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/")
-
 
     def print_err(self, error):
         print(f"\n\033[1;37;41m<!>{error}<!>\033[0m")
