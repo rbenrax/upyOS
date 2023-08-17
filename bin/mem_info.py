@@ -3,4 +3,15 @@ import sdata
 
 def __main__(args):
     
-    print(micropython.mem_info(1))
+    if len(args)==1:
+        opt=args[0]
+
+        if opt=="--h":
+            print("Print memory information, mem_info <opt>, 0,1,")
+            return
+        
+        print(micropython.mem_info(opt))
+    else:
+        print(micropython.mem_info())
+
+    
