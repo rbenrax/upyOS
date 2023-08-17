@@ -148,38 +148,50 @@ class smolOS:
  
  # - - - - - - - -
  
-    def run_cmd(self, cmd):
-        parts = cmd.split()
+    def run_cmd(self, fcmd):
+        
+        parts = fcmd.split()
+        
         if len(parts) > 0:
-            command = parts[0]
-            #print(f"{command=}")
-            if command in self.user_commands_aliases: # aliases support
-                command=self.user_commands_aliases[command]
+            cmd = parts[0]
             
-            if command in self.user_commands:
-                if len(parts) > 1:
-                    arguments = parts[1:]
-                    self.user_commands[command](*arguments)
+            #TODO: Correct it, no good
+            if cmd=="py":
+                self.user_commands[cmd](fcmd[2:].strip()) 
+                return
+            
+            args=[]
+            
+            if len(parts) > 1:
+                args = parts[1:]
+                
+                #print(f"{cmd=} {args=} ")
+            
+            if cmd in self.user_commands_aliases: # aliases support
+                cmd=self.user_commands_aliases[cmd]
+            
+            if cmd in self.user_commands:
+                if len(args) > 0:
+                    self.user_commands[cmd](*args)    
                 else:
-                    self.user_commands[command]()
+                    self.user_commands[cmd]()
             else:
-                tmp = command.split(".")
+                tmp = cmd.split(".")
                 if len(tmp) == 2:
-                    cmd = tmp[0]
-                    ext = tmp[1]
+                    cmdl = tmp[0]
+                    ext  = tmp[1]
                 else:
-                    cmd = command
-                    ext = ""
+                    cmdl = cmd
+                    ext  = ""
 
                 #print(line)
                 
-                if utls.file_exists("/bin/" + cmd + ".py"):
+                if utls.file_exists("/bin/" + cmdl + ".py"):
                     
                     try:
-                        ins = __import__(cmd)
+                        ins = __import__(cmdl)
                         if '__main__' in dir(ins):
-                            if len(parts) > 1:
-                                args = parts[1:]
+                            if len(args) > 0:
                                 ins.__main__(args)
                             else:
                                 ins.__main__("")
@@ -189,12 +201,12 @@ class smolOS:
                         sys.print_exception(e)
                     
                     finally:
-                        del sys.modules[cmd]
+                        del sys.modules[cmdl]
 
                 elif ext=="sh":
                     
                     try:
-                        self.run_sh_script("/bin/" + cmd + ".sh")
+                        self.run_sh_script("/bin/" + cmdl + ".sh")
                     except Exception as e:
                         print(f"Error executing script {command}")
                         sys.print_exception(e)
@@ -222,9 +234,10 @@ class smolOS:
         else:
             self.print_err(f"{fn} does not exists.")
 
-    def run_py_code(self, command):
-        exec(command)
-        
+    def run_py_code(self, code):
+        #print(code)
+        exec(code)
+                
     def exit(self):
         raise SystemExit
  
