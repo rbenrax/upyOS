@@ -34,6 +34,7 @@ class smolOS:
         sys.path.append("/opt")
 
         self.clear()
+        print("Booting smolOS...")
 
         # Load board and system configuration
         try:
@@ -110,7 +111,7 @@ class smolOS:
             self.run_cmd("sh /etc/init.sh")
 
             #/etc/rc.local
-            print("Launching rc.local:\n")
+            print("Launching rc.local:")
             self.run_cmd("sh /etc/rc.local")
         else:
             self.print_msg("Recovery mode boot")

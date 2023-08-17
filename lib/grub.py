@@ -42,9 +42,7 @@ def mbr():
             print("\033[5;0H")
             print(t)
             utime.sleep(1)
-
-        print("Booting smolOS...")
-        
+       
         import smolos
         smol = smolos.smolOS()
         
