@@ -7,4 +7,4 @@ def __main__(args):
         print ("Usage: wait <seconds>")
         return
 
-    time.sleep(int(args[0]))
+    time.sleep(int(float(args[0])))

@@ -189,7 +189,7 @@ class smolOS:
                                 ins.__main__("")
 
                     except Exception as e:
-                        print(f"Error executing script {command}")
+                        print(f"Error executing script {cmd}")
                         sys.print_exception(e)
                     
                     finally:

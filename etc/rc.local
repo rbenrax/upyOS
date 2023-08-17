@@ -1,11 +1,5 @@
 # Simple rc.local script for testing 
 
-py print("From_rc.local")
-
-led on 0             # Turn on led 0
-#led rgb 1            # Test rgb led in board (if board has one)
-led off 0            # Turn off led 0
-
 #cd bin              # List files in current directory (hidden files included and human readable)
 #ls / -h
 
@@ -19,9 +13,13 @@ led off 0            # Turn off led 0
 
 #utelnetd start
 
+#run /opt/webserver.py
+
 #ifconfig             # Show Ip data
 
 #test
+
+# run /opt/webserver.py
 
 #help
 # Exit form OS tu python REPL
