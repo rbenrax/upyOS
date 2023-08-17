@@ -1,5 +1,5 @@
+
 help: This help
-man: Single command help
 ls: List files
 cat: print filename content
 cp: cp <file source> <file destination>, copy a single file
