@@ -9,6 +9,8 @@ smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266,
 
 This is a simple test implementation with some modifications of smolOS over ESP32-C3/YD-RP2040 by rbenrax.
 
+The target is to get a common base to use stand alone microcontroller, and fun using it. 
+
 Luatos esp32-c3
 ![luatos](media/luatos_CORE-ESP32_pinout.webp)
 
@@ -26,12 +28,25 @@ Actual Development:
 
 - Added editor from https://github.com/octopusengine/micropython-shell/tree/master
 
+. Reduced memory usage to fit on esp8266
+
+- Added recovery mode, to avoid load of start up failed commands
+
+- Directories:
+-   bin: External caommads (.py, .sh)
+-   lib: smolOS implementation
+-   extlib: External libraries directory
+-   etc: Configuation files
+-   opt: Externa python programs (ex. specific applications)
+-   tmp: temporal firectory
+
 TODO List:
-- Enhance an make external ls, cp, mv, etc. commands
+- Enhance and move external ls, cp, mv, etc. commands
 - Add regexp and directories to file managements
-- Add grep, du, diff, find, tar, ping, ip, uname and hostname.
+- Add grep, du, diff, find, tar, uname and hostname.
 - Revise protected files and directories
-- List external commands
+- Enhance help
+- 
 
 Wishlist is open ;)
 
