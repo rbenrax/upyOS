@@ -26,8 +26,8 @@ def init():
         utls.save_conf_file(sco.getSysConf(), "/etc/system.conf")
         print("Sysconf creado.")
 
-if __name__ == "__main__":
-    
+def mbr():
+     
     try:
         wait=2
 
@@ -56,4 +56,5 @@ if __name__ == "__main__":
         print(ex)
         #sys.print_exception()
 
-        
+#if __name__ == "__main__":
+#    mbr()
