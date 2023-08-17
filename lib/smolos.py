@@ -20,15 +20,15 @@ class smolOS:
         except:
             pass
         
-        if not utls.file_exists("/tmp"):
-            uos.mkdir("/tmp")
+        sdata.name    = "smolOS-" + uos.uname()[0]
+        sdata.version = "0.5 rbenrax"
         
         sys.path.append("/bin")
         sys.path.append("/extlib")
-        
-        sdata.name    = "smolOS-" + uos.uname()[0]
-        sdata.version = "0.4a rbenrax"
-        
+
+        if not utls.file_exists("/tmp"):
+            uos.mkdir("/tmp")
+
         # Load board config
         try:
             sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
@@ -42,6 +42,8 @@ class smolOS:
             self.turbo = sdata.sysconfig["turbo"]
             self.user_commands_aliases = sdata.sysconfig["aliases"]
             self.protected_files = sdata.sysconfig["pfiles"]
+
+            #print(sdata.sysconfig)
             #...
             print("System config loaded.")
             
@@ -63,11 +65,10 @@ class smolOS:
                 sys.print_exception(ex)
             pass
 
-        #self.thread_running = False
+        #Internal Commands def
 
         self.user_commands = {
             "help": self.help,
-            "man" : self.man,
             "ls": self.ls,
             "cat": self.cat,
             "cp" : self.cp,
@@ -86,26 +87,6 @@ class smolOS:
             "exit" : self.exit
             
         }
-        self.user_commands_manual = {
-            "help": "This help",
-            "man": "Single command help",
-            "ls": "List files",
-            "cat": "print filename content",
-            "cp": "cp <file source> <file destination>, copy a single file",
-            "mv": "mv <file source> <file destination>, move o rename a single file",
-            "rm": "rm <file>, remove a file (be careful!)",
-            "clear": "clears the screen",
-            "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
-            "info": "information about a file",
-            "run": "runs external python program",
-            "sh": "run external sh script",
-            "py": "Run python code",
-            "pwd": "Show current directory",
-            "mkdir": "Make directory",
-            "rmdir": "Remove directory",
-            "cd": "Change default directory",
-            "exit" : "Exit to Micropython shell"
-        }
 
         self.boot()
 
@@ -116,19 +97,34 @@ class smolOS:
         else:
             freq(self.cpu_speed_range["slow"] * 1000000)
             
-        ##TODO: Load modules
+        ##Load modules
+        if utls.file_exists("/etc/init.sh"):
+
+            self.print_msg("Normal node boot")
+            
+            #/etc/init.sh
+            self.run_sh_script("/etc/init.sh")
+                      
+            #self.cls()
+            #self.welcome()
+            #self.banner()
+            #self.run_cmd("lshw.py -b")
+            #print("\n\033[1mMemory:")
+            #self.run_cmd("free")
+            #print("\n\033[1mStorage:")
+            #self.run_cmd("df")
+
+            #/etc/rc.local
+            print("\n\033[0mLaunching rc.local commands:\n")
+            self.run_sh_script("/etc/rc.local")
+        else:
+            self.print_msg("Recovery mode boot")
             
         ## End modules
-
-        self.cls()
-        self.welcome()
-
-        #/etc/rc.local
-        print("\n\033[0mLaunching rc.local commands:\n")
-        self.run_sh_script("/etc/rc.local")
         
         self.print_msg("Type 'help' for a smol manual.")
 
+        # Main Loop
         while True:
             try:
                 user_input = input("\n" + uos.getcwd() + " $: ")
@@ -152,7 +148,7 @@ class smolOS:
         parts = cmd.split()
         if len(parts) > 0:
             command = parts[0]
-            
+            #print(f"{command=}")
             if command in self.user_commands_aliases: # aliases support
                 command=self.user_commands_aliases[command]
             
@@ -200,13 +196,14 @@ class smolOS:
                         sys.print_exception(e)
                     
                 else:
-                    self.unknown_function()
+                    self.print_err("unknown function. Try 'help'.")
 
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
                 cont = f.read()
                 for lin in cont.split("\n"):
+                    if lin.strip()=="": continue
                     if len(lin)>1 and lin[0]=="#": continue
                     cmd=lin.split("#")
                     self.run_cmd(cmd[0])
@@ -242,46 +239,19 @@ class smolOS:
          print("\033[H")
  
  # - - -
- 
-    def banner(self):
-        print("\033[1;33;44m                                 ______  _____")
-        print("           _________ ___  ____  / / __ \/ ___/")
-        print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
-        print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
-        print("        /____/_/ /_/ /_/\____/_/\____//____/  ")
-        print("-------------\033[1;5;7mTINY-OS-FOR-TINY-COMPUTERS\033[0;1;33;44m------------\n\033[0m")
-
-    def welcome(self):
-        self.banner()
-        self.run_cmd("lshw.py -b")
-        print("\n\033[1mMemory:")
-        self.run_cmd("free")
-        print("\n\033[1mStorage:")
-        self.run_cmd("df")
-
-    def man(self,cmd=""):
-        try:
-            desc = self.user_commands_manual[cmd]
-            print(f"\033[1m{cmd}\033[0m - {desc}")
-        except:
-            self.print_err("Man not available for command " + cmd)
 
     def help(self):
         print(sdata.name + " version " + sdata.version + "\n")
 
         # Ordering files
-        ok = list(self.user_commands_manual.keys())
-        ok.sort()
+        with open("/etc/man.txt","r") as mf:
+            print(mf.read())
         
-        print("Internal commands:\n")
-        for k in ok:
-            print(f"\033[1m{utls.tspaces(k, 10, "a")}\033[0m{self.user_commands_manual[k]}")
-        
-        print("\nExternal commands:\n")
+        print("External commands:\n")
         
         tmp=uos.listdir("/bin")
         tmp.sort()
-        buf="\033[1m"
+        buf=""
         for ecmd in tmp:
             if ecmd.endswith(".py"):
                 buf += ecmd[:-3] + ", "
@@ -289,7 +259,6 @@ class smolOS:
                 buf += ecmd + ", "
         
         print(buf[:-2])
-        buf+="\033[0m"
 
         print("\n\n\033[1mAdapted by rbenrax, source available in https://github.com/rbenrax/smolOS\033[0m")
         print("Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/")
@@ -302,9 +271,6 @@ class smolOS:
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
         utime.sleep(0.5)
-
-    def unknown_function(self):
-        self.print_err("unknown function. Try 'help'.")
 
 # - -  
 

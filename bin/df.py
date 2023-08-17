@@ -13,7 +13,7 @@ def __main__(args):
         path=args[1]
     
     if mode == "--h":
-        print("Show starege status, df <options>: options --h -h -p")
+        print("Show storage status, df <options>: options --h -h -p")
         return
     
     bit_tuple = uos.statvfs(path)

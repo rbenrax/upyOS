@@ -1,26 +1,29 @@
 # Simple rc.local script for testing 
 
+py print("From_rc.local")
+
 led on 0             # Turn on led 0
-led rgb 1            # Test rgb led in board (if board has one)
+#led rgb 1            # Test rgb led in board (if board has one)
 led off 0            # Turn off led 0
 
 #cd bin              # List files in current directory (hidden files included and human readable)
-#ls -lah
+ls / -h
 
 #lshw -f             # List board hardware
 
 #i2cscan              # Scan for i2c devices
 
-wifi off                        # Turn off wifi in cliente mode
-wifi on                         # Turn on wifi in cliente mode
+#wifi off                        # Turn off wifi in cliente mode
+#wifi on                         # Turn on wifi in cliente mode
 #wifi connect <SSID> <PASS>     # Connect to wifi router
 
 #utelnetd start
 
-ifconfig             # Show Ip data
+#ifconfig             # Show Ip data
 
 #test
 
+#help
 # Exit form OS tu python REPL
 #exit
 

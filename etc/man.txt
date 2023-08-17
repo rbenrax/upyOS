@@ -1,0 +1,18 @@
+help: This help
+man: Single command help
+ls: List files
+cat: print filename content
+cp: cp <file source> <file destination>, copy a single file
+mv: mv <file source> <file destination>, move o rename a single file
+rm: rm <file>, remove a file (be careful!)
+clear: clears the screen
+turbo: toggles turbo mode (100% vs 50% CPU speed)
+info: information about a file
+run: runs external python program
+sh: run external sh script
+py: Run python code
+pwd: Show current directory
+mkdir: Make directory
+rmdir: Remove directory
+cd: Change default directory
+exit : Exit to Micropython shell
