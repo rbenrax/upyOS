@@ -28,20 +28,20 @@ Actual Development:
 
 - Added editor from https://github.com/octopusengine/micropython-shell/tree/master
 
-. Reduced memory usage to fit on esp8266
+- Reduced memory usage to fit on esp8266
 
 - Added recovery mode, to avoid load of start up failed commands
 
 - Directories:
--   bin: External caommads (.py, .sh)
+-   bin: External commands (.py, .sh)
 -   lib: smolOS implementation
--   extlib: External libraries directory
--   etc: Configuation files
--   opt: Externa python programs (ex. specific applications)
--   tmp: temporal firectory
+-   extlib: External libraries
+-   etc: Configuration files
+-   opt: External python programs (ex. specific applications)
+-   tmp: temp directory
 
 TODO List:
-- Enhance and move external ls, cp, mv, etc. commands
+- Enhance and move to external ls, cp, mv, etc. commands
 - Add regexp and directories to file managements
 - Add grep, du, diff, find, tar, uname and hostname.
 - Revise protected files and directories
