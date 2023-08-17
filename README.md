@@ -16,9 +16,11 @@ Luatos esp32-c3
 
 VCC-GND Studio YD-2040
 ![VCC-GND Studio](media/YD-2040-PIN.png)
-![luatos on esp32-c3](media/smolos_01.png )
+
+NodeMCU
 ![NodeMCU esp8266](media/Node-MCU-Pinout.png )
 
+![luatos on esp32-c3](media/smolos_01.png )
 
 Actual Development:
 
