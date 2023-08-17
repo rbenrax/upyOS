@@ -3,13 +3,12 @@
 #clear
 py print("\033[1;33;44m",end="")
 cat /etc/wellcome.txt
-py print("\n\033[0m")
+py print("\033[0m",end="")
 
 lshw.py -b
 
-py print("\n\033[1mMemory:")
+py print("\\n\033[1mMemory:")
 free
 
-py print("\n\033[1mStorage:")
+py print("\\n\033[1mStorage:")
 df
-

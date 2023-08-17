@@ -104,19 +104,10 @@ class smolOS:
         ##Load modules
         if utls.file_exists("/etc/init.sh"):
 
-            self.print_msg("Normal node boot")
+            self.print_msg("Normal mode boot")
             
             #/etc/init.sh
             self.run_cmd("sh /etc/init.sh")
-                      
-            #self.clear()
-            #self.welcome()
-            #self.banner()
-            #self.run_cmd("lshw.py -b")
-            #print("\n\033[1mMemory:")
-            #self.run_cmd("free")
-            #print("\n\033[1mStorage:")
-            #self.run_cmd("df")
 
             #/etc/rc.local
             print("Launching rc.local:\n")
@@ -133,6 +124,7 @@ class smolOS:
             try:
                 user_input = input("\n" + uos.getcwd() + " $: ")
                 self.run_cmd(user_input)
+                
             except KeyboardInterrupt:
                  self.print_msg("Shutdown smolOS..., bye.")
                  sys.exit()
@@ -149,25 +141,25 @@ class smolOS:
  # - - - - - - - -
  
     def run_cmd(self, fcmd):
-        
+        fcmd=fcmd.strip()
+
+        if fcmd[:3]=="py ":
+            #print(f"{fcmd}")
+            self.run_py_code(fcmd[3:])
+            return
+
         parts = fcmd.split()
         
         if len(parts) > 0:
             cmd = parts[0]
-            
-            #TODO: Correct it, no good
-            if cmd=="py":
-                self.user_commands[cmd](fcmd[2:].strip()) 
-                return
-            
+            #print(f"{cmd=}")
             args=[]
             
             if len(parts) > 1:
                 args = parts[1:]
-                
-                #print(f"{cmd=} {args=} ")
+                #print(f"{args=} ")
             
-            if cmd in self.user_commands_aliases: # aliases support
+            if cmd in self.user_commands_aliases:    # aliases support
                 cmd=self.user_commands_aliases[cmd]
             
             if cmd in self.user_commands:
@@ -235,9 +227,8 @@ class smolOS:
             self.print_err(f"{fn} does not exists.")
 
     def run_py_code(self, code):
-        #print(code)
-        exec(code)
-                
+        exec(code.replace('\\n', '\n'))
+            
     def exit(self):
         raise SystemExit
  
