@@ -23,41 +23,6 @@ NodeMCU
 ![luatos on esp32-c3](media/smolos_01.png )
 
 
-MPY: soft reboot
-
-
-Booting smolOS...
-Board config loaded.
-System config loaded.
-CPU speed set to 160 Mhz
-
-->Normal mode boot
-                                 ______  _____     
-           _________ ___  ____  / / __ \/ ___/     
-          / ___/ __ `__ \/ __ \/ / / / /\__ \      
-         (__  ) / / / / / /_/ / / /_/ /___/ /      
-        /____/_/ /_/ /_/\____/_/\____//____/       
--------------TINY-OS-FOR-TINY-COMPUTERS------------
-
-Board: Arduino Nano RP2040 Connect with RP2040
-MicroPython: 1.20.0
-smolOS-rp2 : 0.5 rbenrax (size: 11730 bytes)
-Firmware:v1.20.0 on 2023-04-26 (GNU 12.1.0 MinSizeRel)
-CPU Speed:160.0MHz In power-saving, slow mode. Use `cpuclock` command to set speed.
-Memory:
-Total.:  204416 bytes
-Alloc.:   26528 bytes
-Free..:  177888 bytes (87.02%)
-Storage:
-Total space:  8364032 bytes
-Used space.:   286720 bytes
-Free space.:  8077312 bytes
-Launching rc.local:
-
-->Type 'help' for a smol manual.
-
-/ $: help
-smolOS-rp2 version 0.5 rbenrax
 
 smolOS Help:
 
