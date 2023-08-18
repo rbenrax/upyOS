@@ -30,7 +30,7 @@ Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS, based
 
 Explanation:
 
-The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of simpler programs that can be complemented in a more flexible way.
+The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of simpler programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
 
 In main.py we can launch grub or smolos directly (see files).
 
