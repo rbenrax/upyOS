@@ -5,13 +5,13 @@ Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
 
 Explanation:
 
-The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of simpler programs that can be complemented in a more flexible way.
+The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of simpler programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
 
 In main.py we can launch grub or smolos directly (see files).
 
 Grub will create in /etc dir a file (if doesn't exists) for configure the specific board pins, gpios and other parameters, also allow stop the system boot if any program hung the load.
 
-In smolos boot two shell scripts ar executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution.
+In smolos boot two shell scripts are executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution, you can remove the commands you don't need and make the boot as fast as you want, as well as include commands or programs that you need .
 
 Exists internal and external commands, and internal and externals shell scripts, internal located in /bin directory and are exceuted without extention, external can be located in any directory and are executed thin 'run' and 'sh' commands with file extention, external commands are self-explanatory and some have help (--h).
 
@@ -19,7 +19,7 @@ The system can be extended with more external commands and programs with the aim
 
 The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, etc., allowing access to these parameters between programs.
 
-If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we canuse recovery command in any time, which moves init.sh to init.rec and viceversa.
+If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
 
 I hope it is useful for you!, there are things to do, and improve, but the holidays are running out.
 
