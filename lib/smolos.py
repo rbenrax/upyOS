@@ -5,7 +5,6 @@
 
 import sdata
 import utls
-from machine import freq
 import uos
 import utime
 import sys
@@ -38,6 +37,7 @@ class smolOS:
 
         # Load board and system configuration
         try:
+            # Load data
             sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
             self.cpu_speed_range = sdata.board["mcu"][0]["speed"] # speed of cpu 0
 
@@ -46,7 +46,6 @@ class smolOS:
             print("Board config loaded.")
             
             sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
-            self.turbo = sdata.sysconfig["turbo"]
             self.user_commands_aliases = sdata.sysconfig["aliases"]
             self.protected_files = sdata.sysconfig["pfiles"]
 
@@ -55,11 +54,12 @@ class smolOS:
             print("System config loaded.")
             
         except OSError as ex:
+
+            # Set default values and continue
             self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
 
-            self.turbo = False
             self.user_commands_aliases = {"h": "help"}
-            self.protected_files = ["boot.py","main.py"]
+            self.protected_files = ["/boot.py","/main.py"]
             
             print("Problem loading configuration" + str(ex))
             
@@ -81,7 +81,6 @@ class smolOS:
             "mv" : self.mv,
             "rm": self.rm,
             "clear": self.clear,
-            "turbo": self.toggle_turbo,
             "info": self.info,
             "run": self.run_py_file,
             "sh" : self.run_sh_script,
@@ -97,10 +96,10 @@ class smolOS:
 
     def boot(self):
 
-        if self.turbo:
-            freq(self.cpu_speed_range["turbo"] * 1000000)
+        if sdata.sysconfig["turbo"]:
+            self.run_cmd("cpuclock -turbo")
         else:
-            freq(self.cpu_speed_range["slow"] * 1000000)
+            self.run_cmd("cpuclock -low")
             
         ##Load modules
         if utls.file_exists("/etc/init.sh"):
@@ -232,16 +231,6 @@ class smolOS:
             
     def exit(self):
         raise SystemExit
- 
-    def toggle_turbo(self):
-        self.turbo = not self.turbo
-        if self.turbo:
-            f = self.cpu_speed_range["turbo"]
-        else:
-            f = self.cpu_speed_range["slow"]
-        freq(f * 1000000)
-        sdata.sysconfig["turbo"]=self.turbo
-        self.print_msg("CPU speed set to " + str(f) + " Mhz")
 
     def clear(self):
          print("\033[2J")
