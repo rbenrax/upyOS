@@ -50,15 +50,15 @@ I hope it is useful for you!, there are things to do, and improve, but the holid
 
 Directories structure:
 
-/boot.py         Micropython statup file
-/main.py         Micropython statup file (boot system)
+- boot.py         Micropython statup file
+- main.py         Micropython statup file (boot system)
 
-    /bin        Commands and shell scripts
-    /ext        Configuration files
-    /extlib     External libraries
-    /lib        System implementations libraries
-    /opt        Specific solution or add-on programs
-    /tmp        Temporary directory (to put what you don't know where to put :-)
+      /bin        Commands and shell scripts
+      /ext        Configuration files
+      /extlib     External libraries
+      /lib        System implementations libraries
+      /opt        Specific solution or add-on programs
+      /tmp        Temporary directory (to put what you don't know where to put :-)
 
 
 Internals commands:
