@@ -26,8 +26,7 @@ NodeMCU
 
 smolOS Help:
 
-Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS 
-Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
+Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS, based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
 
 Explanation:
 
@@ -53,6 +52,7 @@ Directories structure:
 
 /boot.py         Micropython statup file
 /main.py         Micropython statup file (boot system)
+
     /bin        Commands and shell scripts
     /ext        Configuration files
     /extlib     External libraries
