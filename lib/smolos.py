@@ -241,13 +241,11 @@ class smolOS:
     def help(self):
         print(sdata.name + " version " + sdata.version + "\n")
 
-        print("\033[1mInternal commands:\033[0m")
-
         # Ordering files
         with open("/etc/man.txt","r") as mf:
             print(mf.read())
         
-        print("\033[1mExternal commands:\033[0m\n")
+        print("External commands:\n")
         
         tmp=uos.listdir("/bin")
         tmp.sort()

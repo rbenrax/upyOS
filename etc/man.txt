@@ -3,19 +3,55 @@ smolOS Help:
 Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS 
 Based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
 
-help: This help
-ls: List files
-cat: print filename content
-cp: cp <file source> <file destination>, copy a single file
-mv: mv <file source> <file destination>, move o rename a single file
-rm: rm <file>, remove a file (be careful!)
-clear: clears the screen
-info: information about a file
-run: runs external python program
-sh: run external sh script
-py: Run python code
-pwd: Show current directory
-mkdir: Make directory
-rmdir: Remove directory
-cd: Change default directory
-exit : Exit to Micropython shell
+Explanation:
+
+The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of simpler programs that can be complemented in a more flexible way.
+
+In main.py we can launch grub or smolos directly (see files).
+
+Grub will create in /etc dir a file (if doesn't exists) for configure the specific board pins, gpios and other parameters, also allow stop the system boot if any program hung the load.
+
+In smolos boot two shell scripts ar executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution.
+
+Exists internal and external commands, and internal and externals shell scripts, internal located in /bin directory and are exceuted without extention, external can be located in any directory and are executed thin 'run' and 'sh' commands with file extention, external commands are self-explanatory and some have help (--h).
+
+The system can be extended with more external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough.
+
+The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, etc., allowing access to these parameters between programs.
+
+If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we canuse recovery command in any time, which moves init.sh to init.rec and viceversa.
+
+I hope it is useful for you!, there are things to do, and improve, but the holidays are running out.
+
+Directories structure:
+
+/
+boot.py         Micropython statup file
+main.py         Micropython statup file (boot system)
+
+    /bin        Commands and shell scripts
+    /ext        Configuration files
+    /extlib     External libraries
+    /lib        System implementations libraries
+    /opt        Specific solution or add-on programs
+    /tmp        Temporary directory (to put what you don't know where to put :-)
+
+
+Internals commands:
+
+help:   This help
+ls:     List files and directories
+cat:    print files content
+cp:     Copy files
+mv:     Move files
+rm:     Remove files
+clear:  Clears the screen
+info:   Get information about a file
+run:    runs external python program
+sh:     run external sh script
+py:     Run python code
+pwd:    Show current directory
+mkdir:  Make directory
+rmdir:  Remove directory
+cd:     Change default directory
+exit:   Exit to Micropython shell
