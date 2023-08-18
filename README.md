@@ -7,7 +7,7 @@ smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266,
 [smolos docs site](http://smol.p1x.in/os/)
 
 
-This is a simple test implementation with some modifications of smolOS over ESP32-C3/YD-RP2040 by rbenrax.
+This is a simple test implementation with some modifications of smolOS over ESP32-C3, ESP8266 and YD-2040 by rbenrax.
 
 The target is to get a common base to use stand alone microcontroller, and fun using it. 
 
@@ -45,7 +45,7 @@ The system can be extended with more external commands and programs with the aim
 
 The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, etc., allowing access to these parameters between programs.
 
-If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we canuse recovery command in any time, which moves init.sh to init.rec and viceversa.
+If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
 
 I hope it is useful for you!, there are things to do, and improve, but the holidays are running out.
 
@@ -82,7 +82,7 @@ rmdir:  Remove directory
 cd:     Change default directory
 exit:   Exit to Micropython shell
 
-External commands:
+Actual external commands:
 
 cpuclock, df, free, i2cscan, ifconfig, led, lineup, lshw, lsmod, mem_info, modules, ping, reboot, recovery, rmmod, sh.sh, test, touch, uhttpd, uptime, utelnetd, vi, wait, wget, wifi
 
