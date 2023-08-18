@@ -65,22 +65,22 @@ main.py         Micropython statup file (boot system)
 
 Internals commands:
 
-help:   This help
-ls:     List files and directories
-cat:    print files content
-cp:     Copy files
-mv:     Move files
-rm:     Remove files
-clear:  Clears the screen
-info:   Get information about a file
-run:    runs external python program
-sh:     run external sh script
-py:     Run python code
-pwd:    Show current directory
-mkdir:  Make directory
-rmdir:  Remove directory
-cd:     Change default directory
-exit:   Exit to Micropython shell
+- help:   This help
+- ls:     List files and directories
+- cat:    print files content
+- cp:     Copy files
+- mv:     Move files
+- rm:     Remove files
+- clear:  Clears the screen
+- info:   Get information about a file
+- run:    runs external python program
+- sh:     run external sh script
+- py:     Run python code
+- pwd:    Show current directory
+- mkdir:  Make directory
+- rmdir:  Remove directory
+- cd:     Change default directory
+- exit:   Exit to Micropython shell
 
 Actual external commands:
 
