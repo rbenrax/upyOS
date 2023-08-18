@@ -293,19 +293,28 @@ class smolOS:
 
     def ls(self, path="", mode="-l"):
         
+        if "-" in path:
+            mode = path
+            path=""
+        
         tsize=0
         
-        if utls.isdir(path):
+        if path != "/" and len(path) < 2 and utls.isdir(path) :
             path = uos.getcwd() + path
-        
+
+        print(f"{path}")
+
         tmp=uos.listdir(path)
         tmp.sort()
         
         for file in tmp:
             #TODO: revisar cd tmo; ls /
-            if "/" in path and len(path) > 1:
+            
+            if path == "/":
+                file = "/" + file
+            elif "/" in path and len(path) > 1:
                 file = path + "/" + file
-    
+
             tsize += self.info(file, mode)
 
         if 'h' in mode:
@@ -314,6 +323,7 @@ class smolOS:
             print(f"\nTotal: {tsize} bytes")
             
     def info(self, filename="", mode="-a"):
+        
         if not utls.file_exists(filename):
             self.print_err("File not found")
             return
