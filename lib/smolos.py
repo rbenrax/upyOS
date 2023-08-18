@@ -354,18 +354,13 @@ class smolOS:
         return size
 
     def cat(self,filename=""):
-        if filename == "":
-            self.print_err("Failed to open the file.")
-            return
+        if filename == "": return
         with open(filename,'r') as file:
             content = file.read()
             print(content)
 
     def cp(self, spath="", dpath=""):
-        if spath == "" or dpath=="":
-            self.print_err("Invalid file(s). Failed to copy the file.")
-            return
-        
+        if spath == "" or dpath=="": return
         if not utls.file_exists(spath):
             self.print_err("File source not exists.")
             return
@@ -391,9 +386,7 @@ class smolOS:
             self.print_msg("File copied successfully.")
 
     def mv(self,spath="", dpath=""):
-        if spath == "" or dpath == "":
-            self.print_err("Invalid file(s). Failed to move the file.")
-            return
+        if spath == "" or dpath == "": return
 
         if not utls.file_exists(spath):
             self.print_err("File source not exists.")
@@ -413,9 +406,7 @@ class smolOS:
             self.print_msg("File moved successfully.")
 
     def rm(self, filename=""):
-        if filename == "":
-            self.print_err("Failed to remove the file.")
-            return
+        if filename == "": return
         if self.protected(filename):
             self.print_err("Can not remove system file!")
         else:
