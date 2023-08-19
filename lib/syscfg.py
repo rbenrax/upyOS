@@ -55,17 +55,17 @@ class SysCfg():
                       "aliases" : {"edit": "vi"},
                       "turbo"   : False,
                       "pfiles"  : ["/boot.py","/main.py"],
-                      "env"     : [{"$?": ""}, {"$0": ""}, {"$1": ""}, {"$2": ""}, {"$3": ""}]
+                      "env"     : {"$?": "", "$0": "", "$1": "", "$2": "", "$3": ""}
                      }
 
     def getBoard(self):
         return self.board
     
-    def setBoard(self, board):
-        self.board=board
+#    def setBoard(self, board):
+#        self.board=board
  
     def getSysConf(self):
         return self.sysconf
     
-    def setSysConf(self, obj):
-        self.sysconf=obj
+#    def setSysConf(self, obj):
+#        self.sysconf=obj

@@ -13,7 +13,25 @@ sysconfig={}
 #board={"i2c"   : [{"scl": 27, "sda": 28}],
 #       "gpio"  : [{"0": 2, "1": 3, "2": 19, "3": 20, "4": 28, "5": 27, "6": 22, "7": 23, "8": 29, "9": 30, "10": 21, "11": 24, "12": 04, "13": 10, "18": 5, "19": 6 }]}
 
+#sysconfig ={"env" : {"$?": "9", "$0": "a", "$1": "b", "$2": "c", "$3": "d"}}
 
+"""Get a value from environment variables"""
+def getenv(var):
+    
+    #print(sysconfig["env"])
+    for k, v in sysconfig["env"].items():
+        if k == var:
+            return v
+    return("")
+
+"""Set a value to a environment variable"""
+def setenv(var, val):    
+    sysconfig["env"][var]=val
+
+"""Remove a environment variable"""
+def unset(var):    
+    del sysconfig["env"][var]
+    
 """Get the gpio assigned to a pin"""
 def getgpiop(pin):
     gpios=board["gpio"][0]
@@ -38,7 +56,8 @@ def getgpio(cat, ins):
 
 if __name__ == "__main__":
     
-    gpios = getgpio("i2c", 0)
-    print(gpios)
-    
-    print(getgpiop(4))
+    #gpios = getgpio("i2c", 0)
+    #print(gpios)
+    #print(getgpiop(4))
+    setenv("$?", 10)
+    print(getenv("$?"))
