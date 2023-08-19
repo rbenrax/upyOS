@@ -1,4 +1,5 @@
 import sdata
+import utls
 
 def __main__(args):
     
@@ -6,6 +7,10 @@ def __main__(args):
         print ("Usage:")
         print ("lineup <file>, upload file in line mode,")
         print ("Send CTRL+D to end upload")
+        return
+    
+    if utls.protected(args[0]):
+        print("Can overwrite system file!")
         return
     
     with open(args[0], "wt") as fp:

@@ -1,6 +1,7 @@
 # file utls
-import os
+import uos
 import json
+import sdata
 
 MONTH = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
@@ -17,13 +18,13 @@ def isfile(filename):
 
 def get_mode(filename):
     try:
-        return os.stat(filename)[0]
+        return uos.stat(filename)[0]
     except OSError:
         return 0
 
 def get_stat(filename):
     try:
-        return os.stat(filename)
+        return uos.stat(filename)
     except OSError:
         return (0,) * 10
 
@@ -50,6 +51,22 @@ def save_conf_file(obj, path):
         dump(obj, cf)
 
 # ---
+
+def protected(path):
+    
+    if not "/" in path:
+        if uos.getcwd() == "/":
+            path = "/" + path
+        else:
+            path = uos.getcwd() + "/" + path
+        
+    #print(sdata.sysconfig["pfiles"])
+    #print(path)
+    
+    if path in sdata.sysconfig["pfiles"]:
+        return True
+    else:
+        return False
 
 def human(bytes):
     if bytes > 1024:

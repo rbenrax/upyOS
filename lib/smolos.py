@@ -47,7 +47,6 @@ class smolOS:
             
             sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
             self.user_commands_aliases = sdata.sysconfig["aliases"]
-            self.protected_files = sdata.sysconfig["pfiles"]
 
             #print(sdata.sysconfig)
             #...
@@ -59,7 +58,6 @@ class smolOS:
             self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
 
             self.user_commands_aliases = {"h": "help"}
-            self.protected_files = ["/boot.py","/main.py"]
             
             print("Problem loading configuration" + str(ex))
             
@@ -268,16 +266,6 @@ class smolOS:
 
 # - -  
 
-    def protected(self, path):
-        
-        if not "/" in path:
-            path = uos.getcwd() + path
-            
-        if path in self.protected_files:
-            return True
-        
-        return False
-
     def ls(self, path="", mode="-l"):
 
         if "-" in path:
@@ -286,7 +274,7 @@ class smolOS:
 
         if "--h" in mode:
             print("List files and directories, ls <path> <options>, --h -lhasnk")
-            print("-h: human, -a: hidden, -s: subdirectories, -k: no totals, -n: no file details")
+            print("-h: human readable, -a: incl. hidden, -s: subdirectories, -k: no totals, -n: no file details")
             return
 
         cur_dir=uos.getcwd()
@@ -352,7 +340,7 @@ class smolOS:
         else:
             fattr= " "
 
-        if self.protected(filename):
+        if utls.protected(filename):
             fattr += "r-"
         else:
             fattr += "rw"
@@ -392,7 +380,7 @@ class smolOS:
         except OSError:
             pass  
         
-        if self.protected(dpath):
+        if utls.protected(dpath):
             self.print_err("Can not overwrite system file!")
         else:                  
             with open(spath, 'rb') as fs:
@@ -419,7 +407,7 @@ class smolOS:
         except OSError:
             pass
 
-        if self.protected(spath):
+        if utls.protected(spath):
             self.print_err("Can not move system files!")
         else:
             uos.rename(spath, dpath)
@@ -427,7 +415,7 @@ class smolOS:
 
     def rm(self, filename=""):
         if filename == "": return
-        if self.protected(filename):
+        if utls.protected(filename):
             self.print_err("Can not remove system file!")
         else:
             uos.remove(filename)
