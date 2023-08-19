@@ -52,6 +52,8 @@ class SysCfg():
                     }
 
         self.sysconf={"ver"     : 1.0,
+                      "path"    : ["/bin", "/opt"],
+                      "libpath" : ["/lib", "/extlib"],
                       "aliases" : {"edit": "vi"},
                       "turbo"   : False,
                       "pfiles"  : ["/boot.py","/main.py"],
