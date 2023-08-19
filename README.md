@@ -111,7 +111,7 @@ TODO List:
 - Enhance and move to external ls, cp, mv, etc. commands.
 - Add grep, du, diff, find, tar, uname and hostname.
 - Add threads
-- 
+- Fix errors
 
 Wishlist is open ;)
 
