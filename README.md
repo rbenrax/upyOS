@@ -95,13 +95,17 @@ Actual Development:
 
 - /lib/smolos.py is the next load, is the OS core, has internal and external commands (/bin directory), all commands will be moved to external commands to reduce the memory use.
 
-- Actual implementation also can call simple shell scripts, including /etc/rc.local, the start up script, every script can share argument stored in sdata.sysconfig[env] dictionary.
+- Actual implementation also can call simple shell scripts, including /etc/init.sh and /etc/rc.local, the start up scripts.
 
 - Added editor from https://github.com/octopusengine/micropython-shell/tree/master
 
 - Reduced memory usage to fit on esp8266
 
 - Added recovery mode, to avoid load of start up failed commands
+
+- Added env variables in scripts and python programs, export, echo, unset, sdata.getenv() ans sdata.setenv().
+
+- ls now full functional, or so I hope.
 
 TODO List:
 - Enhance and move to external ls, cp, mv, etc. commands
