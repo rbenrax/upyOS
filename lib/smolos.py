@@ -115,7 +115,7 @@ class smolOS:
             
         ## End modules
         
-        self.print_msg("Type 'help' for a smol manual.")
+        self.print_msg("Type 'help' for a smolOS manual.")
 
         # Main Loop
         while True:
