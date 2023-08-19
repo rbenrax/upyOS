@@ -108,11 +108,9 @@ Actual Development:
 - ls now full functional, or so I hope.
 
 TODO List:
-- Enhance and move to external ls, cp, mv, etc. commands
-- Add regexp and directories to file managements
+- Enhance and move to external ls, cp, mv, etc. commands.
 - Add grep, du, diff, find, tar, uname and hostname.
-- Revise protected files and directories
-- Enhance help
+- Add threads
 - 
 
 Wishlist is open ;)
