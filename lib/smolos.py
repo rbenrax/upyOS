@@ -279,37 +279,58 @@ class smolOS:
         return False
 
     def ls(self, path="", mode="-l"):
-        
+
         if "-" in path:
             mode = path
             path=""
+
+        if "--h" in mode:
+            print("List files and directories, ls <path> <options>, --h -lhasnk")
+            print("-h: human, -a: hidden, -s: subdirectories, -k: no totals, -n: no file details")
+            return
+
+        cur_dir=uos.getcwd()
+        #print("0", cur_dir)
         
         tsize=0
-        
-        if path != "/" and len(path) < 2 and utls.isdir(path) :
-            path = uos.getcwd() + path
-
-        print(f"{path}")
-
-        tmp=uos.listdir(path)
-        tmp.sort()
-        
-        for file in tmp:
-            #TODO: revisar cd tmo; ls /
+        if utls.isdir(path):
+            uos.chdir(path)
             
-            if path == "/":
-                file = "/" + file
-            elif "/" in path and len(path) > 1:
-                file = path + "/" + file
+            if path=="" or path==".." : path=uos.getcwd()
 
-            tsize += self.info(file, mode)
+            #print("1", path)
+            
+            if len(path)>0:
+                if path[0]  !="/": path = "/" + path
+                if path[-1] !="/": path+="/"
 
-        if 'h' in mode:
-            print(f"\nTotal: {utls.human(tsize)}")
+            #print("2", path)
+            
+            tmp=uos.listdir()
+            tmp.sort()
+
+            for file in tmp:
+                tsize += self.info(path + file, mode)
+                if "s" in mode and utls.isdir(path + file):
+                    print("\n" + path + file + ":")
+                    tsize += self.ls(path + file, mode)
+                    print("")
+            
+            uos.chdir(cur_dir)
+            
+            if not 'k' in mode:
+                if 'h' in mode:
+                    print(f"\nTotal {path}: {utls.human(tsize)}")
+                else:
+                    print(f"\nTotal {path}: {tsize} bytes")
+
         else:
-            print(f"\nTotal: {tsize} bytes")
-            
-    def info(self, filename="", mode="-a"):
+            print("Invalid directory")
+        #print("3", uos.getcwd())
+        
+        return tsize
+    
+    def info(self, filename="", mode="-l"):
         
         if not utls.file_exists(filename):
             self.print_err("File not found")
@@ -346,8 +367,9 @@ class smolOS:
         else:
             ssize = f"{size:7}"
             
-        print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} " + \
-              f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename.split("/")[-1]}")
+        if not "n" in mode:
+            print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} " + \
+                  f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename.split("/")[-1]}")
               
         return size
 
