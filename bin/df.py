@@ -21,6 +21,7 @@ def __main__(args):
     t = bit_tuple[2] * blksize
     f = bit_tuple[3] * blksize
     u = t - f
+    p = f'({f/t*100:.2f}%)'
 
     if mode=="-p":
         d={"total": t, "used": u, "free": f}
@@ -28,11 +29,11 @@ def __main__(args):
     elif mode=="-h":
         print(f'\033[0mTotal space:\033[1m {utls.human(t)}')
         print(f'\033[0mUsed space.:\033[1m {utls.human(u)}')
-        print(f'\033[0mFree space.:\033[1m {utls.human(f)}\033[0m')
+        print(f'\033[0mFree space.:\033[1m {utls.human(f)} {p}\033[0m')
     else:
         print(f'\033[0mTotal space:\033[1m {t:8} bytes')
         print(f'\033[0mUsed space.:\033[1m {u:8} bytes')
-        print(f'\033[0mFree space.:\033[1m {f:8} bytes\033[0m')
+        print(f'\033[0mFree space.:\033[1m {f:8} bytes {p}\033[0m')
 
 if __name__ == "__main__":
 
