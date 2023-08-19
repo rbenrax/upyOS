@@ -221,12 +221,13 @@ class smolOS:
         
         if utls.file_exists(fn):
             exec(open(fn).read())
+            #exec(open(filepath).read(), { "_ARGS": args })
         else:
             self.print_err(f"{fn} does not exists.")
 
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
-            
+        
     def exit(self):
         raise SystemExit
 
