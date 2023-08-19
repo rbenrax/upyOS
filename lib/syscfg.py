@@ -54,10 +54,10 @@ class SysCfg():
         self.sysconf={"ver"     : 1.0,
                       "path"    : ["/bin", "/opt"],
                       "libpath" : ["/lib", "/extlib"],
-                      "aliases" : {"edit": "vi"},
+                      "env"     : {"$?": ""},
                       "turbo"   : False,
                       "pfiles"  : ["/boot.py","/main.py"],
-                      "env"     : {"$?": "", "$0": "", "$1": "", "$2": "", "$3": ""}
+                      "aliases" : {"edit": "vi"}
                      }
 
     def getBoard(self):
