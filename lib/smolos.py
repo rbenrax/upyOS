@@ -333,34 +333,36 @@ class smolOS:
         
         return tsize
     
-    def info(self, filename="", mode="-l"):
-        
-        if not utls.file_exists(filename):
+    def info(self, path="", mode="-l"):
+
+        if not utls.file_exists(path):
             self.print_err("File not found")
             return
         
-        # Hiden file
-        if mode!="-a":
-            if filename[1]==".": return 0
+        filename= path.split("/")[-1]
         
-        stat = utls.get_stat(filename)
+        # Hidden files
+        if not "a" in mode:
+            if filename[0]==".": return 0
+        
+        stat = utls.get_stat(path)
         
         #mode = stat[0]
         size = stat[6]
         mtime = stat[8]
         localtime = utime.localtime(mtime)
 
-        if utls.isdir(filename):
+        if utls.isdir(path):
             fattr= "d"
         else:
             fattr= " "
 
-        if utls.protected(filename):
+        if utls.protected(path):
             fattr += "r-"
         else:
             fattr += "rw"
 
-        if ".py" in filename:
+        if ".py" in path or ".sh" in path:
             fattr += 'x'
         else:
             fattr += '-'
@@ -372,7 +374,7 @@ class smolOS:
             
         if not "n" in mode:
             print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} " + \
-                  f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename.split("/")[-1]}")
+                  f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename}")
               
         return size
 
@@ -440,13 +442,22 @@ class smolOS:
         print(uos.getcwd())
        
     def mkdir(self, path=""):
-        uos.mkdir(path)
-    
+        try:
+            uos.mkdir(path)
+        except OSError:
+            print("Invalid path")
+            
     def rmdir(self, path=""):
-        uos.rmdir(path)
-        
+        try:
+            uos.rmdir(path)
+        except OSError:
+            print("Invalid path")
+            
     def chdir(self, path=""):
-        uos.chdir(path)
+        try:
+            uos.chdir(path)
+        except OSError:
+            print("Invalid path")
 
 # Module test
 if __name__ == "__main__":
