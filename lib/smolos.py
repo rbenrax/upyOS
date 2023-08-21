@@ -1,5 +1,7 @@
 # smolOS by Krzysztof Krystian Jankowski
 # Homepage: http://smol.p1x.in/os/
+
+
 # Adptations by rbenrax
 
 import sdata
