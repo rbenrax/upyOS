@@ -88,7 +88,6 @@ cpuclock, df, free, i2cscan, ifconfig, led, lineup, lshw, lsmod, mem_info, modul
 
 
 
-
 Actual Development:
 
 - /lib/grubs.py the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, smolos process will read its content and will enable the resources to be used by the system, modules, external commands, etc.
