@@ -445,4 +445,3 @@ class smolOS:
 # Module test
 if __name__ == "__main__":
     smol = smolOS()
-
