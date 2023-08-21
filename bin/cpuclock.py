@@ -8,22 +8,23 @@ def __main__(args):
         return
 
     actclk = sdata.sysconfig["turbo"]
-    newclk = False
     
     if args[0] == "-v":
-        print("Turbo CPU speed: " + str(actclk))
+        print(f"CPU speed: {freq()*0.000001} MHz, Turbo: {actclk}")
         return
-    
-    if args[0] == "-t":
-        newclk = not actclk
 
-    if args[0] == "-low" or newclk == False :
+    turbo = False
+
+    if args[0] == "-t":
+        turbo = not actclk
+
+    if args[0] == "-low" or turbo == False :
         f = sdata.board["mcu"][0]["speed"]["slow"]
 
-    if args[0] == "-turbo" or newclk == True :
+    if args[0] == "-turbo" or turbo == True :
         f = sdata.board["mcu"][0]["speed"]["turbo"]
         
-    sdata.sysconfig["turbo"] = newclk
+    sdata.sysconfig["turbo"] = turbo
     freq(f * 1000000)
     print("CPU speed set to " + str(f) + " Mhz")
         

@@ -1,8 +1,6 @@
 # smolOS by Krzysztof Krystian Jankowski
 # Homepage: http://smol.p1x.in/os/
-
-# Mods by rbenrax
-
+# Adptations by rbenrax
 
 import sdata
 import utls
@@ -23,50 +21,34 @@ class smolOS:
         sdata.name    = "smolOS-" + uos.uname()[0]
         sdata.version = "0.5 rbenrax"
 
-        if not utls.file_exists("/tmp"): # Temp directory
-            uos.mkdir("/tmp")
-            
         if not utls.file_exists("/opt"): # Specific solutions directory
             uos.mkdir("/opt")
-            
+
+        if not utls.file_exists("/tmp"): # Temp directory
+            uos.mkdir("/tmp")
+
         sys.path.append("/bin")
         sys.path.append("/extlib")
-        sys.path.append("/opt")
 
         self.clear()
         print("Booting smolOS...")
 
         # Load board and system configuration
         try:
-            # Load data
-            sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
-            self.cpu_speed_range = sdata.board["mcu"][0]["speed"] # speed of cpu 0
-
-            #print(sdata.board)
-            #...
-            print("Board config loaded.")
-            
             sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
-            self.user_commands_aliases = sdata.sysconfig["aliases"]
-
             #print(sdata.sysconfig)
-            #...
             print("System config loaded.")
             
+            sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
+            #print(sdata.board)
+            print("Board config loaded.")
+            
         except OSError as ex:
-
-            # Set default values and continue
-            self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
-
-            self.user_commands_aliases = {"h": "help"}
-            
             print("Problem loading configuration" + str(ex))
-            
             if sdata.debug:
                 sys.print_exception(ex)
 
         except Exception as ex:
-            #print(ex)
             if sdata.debug:
                 sys.print_exception(ex)
             pass
@@ -95,17 +77,18 @@ class smolOS:
 
     def boot(self):
 
-        if sdata.sysconfig["turbo"]:
-            self.run_cmd("cpuclock -turbo")
-        else:
-            self.run_cmd("cpuclock -low")
+        if "turbo" in sdata.sysconfig:
+            if sdata.sysconfig["turbo"]:
+                self.run_cmd("cpuclock -turbo")
+            else:
+                self.run_cmd("cpuclock -low")
             
         ##Load modules
         if utls.file_exists("/etc/init.sh"):
-
             self.print_msg("Normal mode boot")
             
             #/etc/init.sh
+            #print("Launching init.sh:")
             self.run_cmd("sh /etc/init.sh")
 
             #/etc/rc.local
@@ -125,11 +108,11 @@ class smolOS:
                 self.run_cmd(user_input)
                 
             except KeyboardInterrupt:
-                 self.print_msg("Shutdown smolOS..., bye.")
-                 sys.exit()
+                self.print_msg("Shutdown smolOS..., bye.")
+                sys.exit()
 
             except EOFError:
-                 self.print_msg("Send EOF")
+                self.print_msg("Send EOF")
 
             except Exception as ex:
                 self.print_err("cmd error, " + str(ex))
@@ -158,16 +141,16 @@ class smolOS:
                 args = parts[1:]
                 #print(f"{args=} ")
             
-            if cmd in self.user_commands_aliases:    # aliases support
-                cmd=self.user_commands_aliases[cmd]
+            if sdata.sysconfig:
+                if cmd in sdata.sysconfig["aliases"]:    # aliases support
+                    cmd=sdata.sysconfig["aliases"][cmd]
             
             if cmd in self.user_commands:
                 if len(args) > 0:
                     if cmd=="run":
-                       #print("p1")
                        self.user_commands[cmd](args)
                     else:
-                       self.user_commands[cmd](*args)    
+                       self.user_commands[cmd](*args)
                 else:
                     self.user_commands[cmd]()
             else:
@@ -179,10 +162,7 @@ class smolOS:
                     cmdl = cmd
                     ext  = ""
 
-                #print(line)
-                
                 if ext=="py" or ext=="":
-
                     #print(f"{cmdl=} {ext=}")
                     imerr=False
                     try:
@@ -194,6 +174,8 @@ class smolOS:
                             else:
                                 ins.__main__("")
 
+                    except KeyboardInterrupt:
+                        print(f"{cmd} ended")
                     except ImportError as ie:
                         imerr=True
                         print(f"Command or programs does not exists {cmd}")
@@ -205,10 +187,8 @@ class smolOS:
                     finally:
                         if not imerr:
                             del sys.modules[cmdl]
-                        
 
                 elif ext=="sh":
-                    
                     try:
                         self.run_sh_script("/bin/" + cmdl + ".sh")
                     except Exception as e:
@@ -229,7 +209,6 @@ class smolOS:
                     self.run_cmd(cmd[0])
  
     def run_py_file(self, args):
-
         if args[0] == "":
             self.print_err("Specify a file name to run.")
             return
