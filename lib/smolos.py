@@ -63,7 +63,7 @@ class smolOS:
             "rm": self.rm,
             "clear": self.clear,
             "info": self.info,
-            "run": self.run_py_file,
+#            "run": self.run_py_file,
             "sh" : self.run_sh_script,
             "py": self.run_py_code,
             "pwd": self.pwd,
@@ -147,10 +147,13 @@ class smolOS:
             
             if cmd in self.user_commands:
                 if len(args) > 0:
-                    if cmd=="run":
-                       self.user_commands[cmd](args)
-                    else:
-                       self.user_commands[cmd](*args)
+                    
+                    # removed run command
+                    #if cmd=="run":
+                        #print(f"run mode {cmd} {args}")
+                    #    self.user_commands[cmd](args)
+                    #else:
+                    self.user_commands[cmd](*args)
                 else:
                     self.user_commands[cmd]()
             else:
@@ -163,7 +166,7 @@ class smolOS:
                     ext  = ""
 
                 if ext=="py" or ext=="":
-                    #print(f"{cmdl=} {ext=}")
+                    #print(f" import mode {cmdl=} {ext=} {args}")
                     imerr=False
                     try:
                         ins = __import__(cmdl)
@@ -208,15 +211,16 @@ class smolOS:
                     cmd=lin.split("#")
                     self.run_cmd(cmd[0])
  
-    def run_py_file(self, args):
-        if args[0] == "":
-            self.print_err("Specify a file name to run.")
-            return
-
-        if utls.file_exists(args[0]):
-            exec(open(args[0]).read(), { "args": args[0:] })
-        else:
-            self.print_err(f"{args[0]} does not exists.")
+#    def run_py_file(self, args):
+#        if args[0] == "":
+#           self.print_err("Specify a file name to run.")
+#           return
+#
+#        if utls.file_exists(args[0]):
+#            #print(f"P1: {args=}")
+#            exec(open(args[0]).read(), { "args": args[0:] })
+#        else:
+#            self.print_err(f"{args[0]} does not exists.")
 
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
