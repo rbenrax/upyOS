@@ -6,7 +6,7 @@ cat /etc/wellcome.txt
 py print("\033[0m",end="")
 
 py print("\\n")
-lshw.py -b
+lshw -b
 
 py print("\\n\033[1mMemory:")
 free

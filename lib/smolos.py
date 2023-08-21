@@ -3,6 +3,7 @@
 
 # Mods by rbenrax
 
+
 import sdata
 import utls
 import uos
@@ -162,7 +163,11 @@ class smolOS:
             
             if cmd in self.user_commands:
                 if len(args) > 0:
-                    self.user_commands[cmd](*args)    
+                    if cmd=="run":
+                       #print("p1")
+                       self.user_commands[cmd](args)
+                    else:
+                       self.user_commands[cmd](*args)    
                 else:
                     self.user_commands[cmd]()
             else:
@@ -176,22 +181,31 @@ class smolOS:
 
                 #print(line)
                 
-                if utls.file_exists("/bin/" + cmdl + ".py"):
-                    
+                if ext=="py" or ext=="":
+
+                    #print(f"{cmdl=} {ext=}")
+                    imerr=False
                     try:
                         ins = __import__(cmdl)
                         if '__main__' in dir(ins):
+                            #print(f"{args=}")
                             if len(args) > 0:
                                 ins.__main__(args)
                             else:
                                 ins.__main__("")
 
+                    except ImportError as ie:
+                        imerr=True
+                        print(f"Command or programs does not exists {cmd}")
                     except Exception as e:
+                        imerr=True
                         print(f"Error executing script {cmd}")
                         sys.print_exception(e)
                     
                     finally:
-                        del sys.modules[cmdl]
+                        if not imerr:
+                            del sys.modules[cmdl]
+                        
 
                 elif ext=="sh":
                     
@@ -202,7 +216,7 @@ class smolOS:
                         sys.print_exception(e)
                     
                 else:
-                    self.print_err("unknown function. Try 'help'.")
+                    self.print_err("Unknown function or program. Try 'help'.")
 
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
@@ -214,20 +228,20 @@ class smolOS:
                     cmd=lin.split("#")
                     self.run_cmd(cmd[0])
  
-    def run_py_file(self, fn=""):
-        if fn == "":
+    def run_py_file(self, args):
+
+        if args[0] == "":
             self.print_err("Specify a file name to run.")
             return
-        
-        if utls.file_exists(fn):
-            exec(open(fn).read())
-            #exec(open(filepath).read(), { "_ARGS": args })
+
+        if utls.file_exists(args[0]):
+            exec(open(args[0]).read(), { "args": args[0:] })
         else:
-            self.print_err(f"{fn} does not exists.")
+            self.print_err(f"{args[0]} does not exists.")
 
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
-        
+            
     def exit(self):
         raise SystemExit
 
