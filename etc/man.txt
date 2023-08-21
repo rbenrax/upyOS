@@ -21,7 +21,7 @@ The sdata module contains all the system data, allowing access to the board conf
 
 If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
 
-I hope it is useful for you!, there are things to do, and improve, but the holidays are running out. 
+I hope it is useful for you!, there are things to do, and improve, but the holidays are running out.
 
 Directories structure:
 
