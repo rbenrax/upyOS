@@ -5,14 +5,14 @@ def __main__(args):
     
     if len(args) == 0:
         print ("Usage:")
-        print ("lineup <file>, upload file in line mode,")
-        print ("Send CTRL+D to end upload")
+        print ("fileup <file>, upload file in line mode")
         return
     
     if utls.protected(args[0]):
         print("Can overwrite system file!")
         return
     
+    print ("Send CTRL+D to end upload")
     with open(args[0], "wt") as fp:
       while (True):
         try:
