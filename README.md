@@ -30,28 +30,25 @@ Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS, based
 
 Explanation:
 
-The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of simpler programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
+he objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of more simple programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
 
 In main.py we can launch grub or smolos directly (see files).
 
-Grub will create in /etc dir a file (if doesn't exists) for configure the specific board pins, gpios and other parameters, also allow stop the system boot if any program hung the load.
+Grub will create in /etc dir a file (if doesn't exists) for configure the specific board pins, gpios and other parameters, you can remove unused parameter to optimize the memory use, also allow stop the system boot if any program hung the load.
 
-In smolos boot two shell scripts are executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution, you can remove the commands you don't need and make the boot as fast as you want, as well as include commands or programs that you need .
+In smolos boot, two shell scripts are executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution, you can remove the commands you don't need and make the boot as fast as you want, as well as include commands or programs that you need.
 
-Exists internal and external commands, and internal and externals shell scripts, internal located in /bin directory and are exceuted without extention, external can be located in any directory and are executed thin 'run' and 'sh' commands with file extention, external commands are self-explanatory and some have help (--h).
+Exists internal and external commands, and internal and externals shell scripts, internal located in /bin directory and are exceuted without extention, external can be located in any directory and are executed directly, external commands are self-explanatory and some have help (--h).
 
 The system can be extended with more external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough.
 
 The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, etc., allowing access to these parameters between programs.
 
-Environmet variables can be set, get and unset from commands/scripts (export, echo, unset) and python programs by sdata.getenv() and setenv() functions
-
 If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
 
-I hope it is useful for you!, there are things to do, and improve, but the holidays are running out.
+I hope it is useful for you!, there are things to do, and improve.
 
 Directories structure:
-
 - boot.py         Micropython statup file
 - main.py         Micropython statup file (boot system)
 
@@ -73,7 +70,6 @@ Internals commands:
 - rm:     Remove files
 - clear:  Clears the screen
 - info:   Get information about a file
-- run:    runs external python program
 - sh:     run external sh script
 - py:     Run python code
 - pwd:    Show current directory
@@ -105,6 +101,8 @@ Actual Development:
 - Added env variables in scripts and python programs, export, echo, unset, sdata.getenv() ans sdata.setenv().
 
 - ls now full functional, or so I hope.
+
+- Now shell scripts can trasalate environment variables.
 
 TODO List:
 - Enhance and move to external ls, cp, mv, etc. commands.

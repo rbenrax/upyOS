@@ -15,11 +15,17 @@
 
 #utelnetd start
 
-#test
-#run /opt/test_run.py 1 $? 3 $0 5 6 7
-/opt/test_run.py 1 $? 3 $0 5 6 7
+# External prog test
+#/opt/test_run.py 1 $? 3 $0 5 6 7
+
+# Env vars traslate test
+#export $0 opt
+#echo Directory: $0
+#ls $0
+#unset $0
 
 #help
+
 # Exit form OS to python REPL
 #exit
 

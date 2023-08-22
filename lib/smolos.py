@@ -1,6 +1,6 @@
 # smolOS by Krzysztof Krystian Jankowski
 # Homepage: http://smol.p1x.in/os/
-# Adptations by rbenrax
+# Adptated by rbenrax
 
 import sdata
 import utls
@@ -33,7 +33,7 @@ class smolOS:
         self.clear()
         print("Booting smolOS...")
 
-        # Load board and system configuration
+        # Load system  configuration and board definitions
         try:
             sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
             #print(sdata.sysconfig)
@@ -70,6 +70,7 @@ class smolOS:
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
             "cd": self.chdir,
+            "r": self.last_cmd,
             "exit" : self.exit
         }
 
@@ -79,9 +80,9 @@ class smolOS:
 
         if "turbo" in sdata.sysconfig:
             if sdata.sysconfig["turbo"]:
-                self.run_cmd("cpuclock -turbo")
+                self.run_cmd("cpufreq -turbo")
             else:
-                self.run_cmd("cpuclock -low")
+                self.run_cmd("cpufreq -low")
             
         ##Load modules
         if utls.file_exists("/etc/init.sh"):
@@ -99,6 +100,7 @@ class smolOS:
             
         ## End modules
         
+        self.prev_cmd=""
         self.print_msg("Type 'help' for a smolOS manual.")
 
         # Main Loop
@@ -134,6 +136,10 @@ class smolOS:
         
         if len(parts) > 0:
             cmd = parts[0]
+            
+            if cmd!="r":
+                self.prev_cmd = fcmd
+            
             #print(f"{cmd=}")
             args=[]
             
@@ -166,25 +172,23 @@ class smolOS:
                     ext  = ""
 
                 if ext=="py" or ext=="":
-                    #print(f" import mode {cmdl=} {ext=} {args}")
                     imerr=False
                     try:
                         ins = __import__(cmdl)
                         if '__main__' in dir(ins):
-                            #print(f"{args=}")
                             if len(args) > 0:
                                 ins.__main__(args)
                             else:
                                 ins.__main__("")
 
                     except KeyboardInterrupt:
-                        print(f"{cmd} ended")
+                        print(f"{cmd}: ended")
                     except ImportError as ie:
                         imerr=True
-                        print(f"Command or programs does not exists {cmd}")
+                        print(f"{cmd}: not found")
                     except Exception as e:
                         imerr=True
-                        print(f"Error executing script {cmd}")
+                        print(f"Error executing {cmd}")
                         sys.print_exception(e)
                     
                     finally:
@@ -193,7 +197,10 @@ class smolOS:
 
                 elif ext=="sh":
                     try:
-                        self.run_sh_script("/bin/" + cmdl + ".sh")
+                        if not "/" in cmdl:
+                            self.run_sh_script("/bin/" + cmdl + ".sh")
+                        else:
+                            self.run_sh_script(cmdl + ".sh")
                     except Exception as e:
                         print(f"Error executing script {command}")
                         sys.print_exception(e)
@@ -201,15 +208,38 @@ class smolOS:
                 else:
                     self.print_err("Unknown function or program. Try 'help'.")
 
+    def last_cmd(self):
+        # Only runs in ful terminals where is unnecesary
+        #from editstr import editstr
+        #print('┌───┬───┬───┬───┬───┬───')
+        #cmd = editstr(self.prev_cmd)
+        #self.run_cmd(cmd)
+        #del sys.modules["editstr"]
+        self.run_cmd(self.prev_cmd)
+
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
-                cont = f.read()
-                for lin in cont.split("\n"):
+                while True:
+                    lin = f.readline()
+                    if not lin: break
+
                     if lin.strip()=="": continue
-                    if len(lin)>1 and lin[0]=="#": continue
-                    cmd=lin.split("#")
-                    self.run_cmd(cmd[0])
+                    if len(lin)>0 and lin[0]=="#": continue
+                    cmdl=lin.split("#")[0] # Left comment line part
+                    
+                    # Translate env variables $*
+                    tmp = cmdl.split()
+                    
+                    if not tmp[0] in ["export", "echo", "unset"]:
+                        for e in tmp:
+                            if e[0]=="$":
+                                v=sdata.getenv(e[1:])
+                                cmdl = cmdl.replace(e, v)
+
+                    self.run_cmd(cmdl)
+        else:
+            print(f"{ssf}: script not found")
  
 #    def run_py_file(self, args):
 #        if args[0] == "":
@@ -224,7 +254,7 @@ class smolOS:
 
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
-            
+
     def exit(self):
         raise SystemExit
 
@@ -232,14 +262,13 @@ class smolOS:
          print("\033[2J")
          print("\033[H")
  
- # - - -
+# - - -
 
     def help(self):
-        print(sdata.name + " version " + sdata.version + "\n")
+        print(sdata.name + " version: " + sdata.version + "\n")
 
         # Ordering files
-        with open("/etc/man.txt","r") as mf:
-            print(mf.read())
+        self.cat("/etc/help.txt")
         
         print("External commands:\n")
         
@@ -261,7 +290,7 @@ class smolOS:
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
         utime.sleep(0.5)
-
+            
 # - -  
 
     def ls(self, path="", mode="-l"):
@@ -361,11 +390,13 @@ class smolOS:
               
         return size
 
-    def cat(self,filename=""):
-        if filename == "": return
-        with open(filename,'r') as file:
-            content = file.read()
-            print(content)
+    def cat(self, fn=""):
+        if fn == "": return
+        with open(fn,'r') as f:
+            while True:
+                lin = f.readline()
+                if not lin: break
+                print(lin, end="")
 
     def cp(self, spath="", dpath=""):
         if spath == "" or dpath=="": return
@@ -390,8 +421,6 @@ class smolOS:
                         if not buf:
                             break
                         fd.write(buf)
-            
-            self.print_msg("File copied successfully.")
 
     def mv(self,spath="", dpath=""):
         if spath == "" or dpath == "": return
@@ -411,7 +440,6 @@ class smolOS:
             self.print_err("Can not move system files!")
         else:
             uos.rename(spath, dpath)
-            self.print_msg("File moved successfully.")
 
     def rm(self, filename=""):
         if filename == "": return
@@ -419,7 +447,6 @@ class smolOS:
             self.print_err("Can not remove system file!")
         else:
             uos.remove(filename)
-            self.print_msg(f"File {filename} removed successfully.")
 
     def pwd(self):
         print(uos.getcwd())
