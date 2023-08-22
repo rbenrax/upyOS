@@ -1,6 +1,6 @@
 # smolOS by Krzysztof Krystian Jankowski
 # Homepage: http://smol.p1x.in/os/
-# Adptations by rbenrax
+# Adptated by rbenrax
 
 import sdata
 import utls
@@ -33,7 +33,7 @@ class smolOS:
         self.clear()
         print("Booting smolOS...")
 
-        # Load board and system configuration
+        # Load system  configuration and board definitions
         try:
             sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
             #print(sdata.sysconfig)
@@ -166,12 +166,10 @@ class smolOS:
                     ext  = ""
 
                 if ext=="py" or ext=="":
-                    #print(f" import mode {cmdl=} {ext=} {args}")
                     imerr=False
                     try:
                         ins = __import__(cmdl)
                         if '__main__' in dir(ins):
-                            #print(f"{args=}")
                             if len(args) > 0:
                                 ins.__main__(args)
                             else:
