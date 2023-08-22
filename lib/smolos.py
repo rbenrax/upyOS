@@ -234,7 +234,7 @@ class smolOS:
                     if not tmp[0] in ["export", "echo", "unset"]:
                         for e in tmp:
                             if e[0]=="$":
-                                v=sdata.getenv(e)
+                                v=sdata.getenv(e[1:])
                                 cmdl = cmdl.replace(e, v)
 
                     self.run_cmd(cmdl)
