@@ -33,7 +33,7 @@ def unset(var):
     del sysconfig["env"][var]
     
 """Get the gpio assigned to a pin"""
-def getgpiop(pin):
+def getgpio(pin):
     gpios=board["gpio"][0]
     for k, v in gpios.items():
         if v == pin:
@@ -41,7 +41,7 @@ def getgpiop(pin):
     return 0
 
 """Get a dict of pins for a specific service category"""
-def getgpio(cat, ins):
+def getgpios(cat, ins):
     gps={}
     gpios=board["gpio"][0]
     #print(gpios)
@@ -56,8 +56,8 @@ def getgpio(cat, ins):
 
 if __name__ == "__main__":
     
-    #gpios = getgpio("i2c", 0)
+    #gpios = getgpios("i2c", 0)
     #print(gpios)
-    #print(getgpiop(4))
+    #print(getgpio(4))
     setenv("$?", 10)
     print(getenv("$?"))

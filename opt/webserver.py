@@ -22,7 +22,7 @@ if __name__ == "__main__":
     pin=2
 else:
     import sdata
-    pin=sdata.getgpiop(19)
+    pin=sdata.getgpio(19)
 
 sensor = dht.DHT11(Pin(pin))
 #sensor = dht.DHT11(Pin(2))
