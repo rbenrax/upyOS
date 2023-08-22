@@ -238,7 +238,7 @@ class smolOS:
         print(sdata.name + " version " + sdata.version + "\n")
 
         # Ordering files
-        with open("/etc/man.txt","r") as mf:
+        with open("/etc/help.txt","r") as mf:
             print(mf.read())
         
         print("External commands:\n")
