@@ -253,8 +253,7 @@ class smolOS:
         print(sdata.name + " version " + sdata.version + "\n")
 
         # Ordering files
-        with open("/etc/help.txt","r") as mf:
-            print(mf.read())
+        self.cat("/etc/help.txt")
         
         print("External commands:\n")
         
@@ -376,11 +375,13 @@ class smolOS:
               
         return size
 
-    def cat(self,filename=""):
-        if filename == "": return
-        with open(filename,'r') as file:
-            content = file.read()
-            print(content)
+    def cat(self, fn=""):
+        if fn == "": return
+        with open(fn,'r') as f:
+            while True:
+                lin = f.readline()
+                if not lin: break
+                print(lin, end="")
 
     def cp(self, spath="", dpath=""):
         if spath == "" or dpath=="": return
