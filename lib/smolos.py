@@ -79,9 +79,9 @@ class smolOS:
 
         if "turbo" in sdata.sysconfig:
             if sdata.sysconfig["turbo"]:
-                self.run_cmd("cpuclock -turbo")
+                self.run_cmd("cpufreq -turbo")
             else:
-                self.run_cmd("cpuclock -low")
+                self.run_cmd("cpufreq -low")
             
         ##Load modules
         if utls.file_exists("/etc/init.sh"):

@@ -7,16 +7,14 @@ def __main__(args):
         print("Set clock speed, cpuclock <option>: -low, -turbo, --h -v -t (toggle)")
         return
 
-    actclk = sdata.sysconfig["turbo"]
+    turbo = sdata.sysconfig["turbo"]
     
     if args[0] == "-v":
-        print(f"CPU speed: {freq()*0.000001} MHz, Turbo: {actclk}")
+        print(f"CPU speed: {freq()*0.000001} MHz, Turbo: {turbo}")
         return
 
-    turbo = False
-
     if args[0] == "-t":
-        turbo = not actclk
+        turbo = not turbo
 
     if args[0] == "-low" or turbo == False :
         f = sdata.board["mcu"][0]["speed"]["slow"]
@@ -28,8 +26,5 @@ def __main__(args):
     freq(f * 1000000)
     print("CPU speed set to " + str(f) + " Mhz")
         
-if __name__ == "__main__":
 
-    args =["-low"]
-    __main__(args)
         
