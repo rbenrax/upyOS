@@ -206,8 +206,18 @@ class smolOS:
                 for lin in cont.split("\n"):
                     if lin.strip()=="": continue
                     if len(lin)>1 and lin[0]=="#": continue
-                    cmd=lin.split("#")
-                    self.run_cmd(cmd[0])
+                    cmdl=lin.split("#")[0] # Left part os line
+
+                    # Translate env variables $*
+                    tmp = cmdl.split()
+                    
+                    if not tmp[0] in ["export", "echo", "unset"]:
+                        for e in tmp:
+                            if e[0]=="$":
+                                v=sdata.getenv(e)
+                                cmdl = cmdl.replace(e, v)
+
+                    self.run_cmd(cmdl)
  
 #    def run_py_file(self, args):
 #        if args[0] == "":
