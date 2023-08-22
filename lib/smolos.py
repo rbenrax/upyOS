@@ -202,12 +202,14 @@ class smolOS:
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
-                cont = f.read()
-                for lin in cont.split("\n"):
-                    if lin.strip()=="": continue
-                    if len(lin)>1 and lin[0]=="#": continue
-                    cmdl=lin.split("#")[0] # Left part os line
+                while True:
+                    lin = f.readline()
+                    if not lin: break
 
+                    if lin.strip()=="": continue
+                    if len(lin)>0 and lin[0]=="#": continue
+                    cmdl=lin.split("#")[0] # Left comment line part
+                    
                     # Translate env variables $*
                     tmp = cmdl.split()
                     
