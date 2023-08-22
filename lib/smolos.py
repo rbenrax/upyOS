@@ -182,13 +182,13 @@ class smolOS:
                                 ins.__main__("")
 
                     except KeyboardInterrupt:
-                        print(f"{cmd} ended")
+                        print(f"{cmd}: ended")
                     except ImportError as ie:
                         imerr=True
-                        print(f"Command or programs does not exists {cmd}")
+                        print(f"{cmd}: not found")
                     except Exception as e:
                         imerr=True
-                        print(f"Error executing script {cmd}")
+                        print(f"Error executing {cmd}")
                         sys.print_exception(e)
                     
                     finally:
@@ -209,11 +209,13 @@ class smolOS:
                     self.print_err("Unknown function or program. Try 'help'.")
 
     def last_cmd(self):
-        from editstr import editstr
-        print('┌───┬───┬───┬───┬───┬───')
-        cmd = editstr(self.prev_cmd)
-        self.run_cmd(cmd)
-        del sys.modules["editstr"]
+        # Only runs in ful terminals where is unnecesary
+        #from editstr import editstr
+        #print('┌───┬───┬───┬───┬───┬───')
+        #cmd = editstr(self.prev_cmd)
+        #self.run_cmd(cmd)
+        #del sys.modules["editstr"]
+        self.run_cmd(self.prev_cmd)
 
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
@@ -237,7 +239,7 @@ class smolOS:
 
                     self.run_cmd(cmdl)
         else:
-            print(f"{ssf} script not found")
+            print(f"{ssf}: script not found")
  
 #    def run_py_file(self, args):
 #        if args[0] == "":
@@ -263,7 +265,7 @@ class smolOS:
 # - - -
 
     def help(self):
-        print(sdata.name + " version " + sdata.version + "\n")
+        print(sdata.name + " version: " + sdata.version + "\n")
 
         # Ordering files
         self.cat("/etc/help.txt")
@@ -419,8 +421,6 @@ class smolOS:
                         if not buf:
                             break
                         fd.write(buf)
-            
-            self.print_msg("File copied successfully.")
 
     def mv(self,spath="", dpath=""):
         if spath == "" or dpath == "": return
@@ -440,7 +440,6 @@ class smolOS:
             self.print_err("Can not move system files!")
         else:
             uos.rename(spath, dpath)
-            self.print_msg("File moved successfully.")
 
     def rm(self, filename=""):
         if filename == "": return
@@ -448,7 +447,6 @@ class smolOS:
             self.print_err("Can not remove system file!")
         else:
             uos.remove(filename)
-            self.print_msg(f"File {filename} removed successfully.")
 
     def pwd(self):
         print(uos.getcwd())
