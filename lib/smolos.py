@@ -191,7 +191,10 @@ class smolOS:
 
                 elif ext=="sh":
                     try:
-                        self.run_sh_script("/bin/" + cmdl + ".sh")
+                        if not "/" in cmdl:
+                            self.run_sh_script("/bin/" + cmdl + ".sh")
+                        else:
+                            self.run_sh_script(cmdl + ".sh")
                     except Exception as e:
                         print(f"Error executing script {command}")
                         sys.print_exception(e)
@@ -220,6 +223,8 @@ class smolOS:
                                 cmdl = cmdl.replace(e, v)
 
                     self.run_cmd(cmdl)
+        else:
+            print(f"{ssf} script not found")
  
 #    def run_py_file(self, args):
 #        if args[0] == "":
