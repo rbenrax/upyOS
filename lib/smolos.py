@@ -70,6 +70,7 @@ class smolOS:
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
             "cd": self.chdir,
+            "r": self.last_cmd,
             "exit" : self.exit
         }
 
@@ -99,6 +100,7 @@ class smolOS:
             
         ## End modules
         
+        self.prev_cmd=""
         self.print_msg("Type 'help' for a smolOS manual.")
 
         # Main Loop
@@ -134,6 +136,10 @@ class smolOS:
         
         if len(parts) > 0:
             cmd = parts[0]
+            
+            if cmd!="r":
+                self.prev_cmd = fcmd
+            
             #print(f"{cmd=}")
             args=[]
             
@@ -202,6 +208,13 @@ class smolOS:
                 else:
                     self.print_err("Unknown function or program. Try 'help'.")
 
+    def last_cmd(self):
+        from editstr import editstr
+        print('┌───┬───┬───┬───┬───┬───')
+        cmd = editstr(self.prev_cmd)
+        self.run_cmd(cmd)
+        del sys.modules["editstr"]
+
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
@@ -239,7 +252,7 @@ class smolOS:
 
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
-            
+
     def exit(self):
         raise SystemExit
 
@@ -247,7 +260,7 @@ class smolOS:
          print("\033[2J")
          print("\033[H")
  
- # - - -
+# - - -
 
     def help(self):
         print(sdata.name + " version " + sdata.version + "\n")
@@ -275,7 +288,7 @@ class smolOS:
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
         utime.sleep(0.5)
-
+            
 # - -  
 
     def ls(self, path="", mode="-l"):
