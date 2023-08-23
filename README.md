@@ -8,19 +8,10 @@ smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266,
 
 
 This is a simple test implementation with some modifications of smolOS over ESP32-C3, ESP8266 and YD-2040 and any others by rbenrax.
-
 The target is to get a common base to use stand alone microcontroller, and fun using it. 
 
-Luatos esp32-c3
-![luatos](media/luatos_CORE-ESP32_pinout.webp)
-
-VCC-GND Studio YD-2040
-![VCC-GND Studio](media/YD-2040-PIN.png)
-
-NodeMCU
-![NodeMCU esp8266](media/Node-MCU-Pinout.png )
-
 ![YD-2040](media/smolos_01.png )
+
 ![luatos on esp32-c3](media/smolos_02.png )
 
 
@@ -82,6 +73,14 @@ Actual external commands:
 
 cpufreq, df, echo, env, export, fileup, find, free, grep, i2cscan, ifconfig, led, lshw, lsmod, mem_info, modules, ping, reboot, recovery, rmmod, sh.sh, test, touch, uhttpd, unset, uptime, utelnetd, vi, wait, wget, wifi
 
+esp32-c3
+![luatos](media/luatos_CORE-ESP32_pinout.webp)
+
+VCC-GND Studio YD-2040
+![VCC-GND Studio](media/YD-2040-PIN.png)
+
+NodeMCU
+![NodeMCU esp8266](media/Node-MCU-Pinout.png )
 
 
 Actual Development:
