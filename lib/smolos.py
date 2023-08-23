@@ -106,7 +106,7 @@ class smolOS:
         # Main Loop
         while True:
             try:
-                user_input = input("\n" + uos.getcwd() + " $: ")
+                user_input = input(uos.getcwd() + " $: ")
                 self.run_cmd(user_input)
                 
             except KeyboardInterrupt:
@@ -125,6 +125,7 @@ class smolOS:
  # - - - - - - - -
  
     def run_cmd(self, fcmd):
+
         fcmd=fcmd.strip()
 
         if fcmd[:3]=="py ":
@@ -154,7 +155,7 @@ class smolOS:
             if cmd in self.user_commands:
                 if len(args) > 0:
                     
-                    # removed run command
+                    # Run command removed
                     #if cmd=="run":
                         #print(f"run mode {cmd} {args}")
                     #    self.user_commands[cmd](args)
@@ -164,9 +165,9 @@ class smolOS:
                     self.user_commands[cmd]()
             else:
                 tmp = cmd.split(".")
-                if len(tmp) == 2:
+                if len(tmp) > 1:
                     cmdl = tmp[0]
-                    ext  = tmp[1]
+                    ext  = tmp[-1]
                 else:
                     cmdl = cmd
                     ext  = ""
@@ -209,7 +210,7 @@ class smolOS:
                     self.print_err("Unknown function or program. Try 'help'.")
 
     def last_cmd(self):
-        # Only runs in ful terminals where is unnecesary
+        # Only runs in full terminals where is unnecesary
         #from editstr import editstr
         #print('┌───┬───┬───┬───┬───┬───')
         #cmd = editstr(self.prev_cmd)
