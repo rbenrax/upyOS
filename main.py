@@ -7,5 +7,5 @@
 # grub.mbr()
 
 # Launch smolOS once generated the .board file, aprox 0.6kb ram saved
-#import smolos
-#smol = smolos.smolOS()
+import smolos
+smol = smolos.smolOS()
