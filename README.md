@@ -28,9 +28,13 @@ smolOS Help:
 
 Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS, based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
 
+:
+
+Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS, based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
+
 Explanation:
 
-he objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of more simple programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
+The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of more simple programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
 
 In main.py we can launch grub or smolos directly (see files).
 
@@ -42,21 +46,21 @@ Exists internal and external commands, and internal and externals shell scripts,
 
 The system can be extended with more external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough.
 
-The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, etc., allowing access to these parameters between programs.
+The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, environment variables, etc., allowing access to these parameters between programs and scripts.
 
 If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
 
-I hope it is useful for you!, there are things to do, and improve.
+I hope it is useful for you!, there are things to do, and to improve.
 
 Directories structure:
 - boot.py         Micropython statup file
 - main.py         Micropython statup file (boot system)
 
       /bin        Commands and shell scripts
-      /ext        Configuration files
+      /etc        Configuration files
       /extlib     External libraries
       /lib        System implementations libraries
-      /opt        Specific solution or add-on programs
+      /opt        Specific solution or add-on programs (not in path)
       /tmp        Temporary directory (to put what you don't know where to put :-)
 
 
@@ -80,7 +84,7 @@ Internals commands:
 
 Actual external commands:
 
-cpuclock, df, free, i2cscan, ifconfig, led, lineup, lshw, lsmod, mem_info, modules, ping, reboot, recovery, rmmod, sh.sh, test, touch, uhttpd, uptime, utelnetd, vi, wait, wget, wifi
+cpufreq, df, echo, env, export, fileup, find, free, grep, i2cscan, ifconfig, led, lshw, lsmod, mem_info, modules, ping, reboot, recovery, rmmod, sh.sh, test, touch, uhttpd, unset, uptime, utelnetd, vi, wait, wget, wifi
 
 
 
@@ -98,16 +102,18 @@ Actual Development:
 
 - Added recovery mode, to avoid load of start up failed commands
 
-- Added env variables in scripts and python programs, export, echo, unset, sdata.getenv() ans sdata.setenv().
+- Added env envinment variables in scripts and python programs, export, echo, unset sdata.getenv() ans sdata.setenv().
 
-- ls now full functional, or so I hope.
+- ls command is now full functional, or so I hope.
 
 - Now shell scripts can trasalate environment variables.
 
 TODO List:
-- Enhance and move to external ls, cp, mv, etc. commands.
-- Add grep, du, diff, find, tar, uname and hostname.
+- Enhance and move to external ls, cp, mv, etc. commands, to cut memory use.
+- Add diff, tar, uname, hostname and ther usefull commands.
+- Complete wifi and bluetooth support
 - Add threads
+- Add pipes and output redirections??
 - Fix errors
 
 Wishlist is open ;)
