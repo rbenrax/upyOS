@@ -15,7 +15,7 @@ sysconfig={}
 
 #sysconfig ={"env" : {"$?": "9", "$0": "a", "$1": "b", "$2": "c", "$3": "d"}}
 
-"""Get a value from environment variables"""
+#"""Get a value from environment variables"""
 def getenv(var):
     
     #print(sysconfig["env"])
@@ -24,15 +24,15 @@ def getenv(var):
             return v
     return("")
 
-"""Set a value to a environment variable"""
+#"""Set a value to a environment variable"""
 def setenv(var, val):    
     sysconfig["env"][var]=val
 
-"""Remove a environment variable"""
+#"""Remove a environment variable"""
 def unset(var):    
     del sysconfig["env"][var]
     
-"""Get the gpio assigned to a pin"""
+#"""Get the gpio assigned to a pin"""
 def getgpio(pin):
     gpios=board["gpio"][0]
     for k, v in gpios.items():
@@ -40,7 +40,7 @@ def getgpio(pin):
             return int(k)
     return 0
 
-"""Get a dict of pins for a specific service category"""
+#"""Get a dict of pins for a specific service category"""
 def getgpios(cat, ins):
     gps={}
     gpios=board["gpio"][0]
@@ -53,11 +53,10 @@ def getgpios(cat, ins):
                 #print(kps, k)
     return gps
 
-
-if __name__ == "__main__":
+#if __name__ == "__main__":
     
     #gpios = getgpios("i2c", 0)
     #print(gpios)
     #print(getgpio(4))
-    setenv("$?", 10)
-    print(getenv("$?"))
+    #setenv("$?", 10)
+    #print(getenv("$?"))
