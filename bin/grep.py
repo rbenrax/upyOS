@@ -1,11 +1,10 @@
-import sdata
 import uos
 import utls
 
 def __main__(args):
 
     if len(args) == 0:
-        print("Find text in files, grep <option>: <text> [-r] ")
+        print("Find text in files, grep <text> <options>: [-rv] (recursive, verbose) ")
         return
     
     txt=""
@@ -28,10 +27,15 @@ def __main__(args):
         for f in tmp:
             if not utls.isdir(f):
                 with open(apath + f, "r") as fh:
-                    ft=fh.read()
-                    if ft.find(atxt)!=-1:
-                        print(f"Found: {apath}{f}")
-                        
+                    while True:
+                        ft=fh.readline()
+                        if not ft: break
+
+                        if ft.find(atxt)>-1:
+                            print(f"Found: {apath}{f}")
+                            if "v" in mode:
+                                print(f"{ft}")
+
             elif "r" in mode:
                 search(atxt, f, amode)
 
@@ -39,7 +43,7 @@ def __main__(args):
 
 if __name__ == "__main__":
 
-    args = ["sys", "-r"]
+    args = [".read(", "-rv"]
     __main__(args)
         
         
