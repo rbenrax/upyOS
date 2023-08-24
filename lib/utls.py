@@ -1,11 +1,15 @@
 # file utls
-import uos
-import json
 import sdata
+
+from uos import stat
+from uos import getcwd
+
+from json import dump as jdump
+from json import load as jload
 
 MONTH = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
-WEEKDAY = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
+#WEEKDAY = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
 
 def file_exists(filename):
     return get_mode(filename) & 0xc000 != 0
@@ -18,29 +22,24 @@ def isfile(filename):
 
 def get_mode(filename):
     try:
-        return uos.stat(filename)[0]
+        return stat(filename)[0]
     except OSError:
         return 0
 
 def get_stat(filename):
     try:
-        return uos.stat(filename)
+        return stat(filename)
     except OSError:
         return (0,) * 10
 
 # ---
 
 def dump(obj, file):
-    json.dump(obj, file)
+    jdump(obj, file)
     
 def load(file):
-    return json.load(file)
+    return jload(file)
 
-def dumps(obj):
-    return json.dumps(obj)
-    
-def loads(data):
-    return json.loads(data)
 
 def load_conf_file(path):
     with open(path, "r") as cf:
@@ -55,10 +54,10 @@ def save_conf_file(obj, path):
 def protected(path):
     
     if not "/" in path:
-        if uos.getcwd() == "/":
+        if getcwd() == "/":
             path = "/" + path
         else:
-            path = uos.getcwd() + "/" + path
+            path = getcwd() + "/" + path
         
     #print(sdata.sysconfig["pfiles"])
     #print(path)
@@ -89,7 +88,7 @@ def tspaces(t, n=12, ab="a", fc=" "):
 
 # - - - -
 
-if __name__ == "__main__":      
-    print(human(1257))
-    print(tspaces("rafa", 12, "b", " "))
-    gpios = getgpio("i2c", 0)
+#if __name__ == "__main__":      
+#    print(human(1257))
+#    print(tspaces("rafa", 12, "b", " "))
+#    gpios = getgpio("i2c", 0)
