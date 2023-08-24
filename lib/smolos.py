@@ -2,11 +2,10 @@
 # Homepage: http://smol.p1x.in/os/
 # Adptated by rbenrax
 
-import sdata
-import utls
-import uos
-import utime
 import sys
+import sdata
+import uos
+import utls
 
 class smolOS:
     def __init__(self):
@@ -14,7 +13,6 @@ class smolOS:
         try:
             del sys.modules["syscfg"]
             del sys.modules["grub"]
-            #print(sys.modules)
         except:
             pass
         
@@ -37,11 +35,11 @@ class smolOS:
         try:
             sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
             #print(sdata.sysconfig)
-            print("System config loaded.")
+            print("System cfg loaded.")
             
             sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
             #print(sdata.board)
-            print("Board config loaded.")
+            print("Board cfg loaded.")
             
         except OSError as ex:
             print("Problem loading configuration" + str(ex))
@@ -60,13 +58,12 @@ class smolOS:
             "cp" : self.cp,
             "mv" : self.mv,
             "rm": self.rm,
-#            "run": self.run_py_file,
-            "sh" : self.run_sh_script,
-            "py": self.run_py_code,
             "pwd": self.pwd,
             "cd": self.chdir,
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
+            "sh" : self.run_sh_script,
+            "py": self.run_py_code,
             "r": self.last_cmd,
             "exit" : self.exit
         }
@@ -81,7 +78,6 @@ class smolOS:
             else:
                 self.run_cmd("cpufreq -low")
             
-        ##Load modules
         if utls.file_exists("/etc/init.sh"):
             self.print_msg("Normal mode boot")
             
@@ -94,8 +90,6 @@ class smolOS:
             self.run_cmd("sh /etc/rc.local")
         else:
             self.print_msg("Recovery mode boot")
-            
-        ## End modules
         
         self.prev_cmd=""
         self.print_msg("Type 'help' for a smolOS manual.")
@@ -151,12 +145,6 @@ class smolOS:
             
             if cmd in self.user_commands:
                 if len(args) > 0:
-                    
-                    # Run command removed
-                    #if cmd=="run":
-                        #print(f"run mode {cmd} {args}")
-                    #    self.user_commands[cmd](args)
-                    #else:
                     self.user_commands[cmd](*args)
                 else:
                     self.user_commands[cmd]()
@@ -239,27 +227,9 @@ class smolOS:
         else:
             print(f"{ssf}: script not found")
  
-#    def run_py_file(self, args):
-#        if args[0] == "":
-#           self.print_err("Specify a file name to run.")
-#           return
-#
-#        if utls.file_exists(args[0]):
-#            #print(f"P1: {args=}")
-#            exec(open(args[0]).read(), { "args": args[0:] })
-#        else:
-#            self.print_err(f"{args[0]} does not exists.")
-
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
 
-    def exit(self):
-        raise SystemExit
-
-    def clear(self):
-         print("\033[2J")
-         print("\033[H")
- 
 # - - -
 
     def help(self):
@@ -280,13 +250,18 @@ class smolOS:
         
         print(buf[:-2])
 
+    def clear(self):
+         print("\033[2J")
+         print("\033[H")
+
+    def exit(self):
+        raise SystemExit
+
     def print_err(self, error):
         print(f"\n\033[1;37;41m<!>{error}<!>\033[0m")
-        utime.sleep(1)
 
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
-        utime.sleep(0.5)
             
 # - -  
  

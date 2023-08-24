@@ -10,6 +10,7 @@ def __main__(args):
                 lin = f.readline()
                 if not lin: break
                 print(lin, end="")
+            print("")
 
 #if __name__ == "__main__":
 
