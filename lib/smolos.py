@@ -56,7 +56,6 @@ class smolOS:
         # Internal Commands def
         self.user_commands = {
             "help": self.help,
-            "cat": self.cat,
             "cp" : self.cp,
             "mv" : self.mv,
             "rm": self.rm,
@@ -266,8 +265,7 @@ class smolOS:
     def help(self):
         print(sdata.name + " version: " + sdata.version + "\n")
 
-        # Ordering files
-        self.cat("/etc/help.txt")
+        self.run_cmd("cat /etc/help.txt")
         
         print("External commands:\n")
         
@@ -292,14 +290,6 @@ class smolOS:
             
 # - -  
  
-    def cat(self, fn=""):
-        if fn == "": return
-        with open(fn,'r') as f:
-            while True:
-                lin = f.readline()
-                if not lin: break
-                print(lin, end="")
-
     def cp(self, spath="", dpath=""):
         if spath == "" or dpath=="": return
         if not utls.file_exists(spath):

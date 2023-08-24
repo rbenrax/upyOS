@@ -1,4 +1,4 @@
-import time
+from utime import sleep
 import sdata
 
 def __main__(args):
@@ -7,4 +7,4 @@ def __main__(args):
         print ("Usage: wait <seconds>")
         return
 
-    time.sleep(int(float(args[0])))
+    sleep(int(float(args[0])))
