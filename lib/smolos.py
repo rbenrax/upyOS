@@ -56,17 +56,17 @@ class smolOS:
         # Internal Commands def
         self.user_commands = {
             "help": self.help,
+            "clear": self.clear,
             "cp" : self.cp,
             "mv" : self.mv,
             "rm": self.rm,
-            "clear": self.clear,
 #            "run": self.run_py_file,
             "sh" : self.run_sh_script,
             "py": self.run_py_code,
             "pwd": self.pwd,
+            "cd": self.chdir,
             "mkdir": self.mkdir,
             "rmdir": self.rmdir,
-            "cd": self.chdir,
             "r": self.last_cmd,
             "exit" : self.exit
         }
