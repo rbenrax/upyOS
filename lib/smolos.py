@@ -56,13 +56,11 @@ class smolOS:
         # Internal Commands def
         self.user_commands = {
             "help": self.help,
-            "ls": self.ls,
             "cat": self.cat,
             "cp" : self.cp,
             "mv" : self.mv,
             "rm": self.rm,
             "clear": self.clear,
-            "info": self.info,
 #            "run": self.run_py_file,
             "sh" : self.run_sh_script,
             "py": self.run_py_code,
@@ -293,104 +291,7 @@ class smolOS:
         utime.sleep(0.5)
             
 # - -  
-
-    def ls(self, path="", mode="-l"):
-
-        if "-" in path:
-            mode = path
-            path=""
-
-        if "--h" in mode:
-            print("List files and directories, ls <path> <options>, --h -lhasnk")
-            print("-h: human readable, -a: incl. hidden, -s: subdirectories, -k: no totals, -n: no file details")
-            return
-
-        cur_dir=uos.getcwd()
-        #print("0", cur_dir)
-        
-        tsize=0
-        if utls.isdir(path):
-            uos.chdir(path)
-            
-            if path=="" or path==".." : path=uos.getcwd()
-
-            #print("1", path)
-            
-            if len(path)>0:
-                if path[0]  !="/": path = "/" + path
-                if path[-1] !="/": path+="/"
-
-            #print("2", path)
-            
-            tmp=uos.listdir()
-            tmp.sort()
-
-            for file in tmp:
-                tsize += self.info(path + file, mode)
-                if "s" in mode and utls.isdir(path + file):
-                    print("\n" + path + file + ":")
-                    tsize += self.ls(path + file, mode)
-                    print("")
-            
-            uos.chdir(cur_dir)
-            
-            if not 'k' in mode:
-                if 'h' in mode:
-                    print(f"\nTotal {path}: {utls.human(tsize)}")
-                else:
-                    print(f"\nTotal {path}: {tsize} bytes")
-
-        else:
-            print("Invalid directory")
-        #print("3", uos.getcwd())
-        
-        return tsize
-    
-    def info(self, path="", mode="-l"):
-
-        if not utls.file_exists(path):
-            self.print_err("File not found")
-            return
-        
-        filename= path.split("/")[-1]
-        
-        # Hidden files
-        if not "a" in mode:
-            if filename[0]==".": return 0
-        
-        stat = utls.get_stat(path)
-        
-        #mode = stat[0]
-        size = stat[6]
-        mtime = stat[8]
-        localtime = utime.localtime(mtime)
-
-        if utls.isdir(path):
-            fattr= "d"
-        else:
-            fattr= " "
-
-        if utls.protected(path):
-            fattr += "r-"
-        else:
-            fattr += "rw"
-
-        if ".py" in path or ".sh" in path:
-            fattr += 'x'
-        else:
-            fattr += '-'
-        
-        if "h" in mode:
-            ssize = f"{utls.human(size)}"
-        else:
-            ssize = f"{size:7}"
-            
-        if not "n" in mode:
-            print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} " + \
-                  f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename}")
-              
-        return size
-
+ 
     def cat(self, fn=""):
         if fn == "": return
         with open(fn,'r') as f:
