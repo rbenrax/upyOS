@@ -38,16 +38,8 @@ main.py         Micropython statup file (boot system)
 
 Internals commands:
 
-help:   This help
-clear:  Clears the screen
-cp:     Copy files
-mv:     Move files
-rm:     Remove files
-sh      run shell script, if no .sh extention
+sh      run shell script, if script has no .sh extention
 py:     Run python code
-pwd:    Show current directory
-cd:     Change default directory
-mkdir:  Make directory
-rmdir:  Remove directory
+r:      Repeat last command
 exit:   Exit to Micropython shell
 

@@ -55,7 +55,6 @@ class smolOS:
             "sh" : self.run_sh_script,
             "py": self.run_py_code,
             "r": self.last_cmd,
-            "help": self.help,
             "exit" : self.exit
         }
 
@@ -99,7 +98,7 @@ class smolOS:
                 self.print_msg("Send EOF")
 
             except Exception as ex:
-                self.print_err("cmd error, " + str(ex))
+                print("cmd error, " + str(ex))
                 if sdata.debug:
                     sys.print_exception(ex)
                 pass
@@ -183,7 +182,7 @@ class smolOS:
                         sys.print_exception(e)
                     
                 else:
-                    self.print_err("Unknown function or program. Try 'help'.")
+                    print(f"{cmd}: Unknown function or program. Try 'help'.")
 
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
@@ -223,29 +222,8 @@ class smolOS:
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
 
-    def help(self):
-        print(sdata.name + " version: " + sdata.version + "\n")
-
-        self.run_cmd("cat /etc/help.txt")
-        
-        print("External commands:\n")
-        
-        tmp=uos.listdir("/bin")
-        tmp.sort()
-        buf=""
-        for ecmd in tmp:
-            if ecmd.endswith(".py"):
-                buf += ecmd[:-3] + ", "
-            else:
-                buf += ecmd + ", "
-        
-        print(buf[:-2])
-
     def exit(self):
         raise SystemExit
-
-    def print_err(self, error):
-        print(f"\n\033[1;37;41m<!>{error}<!>\033[0m")
 
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
