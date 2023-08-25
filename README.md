@@ -54,24 +54,14 @@ Directories structure:
 Internals commands:
 
 - help:   This help
-- ls:     List files and directories
-- cat:    print files content
-- cp:     Copy files
-- mv:     Move files
-- rm:     Remove files
-- clear:  Clears the screen
-- info:   Get information about a file
-- sh:     run external sh script
+- sh:     run external shell script if script has no sh extention
 - py:     Run python code
-- pwd:    Show current directory
-- mkdir:  Make directory
-- rmdir:  Remove directory
-- cd:     Change default directory
+- r:      Repeat last command
 - exit:   Exit to Micropython shell
 
 Actual external commands:
 
-cpufreq, df, echo, env, export, fileup, find, free, grep, i2cscan, ifconfig, led, lshw, lsmod, mem_info, modules, ping, reboot, recovery, rmmod, sh.sh, test, touch, uhttpd, unset, uptime, utelnetd, vi, wait, wget, wifi
+cat, cd, clear, cp, cpufreq, df, echo, env, export, fileup, find, free, grep, help, i2cscan, ifconfig, led, ls, lshw, lsmod, mi, mkdir, modules, mv, ping, pwd, reboot, recovery, rm, rmdir, rmmod, sh.sh, test, touch, uhttpd, unset, uptime, utelnetd, vi, wait, wget, wifi
 
 esp32-c3
 ![luatos](media/luatos_CORE-ESP32_pinout.webp)
