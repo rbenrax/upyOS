@@ -5,8 +5,7 @@ def __main__(args):
     if len(args) == 1:
         mode=args[0]
     else:
-        print ("Usage:")
-        print ("Ping IP, ping <ip>led")
+        print ("Ping IP\nUsage: ping <ip>")
         return
     
     ping(args[0])

@@ -4,7 +4,7 @@ import utls
 def __main__(args):
 
     if len(args) != 2:
-        print("Copy file, cp <spath> <dpath>")
+        print("Copy file\nUsage: cp <spath> <dpath>")
         return
     else:
         spath=args[0]

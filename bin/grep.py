@@ -4,7 +4,7 @@ import utls
 def __main__(args):
 
     if len(args) == 0:
-        print("Find text in files, grep <text> <options>: [-rv] (recursive, verbose) ")
+        print("Find text in files\nUsage: grep <text> <options>: [-rv] (recursive, verbose) ")
         return
     
     txt=""

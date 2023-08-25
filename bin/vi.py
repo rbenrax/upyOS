@@ -6,8 +6,7 @@ import editor
 
 def __main__(args):
     if len(args) == 0:
-        print ("Usage:")
-        print ("vi <file> ")
+        print ("Edit a file\nUsage: vi <filename>")
         return
     
     editor.edit(args[0])

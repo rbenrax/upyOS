@@ -4,7 +4,7 @@ from machine import freq
 def __main__(args):
 
     if len(args) != 1 or args[0] == "--h":
-        print("Set clock speed, cpuclock <option>: -low, -turbo, --h -v -t (toggle)")
+        print("Set clock speed\nUsage: cpuclock <option>: -low, -turbo, --h -v -t (toggle)")
         return
 
     turbo = sdata.sysconfig["turbo"]

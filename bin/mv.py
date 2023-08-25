@@ -4,7 +4,7 @@ import utls
 def __main__(args):
 
     if len(args) != 2:
-        print("Move file, mv <spath> <dpath>")
+        print("Move file\nUsage: mv <spath> <dpath>")
         return
     else:
         spath=args[0]

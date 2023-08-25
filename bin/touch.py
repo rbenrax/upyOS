@@ -4,8 +4,7 @@ import sdata
 def __main__(args):
 
     if len(args) == 0:
-        print ("Usage:")
-        print ("touch <filename> <line content..>, Create or add a line to a file with values passed")
+        print ("Create and/or add a line to a file with values in line\nUsage: touch <filename> <line content..>")
         return
     
     with open(args[0], "a") as file:

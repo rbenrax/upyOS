@@ -5,7 +5,7 @@ import utls
 def __main__(args):
 
     if len(args) == 0:
-        print("Find files in directories, find <option>: <pattern> [-r] ")
+        print("Find files in directories\nUsage: find <option>: <pattern> [-r]")
         return
     
     txt=""

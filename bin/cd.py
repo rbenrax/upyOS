@@ -3,7 +3,7 @@ import uos
 def __main__(args):
 
     if len(args) != 1:
-        print("Chage current directory, cd <path>")
+        print("Chage current directory\nUsage: cd <path>")
         return
     else:
         path=args[0]

@@ -4,8 +4,7 @@ import utls
 def __main__(args):
     
     if len(args) == 0:
-        print ("Usage:")
-        print ("fileup <file>, upload file in line mode")
+        print ("Upload file in line mode\nUsage: fileup <filename>")
         return
     
     if utls.protected(args[0]):

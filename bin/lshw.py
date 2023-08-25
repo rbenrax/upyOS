@@ -5,8 +5,7 @@ import sdata
 def __main__(args):
 
     if len(args) < 1:
-        print ("Usage:")
-        print ("lshw <options>, options: -b, -f")
+        print ("List system hardware and interfaces\nUsage: lshw <options>, options: -b, -f")
         return
 
     mode=args[0]

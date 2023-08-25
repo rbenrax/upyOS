@@ -5,19 +5,32 @@ import sdata
 #scl1=sdata.board["i2c"][0]["scl"]
 #sda1=sdata.board["i2c"][0]["sda"]
 
-i2c_id=0
-gpios = sdata.getgpios("i2c", i2c_id)
-print(gpios)
+def __main__(args):
 
-i2c = machine.I2C(id=i2c_id, scl=machine.Pin(gpios["scl"]), sda=machine.Pin(gpios["sda"]))
+    if len(args) == 0:
+        print("Scan i2c bus for devices\nUsage: i2cscan <bus>: 0,1,..")
+        return
+    else:
+        buses=len(sdata.board["i2c"])
+        if buses>0:
+            i2c_id=int(args[0])
+            if i2c_id <= buses-1:
+                gpios = sdata.getgpios("i2c", i2c_id)
+                print(gpios)
 
-print('Scan i2c bus...')
-devices = i2c.scan()
+                i2c = machine.I2C(id=i2c_id, scl=machine.Pin(gpios["scl"]), sda=machine.Pin(gpios["sda"]))
 
-if len(devices) == 0:
-  print("No i2c device !")
-else:
-  print('i2c devices found:',len(devices))
+                print('Scan i2c bus...')
+                devices = i2c.scan()
 
-  for device in devices:  
-    print("Decimal address: ",device," | Hexa address: ",hex(device))
+                if len(devices) == 0:
+                    print("No i2c device !")
+                else:
+                    print('i2c devices found:',len(devices))
+
+                    for device in devices:  
+                        print("Decimal address: ", device, " | Hexa address: ", hex(device))
+            else:
+                print(f"I2C bus {i2c_id} not exists in this board")
+        else:
+            print("This board seems has no I2C bus")

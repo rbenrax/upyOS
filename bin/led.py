@@ -7,7 +7,7 @@ def __main__(args):
 
     if len(args) < 2:
         print ("Usage:")
-        print ("Control system leds, led <command> <led>: on, off led: 0,1,..., rgb led in strip ")
+        print ("Control system leds\nUsage: led <command> <led>: on, off led: 0,1,..., rgb led in strip ")
         return
 
     cmd=args[0]

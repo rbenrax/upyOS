@@ -3,8 +3,7 @@ import urequests
 def __main__(args):
     
     if len(args) == 0:
-        print ("Usage:")
-        print ("wget <url>")
+        print ("Get a file form the net\nUsage:wget <url>")
         return
     
     url = args[0]

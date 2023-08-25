@@ -2,7 +2,7 @@
 def __main__(args):
     
     if len(args) == 0:
-        print("Show file content, cat <path>")
+        print("Show file content\nUsage: cat <path>")
         return
     else:
         with open(args[0], 'r') as f:

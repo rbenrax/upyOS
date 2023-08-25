@@ -9,7 +9,7 @@ def __main__(args):
         mode=args[0]
     
     if mode == "--h":
-        print("Change to/from recovery mode, recovery <options>: options --h -n -r")
+        print("Change to/from recovery mode\nUsage: recovery <options>: options --h -n -r")
         return
     
     nor = "/etc/init.sh"

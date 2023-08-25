@@ -11,7 +11,7 @@ def __main__(args):
         return
     
     if len(args) == 0:
-        print ("Usage:")
+        print ("WIFI management command\n Usage:")
         print ("wifi status - prints wifi client status")
         print ("wifi on - activate wifi client")
         print ("wifi off - deactivate wifi client")

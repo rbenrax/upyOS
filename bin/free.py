@@ -8,7 +8,7 @@ def __main__(args):
         mode=args[0]
 
     if mode == "--h":
-        print("Show ram status, df <options>: --h -h -p")
+        print("Show ram status\nUsage: df <options>: --h -h -p")
         return
     
     gc.collect()
