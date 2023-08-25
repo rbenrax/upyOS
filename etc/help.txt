@@ -42,4 +42,3 @@ sh      run shell script, if script has no .sh extention
 py:     Run python code
 r:      Repeat last command
 exit:   Exit to Micropython shell
-
