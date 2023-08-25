@@ -28,8 +28,7 @@ class smolOS:
         sys.path.append("/bin")
         sys.path.append("/extlib")
 
-        self.clear()
-        print("Booting smolOS...")
+        print("\033[2J\033[HBooting smolOS...")
 
         # Load system  configuration and board definitions
         try:
@@ -53,18 +52,10 @@ class smolOS:
 
         # Internal Commands def
         self.user_commands = {
-            "help": self.help,
-            "clear": self.clear,
-            "cp" : self.cp,
-            "mv" : self.mv,
-            "rm": self.rm,
-            "pwd": self.pwd,
-            "cd": self.chdir,
-            "mkdir": self.mkdir,
-            "rmdir": self.rmdir,
             "sh" : self.run_sh_script,
             "py": self.run_py_code,
             "r": self.last_cmd,
+            "help": self.help,
             "exit" : self.exit
         }
 
@@ -194,15 +185,6 @@ class smolOS:
                 else:
                     self.print_err("Unknown function or program. Try 'help'.")
 
-    def last_cmd(self):
-        # Only runs in full terminals where is unnecesary
-        #from editstr import editstr
-        #print('┌───┬───┬───┬───┬───┬───')
-        #cmd = editstr(self.prev_cmd)
-        #self.run_cmd(cmd)
-        #del sys.modules["editstr"]
-        self.run_cmd(self.prev_cmd)
-
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
@@ -232,6 +214,15 @@ class smolOS:
 
 # - - -
 
+    def last_cmd(self):
+        # Only runs in full terminals where is unnecesary
+        #from editstr import editstr
+        #print('┌───┬───┬───┬───┬───┬───')
+        #cmd = editstr(self.prev_cmd)
+        #self.run_cmd(cmd)
+        #del sys.modules["editstr"]
+        self.run_cmd(self.prev_cmd)
+
     def help(self):
         print(sdata.name + " version: " + sdata.version + "\n")
 
@@ -250,10 +241,6 @@ class smolOS:
         
         print(buf[:-2])
 
-    def clear(self):
-         print("\033[2J")
-         print("\033[H")
-
     def exit(self):
         raise SystemExit
 
@@ -262,80 +249,7 @@ class smolOS:
 
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
-            
+
 # - -  
- 
-    def cp(self, spath="", dpath=""):
-        if spath == "" or dpath=="": return
-        if not utls.file_exists(spath):
-            self.print_err("File source not exists.")
-            return
-        
-        sfile = spath.split("/")[-1]
-        try:
-            uos.listdir(dpath)
-            dpath += "/" + sfile
-        except OSError:
-            pass  
-        
-        if utls.protected(dpath):
-            self.print_err("Can not overwrite system file!")
-        else:                  
-            with open(spath, 'rb') as fs:
-                with open(dpath, "wb") as fd:
-                    while True:
-                        buf = fs.read(256)
-                        if not buf:
-                            break
-                        fd.write(buf)
-
-    def mv(self,spath="", dpath=""):
-        if spath == "" or dpath == "": return
-
-        if not utls.file_exists(spath):
-            self.print_err("File source not exists.")
-            return
-
-        sfile = spath.split("/")[-1]
-        try:
-            uos.listdir(dpath)
-            dpath += "/" + sfile
-        except OSError:
-            pass
-
-        if utls.protected(spath):
-            self.print_err("Can not move system files!")
-        else:
-            uos.rename(spath, dpath)
-
-    def rm(self, filename=""):
-        if filename == "": return
-        if utls.protected(filename):
-            self.print_err("Can not remove system file!")
-        else:
-            uos.remove(filename)
-
-    def pwd(self):
-        print(uos.getcwd())
-       
-    def mkdir(self, path=""):
-        try:
-            uos.mkdir(path)
-        except OSError:
-            print("Invalid path")
-            
-    def rmdir(self, path=""):
-        try:
-            uos.rmdir(path)
-        except OSError:
-            print("Invalid path")
-            
-    def chdir(self, path=""):
-        try:
-            uos.chdir(path)
-        except OSError:
-            print("Invalid path")
-
-# Module test
 if __name__ == "__main__":
     smol = smolOS()

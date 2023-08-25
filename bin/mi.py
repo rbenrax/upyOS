@@ -7,11 +7,9 @@ def __main__(args):
         opt=args[0]
 
         if opt=="--h":
-            print("Print memory information, mem_info <opt>, 0,1,")
+            print("Print memory information, mi <opt>, 0,1,")
             return
         
         print(micropython.mem_info(opt))
     else:
         print(micropython.mem_info())
-
-    

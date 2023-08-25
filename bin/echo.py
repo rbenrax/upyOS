@@ -13,4 +13,4 @@ def __main__(args):
         print(ret[:-1])
         return(ret[:-1])
     else:
-        print("Show env variable, echo const/<var>: var $?, $1, ..., any")
+        print("Show msg + env variable, echo const/<var>: var $?, $1, ..., any")
