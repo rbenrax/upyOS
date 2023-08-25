@@ -54,6 +54,7 @@ class smolOS:
         self.user_commands = {
             "sh" : self.run_sh_script,
             "py": self.run_py_code,
+            "pyp": self.run_pyp_code,
             "r": self.last_cmd,
             "exit" : self.exit
         }
@@ -91,8 +92,7 @@ class smolOS:
                 self.run_cmd(user_input)
                 
             except KeyboardInterrupt:
-                self.print_msg("Shutdown smolOS..., bye.")
-                sys.exit()
+                self.exit()
 
             except EOFError:
                 self.print_msg("Send EOF")
@@ -207,7 +207,10 @@ class smolOS:
                     self.run_cmd(cmdl)
         else:
             print(f"{ssf}: script not found")
- 
+
+    def run_pyp_code(self, code):
+        self.run_py_code(f"print({code})")
+        
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
 
@@ -223,7 +226,10 @@ class smolOS:
         self.run_cmd(self.prev_cmd)
 
     def exit(self):
-        raise SystemExit
+        self.print_msg("Shutdown smolOS..., bye.")
+        print()
+        sys.exit()
+        #raise SystemExit
 
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")

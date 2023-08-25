@@ -26,6 +26,9 @@
 
 #help
 
+py print(dir(os))
+pyp dir(os)
+
 # Exit form OS to python REPL
-#exit
+exit
 
