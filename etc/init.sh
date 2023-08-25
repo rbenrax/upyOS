@@ -1,19 +1,22 @@
 # Init file script in normal mode, if does not exists, we are in recovery mode and should exists init.rec
 
-#clear
-py print("\033[1;33;44m",end="")
-cat /etc/wellcome.txt
-py print("\033[0m",end="")
+# > (execute Python code)
+# < (Print the Python code execution)
 
-py print("\\n")
+#clear
+< "\033[1;33;44m", end=""
+cat /etc/wellcome.txt
+< "\033[0m", end=""
+
+< "\\n"
 lshw -b
 
-py print("\\n"*2)
-py print("\033[1mMemory:")
+< "\\n"*2
+< "\033[1mMemory:"
 free
 
-py print("\\n"*2)
-py print("\033[1mStorage:")
+< "\\n"*2
+< "\033[1mStorage:"
 df
 
 led on 0             # Turn on led 0

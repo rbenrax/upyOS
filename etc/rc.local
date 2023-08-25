@@ -26,9 +26,12 @@
 
 #help
 
-#py import os
-#py print(dir(os))
-#pyp dir(os)
+# > = Execute Python code
+# < = Print Python code Execution
+
+#> import os
+#> print(dir(os))
+#< dir(os)
 
 # Exit form OS to python REPL
 #exit

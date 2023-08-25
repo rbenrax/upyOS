@@ -53,8 +53,6 @@ class smolOS:
         # Internal Commands def
         self.user_commands = {
             "sh" : self.run_sh_script,
-            "py": self.run_py_code,
-            "pyp": self.run_pyp_code,
             "r": self.last_cmd,
             "exit" : self.exit
         }
@@ -104,20 +102,29 @@ class smolOS:
                 pass
  
  # - - - - - - - -
- 
+
+    def run_py_code(self, code):
+        exec(code.replace('\\n', '\n'))
+
     def run_cmd(self, fcmd):
 
         fcmd=fcmd.strip()
 
-        if fcmd[:3]=="py ":
-            #print(f"{fcmd}")
-            self.run_py_code(fcmd[3:])
+        if fcmd[:2]=="> ":
+            self.run_py_code(fcmd[2:])
+            return
+        elif fcmd[:2]=="< ":
+            self.run_py_code(f"print({fcmd[2:]})")
             return
 
         parts = fcmd.split()
         
         if len(parts) > 0:
             cmd = parts[0]
+            
+            if sdata.sysconfig:
+                if cmd in sdata.sysconfig["aliases"]:    # aliases support
+                    cmd=sdata.sysconfig["aliases"][cmd]
             
             if cmd!="r":
                 self.prev_cmd = fcmd
@@ -129,15 +136,14 @@ class smolOS:
                 args = parts[1:]
                 #print(f"{args=} ")
             
-            if sdata.sysconfig:
-                if cmd in sdata.sysconfig["aliases"]:    # aliases support
-                    cmd=sdata.sysconfig["aliases"][cmd]
-            
+            # Internal commands
             if cmd in self.user_commands:
                 if len(args) > 0:
                     self.user_commands[cmd](*args)
                 else:
                     self.user_commands[cmd]()
+
+            # External commands or scripts
             else:
                 tmp = cmd.split(".")
                 if len(tmp) > 1:
@@ -207,12 +213,6 @@ class smolOS:
                     self.run_cmd(cmdl)
         else:
             print(f"{ssf}: script not found")
-
-    def run_pyp_code(self, code):
-        self.run_py_code(f"print({code})")
-        
-    def run_py_code(self, code):
-        exec(code.replace('\\n', '\n'))
 
 # - - -
 
