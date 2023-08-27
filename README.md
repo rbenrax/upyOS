@@ -92,6 +92,22 @@ Actual Development:
 - ls command is now full functional, or so I hope.
 
 - Now shell scripts can trasalate environment variables.
+- 
+- From command line prompt is possible input python code directly:
+
+">" command allow input python code:
+
+/ $: > import ftptiny
+/ $: > ftp = ftptiny.FtpTiny()
+/ $: > ftp.start()
+
+"<" command allow print any python expression:
+
+/ $: < sys.modules
+{'smolos': <module 'smolos' from '/lib/smolos.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
+
+/ $: < 2+2
+4
 
 TODO List:
 - Enhance and move to external ls, cp, mv, etc. commands, to cut memory use.
