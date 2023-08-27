@@ -97,7 +97,6 @@ Actual Development:
 
 <code>
 ">" command allow input python code:
-
 / $: > import ftptiny
 / $: > ftp = ftptiny.FtpTiny()
 / $: > ftp.start()
@@ -105,7 +104,6 @@ Actual Development:
 "<" command allow print any python expression:
 
 / $: < sys.modules
-
 {'smolos': <module 'smolos' from '/lib/smolos.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
 
 / $: < 2+2
