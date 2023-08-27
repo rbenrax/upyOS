@@ -95,6 +95,7 @@ Actual Development:
 - 
 - From command line prompt is possible input python code directly:
 
+<code>
 ">" command allow input python code:
 
 / $: > import ftptiny
@@ -104,10 +105,12 @@ Actual Development:
 "<" command allow print any python expression:
 
 / $: < sys.modules
+
 {'smolos': <module 'smolos' from '/lib/smolos.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
 
 / $: < 2+2
 4
+</code>
 
 TODO List:
 - Enhance and move to external ls, cp, mv, etc. commands, to cut memory use.
