@@ -92,7 +92,7 @@ Actual Development:
 - ls command is now full functional, or so I hope.
 
 - Now shell scripts can trasalate environment variables.
-- 
+
 - From command line prompt is possible input python code directly:
 
 <code>
@@ -100,7 +100,9 @@ Actual Development:
 / $: > import ftptiny
 / $: > ftp = ftptiny.FtpTiny()
 / $: > ftp.start()
+</code>
 
+<code>
 "<" command allow print any python expression:
 
 / $: < sys.modules
