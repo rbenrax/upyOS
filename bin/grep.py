@@ -22,10 +22,11 @@ def __main__(args):
         #print(f"{atxt=} {apath=} {amode=}")
 
         if apath !="/" and len(apath)>1:
-            apath+="/"
+            if apath[-1] != "/": apath+="/"
         
         for f in tmp:
-            if not utls.isdir(f):
+            if not utls.isdir(apath + f):
+                print(f"{apath + f}")
                 with open(apath + f, "r") as fh:
                     while True:
                         ft=fh.readline()
@@ -37,7 +38,7 @@ def __main__(args):
                                 print(f"{ft}")
 
             elif "r" in mode:
-                search(atxt, f, amode)
+                search(atxt, apath + f, amode)
 
     search(txt, "", mode)
 
