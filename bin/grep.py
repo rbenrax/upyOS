@@ -26,7 +26,7 @@ def __main__(args):
         
         for f in tmp:
             if not utls.isdir(apath + f):
-                print(f"{apath + f}")
+                #print(f"{apath + f}")
                 with open(apath + f, "r") as fh:
                     while True:
                         ft=fh.readline()
