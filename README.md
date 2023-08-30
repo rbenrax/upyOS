@@ -108,17 +108,17 @@ Actual Development:
       / $: < 2+2
       4
 
-- Sinple support for thread management and asyncio, tests avilable:
+- Sinple support for thread management and asyncio, tests availables:
   
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
-
+  
 
 TODO List:
-- Enhance and move to external ls, cp, mv, etc. commands, to cut memory use.
-- Add diff, tar, uname, hostname and ther usefull commands.
+- Enhance ls, cp, mv, etc. commands
+- Add diff, tar, uname, hostname and other usefull commands.
 - Complete wifi and bluetooth support
-- Add threads
+- Enhance threads and asynio test
 - Add pipes and output redirections??
 - Fix errors
 
