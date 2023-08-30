@@ -7,6 +7,7 @@ import sdata
 import uos
 import utls
 import _thread
+import uasyncio
 
 class smolOS:
     
