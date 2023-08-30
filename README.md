@@ -108,7 +108,7 @@ Actual Development:
       / $: < 2+2
       4
 
-- Sinple support for thread management and asyncio, tests availables:
+- Simple support for thread management and asyncio, tests availables:
   
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
