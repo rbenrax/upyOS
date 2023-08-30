@@ -17,20 +17,20 @@ sysconfig={}
 
 #"""Get a value from environment variables"""
 def getenv(var):
-    
     #print(sysconfig["env"])
     for k, v in sysconfig["env"].items():
-        if k == var:
+        if k == str(var):
             return v
     return("")
 
 #"""Set a value to a environment variable"""
-def setenv(var, val):    
-    sysconfig["env"][var]=val
+def setenv(var, val):
+    sysconfig["env"][str(var)]=str(val)
 
 #"""Remove a environment variable"""
-def unset(var):    
-    del sysconfig["env"][var]
+def unset(var):
+    if sysconfig["env"][str(var)]:
+        del sysconfig["env"][str(var)]
     
 #"""Get the gpio assigned to a pin"""
 def getgpio(pin):

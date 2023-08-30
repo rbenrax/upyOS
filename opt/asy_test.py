@@ -5,9 +5,18 @@
 #import sdata
 import uasyncio
 from machine import Pin
+import sdata
+hd=None
+
+def __th__(th):
+    gobal hd
+    hd=th
 
 async def blink(led, period_ms):
     while True:
+        
+        #if sdata.getenv(hd)!="R": break
+        
         led.on()
         await uasyncio.sleep_ms(5)
         led.off()
@@ -18,8 +27,8 @@ async def main():
     t2 = uasyncio.create_task(blink(Pin(13), 100))
     #await t1
     #await t2
-    await uasyncio.sleep_ms(5000)
-    #results = await uasyncio.gather(t1, t2)
+    # await uasyncio.sleep_ms(5000)
+    results = await uasyncio.gather(t1, t2)
 
 def __main__(args):
     uasyncio.run(main())

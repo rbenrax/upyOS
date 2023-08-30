@@ -13,8 +13,6 @@ class smolOS:
     
     def __init__(self):
 
-        self._threads=[]
-
         try:
             del sys.modules["syscfg"]
             del sys.modules["grub"]
@@ -59,7 +57,8 @@ class smolOS:
         self.user_commands = {
             "sh" : self.run_sh_script,
             "r": self.last_cmd,
-            "ps": self.ps,
+            #"ps": self.ps,
+            "kill": self.kill,
             "exit" : self.exit
         }
 
@@ -122,6 +121,12 @@ class smolOS:
         elif fcmd[:2]=="< ":
             self.run_py_code(f"print({fcmd[2:]})")
             return
+        elif fcmd[:2]=="./":
+            cwd = uos.getcwd()
+            if uos.getcwd() != "/":
+                fcmd = cwd + "/" + fcmd[2:]
+            else:
+                fcmd = "/" + fcmd[2:]
 
         parts = fcmd.split()
         
@@ -185,12 +190,17 @@ class smolOS:
         
         if thread:
             th=_thread.get_ident()
-            self._threads.append(th)
-            #print(f"ths1 {self._threads}")
+            print(f"ths1 {th}")
+            sdata.setenv(th, "R")
         
         try:
             ins = __import__(cmdl)
             if '__main__' in dir(ins):
+                
+                if thread:
+                    if '__th__' in dir(ins): # pass thread handle
+                        ins.__th__(th)
+                        
                 if len(args) > 0:
                     ins.__main__(args)
                 else:
@@ -206,12 +216,11 @@ class smolOS:
             print(f"Error executing {cmdl}")
             sys.print_exception(e)
         finally:
-            #########################
-            #if thread: print(_thread.get_ident())
+
             if thread:
-                #print(f"ths2 {self._threads}")
-                self._threads.remove(th)
-            #########################
+                sdata.unset(th)
+                #print(f"ths2 {th}")
+
             if not imerr:
                 del sys.modules[cmdl]
 
@@ -251,16 +260,19 @@ class smolOS:
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
 
-    def ps(self):
-        for th in self._threads:
-            print(f"id: {self._threads}")
+#    def ps(self):
+#        for th in self._threads:
+#            print(f"id: {self._threads}")
+            
+    def kill(self, p):
+        sdata.setenv(p, "S")
             
     def exit(self):
         self.print_msg("Shutdown smolOS..., bye.\n")
         
         #########################
-        for th in self._threads:
-            th.exit()
+        #for th in self._threads:
+        #    th.exit()
         #########################
 
         raise SystemExit    

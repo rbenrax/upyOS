@@ -33,6 +33,10 @@
 #> print(dir(os))
 #< dir(os)
 
+# Threads tests
+#/opt/thr_test &
+#/opt/asy_test &
+
 # Exit form OS to python REPL
 #exit
 
