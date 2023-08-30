@@ -6,9 +6,13 @@ import sys
 import sdata
 import uos
 import utls
+import _thread
 
 class smolOS:
+    
     def __init__(self):
+
+        self._threads=[]
 
         try:
             del sys.modules["syscfg"]
@@ -54,6 +58,7 @@ class smolOS:
         self.user_commands = {
             "sh" : self.run_sh_script,
             "r": self.last_cmd,
+            "ps": self.ps,
             "exit" : self.exit
         }
 
@@ -154,28 +159,11 @@ class smolOS:
                     ext  = ""
 
                 if ext=="py" or ext=="":
-                    imerr=False
-                    try:
-                        ins = __import__(cmdl)
-                        if '__main__' in dir(ins):
-                            if len(args) > 0:
-                                ins.__main__(args)
-                            else:
-                                ins.__main__("")
 
-                    except KeyboardInterrupt:
-                        print(f"{cmd}: ended")
-                    except ImportError as ie:
-                        imerr=True
-                        print(f"{cmd}: not found")
-                    except Exception as e:
-                        imerr=True
-                        print(f"Error executing {cmd}")
-                        sys.print_exception(e)
-                    
-                    finally:
-                        if not imerr:
-                            del sys.modules[cmdl]
+                    if len(parts) > 1 and parts[-1]=="&": # If new thread
+                        th = _thread.start_new_thread(self.newProc, (True, cmdl, args[:-1]))
+                    else:
+                        self.newProc(False, cmdl, args)
 
                 elif ext=="sh":
                     try:
@@ -189,6 +177,42 @@ class smolOS:
                     
                 else:
                     print(f"{cmd}: Unknown function or program. Try 'help'.")
+
+    def newProc(self, thread, cmdl, args):
+        #print(f"{thread} {cmdl} {args}")
+        imerr=False
+        
+        if thread:
+            th=_thread.get_ident()
+            self._threads.append(th)
+            #print(f"ths1 {self._threads}")
+        
+        try:
+            ins = __import__(cmdl)
+            if '__main__' in dir(ins):
+                if len(args) > 0:
+                    ins.__main__(args)
+                else:
+                    ins.__main__("")
+
+        except KeyboardInterrupt:
+            print(f"{cmdl}: ended")
+        except ImportError as ie:
+            imerr=True
+            print(f"{cmdl}: not found")
+        except Exception as e:
+            imerr=True
+            print(f"Error executing {cmdl}")
+            sys.print_exception(e)
+        finally:
+            #########################
+            #if thread: print(_thread.get_ident())
+            if thread:
+                #print(f"ths2 {self._threads}")
+                self._threads.remove(th)
+            #########################
+            if not imerr:
+                del sys.modules[cmdl]
 
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
@@ -214,6 +238,7 @@ class smolOS:
         else:
             print(f"{ssf}: script not found")
 
+
 # - - -
 
     def last_cmd(self):
@@ -225,11 +250,21 @@ class smolOS:
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
 
+    def ps(self):
+        for th in self._threads:
+            print(f"id: {self._threads}")
+            
     def exit(self):
-        self.print_msg("Shutdown smolOS..., bye.")
-        print()
+        self.print_msg("Shutdown smolOS..., bye.\n")
+        
+        #########################
+        for th in self._threads:
+            th.exit()
+        #########################
+
+        raise SystemExit    
         sys.exit()
-        #raise SystemExit
+        
 
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
