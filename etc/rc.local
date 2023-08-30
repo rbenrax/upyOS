@@ -5,7 +5,7 @@
 
 #lshw -f             # List board hardware
 
-#i2cscan             # Scan for i2c devices
+#i2cscan 0            # Scan for i2c devices
 
 #wifi off                        # Turn off wifi in cliente mode
 #wifi on                         # Turn on wifi in cliente mode
