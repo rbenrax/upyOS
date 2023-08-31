@@ -191,7 +191,7 @@ class smolOS:
                         else:
                             self.run_sh_script(cmdl + ".sh")
                     except Exception as e:
-                        print(f"Error executing script {command}")
+                        print(f"Error executing script {fcmd}")
                         sys.print_exception(e)
                     
                 else:
