@@ -37,6 +37,8 @@ The sdata module contains all the system data, allowing access to the board conf
 
 If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
 
+Since most microcontrollers only have one thread more, then one main thread an alternative one, python programs can be summited in a thread apart ending command with "&"
+
 I hope it is useful for you!, there are things to do, and to improve.
 
 Directories structure:
@@ -57,6 +59,8 @@ Internals commands:
 - sh:     run external shell script if script has no sh extention
 - py:     Run python code
 - r:      Repeat last command
+- ps:     Show (alternative) process status
+- kill:   Kill (alternative) process
 - exit:   Exit to Micropython shell
 
 Actual external commands:
