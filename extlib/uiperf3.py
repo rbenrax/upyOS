@@ -223,6 +223,16 @@ def server_once():
     stats = Stats(param)
     stats.start()
     running = True
+    
+    ## rbenrax 31/08/2023
+    ## Workarround
+    ## Limiting memory use to avoid momory allocation error
+    ## TODO: Ask client change len size requested
+    if param['len'] > 16384:
+        param['len'] = 16384
+    ##
+    ##
+        
     data_buf = bytearray(os.urandom(param['len']))
     while running:
         for pollable in poll.poll(stats.max_dt_ms()):
