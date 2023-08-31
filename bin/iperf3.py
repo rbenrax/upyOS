@@ -17,7 +17,7 @@ def __main__(args):
 
     if mode == "-s":
         uiperf3.server()    
-    elif "c" in mode:
+    elif "-c" in mode:
         u=False
         r=False
         if "u" in mode: u=True
