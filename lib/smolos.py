@@ -12,27 +12,32 @@ class smolOS:
     
     def __init__(self):
 
+        # Remove modules previusly loaded by grub
         try:
             del sys.modules["syscfg"]
             del sys.modules["grub"]
         except:
             pass
         
+        # sdata store all system data
         sdata.name    = "smolOS-" + uos.uname()[0]
         sdata.version = "0.5 rbenrax"
 
+        # Create directories
         if not utls.file_exists("/opt"): # Specific solutions directory
             uos.mkdir("/opt")
 
         if not utls.file_exists("/tmp"): # Temp directory
             uos.mkdir("/tmp")
 
+        # Set library path for modules finding, by default is /lib only
         sys.path.append("/bin")
         sys.path.append("/extlib")
+        #sys.path.append("/opt") # /opt directory calls need full path
 
         print("\033[2J\033[HBooting smolOS...")
 
-        # Load system  configuration and board definitions
+        # Load system configuration and board definitions
         try:
             sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
             #print(sdata.sysconfig)
@@ -52,7 +57,7 @@ class smolOS:
                 sys.print_exception(ex)
             pass
 
-        # Internal Commands def
+        # Internal Commands definition
         self.user_commands = {
             "sh" : self.run_sh_script,
             "r": self.last_cmd,
@@ -61,20 +66,15 @@ class smolOS:
             "exit" : self.exit
         }
 
-        self.boot()
-
-    def boot(self):
-
         if "turbo" in sdata.sysconfig:
             if sdata.sysconfig["turbo"]:
                 self.run_cmd("cpufreq -turbo")
             else:
                 self.run_cmd("cpufreq -low")
-            
+
         if utls.file_exists("/etc/init.sh"):
             self.print_msg("Normal mode boot")
             
-            #/etc/init.sh
             #print("Launching init.sh:")
             self.run_cmd("sh /etc/init.sh")
 
@@ -87,7 +87,7 @@ class smolOS:
         self.prev_cmd=""
         self.print_msg("Type 'help' for a smolOS manual.")
 
-        # Main Loop
+        # Main command processing loop
         while True:
             try:
                 user_input = input(uos.getcwd() + " $: ")
@@ -127,21 +127,26 @@ class smolOS:
             else:
                 fcmd = "/" + fcmd[2:]
 
+        # Separate full command elements
         parts = fcmd.split()
         
         if len(parts) > 0:
+
+            # Get command 
             cmd = parts[0]
             
+            # Traslate command aliases
             if sdata.sysconfig:
-                if cmd in sdata.sysconfig["aliases"]:    # aliases support
+                if cmd in sdata.sysconfig["aliases"]:    
                     cmd=sdata.sysconfig["aliases"][cmd]
             
+            # Last command repeat 
             if cmd!="r":
                 self.prev_cmd = fcmd
             
-            #print(f"{cmd=}")
             args=[]
             
+            # Get command arguments
             if len(parts) > 1:
                 args = parts[1:]
                 #print(f"{args=} ")
@@ -163,14 +168,22 @@ class smolOS:
                     cmdl = cmd
                     ext  = ""
 
+                # External Python commands and programs
                 if ext=="py" or ext=="":
 
                     if len(parts) > 1 and parts[-1]=="&": # If new thread
-                        from _thread import start_new_thread
-                        start_new_thread(self.newProc, (True, cmdl, args[:-1]))
+                        # Since most microcontrollers only have one thread more...
+                        # One main thread an alternative one, for now
+                        if sdata.getenv("THR1")=="R":
+                            print("Thread 1 alrady running, kill it first")
+                            return
+                        else:
+                            from _thread import start_new_thread
+                            start_new_thread(self.newProc, (True, cmdl, args[:-1]))
                     else:
                         self.newProc(False, cmdl, args)
 
+                # External shell scripts
                 elif ext=="sh":
                     try:
                         if not "/" in cmdl:
@@ -184,18 +197,13 @@ class smolOS:
                 else:
                     print(f"{cmd}: Unknown function or program. Try 'help'.")
 
+    # Lanunch new process
     def newProc(self, thread, cmdl, args):
-        imerr=False
+        imerr=False    # Import module error?
         
-        # Since most microcontrollers only have one thread...
-        # One main Thread an alternative one, for now
         if thread:
-            if sdata.getenv("THR1")=="R":
-                print("Thread 1 alrady running, kill it first")
-                return
-            else:    
-                sdata.setenv("THR1", "R")
-        
+            sdata.setenv("THR1", "R")
+
         try:
             ins = __import__(cmdl)
             if '__main__' in dir(ins):
@@ -221,6 +229,7 @@ class smolOS:
             if not imerr:
                 del sys.modules[cmdl]
 
+    # Run shell script
     def run_sh_script(self, ssf):
         if utls.file_exists(ssf):
             with open(ssf,'r') as f:
@@ -245,9 +254,9 @@ class smolOS:
         else:
             print(f"{ssf}: script not found")
 
-
 # - - -
 
+    # Repeat command
     def last_cmd(self):
         # Only runs in full terminals where is unnecesary
         #from editstr import editstr
@@ -256,7 +265,8 @@ class smolOS:
         #self.run_cmd(cmd)
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
-
+    
+    # Thread status
     def ps(self):
         if sdata.getenv("THR1") == "R":
             print("Thread 1 Running")
@@ -264,10 +274,12 @@ class smolOS:
         else:
             print("Thread 1 Stopped")
             return 0
-            
+
+    # Kill thread
     def kill(self):
         sdata.setenv("THR1", "S")
             
+    # System exit
     def exit(self):
         self.print_msg("Shutdown smolOS..., bye.")
         print("")
