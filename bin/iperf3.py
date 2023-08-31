@@ -3,7 +3,7 @@ import uiperf3
 def __main__(args):
 
     if len(args) == 0:
-        print("Test network performance\nUsage: iperf3 -s / iperf3 -c <destIP>")
+        print("Test network performance\nUsage: iperf3 -s / iperf3 -c[ur] <destIP>")
         return
     
     mode=""
@@ -17,6 +17,10 @@ def __main__(args):
 
     if mode == "-s":
         uiperf3.server()    
-    elif mode == "-c":
-        uiperf3.client(ip, udp=True, reverse=True)
+    elif "c" in mode:
+        u=False
+        r=False
+        if "u" in mode: u=True
+        if "r" in mode: r=True
+        uiperf3.client(ip, udp=u, reverse=r)
 
