@@ -20,7 +20,7 @@ def __main__(args):
             if utls.file_exists(nor):
                 uos.remove(nor)
             uos.rename(rec, nor)
-            print("Set Normal node boot")
+            print("Set Normal mode boot")
             return
         else:
             print(rec + " not exists")
@@ -30,7 +30,7 @@ def __main__(args):
             if utls.file_exists(rec):
                 uos.remove(rec)
             uos.rename(nor, rec)
-            print("Set Recovery node boot")
+            print("Set Recovery mode boot")
         else:
             print(nor + " not exists")
 

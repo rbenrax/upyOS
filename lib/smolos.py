@@ -6,8 +6,7 @@ import sys
 import sdata
 import uos
 import utls
-import _thread
-import uasyncio
+import utime
 
 class smolOS:
     
@@ -57,7 +56,7 @@ class smolOS:
         self.user_commands = {
             "sh" : self.run_sh_script,
             "r": self.last_cmd,
-            #"ps": self.ps,
+            "ps": self.ps,
             "kill": self.kill,
             "exit" : self.exit
         }
@@ -167,7 +166,8 @@ class smolOS:
                 if ext=="py" or ext=="":
 
                     if len(parts) > 1 and parts[-1]=="&": # If new thread
-                        th = _thread.start_new_thread(self.newProc, (True, cmdl, args[:-1]))
+                        from _thread import start_new_thread
+                        start_new_thread(self.newProc, (True, cmdl, args[:-1]))
                     else:
                         self.newProc(False, cmdl, args)
 
@@ -185,22 +185,20 @@ class smolOS:
                     print(f"{cmd}: Unknown function or program. Try 'help'.")
 
     def newProc(self, thread, cmdl, args):
-        #print(f"{thread} {cmdl} {args}")
         imerr=False
         
+        # Since most microcontrollers only have one thread...
+        # One main Thread an alternative one, for now
         if thread:
-            th=_thread.get_ident()
-            print(f"ths1 {th}")
-            sdata.setenv(th, "R")
+            if sdata.getenv("THR1")=="R":
+                print("Thread 1 alrady running, kill it first")
+                return
+            else:    
+                sdata.setenv("THR1", "R")
         
         try:
             ins = __import__(cmdl)
             if '__main__' in dir(ins):
-                
-                if thread:
-                    if '__th__' in dir(ins): # pass thread handle
-                        ins.__th__(th)
-                        
                 if len(args) > 0:
                     ins.__main__(args)
                 else:
@@ -218,8 +216,7 @@ class smolOS:
         finally:
 
             if thread:
-                sdata.unset(th)
-                #print(f"ths2 {th}")
+                sdata.getenv("THR1")=="S"
 
             if not imerr:
                 del sys.modules[cmdl]
@@ -260,24 +257,29 @@ class smolOS:
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
 
-#    def ps(self):
-#        for th in self._threads:
-#            print(f"id: {self._threads}")
+    def ps(self):
+        if sdata.getenv("THR1") == "R":
+            print("Thread 1 Running")
+            return 1
+        else:
+            print("Thread 1 Stopped")
+            return 0
             
-    def kill(self, p):
-        sdata.setenv(p, "S")
+    def kill(self):
+        sdata.setenv("THR1", "S")
             
     def exit(self):
-        self.print_msg("Shutdown smolOS..., bye.\n")
+        self.print_msg("Shutdown smolOS..., bye.")
+        print("")
         
-        #########################
-        #for th in self._threads:
-        #    th.exit()
-        #########################
-
-        raise SystemExit    
-        sys.exit()
-        
+        # Stop threads before exit
+        if self.ps() > 0:
+            self.kill()
+            utime.sleep(3)
+            print("Thread 1 Stopped")
+            
+        raise SystemExit
+        #sys.exit()
 
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")

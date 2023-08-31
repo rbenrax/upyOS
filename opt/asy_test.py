@@ -1,29 +1,20 @@
-
 # Asyncio Test 
 # From command line launch with & ending
 
-#import sdata
+import sdata
 import uasyncio
 from machine import Pin
-import sdata
-hd=None
-
-def __th__(th):
-    gobal hd
-    hd=th
 
 async def blink(led, period_ms):
     while True:
-        
-        #if sdata.getenv(hd)!="R": break
-        
+        if sdata.getenv("THR1")!="R": break
         led.on()
         await uasyncio.sleep_ms(5)
         led.off()
         await uasyncio.sleep_ms(period_ms)
 
 async def main():    
-    t1 = uasyncio.create_task(blink(Pin(12), 700))
+    t1 = uasyncio.create_task(blink(Pin(25), 700))
     t2 = uasyncio.create_task(blink(Pin(13), 100))
     #await t1
     #await t2
