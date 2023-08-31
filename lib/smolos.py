@@ -178,8 +178,11 @@ class smolOS:
                             print("Thread 1 alrady running, kill it first")
                             return
                         else:
-                            from _thread import start_new_thread
-                            start_new_thread(self.newProc, (True, cmdl, args[:-1]))
+                            try:
+                                from _thread import start_new_thread
+                                start_new_thread(self.newProc, (True, cmdl, args[:-1]))
+                            except ImportError:
+                                print("System has not thread support")
                     else:
                         self.newProc(False, cmdl, args)
 
