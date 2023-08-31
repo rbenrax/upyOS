@@ -122,10 +122,10 @@ class smolOS:
             return
         elif fcmd[:2]=="./":
             cwd = uos.getcwd()
-            if uos.getcwd() != "/":
-                fcmd = cwd + "/" + fcmd[2:]
-            else:
+            if cwd == "/":
                 fcmd = "/" + fcmd[2:]
+            else:
+                fcmd = cwd + "/" + fcmd[2:]
 
         # Separate full command elements
         parts = fcmd.split()
