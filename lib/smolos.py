@@ -281,15 +281,16 @@ class smolOS:
             
     # System exit
     def exit(self):
-        self.print_msg("Shutdown smolOS..., bye.")
-        print("")
-        
+
         # Stop threads before exit
         if self.ps() > 0:
             self.kill()
-            utime.sleep(3)
+            utime.sleep(2)
             print("Thread 1 Stopped")
-            
+
+        self.print_msg("Shutdown smolOS..., bye.")
+        print("")
+        
         raise SystemExit
         #sys.exit()
 
