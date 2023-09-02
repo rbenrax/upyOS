@@ -95,7 +95,7 @@ Actual Development:
 
 - ls command is now full functional, or so I hope.
 
-- Now shell scripts can trasalate environment variables.
+- Now shell scripts can translate environment variables.
 
 - From command line prompt is possible input python code directly:
 
