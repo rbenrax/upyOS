@@ -7,6 +7,7 @@ import sdata
 import uos
 import utls
 import utime
+import uasyncio
 
 class smolOS:
     
@@ -135,7 +136,7 @@ class smolOS:
             # Get command 
             cmd = parts[0]
             
-            # Traslate command aliases
+            # Translate command aliases
             if sdata.sysconfig:
                 if cmd in sdata.sysconfig["aliases"]:    
                     cmd=sdata.sysconfig["aliases"][cmd]
