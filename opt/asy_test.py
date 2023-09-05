@@ -4,10 +4,23 @@
 import sdata
 import uasyncio
 from machine import Pin
+import _thread
 
 async def blink(led, period_ms):
     while True:
-        if sdata.getenv("THR1")!="R": break
+
+        #if sdata.getenv("THR1") !="R": break
+        pid_sts="R"
+        thid = _thread.get_ident()
+        for i in sdata.procs:
+            if isinstance(i, str): continue
+            print(f"{i.pid} {i.tid} {i.cmd} {i.args}")
+            if i.tid == thid:
+                pid_sts=i.sts
+                break
+                
+        if pid_sts != "R": break
+
         led.on()
         await uasyncio.sleep_ms(5)
         led.off()

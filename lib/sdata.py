@@ -6,6 +6,7 @@ debug   = True
 
 board={}
 sysconfig={}
+procs=[]
 
 # ---
 
@@ -31,7 +32,7 @@ def setenv(var, val):
 def unset(var):
     if sysconfig["env"][str(var)]:
         del sysconfig["env"][str(var)]
-    
+
 #"""Get the gpio assigned to a pin"""
 def getgpio(pin):
     gpios=board["gpio"][0]

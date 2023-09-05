@@ -9,6 +9,58 @@ import utls
 import utime
 import uasyncio
 
+class proc:
+    def __init__(self, ):
+        self.tid   = 0
+        self.cmd  = ""
+        self.args = ""
+        self.sts  = "S"
+        self.pid = len(sdata.procs)
+        
+        sdata.procs.append(self)
+        #print(f"P1: {self.pid} {self.cmd}")
+        
+    # Lanunch new process
+    def run(self, isthr, cmd, args):
+        self.cmd = cmd
+        self.args = args
+
+        if isthr:
+            from _thread import get_ident
+            self.id = get_ident()
+        
+        imerr=False    # Import module error?
+        
+        try:
+            ins = __import__(self.cmd)
+            if '__main__' in dir(ins):
+                self.sts = "R"
+                
+                #print(f"P1: {self.id} {self.cmd} {self.args}")
+                if len(self.args) > 0:
+                    ins.__main__(self.args)
+                else:
+                    ins.__main__("")
+
+        except KeyboardInterrupt:
+            print(f"{self.cmd}: ended")
+        except ImportError as ie:
+            imerr=True
+            print(f"{self.cmd}: not found")
+        except Exception as e:
+            imerr=True
+            print(f"Error executing {self.cmd}")
+            sys.print_exception(e)
+        finally:
+
+            if not imerr:
+                del sys.modules[self.cmd]
+            
+            self.sts = "S"
+            
+            #print(f"P2: {self.pid}")
+            del sdata.procs[self.pid]
+
 class smolOS:
     
     def __init__(self):
@@ -172,20 +224,22 @@ class smolOS:
                 # External Python commands and programs
                 if ext=="py" or ext=="":
 
+                    newProc = proc()
                     if len(parts) > 1 and parts[-1]=="&": # If new thread
                         # Since most microcontrollers only have one thread more...
                         # One main thread an alternative one, for now
-                        if sdata.getenv("THR1")=="R":
-                            print("Thread 1 alrady running, kill it first")
-                            return
-                        else:
-                            try:
-                                from _thread import start_new_thread
-                                start_new_thread(self.newProc, (True, cmdl, args[:-1]))
-                            except ImportError:
-                                print("System has not thread support")
+                        try:
+                            from _thread import start_new_thread
+                            start_new_thread(newProc.run, (True, cmdl, args[:-1]))
+                        except ImportError:
+                            print("System has not thread support")
+                        except Exception as ex:
+                            print(f"Error launching thread {ex}")
+                            if sdata.debug:
+                                sys.print_exception(ex)
+                            
                     else:
-                        self.newProc(False, cmdl, args)
+                        newProc.run(False, cmdl, args)
 
                 # External shell scripts
                 elif ext=="sh":
@@ -200,38 +254,6 @@ class smolOS:
                     
                 else:
                     print(f"{cmd}: Unknown function or program. Try 'help'.")
-
-    # Lanunch new process
-    def newProc(self, thread, cmdl, args):
-        imerr=False    # Import module error?
-        
-        if thread:
-            sdata.setenv("THR1", "R")
-
-        try:
-            ins = __import__(cmdl)
-            if '__main__' in dir(ins):
-                if len(args) > 0:
-                    ins.__main__(args)
-                else:
-                    ins.__main__("")
-
-        except KeyboardInterrupt:
-            print(f"{cmdl}: ended")
-        except ImportError as ie:
-            imerr=True
-            print(f"{cmdl}: not found")
-        except Exception as e:
-            imerr=True
-            print(f"Error executing {cmdl}")
-            sys.print_exception(e)
-        finally:
-
-            if thread:
-                sdata.getenv("THR1")=="S"
-
-            if not imerr:
-                del sys.modules[cmdl]
 
     # Run shell script
     def run_sh_script(self, ssf):
@@ -272,25 +294,22 @@ class smolOS:
     
     # Thread status
     def ps(self):
-        if sdata.getenv("THR1") == "R":
-            print("Thread 1 Running")
-            return 1
-        else:
-            print("Thread 1 Stopped")
-            return 0
+        print(f"Proc Sts Thread_Id   Cmd   Args")
+        for i in sdata.procs:
+            print(f"{i.pid}   {i.sts}   {i.id}   {i.cmd}   {i.args}")
 
     # Kill thread
-    def kill(self):
-        sdata.setenv("THR1", "S")
+    def kill(self, pid):
+        if sdata.procs:
+            sdata.procs[int(pid)] = "S"
             
     # System exit
     def exit(self):
 
         # Stop threads before exit
-        if self.ps() > 0:
-            self.kill()
-            utime.sleep(2)
-            print("Thread 1 Stopped")
+        for i in sdata.procs:
+            self.kill(i.pid)
+        utime.sleep(2)
 
         self.print_msg("Shutdown smolOS..., bye.")
         print("")

@@ -3,14 +3,25 @@
 
 import sdata
 import utime
+import _thread
 
 def __main__(args):
     cont=0
     while True:
         cont+=1
-        print(f"{sdata.getenv("THR1")} Hola {cont} ")
+        print(f"Hola {cont} ")
         utime.sleep(4)
-        if sdata.getenv("THR1")!="R": break
+
+        pid_sts="R"
+        thid = _thread.get_ident()
+        for i in sdata.procs:
+            if isinstance(i, str): continue
+            print(f"{i.pid} {i.tid} {i.cmd} {i.args}")
+            if i.tid == thid:
+                pid_sts=i.sts
+                break
+                
+        if pid_sts != "R": break
 
 if __name__ == "__main__":
     args =[""]
