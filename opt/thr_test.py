@@ -3,7 +3,7 @@
 
 import sdata
 import utime
-import _thread
+from _thread import get_ident
 
 def __main__(args):
     cont=0
@@ -12,16 +12,7 @@ def __main__(args):
         print(f"Hola {cont} ")
         utime.sleep(4)
 
-        pid_sts="R"
-        thid = _thread.get_ident()
-        for i in sdata.procs:
-            if isinstance(i, str): continue
-            print(f"{i.pid} {i.tid} {i.cmd} {i.args}")
-            if i.tid == thid:
-                pid_sts=i.sts
-                break
-                
-        if pid_sts != "R": break
+        if sdata.endthr(get_ident()): break
 
 if __name__ == "__main__":
     args =[""]

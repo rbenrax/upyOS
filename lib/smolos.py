@@ -27,7 +27,7 @@ class proc:
 
         if isthr:
             from _thread import get_ident
-            self.id = get_ident()
+            self.tid = get_ident()
         
         imerr=False    # Import module error?
         
@@ -52,14 +52,11 @@ class proc:
             print(f"Error executing {self.cmd}")
             sys.print_exception(e)
         finally:
+            self.sts = "S"
+            del sdata.procs[self.pid]
 
             if not imerr:
                 del sys.modules[self.cmd]
-            
-            self.sts = "S"
-            
-            #print(f"P2: {self.pid}")
-            del sdata.procs[self.pid]
 
 class smolOS:
     
@@ -296,18 +293,20 @@ class smolOS:
     def ps(self):
         print(f"Proc Sts Thread_Id   Cmd   Args")
         for i in sdata.procs:
-            print(f"{i.pid}   {i.sts}   {i.id}   {i.cmd}   {i.args}")
+            #if isinstance(i, str): continue
+            print(f"{i.pid}   {i.sts}   {i.tid}   {i.cmd}   {i.args}")
 
     # Kill thread
     def kill(self, pid):
         if sdata.procs:
-            sdata.procs[int(pid)] = "S"
+            sdata.procs[int(pid)].sts = "S"
             
     # System exit
     def exit(self):
 
         # Stop threads before exit
         for i in sdata.procs:
+            #if isinstance(i, str): continue
             self.kill(i.pid)
         utime.sleep(2)
 

@@ -16,33 +16,43 @@ procs=[]
 
 #sysconfig ={"env" : {"$?": "9", "$0": "a", "$1": "b", "$2": "c", "$3": "d"}}
 
-#"""Get a value from environment variables"""
 def getenv(var):
+    """Get a value from environment variables"""
     #print(sysconfig["env"])
     for k, v in sysconfig["env"].items():
         if k == str(var):
             return v
     return("")
 
-#"""Set a value to a environment variable"""
 def setenv(var, val):
+    """Set a value to a environment variable"""
     sysconfig["env"][str(var)]=str(val)
 
-#"""Remove a environment variable"""
 def unset(var):
+    """Remove a environment variable"""
     if sysconfig["env"][str(var)]:
         del sysconfig["env"][str(var)]
 
-#"""Get the gpio assigned to a pin"""
+def endthr(thid):
+    """Test if a trhead should be stopped"""
+    end = False
+    for i in procs:
+        #print(f"{thid} {i.tid} {i.sts})")
+        if i.tid == thid and i.sts == "S":
+            end = True
+            break
+    return end
+
 def getgpio(pin):
+    """Get the gpio assigned to a pin"""
     gpios=board["gpio"][0]
     for k, v in gpios.items():
         if v == pin:
             return int(k)
     return 0
 
-#"""Get a dict of pins for a specific service category"""
 def getgpios(cat, ins):
+    """Get a dict of pins for a specific service category"""
     gps={}
     gpios=board["gpio"][0]
     #print(gpios)
