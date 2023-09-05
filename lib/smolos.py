@@ -12,11 +12,11 @@ import utls
 # Process class
 class proc:
     def __init__(self):
-        self.tid  = 0
-        self.cmd  = ""
-        self.args = ""
-        self.sts  = "S"
-        self.pid  = len(sdata.procs)
+        self.tid  = 0                # Thread id
+        self.cmd  = ""               # Command
+        self.args = ""               # Arguments
+        self.sts  = "S"              # Process status
+        self.pid  = len(sdata.procs) # Process id
         
         sdata.procs.append(self)
         
@@ -221,12 +221,12 @@ class smolOS:
                 # External Python commands and programs
                 if ext=="py" or ext=="":
 
-                    newProc = proc()
                     if len(parts) > 1 and parts[-1]=="&": # If new thread
                         # Since most microcontrollers only have one thread more...
                         # One main thread an alternative one, for now
                         try:
                             from _thread import start_new_thread
+                            newProc = proc()
                             start_new_thread(newProc.run, (True, cmdl, args[:-1]))
                         except ImportError:
                             print("System has not thread support")
@@ -236,6 +236,7 @@ class smolOS:
                                 sys.print_exception(ex)
                             
                     else:
+                        newProc = proc()
                         newProc.run(False, cmdl, args)
 
                 # External shell scripts
