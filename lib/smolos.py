@@ -3,19 +3,20 @@
 # Adptated by rbenrax
 
 import sys
-import sdata
 import uos
-import utls
 import utime
 
-# Class process (only for python programas)
+import sdata
+import utls
+
+# Process class
 class proc:
     def __init__(self, ):
-        self.tid   = 0
+        self.tid  = 0
         self.cmd  = ""
         self.args = ""
         self.sts  = "S"
-        self.pid = len(sdata.procs)
+        self.pid  = len(sdata.procs)
         
         sdata.procs.append(self)
         
@@ -33,7 +34,9 @@ class proc:
         try:
             ins = __import__(self.cmd)
             if '__main__' in dir(ins):
+                
                 self.sts = "R"
+                
                 if len(self.args) > 0:
                     ins.__main__(self.args)
                 else:
@@ -49,7 +52,7 @@ class proc:
             print(f"Error executing {self.cmd}")
             sys.print_exception(e)
         finally:
-            self.sts = "S"
+            #self.sts = "S"
             del sdata.procs[self.pid]
 
             if not imerr:
@@ -288,10 +291,10 @@ class smolOS:
     
     # Thread status
     def ps(self):
-        print(f"Proc Sts Thread_Id   Cmd   Args")
+        print(f"Proc Sts Thread_Id Cmd/Args")
         for i in sdata.procs:
             #if isinstance(i, str): continue
-            print(f"{i.pid}   {i.sts}   {i.tid}   {i.cmd}   {i.args}")
+            print(f"{i.pid:4}  {i.sts}  {i.tid} {i.cmd} {i.args}")
 
     # Kill thread
     def kill(self, pid):
