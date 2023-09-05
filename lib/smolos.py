@@ -11,7 +11,7 @@ import utls
 
 # Process class
 class proc:
-    def __init__(self, ):
+    def __init__(self):
         self.tid  = 0
         self.cmd  = ""
         self.args = ""
