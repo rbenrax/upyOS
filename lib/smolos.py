@@ -7,8 +7,8 @@ import sdata
 import uos
 import utls
 import utime
-import uasyncio
 
+# Class process (only for python programas)
 class proc:
     def __init__(self, ):
         self.tid   = 0
@@ -18,7 +18,6 @@ class proc:
         self.pid = len(sdata.procs)
         
         sdata.procs.append(self)
-        #print(f"P1: {self.pid} {self.cmd}")
         
     # Lanunch new process
     def run(self, isthr, cmd, args):
@@ -35,8 +34,6 @@ class proc:
             ins = __import__(self.cmd)
             if '__main__' in dir(ins):
                 self.sts = "R"
-                
-                #print(f"P1: {self.id} {self.cmd} {self.args}")
                 if len(self.args) > 0:
                     ins.__main__(self.args)
                 else:
