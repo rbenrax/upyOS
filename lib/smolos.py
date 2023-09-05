@@ -12,12 +12,16 @@ import utls
 # Process class
 class proc:
     def __init__(self):
-        self.pid  = 0     # Process id
+#        self.pid  = 0     # Process id
         self.tid  = 0     # Thread id
-        self.cmd  = ""    # Command
-        self.args = ""    # Arguments
-        self.sts  = "S"   # Process status
+#         self.cmd  = ""    # Command
+#        self.args = ""    # Arguments
+#       self.sts  = "S"   # Process status
 
+        sdata.pid += 1
+        self.pid = sdata.pid
+        sdata.procs.append(self)
+        
     # Lanunch new process
     def run(self, isthr, cmd, args):
         self.cmd = cmd
@@ -32,10 +36,8 @@ class proc:
         try:
             ins = __import__(self.cmd)
             if '__main__' in dir(ins):
-                
-                self.pid  = len(sdata.procs) # Process id
+
                 self.sts = "R"
-                sdata.procs.append(self)
                 
                 if len(self.args) > 0:
                     ins.__main__(self.args)
@@ -53,7 +55,10 @@ class proc:
             sys.print_exception(e)
         finally:
             #self.sts = "S"
-            del sdata.procs[self.pid]
+            for idx, i in enumerate(sdata.procs):
+                if i.pid == self.pid:
+                    del sdata.procs[idx]
+                    break
 
             if not imerr:
                 del sys.modules[self.cmd]
@@ -292,16 +297,21 @@ class smolOS:
     
     # Thread status
     def ps(self):
-        print(f"Proc Sts Thread_Id Cmd/Args")
-        for i in sdata.procs:
-            if i.sts == "S": del sdata.procs[i.pid]
+        if len(sdata.procs)>0:
+            print(f"Proc Sts Thread_Id       Cmd/Args")
+        for idx, i in enumerate(sdata.procs):
+            #if i.sts == "S": del sdata.procs[idx] # Clening
             print(f"{i.pid:4}  {i.sts}  {i.tid} {i.cmd} {i.args}")
 
     # Kill thread
     def kill(self, pid):
-        if sdata.procs:
-            sdata.procs[int(pid)].sts = "S"
-            
+        for i in sdata.procs:
+            if i.pid == int(pid):
+                i.sts="S"
+                #print(f"{i.pid=} {pid=} {i.sts=}")
+                utime.sleep(1)
+                break
+ 
     # System exit
     def exit(self):
 

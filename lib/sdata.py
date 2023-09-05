@@ -7,7 +7,7 @@ debug   = True
 board={}
 sysconfig={}
 procs=[]
-
+pid=0
 # ---
 
 #To local check
