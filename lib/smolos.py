@@ -12,14 +12,14 @@ import utls
 # Process class
 class proc:
     def __init__(self):
-        self.pid  = 0     # Process id
-        self.tid  = 0     # Thread id
-        self.cmd  = ""    # Command
-        self.args = ""    # Arguments
-        self.sts  = "S"   # Process status
-
+        
         sdata.pid += 1
-        self.pid = sdata.pid
+        self.pid  = sdata.pid        # Process id
+        self.tid  = 0                # Thread id
+        self.cmd  = ""              # Command
+        self.args = ""              # Arguments
+        self.sta  = utime.ticks_ms() # Start time
+        self.sts  = "S"              # Process status
         
         sdata.procs.append(self)
 
@@ -299,10 +299,10 @@ class smolOS:
     # Process status
     def ps(self):
         if len(sdata.procs)>0:
-            print(f"Proc Sts Thread_Id      Cmd/Args")
+            print(f"Proc Sts  Init_T   Elapsed   Thread_Id      Cmd/Args")
             
             for i in sdata.procs:
-                print(f"{i.pid:4}  {i.sts}  {i.tid}   {i.cmd} {" ".join(i.args)}")
+                print(f"{i.pid:4}  {i.sts}   {i.sta}  {utime.ticks_ms() - i.sta}      {i.tid}    {i.cmd} {" ".join(i.args)}")
 
     # Kill process
     def kill(self, pid):
