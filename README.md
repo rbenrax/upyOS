@@ -1,6 +1,6 @@
-# smolOS-->raxOS
+# smolOS-->upyOS
 
-The project already has enough changes to propose a name change, the new nane will be raxOS.
+The project already has enough changes to propose a name change, the new nane will be upyOS.
 
 smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266, RP2040, etc.) giving the user POSIX-like environment, originally developed by Krzysztof Krystian Jankowski and adapted by me.
 
