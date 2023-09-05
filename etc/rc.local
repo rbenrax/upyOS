@@ -33,7 +33,9 @@
 #> print(dir(os))
 #< dir(os)
 
-/opt/thr_test &
+#/opt/thr_test &
+
+> sys.path.append("/opt")
 
 # Exit form OS to python REPL
 #exit
