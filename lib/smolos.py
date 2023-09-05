@@ -12,14 +12,12 @@ import utls
 # Process class
 class proc:
     def __init__(self):
-        self.tid  = 0                # Thread id
-        self.cmd  = ""               # Command
-        self.args = ""               # Arguments
-        self.sts  = "S"              # Process status
-        self.pid  = len(sdata.procs) # Process id
-        
-        sdata.procs.append(self)
-        
+        self.pid  = 0     # Process id
+        self.tid  = 0     # Thread id
+        self.cmd  = ""    # Command
+        self.args = ""    # Arguments
+        self.sts  = "S"   # Process status
+
     # Lanunch new process
     def run(self, isthr, cmd, args):
         self.cmd = cmd
@@ -35,7 +33,9 @@ class proc:
             ins = __import__(self.cmd)
             if '__main__' in dir(ins):
                 
+                self.pid  = len(sdata.procs) # Process id
                 self.sts = "R"
+                sdata.procs.append(self)
                 
                 if len(self.args) > 0:
                     ins.__main__(self.args)
