@@ -293,7 +293,7 @@ class smolOS:
     def ps(self):
         print(f"Proc Sts Thread_Id Cmd/Args")
         for i in sdata.procs:
-            #if isinstance(i, str): continue
+            if i.sts == "S": del sdata.procs[i.pid]
             print(f"{i.pid:4}  {i.sts}  {i.tid} {i.cmd} {i.args}")
 
     # Kill thread
@@ -306,9 +306,8 @@ class smolOS:
 
         # Stop threads before exit
         for i in sdata.procs:
-            #if isinstance(i, str): continue
             self.kill(i.pid)
-        utime.sleep(2)
+        utime.sleep(1)
 
         self.print_msg("Shutdown smolOS..., bye.")
         print("")
