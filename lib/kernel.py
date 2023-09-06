@@ -29,6 +29,7 @@ class proc:
         if isthr:
             from _thread import get_ident
             self.tid = get_ident()
+            print(f"[{self.pid}]")
         
         imerr=False    # Import module error?
         
@@ -62,6 +63,9 @@ class proc:
 
             if not imerr:
                 del sys.modules[self.cmd]
+                
+            if isthr:
+                print(f"[{self.pid}]+ Done")
 
 class upyOS:
     
