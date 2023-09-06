@@ -20,11 +20,10 @@ class proc:
         self.sta  = utime.ticks_ms() # Start time
         self.sts  = "S"              # Process status
         
-        sdata.procs.append(self)
-
     def run(self, isthr, cmd, args):
         self.cmd  = cmd
         self.args = args
+        sdata.procs.append(self)
 
         if isthr:
             from _thread import get_ident
@@ -241,6 +240,10 @@ class upyOS:
                             print("System has not thread support")
                         except Exception as ex:
                             print(f"Error launching thread {ex}")
+                            #for idx, i in enumerate(sdata.procs):
+                            #    if i.sts == "S":
+                            #        del sdata.procs[idx]
+                            #        break
                             if sdata.debug:
                                 sys.print_exception(ex)
                             
@@ -319,9 +322,12 @@ class upyOS:
     def exit(self):
 
         # Stop threads before exit
-        for i in sdata.procs:
-            self.kill(i.pid)
-        utime.sleep(1)
+        if len(sdata.procs)>0:
+            print("\nStoping process...")
+            for i in sdata.procs:
+                self.kill(i.pid)
+            while len(sdata.procs)>0:
+                utime.sleep(1)
 
         self.print_msg("Shutdown upyOS..., bye.")
         print("")
