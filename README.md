@@ -12,9 +12,9 @@ upyOS - a tiny and simple operating system for MicroPython (targetting ESP8266, 
 This is a implementation tested over ESP32-C3, ESP8266 and YD-2040 by rbenrax.
 The target is to get a common base to use stand alone microcontroller, and fun using it. 
 
-![mupyos01](media/mupyos_01.png )
+![upyos01](media/upyos_01.png )
 
-![mupyos02](media/mupyos_02.png )
+![upyos02](media/upyos_02.png )
 
 
 upyOS Help:
