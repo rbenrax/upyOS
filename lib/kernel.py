@@ -9,9 +9,8 @@ import sdata
 import utls
 
 # Process class
-class proc:
+class Proc:
     def __init__(self):
-        
         sdata.pid += 1
         self.pid  = sdata.pid        # Process id
         self.tid  = 0                # Thread id
@@ -28,7 +27,7 @@ class proc:
         if isthr:
             from _thread import get_ident
             self.tid = get_ident()
-            print(f"[{self.pid}]")
+            print(f"\n[{self.pid}]")
         
         imerr=False    # Import module error?
         
@@ -61,6 +60,7 @@ class proc:
                     break
 
             if not imerr:
+                #TODO: Check if several instances of module are running
                 del sys.modules[self.cmd]
                 
             if isthr:
@@ -119,6 +119,7 @@ class upyOS:
         self.user_commands = {
             "sh" : self.run_sh_script,
             "r": self.last_cmd,
+            #"watch": self.watch,
             "ps": self.ps,
             "kill": self.kill,
             "exit" : self.exit
@@ -234,7 +235,7 @@ class upyOS:
                         # One main thread an alternative one, for now
                         try:
                             from _thread import start_new_thread
-                            newProc = proc()
+                            newProc = Proc()
                             start_new_thread(newProc.run, (True, cmdl, args[:-1]))
                         except ImportError:
                             print("System has not thread support")
@@ -248,7 +249,7 @@ class upyOS:
                                 sys.print_exception(ex)
                             
                     else:
-                        newProc = proc()
+                        newProc = Proc()
                         newProc.run(False, cmdl, args)
 
                 # External shell scripts
@@ -301,6 +302,17 @@ class upyOS:
         #self.run_cmd(cmd)
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
+        
+    # Watch command
+#    def watch(self, cmd=""):
+#        if cmd == "":
+#            print("Repeat command every time\nUsage: watch <cmd> <options>: [-t] (seconds)")
+#            return
+#            
+#        while True:
+#            print(f"\033[2J\033[HEvery: {2}\t{cmd}")
+#            self.run_cmd(cmd)
+#            utime.sleep(2)
     
     # Process status
     def ps(self):
