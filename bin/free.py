@@ -27,7 +27,7 @@ def __main__(args):
         print(f'\033[0mTotal:\033[1m {utls.human(t)}')
         print(f'\033[0mAlloc:\033[1m {utls.human(a)}')
         print(f'\033[0mFree.:\033[1m {utls.human(f)} {p}\033[0m')
-        print(f'\033[0mStack:\033[1m {utls.human(s)} {p}\033[0m')
+        print(f'\033[0mStack:\033[1m {utls.human(s)}')
     else:
         print(f'\033[0mTotal:\033[1m {t:7} bytes')
         print(f'\033[0mAlloc:\033[1m {a:7} bytes')
