@@ -14,7 +14,7 @@ def init():
 
     # Create sysconfig
 
-    file = "/etc/smolOS-" + uos.uname()[0] + ".board"
+    file = "/etc/upyOS-" + uos.uname()[0] + ".board"
     board = uos.uname()[4]
     sco = syscfg.SysCfg(board)
     
@@ -33,7 +33,7 @@ def mbr():
 
         print("\033[2J") # Clear screen
         print("\033[H")  # Goto 0,0
-        print("smolOS grub\n")
+        print("upyOS grub\n")
         
         print("Initializing...")
         init()
@@ -43,11 +43,11 @@ def mbr():
             print(t)
             utime.sleep(1)
        
-        import smolos
-        smol = smolos.smolOS()
+        import kernel
+        upyos = kernel.upyOS()
         
     except KeyboardInterrupt:
-         print("Grub canceled, smolOS booting aborted.")
+         print("Grub canceled, upyOS booting aborted.")
          sys.exit()
          
     except Exception as ex:

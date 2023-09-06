@@ -13,7 +13,7 @@ def __main__(args):
 
     print(f"\033[0mBoard:\033[1m {uos.uname()[4]}")
     print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
-    print(f"\033[0m{sdata.name} :\033[1m {sdata.version} (size: {uos.stat('/lib/smolos.py')[6]} bytes)")
+    print(f"\033[0m{sdata.name} :\033[1m {sdata.version} (size: {uos.stat('/lib/kernel.py')[6]} bytes)")
     print(f"\033[0mFirmware:\033[1m{uos.uname().version}")
 
     if sdata.sysconfig["turbo"]:

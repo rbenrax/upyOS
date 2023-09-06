@@ -1,7 +1,4 @@
-# Simple rc.local script for testing 
-
-#cd bin              # List files in current directory (hidden files included and human readable)
-#ls / -h
+# This file script is called after init.sh and may content user startup commands same as above script.
 
 #lshw -f             # List board hardware
 

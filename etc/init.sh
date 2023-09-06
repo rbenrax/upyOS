@@ -1,6 +1,7 @@
-# Init file script in normal mode, if does not exists, we are in recovery mode and should exists init.rec
-
-# > (execute Python code)
+# This script file is the first script called in boot, this is normal mode, if does not exists, 
+# we are in recovery mode and should exists init.rec
+# Internal and external commands can be used
+# > (Execute Python code)
 # < (Print the Python code execution)
 
 #clear
