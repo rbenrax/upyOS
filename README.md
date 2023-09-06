@@ -39,7 +39,9 @@ The sdata module contains all the system data, allowing access to the board conf
 
 If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
 
-Since most microcontrollers only have one thread more, then one main thread and one alternative, python programs can be summited in a thread apart ending command with "&", asyncio programas may be used.
+RP2040 has only two threads and is limited to this number, but ESP32 and others may have more. Python programs can be submitted in a separate thread by ending the command with '&' symbol, and asyncio programs may also be used."
+
+Threads may be stopped by kill command, but then must be controlled in main loop inside the procces, see examples in /opt directory.
 
 I hope it is useful for you!, there are things to do, and to improve.
 
