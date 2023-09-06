@@ -234,7 +234,8 @@ class upyOS:
                         # Since most microcontrollers only have one thread more...
                         # One main thread an alternative one, for now
                         try:
-                            from _thread import start_new_thread
+                            from _thread import start_new_thread, stack_size
+                            if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
                             newProc = Proc()
                             start_new_thread(newProc.run, (True, cmdl, args[:-1]))
                         except ImportError:
