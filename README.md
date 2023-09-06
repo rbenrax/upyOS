@@ -1,35 +1,35 @@
-# smolOS-->upyOS
+# upyOS
 
 The project already has enough changes to propose a name change, the new name will be upyOS.
 
-smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266, RP2040, etc.) giving the user POSIX-like environment, originally developed by Krzysztof Krystian Jankowski and adapted by me.
+upyOS - a tiny and simple operating system for MicroPython (targetting ESP8266, RP2040, etc.) giving the user POSIX-like environment, originally developed by Krzysztof Krystian Jankowski and adapted by me.
 
 [smolOS original github site](https://github.com/w84death/smolOS/tree/main)
 
 [smolos docs site](http://smol.p1x.in/os/)
 
 
-This is a simple test implementation with some modifications of smolOS over ESP32-C3, ESP8266 and YD-2040 and any others by rbenrax.
+This is a implementation tested over ESP32-C3, ESP8266 and YD-2040 by rbenrax.
 The target is to get a common base to use stand alone microcontroller, and fun using it. 
 
-![YD-2040](media/smolos_01.png )
+![mupyos01](media/mupyos_01.png )
 
-![luatos on esp32-c3](media/smolos_02.png )
+![mupyos02](media/mupyos_02.png )
 
 
-smolOS Help:
+upyOS Help:
 
-Adapted by rbenrax, source available in https://github.com/rbenrax/smolOS, based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
+Adapted by rbenrax, source available in https://github.com/rbenrax/upyOS, based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
 
 Explanation:
 
 The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of more simple programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
 
-In main.py we can launch grub or smolos directly (see files).
+In main.py we can launch grub or upyOS directly (see files).
 
 Grub will create in /etc dir a file (if doesn't exists) for configure the specific board pins, gpios and other parameters, you can remove unused parameter to optimize the memory use, also allow stop the system boot if any program hung the load.
 
-In smolos boot, two shell scripts are executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution, you can remove the commands you don't need and make the boot as fast as you want, as well as include commands or programs that you need.
+In upyOS boot, two shell scripts are executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution, you can remove the commands you don't need and make the boot as fast as you want, as well as include commands or programs that you need.
 
 Exists internal and external commands, and internal and externals shell scripts, internal located in /bin directory and are exceuted without extention, external can be located in any directory and are executed directly, external commands are self-explanatory and some have help (--h).
 
@@ -81,9 +81,9 @@ NodeMCU
 
 Actual Development:
 
-- /lib/grubs.py the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, smolos process will read its content and will enable the resources to be used by the system, modules, external commands, etc.
+- /lib/grubs.py the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, upyOS process will read its content and will enable the resources to be used by the system, modules, external commands, etc.
 
-- /lib/smolos.py is the next load, is the OS core, has internal and external commands (/bin directory), all commands will be moved to external commands to reduce the memory use.
+- /lib/kernel.py upyos class is the next load, is the OS core, has internal and external commands (/bin directory), all commands will be moved to external commands to reduce the memory use.
 
 - Actual implementation also can call simple shell scripts, including /etc/init.sh and /etc/rc.local, the start up scripts.
 
@@ -109,7 +109,7 @@ Actual Development:
       "<" command allow print any python expression:
       
       / $: < sys.modules
-      {'smolos': <module 'smolos' from '/lib/smolos.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
+      {'kernel': <module 'kernel' from '/lib/kernel.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
       
       / $: < 2+2
       4
