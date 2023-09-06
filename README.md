@@ -1,4 +1,4 @@
-# upyOS
+# upyOS (formerly rbenrax/smolOS)
 
 The project already has enough changes to propose a name change, the new name will be upyOS.
 
