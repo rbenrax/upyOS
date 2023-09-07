@@ -323,17 +323,6 @@ class upyOS:
         #self.run_cmd(cmd)
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
-        
-    # Watch command
-#    def watch(self, cmd=""):
-#        if cmd == "":
-#            print("Repeat command every time\nUsage: watch <cmd> <options>: [-t] (seconds)")
-#            return
-#            
-#        while True:
-#            print(f"\033[2J\033[HEvery: {2}\t{cmd}")
-#            self.run_cmd(cmd)
-#            utime.sleep(2)
     
     # Process status
     def ps(self):
