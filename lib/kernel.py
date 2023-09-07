@@ -81,11 +81,15 @@ class Proc:
                     break
                 
             if self.isthr:
-                print(f"[{self.pid}]+ Done")
+                print(f"[{self.pid}]+ Done\t {self.cmd}")
 
 class upyOS:
     
-    def __init__(self):
+    def __init__(self, boot_args):
+
+        # Valid boot_args:
+        # -r = Recovery mode
+        # -n = no load board config
 
         # Remove modules previusly loaded by grub
         try:
@@ -118,9 +122,10 @@ class upyOS:
             #print(sdata.sysconfig)
             print("System cfg loaded.")
             
-            sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
-            #print(sdata.board)
-            print("Board cfg loaded.")
+            if not "-n" in boot_args:
+                sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
+                #print(sdata.board)
+                print("Board cfg loaded.")
             
         except OSError as ex:
             print("Problem loading configuration" + str(ex))
@@ -147,7 +152,7 @@ class upyOS:
             else:
                 self.run_cmd("cpufreq -low")
 
-        if utls.file_exists("/etc/init.sh"):
+        if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
             
             #print("Launching init.sh:")
@@ -366,4 +371,4 @@ class upyOS:
 
 # - -  
 if __name__ == "__main__":
-    upyos = upyOS()
+    upyos = upyOS("") # Boot_args: -r -n

@@ -44,7 +44,7 @@ def mbr():
             utime.sleep(1)
        
         import kernel
-        upyos = kernel.upyOS()
+        upyos = kernel.upyOS("")
         
     except KeyboardInterrupt:
          print("Grub canceled, upyOS booting aborted.")
