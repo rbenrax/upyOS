@@ -30,7 +30,8 @@
 #> print(dir(os))
 #< dir(os)
 
-#/opt/thr_test &
+#/opt/asy_test &
+#/opt/thr_test
 
 > sys.path.append("/opt")
 

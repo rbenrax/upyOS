@@ -10,7 +10,10 @@ import utls
 
 # Process class
 class Proc:
-    def __init__(self):
+    def __init__(self, syscall):
+        
+        self.syscall = syscall       # upyOS instance, for sytem calls
+        
         sdata.pid += 1
         self.pid  = sdata.pid        # Process id
         self.tid  = 0                # Thread id
@@ -29,39 +32,52 @@ class Proc:
             self.tid = get_ident()
             print(f"\n[{self.pid}]")
         
-        imerr=False    # Import module error?
+        rmmod=True    # Remove module?
         
         try:
-            ins = __import__(self.cmd)
-            if '__main__' in dir(ins):
+            mod = __import__(self.cmd)
+            if '__main__' in dir(mod):
+
+                if hasattr(mod, 'rmmod'):      # The user space functions can avoid module being removed
+                    rmmod=mod.rmmod
+
+                if hasattr(mod, 'syscall'):    # The user space functinos can call system funcions
+                    mod.syscall=self.syscall
 
                 self.sts = "R"       # Porcess Running
                 
                 if len(self.args) > 0:
-                    ins.__main__(self.args)
+                    mod.__main__(self.args)
                 else:
-                    ins.__main__("")
+                    mod.__main__("")
 
         except KeyboardInterrupt:
             print(f"{self.cmd}: ended")
         except ImportError as ie:
-            imerr=True
+            rmmod=False
             print(f"{self.cmd}: not found")
         except Exception as e:
-            imerr=True
+            rmmod=False
             print(f"Error executing {self.cmd}")
             if sdata.debug:
                 sys.print_exception(e)
         finally:
-            #self.sts = "S"
+
+            # Check if several instances of module are running
+            for i in sdata.procs:
+                if i.cmd == self.cmd and i.pid != self.pid:
+                    rmmod=False # There is another modules instance running
+                    break
+
+            #print(f"{rmmod=}")
+            if rmmod:
+                del sys.modules[self.cmd]
+
+            # Remove process from process list
             for idx, i in enumerate(sdata.procs):
                 if i.pid == self.pid:
                     del sdata.procs[idx]
                     break
-
-            if not imerr:
-                #TODO: Check if several instances of module are running
-                del sys.modules[self.cmd]
                 
             if isthr:
                 print(f"[{self.pid}]+ Done")
@@ -236,21 +252,18 @@ class upyOS:
                         try:
                             from _thread import start_new_thread, stack_size
                             if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
-                            newProc = Proc()
+                            newProc = Proc(self)
                             start_new_thread(newProc.run, (True, cmdl, args[:-1]))
                         except ImportError:
                             print("System has not thread support")
                         except Exception as ex:
                             print(f"Error launching thread {ex}")
-                            #for idx, i in enumerate(sdata.procs):
-                            #    if i.sts == "S":
-                            #        del sdata.procs[idx]
-                            #        break
+
                             if sdata.debug:
                                 sys.print_exception(ex)
                             
                     else:
-                        newProc = Proc()
+                        newProc = Proc(self)
                         newProc.run(False, cmdl, args)
 
                 # External shell scripts
