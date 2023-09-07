@@ -23,11 +23,12 @@ class Proc:
         self.sts  = "S"              # Process status
         
     def run(self, isthr, cmd, args):
+        self.isthr= isthr
         self.cmd  = cmd
         self.args = args
         sdata.procs.append(self)
 
-        if isthr:
+        if self.isthr:
             from _thread import get_ident
             self.tid = get_ident()
             print(f"\n[{self.pid}]")
@@ -79,7 +80,7 @@ class Proc:
                     del sdata.procs[idx]
                     break
                 
-            if isthr:
+            if self.isthr:
                 print(f"[{self.pid}]+ Done")
 
 class upyOS:
@@ -135,7 +136,6 @@ class upyOS:
         self.user_commands = {
             "sh" : self.run_sh_script,
             "r": self.last_cmd,
-            #"watch": self.watch,
             "ps": self.ps,
             "kill": self.kill,
             "exit" : self.exit
