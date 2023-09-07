@@ -8,8 +8,8 @@ import utime
 import sdata
 import utls
 
-procs=[]
 _pid=0
+procs=[]
 
 # Process class
 class Proc:
@@ -23,7 +23,7 @@ class Proc:
         self.tid  = 0                # Thread id
         self.cmd  = ""               # Command
         self.args = ""               # Arguments
-        self.sta  = utime.ticks_ms() # Start time
+        self.stt  = utime.ticks_ms() # Start time
         self.sts  = "S"              # Process status
         self.rmmod = True            # Remove module, default
         
@@ -330,7 +330,7 @@ class upyOS:
             print(f"Proc Sts  Init_T   Elapsed   Thread_Id      Cmd/Args")
             
             for i in procs:
-                print(f"{i.pid:4}  {i.sts}   {i.sta}  {utime.ticks_ms() - i.sta}      {i.tid}    {i.cmd} {" ".join(i.args)}")
+                print(f"{i.pid:4}  {i.sts}   {i.stt}  {utime.ticks_ms() - i.stt}      {i.tid}    {i.cmd} {" ".join(i.args)}")
 
     # Kill process
     def kill(self, pid):

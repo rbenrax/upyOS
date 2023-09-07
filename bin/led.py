@@ -37,8 +37,9 @@ def __main__(args):
         return
 
     system_leds = []
-    for pn in sdata.board["ledio"][0].values(): #Leds gpios
-       system_leds.append(machine.Pin(pn, machine.Pin.OUT))
+    if "ledio" in sdata.board:
+        for pn in sdata.board["ledio"][0].values(): #Leds gpios
+           system_leds.append(machine.Pin(pn, machine.Pin.OUT))
 
     if ln < 0 or ln>len(system_leds)-1:
        print("Led not found.")

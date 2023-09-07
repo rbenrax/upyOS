@@ -7,6 +7,8 @@ def __main__(args):
         print("Set clock speed\nUsage: cpuclock <option>: -low, -turbo, --h -v -t (toggle)")
         return
 
+    if not "mcu" in sdata.board: return
+    
     turbo = sdata.sysconfig["turbo"]
     
     if args[0] == "-v":
