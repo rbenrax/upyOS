@@ -5,21 +5,18 @@ import sdata
 import utime
 from _thread import get_ident
 
-# The user space functions can avoid module being removed (passed in call)
-rmmod=False
-
-# The user space functions can call system funcions by syscall reference (passed in call)
-syscall=None
+# Current process refeference (passed in call)
+proc=None
 
 def __main__(args):
-    syscall.ps()
+    proc.syscall.ps()
     cont=0
     while True:
         cont+=1
         print(f"Hola {cont} ")
         utime.sleep(4)
 
-        if sdata.endthr(get_ident()): break
+        if proc.sts=="S":break
 
 if __name__ == "__main__":
     args =[""]

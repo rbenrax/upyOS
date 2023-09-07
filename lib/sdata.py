@@ -6,8 +6,7 @@ debug   = True
 
 board={}
 sysconfig={}
-procs=[]
-pid=0
+
 # ---
 
 #To local check
@@ -32,16 +31,6 @@ def unset(var):
     """Remove a environment variable"""
     if sysconfig["env"][str(var)]:
         del sysconfig["env"][str(var)]
-
-def endthr(thid):
-    """Test if a trhead should be stopped"""
-    end = False
-    for i in procs:
-        #print(f"{thid} {i.tid} {i.sts})")
-        if i.tid == thid and i.sts == "S":
-            end = True
-            break
-    return end
 
 def getgpio(pin):
     """Get the gpio assigned to a pin"""
