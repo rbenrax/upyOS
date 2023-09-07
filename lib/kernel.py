@@ -19,12 +19,12 @@ class Proc:
         
         global _pid
         _pid += 1
-        self.pid  = _pid             # Process id
-        self.tid  = 0                # Thread id
-        self.cmd  = ""               # Command
-        self.args = ""               # Arguments
-        self.stt  = utime.ticks_ms() # Start time
-        self.sts  = "S"              # Process status
+        self.pid   = _pid             # Process id
+        self.tid   = 0                # Thread id
+        self.cmd   = ""               # Command
+        self.args  = ""               # Arguments
+        self.stt   = utime.ticks_ms() # Start time
+        self.sts   = "S"              # Process status
         self.rmmod = True            # Remove module, default
         
     def run(self, isthr, cmd, args):
