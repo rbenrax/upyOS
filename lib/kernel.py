@@ -41,7 +41,7 @@ class Proc:
                 if hasattr(mod, 'rmmod'):      # The user space functions can avoid module being removed
                     rmmod=mod.rmmod
 
-                if hasattr(mod, 'syscall'):    # The user space functinos can call system funcions
+                if hasattr(mod, 'syscall'):    # The user space functions can call system funcions
                     mod.syscall=self.syscall
 
                 self.sts = "R"       # Porcess Running
