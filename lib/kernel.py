@@ -142,7 +142,6 @@ class upyOS:
 
         # Internal Commands definition
         self.user_commands = {
-            "sh" : self.run_sh_script,
             "r": self.last_cmd,
             "ps": self.ps,
             "kill": self.kill,
@@ -291,30 +290,6 @@ class upyOS:
                 else:
                     print(f"{cmd}: Unknown function or program. Try 'help'.")
 
-    # Run shell script
-    def run_sh_script(self, ssf):
-        if utls.file_exists(ssf):
-            with open(ssf,'r') as f:
-                while True:
-                    lin = f.readline()
-                    if not lin: break
-
-                    if lin.strip()=="": continue
-                    if len(lin)>0 and lin[0]=="#": continue
-                    cmdl=lin.split("#")[0] # Left comment line part
-                    
-                    # Translate env variables $*
-                    tmp = cmdl.split()
-                    
-                    if not tmp[0] in ["export", "echo", "unset"]:
-                        for e in tmp:
-                            if e[0]=="$":
-                                v=sdata.getenv(e[1:])
-                                cmdl = cmdl.replace(e, v)
-
-                    self.run_cmd(cmdl)
-        else:
-            print(f"{ssf}: script not found")
 
 # - - -
 
@@ -369,8 +344,10 @@ class upyOS:
             print("\nStoping process...")
             for i in procs:
                 self.kill(i.pid)
-            while len(procs)>0:
-                utime.sleep(1)
+
+            #TODO: solve
+            #while len(procs)>0:
+            utime.sleep(1)
 
         self.print_msg("Shutdown upyOS..., bye.")
         print("")
