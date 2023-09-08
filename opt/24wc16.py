@@ -3,12 +3,12 @@
 
 from time import sleep
 from machine import I2C, Pin
-import sdata
+import utls
 
 def __main__(args):
     
     i2c_id=0
-    gpios = sdata.getgpios("i2c", i2c_id)
+    gpios = utls.getgpios("i2c", i2c_id)
     print(gpios)
 
     i2c = I2C(id=i2c_id, scl=Pin(gpios["scl"]), sda=Pin(gpios["sda"]), freq=400000)

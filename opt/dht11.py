@@ -7,8 +7,8 @@ import dht
 if __name__ == "__main__":
     pin=2
 else:
-    import sdata
-    pin=sdata.getgpio(19)
+    import utls
+    pin=utls.getgpio(19)
 
 sensor = dht.DHT11(Pin(pin))
 

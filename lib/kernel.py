@@ -146,6 +146,9 @@ class upyOS:
             "r": self.last_cmd,
             "ps": self.ps,
             "kill": self.kill,
+            "getenv": self.getenv,
+            "setenv": self.setenv,
+            "unset": self.unset,
             "exit" : self.exit
         }
 
@@ -340,7 +343,24 @@ class upyOS:
                 i.sts="S"
                 utime.sleep(1)
                 break
- 
+            
+    def getenv(self, var=""):
+        """Get a value from environment variables"""
+        #print(sysconfig["env"])
+        for k, v in sdata.sysconfig["env"].items():
+            if k == var:
+                return v
+        return("")
+
+    def setenv(self, var="", val=""):
+        """Set a value to a environment variable"""
+        sdata.sysconfig["env"][var]=val
+
+    def unset(self, var=""):
+        """Remove a environment variable"""
+        if sdata.sysconfig["env"][var]:
+            del sdata.sysconfig["env"][var]
+
     # System exit
     def exit(self):
 
