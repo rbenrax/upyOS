@@ -144,7 +144,6 @@ class upyOS:
         # Internal Commands definition
         self.user_commands = {
             "r": self.last_cmd,
-            "kill": self.kill,
             "getenv": self.getenv,
             "setenv": self.setenv,
             "unset": self.unset,
@@ -301,14 +300,6 @@ class upyOS:
         #self.run_cmd(cmd)
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
-
-    # Kill process
-    def kill(self, pid):
-        for i in procs:
-            if i.pid == int(pid):
-                i.sts="S"
-                utime.sleep(1)
-                break
             
     def getenv(self, var=""):
         """Get a value from environment variables"""
