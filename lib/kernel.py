@@ -35,6 +35,7 @@ class Proc:
         
         global procs
         procs.append(self)
+        #print(f"{len(procs)=}")
 
         if self.isthr:
             from _thread import get_ident
@@ -144,6 +145,8 @@ class upyOS:
         # Internal Commands definition
         self.user_commands = {
             "r": self.last_cmd,
+            "ps": self.ps,
+            "kill": self.kill,
             "getenv": self.getenv,
             "setenv": self.setenv,
             "unset": self.unset,
@@ -318,6 +321,21 @@ class upyOS:
         if sdata.sysconfig["env"][var]:
             del sdata.sysconfig["env"][var]
 
+    def ps(self):
+        """ Process status """
+        if len(procs)>0:
+            print(f"  Proc Sts     Init_T   Elapsed   Thread_Id   Cmd/Args")
+            for i in procs:
+                print(f"{i.pid:6}  {i.sts:3}  {i.stt:8}  {utime.ticks_ms() - i.stt:8}  {i.tid:10}   {i.cmd} {" ".join(i.args)}")
+                
+    def kill(self, pid="0"):
+        """ Kill process """
+        for i in procs:
+            if i.pid == int(pid):
+                i.sts="S"
+                utime.sleep(.2)
+                break
+
     # System exit
     def exit(self):
 
@@ -325,18 +343,18 @@ class upyOS:
         if len(procs)>0:
             print("\nStoping process...")
             for i in procs:
-                i.sts="S"   #self.run_cmd(f"kill {i.pid}")
+                i.sts="S"
+                #self.kill(i.pid)
 
-            #TODO: solve if sh script send exit command
             while len(procs)>0:
-                print("\nWaiting...")
+                print("Waiting...")
                 utime.sleep(1)
 
         self.print_msg("Shutdown upyOS..., bye.")
         print("")
         
-        raise SystemExit
-        #sys.exit()
+        #raise SystemExit
+        sys.exit()
 
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")

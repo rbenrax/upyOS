@@ -3,6 +3,9 @@ import utime
 
 def __main__(args):
 
+    print("This command should be analized, caos")
+    return
+
     if len(args) == 1:
         print("Show process status\nUsage: ps")
         return
