@@ -6,21 +6,20 @@ proc=None
 def __main__(args):
 
     if len(args) == 0:
-        print("Repeat command every time\nUsage: watch <cmd> <args> -t <every>")
+        print("Repeat a command every specified time\nUsage: watch <cmd> <args> -t <time>")
         return
 
     t=2
     
-    #TODO: change args get
-    if len(args) > 2 and args[-2] == "-t":
+    if len(args) > 2 and args[-2] == "-t" and args[-1].isdigit():
         t=float(args[-1])
-        cmd=args[:-2]
+        cmd=" ".join(args[:-2])
     else:
-        cmd=args
+        cmd=" ".join(args)
         
     while True:
         print(f"\033[2J\033[HEvery: {t}\t{cmd}")
-        proc.syscall.run_cmd(" ".join(cmd))
+        proc.syscall.run_cmd(cmd)
         utime.sleep(t)
         if proc.sts=="S":break
 
