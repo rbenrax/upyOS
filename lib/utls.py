@@ -103,9 +103,9 @@ def getgpio(pin):
 def getgpios(cat, ins):
     """Get a dict of pins for a specific service category"""
     gps={}
-    gpios=board["gpio"][0]
+    gpios=sdata.board["gpio"][0]
     #print(gpios)
-    for kps, vps in board[cat][ins].items():
+    for kps, vps in sdata.board[cat][ins].items():
         for k, v in gpios.items():
             #print(type(k), type(v))
             if v == vps:

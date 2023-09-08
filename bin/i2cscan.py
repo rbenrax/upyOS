@@ -1,5 +1,6 @@
 import machine
 import utls
+import sdata
 
 #print(utls.board["i2c"])
 #scl1=utls.board["i2c"][0]["scl"]
@@ -11,7 +12,7 @@ def __main__(args):
         print("Scan i2c bus for devices\nUsage: i2cscan <bus>: 0,1,..")
         return
     else:
-        buses=len(utls.board["i2c"])
+        buses=len(sdata.board["i2c"])
         if buses>0:
             i2c_id=int(args[0])
             if i2c_id <= buses-1:

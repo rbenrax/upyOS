@@ -325,11 +325,12 @@ class upyOS:
         if len(procs)>0:
             print("\nStoping process...")
             for i in procs:
-                self.kill(i.pid)
+                i.sts="S"   #self.run_cmd(f"kill {i.pid}")
 
             #TODO: solve if sh script send exit command
-            #while len(procs)>0:
-            utime.sleep(1)
+            while len(procs)>0:
+                print("\nWaiting...")
+                utime.sleep(1)
 
         self.print_msg("Shutdown upyOS..., bye.")
         print("")
