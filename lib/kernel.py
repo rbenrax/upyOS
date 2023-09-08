@@ -47,7 +47,7 @@ class Proc:
                 if hasattr(mod, 'proc'):      # The user space functions can avoid module being removed
                     mod.proc=self
 
-                self.sts = "R"       # Porcess Running
+                self.sts = "R"                # Porcess Running
                 
                 if len(self.args) > 0:
                     mod.__main__(self.args)
@@ -103,6 +103,7 @@ class upyOS:
         # sdata store all system data
         sdata.name    = "upyOS-" + uos.uname()[0]
         sdata.version = "0.5"
+        sdata.initime = utime.time()
 
         # Create directories
         if not utls.file_exists("/opt"): # Specific solutions directory

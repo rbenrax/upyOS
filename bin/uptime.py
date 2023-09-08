@@ -1,8 +1,7 @@
 import utime
 import sdata
 
-#TODO: Revise time
-localtime = utime.localtime(utime.time())
-print (f"Current time from system startup is: {localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2}")
+localt = utime.gmtime(utime.time())
+uptime = utime.gmtime(utime.time() - (sdata.initime))
 
-       
+print (f"{localt[3]:0>2} {localt[4]:0>2} {localt[5]:0>2}  {uptime[3]:0>2} {uptime[4]:0>2} {uptime[5]:0>2} up")
