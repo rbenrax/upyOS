@@ -25,7 +25,8 @@ class Proc:
         self.args  = ""               # Arguments
         self.stt   = utime.ticks_ms() # Start time
         self.sts   = "S"              # Process status
-        self.rmmod = True            # Remove module, default
+        self.rmmod = True             # Remove module, default True
+        self.isthr = False
         
     def run(self, isthr, cmd, args):
         self.isthr= isthr
@@ -44,15 +45,15 @@ class Proc:
             mod = __import__(self.cmd)
             if '__main__' in dir(mod):
 
-                if hasattr(mod, 'proc'):      # The user space functions can avoid module being removed
+                if hasattr(mod, 'proc'):      # Passing proc ref to run module
                     mod.proc=self
 
-                self.sts = "R"                # Porcess Running
+                self.sts = "R"                # Process Running
                 
                 if len(self.args) > 0:
                     mod.__main__(self.args)
                 else:
-                    mod.__main__("")
+                    mod.__main__("") # TODO: no nice
 
         except KeyboardInterrupt:
             print(f"{self.cmd}: ended")
@@ -91,7 +92,7 @@ class upyOS:
 
         # Valid boot_args:
         # -r = Recovery mode
-        # -n = no load board config
+        # -n = No board config load
 
         # Remove modules previusly loaded by grub
         try:
@@ -115,8 +116,8 @@ class upyOS:
         # Set library path for modules finding, by default is /lib only
         sys.path.append("/bin")
         sys.path.append("/extlib")
-        #sys.path.append("/opt") # /opt directory calls need full path
 
+        # Clean screen and boot
         print("\033[2J\033[HBooting upyOS...")
 
         # Load system configuration and board definitions
@@ -279,16 +280,15 @@ class upyOS:
                 elif ext=="sh":
                     try:
                         if not "/" in cmdl:
-                            self.run_sh_script("/bin/" + cmdl + ".sh")
+                            self.run_cmd("sh /bin/" + cmdl + ".sh")
                         else:
-                            self.run_sh_script(cmdl + ".sh")
+                            self.run_cmd("sh " + cmdl + ".sh")
                     except Exception as e:
                         print(f"Error executing script {fcmd}")
                         sys.print_exception(e)
                     
                 else:
                     print(f"{cmd}: Unknown function or program. Try 'help'.")
-
 
 # - - -
 
