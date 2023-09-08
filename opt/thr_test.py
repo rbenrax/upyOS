@@ -9,7 +9,7 @@ from _thread import get_ident
 proc=None
 
 def __main__(args):
-    proc.syscall.ps()
+    #proc.syscall.run_cmd("ps")
     cont=0
     while True:
         cont+=1

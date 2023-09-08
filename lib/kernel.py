@@ -143,7 +143,6 @@ class upyOS:
         # Internal Commands definition
         self.user_commands = {
             "r": self.last_cmd,
-            "ps": self.ps,
             "kill": self.kill,
             "getenv": self.getenv,
             "setenv": self.setenv,
@@ -302,14 +301,6 @@ class upyOS:
         #self.run_cmd(cmd)
         #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
-    
-    # Process status
-    def ps(self):
-        if len(procs)>0:
-            print(f"Proc Sts  Init_T   Elapsed   Thread_Id      Cmd/Args")
-            
-            for i in procs:
-                print(f"{i.pid:4}  {i.sts}   {i.stt}  {utime.ticks_ms() - i.stt}      {i.tid}    {i.cmd} {" ".join(i.args)}")
 
     # Kill process
     def kill(self, pid):
@@ -345,7 +336,7 @@ class upyOS:
             for i in procs:
                 self.kill(i.pid)
 
-            #TODO: solve
+            #TODO: solve if sh script send exit command
             #while len(procs)>0:
             utime.sleep(1)
 
