@@ -344,6 +344,7 @@ class upyOS:
             while len(sdata.procs)>0:
                 print("Waiting...")
                 utime.sleep(1)
+                if len(sdata.procs)==1 and not sdata.procs[0].isthr: break
 
         self.print_msg("Shutdown upyOS..., bye.")
         print("")
