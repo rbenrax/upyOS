@@ -355,6 +355,12 @@ class upyOS:
     def print_msg(self, message):
         print(f"\n\033[1;34;47m->{message}\033[0m")
 
+    def getboard(self):
+        return sdata.board
+    
+    def getconf(self):
+        return sdata.sysconfig
+
 # - -  
 if __name__ == "__main__":
     upyos = upyOS("") # Boot_args: -r -n
