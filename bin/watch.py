@@ -9,7 +9,7 @@ def __main__(args):
         print("Repeat a command every specified time\nUsage: watch <cmd> <args> -t <time>")
         return
 
-    t=2
+    t=2.0
     
     if len(args) > 2 and args[-2] == "-t" and args[-1].isdigit():
         t=float(args[-1])
@@ -18,7 +18,7 @@ def __main__(args):
         cmd=" ".join(args)
         
     while True:
-        print(f"\033[2J\033[HEvery: {t}\t{cmd}")
+        print(f"\033[2J\033[HEvery: {t}s: {cmd}")
         proc.syscall.run_cmd(cmd)
         utime.sleep(t)
         if proc.sts=="S":break
