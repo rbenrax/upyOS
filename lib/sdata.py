@@ -8,5 +8,8 @@ debug   = True
 board={}
 sysconfig={}
 
+_pid=0
+procs=[]
+
 # ---
 

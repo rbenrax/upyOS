@@ -1,4 +1,4 @@
-import kernel
+import sdata
 import utime
 
 def __main__(args):
@@ -11,8 +11,8 @@ def __main__(args):
         return
     
      # Process status
-    if len(kernel.procs)>0:
+    if len(sdata.procs)>0:
         print(f"Proc Sts  Init_T   Elapsed   Thread_Id      Cmd/Args")
         
-        for i in kernel.procs:
+        for i in sdata.procs:
             print(f"{i.pid:4}  {i.sts}   {i.stt}  {utime.ticks_ms() - i.stt}      {i.tid}    {i.cmd} {" ".join(i.args)}")

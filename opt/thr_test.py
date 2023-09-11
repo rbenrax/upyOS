@@ -1,7 +1,6 @@
 # Thread Test 
 # From command line launch with & ending
 
-import sdata
 import utime
 from _thread import get_ident
 

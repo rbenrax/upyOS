@@ -1,4 +1,4 @@
-import kernel
+import sdata
 import utime
 
 def __main__(args):
@@ -11,7 +11,7 @@ def __main__(args):
         return
     
     # Kill process
-    for i in kernel.procs:
+    for i in sdata.procs:
         if i.pid == int(args[0]):
             i.sts="S"
             utime.sleep(.2)

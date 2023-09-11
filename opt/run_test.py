@@ -1,4 +1,3 @@
-import sdata
 import sys
 
 # Current process refeference (passed in call)

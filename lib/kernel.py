@@ -8,18 +8,14 @@ import utime
 import sdata
 import utls
 
-_pid=0
-procs=[]
-
 # Process class
 class Proc:
     def __init__(self, syscall):
         
         self.syscall = syscall       # upyOS instance, for sytem calls
         
-        global _pid
-        _pid += 1
-        self.pid   = _pid             # Process id
+        sdata._pid += 1
+        self.pid   = sdata._pid       # Process id
         self.tid   = 0                # Thread id
         self.cmd   = ""               # Command
         self.args  = ""               # Arguments
@@ -33,9 +29,8 @@ class Proc:
         self.cmd  = cmd
         self.args = args
         
-        global procs
-        procs.append(self)
-        #print(f"{len(procs)=}")
+        sdata.procs.append(self)
+        #print(f"{len(sdata.procs)=}")
 
         if self.isthr:
             from _thread import get_ident
@@ -69,7 +64,7 @@ class Proc:
         finally:
 
             # Check if several instances of module are running
-            for i in procs:
+            for i in sdata.procs:
                 if i.cmd == self.cmd and i.pid != self.pid:
                     self.rmmod=False # There is another modules instance running
                     break
@@ -79,9 +74,9 @@ class Proc:
                 del sys.modules[self.cmd]
 
             # Remove process from process list
-            for idx, i in enumerate(procs):
+            for idx, i in enumerate(sdata.procs):
                 if i.pid == self.pid:
-                    del procs[idx]
+                    del sdata.procs[idx]
                     break
                 
             if self.isthr:
@@ -323,14 +318,14 @@ class upyOS:
 
     def ps(self):
         """ Process status """
-        if len(procs)>0:
+        if len(sdata.procs)>0:
             print(f"  Proc Sts     Init_T   Elapsed   Thread_Id   Cmd/Args")
-            for i in procs:
+            for i in sdata.procs:
                 print(f"{i.pid:6}  {i.sts:3}  {i.stt:8}  {utime.ticks_ms() - i.stt:8}  {i.tid:10}   {i.cmd} {" ".join(i.args)}")
                 
     def kill(self, pid="0"):
         """ Kill process """
-        for i in procs:
+        for i in sdata.procs:
             if i.pid == int(pid):
                 i.sts="S"
                 utime.sleep(.2)
@@ -340,13 +335,13 @@ class upyOS:
     def exit(self):
 
         # Stop threads before exit
-        if len(procs)>0:
+        if len(sdata.procs)>0:
             print("\nStoping process...")
-            for i in procs:
+            for i in sdata.procs:
                 i.sts="S"
                 #self.kill(i.pid)
 
-            while len(procs)>0:
+            while len(sdata.procs)>0:
                 print("Waiting...")
                 utime.sleep(1)
 

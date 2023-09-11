@@ -1,7 +1,6 @@
 # Asyncio Test 
 # From command line launch with & ending
 
-import sdata
 import uasyncio
 import machine
 
@@ -21,7 +20,7 @@ async def blink(led, period_ms):
         await uasyncio.sleep_ms(period_ms)
 
 async def main():    
-    t1 = uasyncio.create_task(blink(machine.Pin(25), 700))
+    t1 = uasyncio.create_task(blink(machine.Pin(12), 700))
     t2 = uasyncio.create_task(blink(machine.Pin(13), 100))
     #await t1
     #await t2
