@@ -334,6 +334,10 @@ class upyOS:
     # System exit
     def exit(self):
 
+        if not sdata.debug:
+            s=input("\nSalir S/[N] : ")
+            if s.upper()!="S": return
+
         # Stop threads before exit
         if len(sdata.procs)>0:
             print("\nStoping process...")
