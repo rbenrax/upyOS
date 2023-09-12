@@ -230,6 +230,7 @@ def server_once():
     ## TODO: Ask client change len size requested
     if param['len'] > 16384:
         param['len'] = 16384
+        print(f"Very large byte size for this system, a smaller size must be indicated from the client.")
     ##
     ##
         
