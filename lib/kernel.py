@@ -61,17 +61,17 @@ class Proc:
             elif ext=="sh":
                 
                 try:
-                    if not "/" in cmd:
-                        self.syscall.run_cmd("sh /bin/" + cmd + ".sh")
+                    if not "/" in self.cmd:
+                        self.syscall.run_cmd("sh /bin/" + self.cmd + ".sh")
                     else:
-                        self.syscall.run_cmd("sh " + cmd + ".sh")
+                        self.syscall.run_cmd("sh " + self.cmd + ".sh")
                 except Exception as e:
-                    print(f"Error executing script {cmd}")
+                    print(f"Error executing script {self.cmd}")
                     if sdata.debug:
                         sys.print_exception(e)
                 
             else:
-                print(f"{cmd}: Unknown function or program. Try 'help'.")
+                print(f"{self.cmd}: Unknown function or program. Try 'help'.")
 
         except KeyboardInterrupt:
             print(f"{self.cmd}: ended")
@@ -318,11 +318,10 @@ class upyOS:
     def kill(self, pid="0"):
         """ Kill process """
         for i in sdata.procs:
-            if pid.isdigit() and i.pid == int(pid):
+            if i.pid == int(pid):
                 i.sts="S"
+                utime.sleep(.2)
                 break
-            elif pid=="-a": #~ kill all process
-                i.sts="S"
 
     # System exit
     def exit(self):
@@ -360,4 +359,4 @@ class upyOS:
 
 # - -  
 if __name__ == "__main__":
-    upyos = upyOS("-n") # Boot_args: -r -n
+    upyos = upyOS("") # Boot_args: -r -n
