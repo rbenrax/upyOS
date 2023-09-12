@@ -318,10 +318,11 @@ class upyOS:
     def kill(self, pid="0"):
         """ Kill process """
         for i in sdata.procs:
-            if i.pid == int(pid):
+            if pid.isdigit() and i.pid == int(pid):
                 i.sts="S"
-                utime.sleep(.2)
                 break
+            elif pid=="-a": #~ kill all process
+                i.sts="S"
 
     # System exit
     def exit(self):
