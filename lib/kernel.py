@@ -24,32 +24,51 @@ class Proc:
         self.rmmod = True             # Remove module, default True
         self.isthr = False
         
-    def run(self, isthr, cmd, args):
+    def run(self, isthr, ext, cmd, args):
         self.isthr= isthr
         self.cmd  = cmd
         self.args = args
-        
-        sdata.procs.append(self)
-        #print(f"{len(sdata.procs)=}")
 
-        if self.isthr:
-            from _thread import get_ident
-            self.tid = get_ident()
-            print(f"\n[{self.pid}]")
-        
         try:
-            mod = __import__(self.cmd)
-            if '__main__' in dir(mod):
 
-                if hasattr(mod, 'proc'):      # Passing proc ref to run module
-                    mod.proc=self
+            sdata.procs.append(self)
+            #print(f"{len(sdata.procs)=}")
 
-                self.sts = "R"                # Process Running
+            if self.isthr:
+                from _thread import get_ident
+                self.tid = get_ident()
+                print(f"\n[{self.pid}]")
+        
+            # External Python commands and programs
+            if ext=="py" or ext=="":
+          
+                mod = __import__(self.cmd)
+                if '__main__' in dir(mod):
+
+                    if hasattr(mod, 'proc'):      # Passing proc ref to run module
+                        mod.proc=self
+
+                    self.sts = "R"                # Process Running
+                    
+                    if len(self.args) > 0:
+                        mod.__main__(self.args)
+                    else:
+                        mod.__main__("") # TODO: no nice
+
+            # External shell scripts
+            elif ext=="sh":
+                try:
+                    if not "/" in cmd:
+                        self.syscall.run_cmd("sh /bin/" + cmd + ".sh")
+                    else:
+                        self.syscall.run_cmd("sh " + cmd + ".sh")
+                except Exception as e:
+                    print(f"Error executing script {cmd}")
+                    if sdata.debug:
+                        sys.print_exception(e)
                 
-                if len(self.args) > 0:
-                    mod.__main__(self.args)
-                else:
-                    mod.__main__("") # TODO: no nice
+            else:
+                print(f"{cmd}: Unknown function or program. Try 'help'.")
 
         except KeyboardInterrupt:
             print(f"{self.cmd}: ended")
@@ -70,7 +89,7 @@ class Proc:
                     break
 
             #print(f"{self.rmmod=}")
-            if self.rmmod:
+            if self.rmmod and self.cmd in sys.modules:
                 del sys.modules[self.cmd]
 
             # Remove process from process list
@@ -250,53 +269,29 @@ class upyOS:
                     cmdl = cmd
                     ext  = ""
 
-                # External Python commands and programs
-                if ext=="py" or ext=="":
-
-                    if len(parts) > 1 and parts[-1]=="&": # If new thread
-                        # Since most microcontrollers only have one thread more...
-                        # One main thread an alternative one, for now
-                        try:
-                            from _thread import start_new_thread, stack_size
-                            if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
-                            newProc = Proc(self)
-                            start_new_thread(newProc.run, (True, cmdl, args[:-1]))
-                        except ImportError:
-                            print("System has not thread support")
-                        except Exception as ex:
-                            print(f"Error launching thread {ex}")
-
-                            if sdata.debug:
-                                sys.print_exception(ex)
-                            
-                    else:
-                        newProc = Proc(self)
-                        newProc.run(False, cmdl, args)
-
-                # External shell scripts
-                elif ext=="sh":
+                if len(parts) > 1 and parts[-1]=="&": # If new thread
+                    # RP-2040 suport only two threads, esp32 many
                     try:
-                        if not "/" in cmdl:
-                            self.run_cmd("sh /bin/" + cmdl + ".sh")
-                        else:
-                            self.run_cmd("sh " + cmdl + ".sh")
-                    except Exception as e:
-                        print(f"Error executing script {fcmd}")
-                        sys.print_exception(e)
-                    
+                        from _thread import start_new_thread, stack_size
+                        if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
+                        newProc = Proc(self)
+                        start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
+                    except ImportError:
+                        print("System has not thread support")
+                    except Exception as ex:
+                        print(f"Error launching thread {ex}")
+
+                        if sdata.debug:
+                            sys.print_exception(ex)
+                        
                 else:
-                    print(f"{cmd}: Unknown function or program. Try 'help'.")
+                    newProc = Proc(self)
+                    newProc.run(False, ext, cmdl, args)
 
 # - - -
 
     # Repeat command
     def last_cmd(self):
-        # Only runs in full terminals where is unnecesary
-        #from editstr import editstr
-        #print('┌───┬───┬───┬───┬───┬───')
-        #cmd = editstr(self.prev_cmd)
-        #self.run_cmd(cmd)
-        #del sys.modules["editstr"]
         self.run_cmd(self.prev_cmd)
             
     def getenv(self, var=""):
