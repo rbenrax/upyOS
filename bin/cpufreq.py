@@ -4,29 +4,31 @@ from machine import freq
 def __main__(args):
 
     if len(args) != 1 or args[0] == "--h":
-        print("Set clock speed\nUsage: cpuclock <option>: -low, -turbo, --h -v -t (toggle)")
+        print("Set clock speed\nUsage: cpuclock <option>: -low, -turbo, <freq> (caution), --h -v")
         return
 
-    if not "mcu" in sdata.board: return
-    
-    turbo = sdata.sysconfig["turbo"]
-    
     if args[0] == "-v":
-        print(f"CPU speed: {freq()*0.000001} MHz, Turbo: {turbo}")
+        print(f"CPU speed: {freq()*0.000001} MHz")
         return
 
-    if args[0] == "-t":
-        turbo = not turbo
+    if "mcu" in sdata.board:
+        if args[0] == "-low":
+            f = sdata.board["mcu"][0]["speed"]["slow"]
 
-    if args[0] == "-low" or turbo == False :
-        f = sdata.board["mcu"][0]["speed"]["slow"]
-
-    if args[0] == "-turbo" or turbo == True :
-        f = sdata.board["mcu"][0]["speed"]["turbo"]
+        if args[0] == "-turbo":
+            f = sdata.board["mcu"][0]["speed"]["turbo"]
+    else:
+        print(f"Invalid modificator, no board file configuration")
         
-    sdata.sysconfig["turbo"] = turbo
-    freq(f * 1000000)
-    print("CPU speed set to " + str(f) + " Mhz")
+    if args[0].isdigit():
+        f = int(args[0])
+        
+    try:
+        freq(f * 1000000)
+        print("CPU speed set to " + str(f) + " Mhz")
+    except ValueError as ve:
+        print(ve)
+        
         
 
         

@@ -170,12 +170,6 @@ class upyOS:
             "exit" : self.exit
         }
 
-        if "turbo" in sdata.sysconfig:
-            if sdata.sysconfig["turbo"]:
-                self.run_cmd("cpufreq -turbo")
-            else:
-                self.run_cmd("cpufreq -low")
-
         if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
             
@@ -365,4 +359,4 @@ class upyOS:
 
 # - -  
 if __name__ == "__main__":
-    upyos = upyOS("") # Boot_args: -r -n
+    upyos = upyOS("-n") # Boot_args: -r -n
