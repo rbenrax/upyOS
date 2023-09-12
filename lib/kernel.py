@@ -14,9 +14,10 @@ class Proc:
         
         self.syscall = syscall       # upyOS instance, for sytem calls
         
-        sdata._pid += 1
+        sdata._pid += 1               # Increment process Id
         self.pid   = sdata._pid       # Process id
         self.tid   = 0                # Thread id
+        self.ext   = ""               # File extention / Call type
         self.cmd   = ""               # Command
         self.args  = ""               # Arguments
         self.stt   = utime.ticks_ms() # Start time
@@ -26,6 +27,7 @@ class Proc:
         
     def run(self, isthr, ext, cmd, args):
         self.isthr= isthr
+        self.ext  = ext
         self.cmd  = cmd
         self.args = args
 
@@ -57,6 +59,7 @@ class Proc:
 
             # External shell scripts
             elif ext=="sh":
+                
                 try:
                     if not "/" in cmd:
                         self.syscall.run_cmd("sh /bin/" + cmd + ".sh")
@@ -99,7 +102,7 @@ class Proc:
                     break
                 
             if self.isthr:
-                print(f"[{self.pid}]+ Done\t {self.cmd}")
+                print(f"[{self.pid}]+ Done\t {self.cmd}{'.' + self.ext if self.ext else ''}")
 
 class upyOS:
     
