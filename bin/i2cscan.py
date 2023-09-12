@@ -2,9 +2,9 @@ import machine
 import utls
 import sdata
 
-#print(utls.board["i2c"])
-#scl1=utls.board["i2c"][0]["scl"]
-#sda1=utls.board["i2c"][0]["sda"]
+#print(sdata.board["i2c"])
+#scl1=sdata.board["i2c"][0]["scl"]
+#sda1=sdata.board["i2c"][0]["sda"]
 
 def __main__(args):
 
