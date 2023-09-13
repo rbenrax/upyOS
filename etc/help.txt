@@ -53,7 +53,7 @@ if <arg1> <comparison operator> <arg2> <action>
    
 Internals commands:
 
-r:      Repeat last command
 ps:     Show (alternative) process status
 kill:   Kill (alternative) process
+r:      Repeat last command
 exit:   Exit to Micropython shell

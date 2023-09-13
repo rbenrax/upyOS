@@ -161,12 +161,12 @@ class upyOS:
 
         # Internal Commands definition
         self.user_commands = {
-            "r": self.last_cmd,
             "ps": self.ps,
             "kill": self.kill,
-            "getenv": self.getenv,
-            "setenv": self.setenv,
-            "unset": self.unset,
+            #"getenv": self.getenv,
+            #"setenv": self.setenv,
+            #"unset": self.unset,
+            "r": self.last_cmd,
             "exit" : self.exit
         }
 
@@ -286,11 +286,7 @@ class upyOS:
                     newProc.run(False, ext, cmdl, args)
 
 # - - -
-
-    # Repeat command
-    def last_cmd(self):
-        self.run_cmd(self.prev_cmd)
-            
+           
     def getenv(self, var=""):
         """Get a value from environment variables"""
         #print(sysconfig["env"])
@@ -323,6 +319,10 @@ class upyOS:
                 break
             elif pid=="-a": #~ kill all process
                 i.sts="S"
+
+    # Repeat command
+    def last_cmd(self):
+        self.run_cmd(self.prev_cmd)
 
     # System exit
     def exit(self):
