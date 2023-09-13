@@ -59,9 +59,6 @@ Directories structure:
 
 Internals commands:
 
-- help:   This help
-- sh:     run external shell script if script has no sh extention
-- py:     Run python code
 - r:      Repeat last command
 - ps:     Show (alternative) process status
 - kill:   Kill (alternative) process
@@ -69,7 +66,7 @@ Internals commands:
 
 Actual external commands:
 
-cat, cd, clear, cp, cpufreq, df, echo, env, export, fileup, find, free, grep, help, i2cscan, ifconfig, led, ls, lshw, lsmod, mi, mkdir, modules, mv, ping, pwd, reboot, recovery, rm, rmdir, rmmod, sh.sh, test, touch, uhttpd, unset, uptime, utelnetd, vi, wait, wget, wifi
+cat, cd, clear, cp, cpufreq, df, echo, env, exit, export, fileup, find, free, grep, help, i2cscan, ifconfig, iperf3, kill, led, ls, lshw, lsmod, mi, mkdir, mv, ping, ps, pwd, reboot, recovery, rm, rmdir, rmmod, sh, touch, uhttpd, unset, uptime, utelnetd, vi, wait, watch, wget, wifi
 
 esp32-c3
 ![luatos](media/luatos_CORE-ESP32_pinout.webp)
@@ -121,6 +118,18 @@ Actual Development:
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
   
+- Shell script basic conditional execution:
+
+      export 0 5   # Set variable 0 to "5" (variables can also be accesed from Python programs and embedded Python)
+      if $0 == 5 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
+      < 1
+      < 2
+      < 3
+      < 4
+      < 5
+      if $0 == 5 return        # Ends shell script
+      if $0 == 5 watch ps -t 5 # Launch command "watch ps" every 5 seconds
+      if $0 == 5 asy_test &    # Summit asy_test process
 
 TODO List:
 - Enhance ls, cp, mv, etc. commands
