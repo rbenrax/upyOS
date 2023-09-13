@@ -35,6 +35,23 @@
 
 > sys.path.append("/opt")
 
+# Threads launch
+#dht_test &
+#asy_test &
+#thr_test &
+#watch ps &
+
+# Conditional execution:
+#export 0 5   # set variable 0 to "5"
+#if $0 == 5 3 # Skip 3 lines (will continue in 4, 5, etc)
+#< 1
+#< 2
+#< 3
+#< 4
+#< 5
+#if $0 == 5 return     # Ends shell script
+#if $0 == 5 asy_test & # Summit asy_test
+
 # Exit form OS to python REPL
 #exit
 

@@ -334,13 +334,11 @@ class upyOS:
         # Stop threads before exit
         if len(sdata.procs)>0:
             print("\nStoping process...")
-            for i in sdata.procs:
-                i.sts="S"
-                #self.kill(i.pid)
 
             while len(sdata.procs)>0:
                 print("Waiting...")
                 utime.sleep(1)
+                self.kill("-a")
                 if len(sdata.procs)==1 and not sdata.procs[0].isthr: break
 
         self.print_msg("Shutdown upyOS..., bye.")
