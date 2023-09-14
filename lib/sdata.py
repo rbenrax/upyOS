@@ -2,6 +2,7 @@
 
 name    = ""
 version = ""
+sid     = 0
 initime = 0
 debug   = True
 

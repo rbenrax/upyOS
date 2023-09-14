@@ -11,9 +11,10 @@ def __main__(args):
     mode=args[0]
     name = uos.uname()[0]
 
+    print(f"\033[0mSystemID:\033[1m {sdata.sid}")
     print(f"\033[0mBoard:\033[1m {uos.uname()[4]}")
-    print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
     print(f"\033[0m{sdata.name} :\033[1m {sdata.version} (size: {uos.stat('/lib/kernel.py')[6]} bytes)")
+    print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
     print(f"\033[0mFirmware:\033[1m{uos.uname().version}")
     print(f"\033[0mCPU Speed:\033[1m{machine.freq()*0.000001}MHz")
 

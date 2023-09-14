@@ -124,6 +124,11 @@ class upyOS:
         sdata.version = "0.5"
         sdata.initime = utime.time()
 
+        # System ID
+        from ubinascii import hexlify
+        from machine import unique_id
+        sdata.sid=hexlify(unique_id()).decode()
+        
         # Create directories
         if not utls.file_exists("/opt"): # Specific solutions directory
             uos.mkdir("/opt")
