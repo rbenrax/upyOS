@@ -208,6 +208,7 @@ class upyOS:
     def run_py_code(self, code):
         exec(code.replace('\\n', '\n'))
 
+    #@utls.timed_function
     def run_cmd(self, fcmd):
 
         fcmd=fcmd.strip()

@@ -1,11 +1,12 @@
-# file utls
-import sdata
+# Utility functions
 
+import utime
 from uos import stat
 from uos import getcwd
-
 from json import dump as jdump
 from json import load as jload
+
+import sdata
 
 MONTH = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
@@ -31,6 +32,16 @@ def get_stat(filename):
         return stat(filename)
     except OSError:
         return (0,) * 10
+
+def timed_function(f, *args, **kwargs):
+    fname = str(f).split(' ')[1]
+    def new_func(*args, **kwargs):
+        t = utime.ticks_us()
+        result = f(*args, **kwargs)
+        delta = utime.ticks_diff(utime.ticks_us(), t)
+        print(f"Function {fname} {args[1]} Time = {delta/1000:6.3f}ms")
+        return result
+    return new_func
 
 # ---
 
