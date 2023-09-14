@@ -348,7 +348,7 @@ class upyOS:
         sys.exit()
 
     def print_msg(self, message):
-        print(f"\n\033[1;34;47m->{message}\033[0m")
+        print(f"\n\033[1;37;44m->{message}\033[0m")
 
     def getboard(self):
         return sdata.board
