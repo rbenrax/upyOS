@@ -1,5 +1,7 @@
 import network
 import sdata
+from utime import sleep
+from utls import tspaces
 
 #TODO: If conected, disconnect first
 #      Prettify
@@ -27,23 +29,45 @@ def __main__(args):
     
     if cmd == "on":
         sta_if.active(True)
+        
     elif cmd == "off":
         sta_if.active(False)
+        
     elif cmd == "status":
         print (f'WiFi is {"Active" if sta_if.active() == True else "Inactive"}')
         print (f"Status {sta_if.status()}")
         if sta_if.isconnected():
             print (f'WiFi connection is {"Established" if sta_if.isconnected() else "Not connected"}')
+            
     elif cmd == "scan":
+        from ubinascii import hexlify
+        print ("SSID  \t\tBssid    \tCHN  \tSignal")
         for net in sta_if.scan():
-            print ("SSID\tUnknown\tCHN\tSignal")
-            print (f"{net[0]}\t{net[1]}\t{net[2]}\t{net[3]}\t")
+            print (f"{tspaces(net[0].decode(), n=12, ab="a")} \t{hexlify(net[1]).decode()}\t{net[2]}\t{net[3]}")
+            
     elif cmd == "connect":
-        print (f"Connecting to {args[1]}")
+        """Conect <SSID> <pass> <Time out>"""
+ 
+        tout=0
+        if len(args)==4:
+            tout=int(args[3])
+ 
+        print (f"Connecting to {args[1]}{', Time out in ' + str(tout) + 's.' if tout > 0 else ''}")
+
         sta_if.connect(args[1], args[2])
+        
         while not sta_if.isconnected():
+            if tout > 0:
+                tout -= 1
+                sleep(1)
+                if tout < 1: break
             pass
-        print ("Connected")
+        
+        if sta_if.isconnected():
+            print ("Connected")
+        else:
+            print ("Time out waiting connection")
+            
     elif cmd == "ap":
         ap_if = network.WLAN(network.AP_IF)
         cmd = args[1]
