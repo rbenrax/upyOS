@@ -13,11 +13,13 @@ def __main__(args):
         return
     
     if len(args) == 0:
-        print ("WIFI management command\n Usage:")
+        print ("WIFI sta_if management command\n Usage:")
         print ("wifi status - prints wifi client status")
         print ("wifi on - activate wifi client")
         print ("wifi off - deactivate wifi client")
         print ("wifi scan - list visible networks")
+        print ("wifi config - list/set networks connect parms")
+        print ("wifi ifconfig - list/set networks ip parms")
         print ("wifi connect <SSID> <PSK> [Tout] - connect to network")
         print ("wifi disconnect - disconnect wifi client") 
         print ("wifi ap - prints Access Point status")
@@ -77,8 +79,24 @@ def __main__(args):
             if len(args)==2:
                 print(sta_if.config(args[1]))
             elif len(args)==3:
-                sta_if.config(args[2] + "=" + args[3])
-        except:
+                sta_if.config(args[1] + "=" + args[2])
+        except Exception as ex:
+            print("config err: " + str(ex))
+            pass
+        
+    elif cmd == "ifconfig":
+        try:
+            if len(args)==1:
+                #w = network.WLAN(network.STA_IF)
+                ic = sta_if.ifconfig()
+                print (f"WiFi sta: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
+                print (f"      status: {'Active' if sta_if.isconnected() else 'Inactive'}")
+                print (f"      DNS {ic[3]}")
+                
+            elif len(args)==5:
+                sta_if.ifconfig(args[1], args[2], args[3], args[4])
+        except Exception as ex:
+            print("ifconfig err: " + str(ex))
             pass
         
     elif cmd == "disconnect":
