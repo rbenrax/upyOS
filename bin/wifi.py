@@ -43,9 +43,9 @@ def __main__(args):
             
     elif cmd == "scan":
         from ubinascii import hexlify
-        print ("SSID  \t\tBssid    \tCHN  \tSignal")
+        print ("SSID  \t\tBssid    \tCh   \tSig \tSec \tVis")
         for net in sta_if.scan():
-            print (f"{tspaces(net[0].decode(), n=12, ab="a")} \t{hexlify(net[1]).decode()}\t{net[2]}\t{net[3]}")
+            print (f"{tspaces(net[0].decode(), n=12, ab="a")} \t{hexlify(net[1]).decode()}\t{net[2]}\t{net[3]}\t{net[4]}\t{net[5]}")
             
     elif cmd == "connect":
         """Conect <SSID> <pass> <Time out>"""
@@ -68,13 +68,24 @@ def __main__(args):
             pass
         
         if sta_if.isconnected():
-            print ("Connected")
+            print("Connected")
         else:
-            print ("Time out waiting connection")
+            print("Time out waiting connection")
     
+    elif cmd == "config":
+        try:
+            if len(args)==2:
+                print(sta_if.config(args[1]))
+            elif len(args)==3:
+                sta_if.config(args[2] + "=" + args[3])
+        except:
+            pass
+        
     elif cmd == "disconnect":
         if sta_if.isconnected():
-            if sta_if.disconnect():
+            print("Disconnecting...")
+            sta_if.disconnect()
+            print("Disconnected")
                 
     elif cmd == "ap":
         ap_if = network.WLAN(network.AP_IF)
