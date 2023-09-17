@@ -48,7 +48,9 @@ def __main__(args):
             
     elif cmd == "connect":
         """Conect <SSID> <pass> <Time out>"""
- 
+        
+        if sta_if.isconnected(): return
+            
         tout=0
         if len(args)==4:
             tout=int(args[3])
