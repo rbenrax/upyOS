@@ -19,6 +19,7 @@ def __main__(args):
         print ("wifi off - deactivate wifi client")
         print ("wifi scan - list visible networks")
         print ("wifi connect <SSID> <PSK> [Tout] - connect to network")
+        print ("wifi disconnect - disconnect wifi client") 
         print ("wifi ap - prints Access Point status")
         print ("wifi ap on - activate Access Point")
         print ("wifi ap off - deactivate Access Point")
@@ -70,7 +71,11 @@ def __main__(args):
             print ("Connected")
         else:
             print ("Time out waiting connection")
-            
+    
+    elif cmd == "disconnect":
+        if sta_if.isconnected():
+            if sta_if.disconnect():
+                
     elif cmd == "ap":
         ap_if = network.WLAN(network.AP_IF)
         cmd = args[1]
