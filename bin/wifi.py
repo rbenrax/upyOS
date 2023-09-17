@@ -18,7 +18,7 @@ def __main__(args):
         print ("wifi on - activate wifi client")
         print ("wifi off - deactivate wifi client")
         print ("wifi scan - list visible networks")
-        print ("wifi connect <SSID> <PSK> - connect to network")
+        print ("wifi connect <SSID> <PSK> [Tout] - connect to network")
         print ("wifi ap - prints Access Point status")
         print ("wifi ap on - activate Access Point")
         print ("wifi ap off - deactivate Access Point")
@@ -28,6 +28,7 @@ def __main__(args):
     cmd = args[0]
     
     if cmd == "on":
+        sta_if.active(False)
         sta_if.active(True)
         
     elif cmd == "off":

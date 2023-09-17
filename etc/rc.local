@@ -4,11 +4,10 @@
 
 #i2cscan 0            # Scan for i2c devices
 
-#wifi off                        # Turn off wifi in cliente mode
-#wifi on                         # Turn on wifi in cliente mode
-#wifi connect <SSID> <PASS>      # Connect to wifi router
-
-#ifconfig             # Show Ip data
+#wifi on                      # Turn on wifi in cliente mode
+#wifi scan
+#wifi connect <SSID> <PASS> 5 # Connect to wifi router
+#ifconfig                     # Show Ip data
 
 #utelnetd start
 
