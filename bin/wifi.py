@@ -31,7 +31,9 @@ def __main__(args):
     cmd = args[0]
     
     if cmd == "on":
-        sta_if.active(False)
+        if sta_if.isconnected():
+            sta_if.disconnect()
+            sta_if.active(False)
         sta_if.active(True)
         
     elif cmd == "off":
