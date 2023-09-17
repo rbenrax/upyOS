@@ -15,9 +15,9 @@ def __main__(args):
     
     if len(args) == 0:
         print ("WIFI ap_if management command\n Usage:")
-        print ("wifi status - prints wifi client status")
-        print ("wifi on - activate wifi client")
-        print ("wifi off - deactivate wifi client")
+        print ("wifi status - prints wifi AP status")
+        print ("wifi on - activate wifi AP")
+        print ("wifi off - deactivate wifi AP")
         print ("wifi config - list/set networks connect parms")
         print ("wifi ifconfig - list/set networks ip parms")
         return
@@ -26,7 +26,8 @@ def __main__(args):
     cmd = args[0]
     
     if cmd == "on":
-        ap_if.active(False)
+        if ap_if.active():
+            ap_if.active(False)
         ap_if.active(True)
         
     elif cmd == "off":
