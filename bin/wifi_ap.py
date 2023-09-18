@@ -1,11 +1,7 @@
 import network
-import sdata
-from utime import sleep
-from utls import tspaces
 import sys
 
-#TODO: If conected, disconnect first
-#      Prettify
+import sdata
 
 def __main__(args):
     
@@ -37,19 +33,31 @@ def __main__(args):
         print (f'WiFi ap_if is {"Active" if ap_if.active() == True else "Inactive"}')
     
     elif cmd == "config":
-        """ap.config(essid='micropython',password=b"micropython",channel=11,authmode=network.AUTH_WPA_WPA2_PSK)  #Set up an access point"""
+        """ap_if.config(essid='micropython',password=b"micropython",channel=11,authmode=network.AUTH_WPA_WPA2_PSK)  #Set up an access point"""
         try:
             if len(args)==1:
-                print("wifi_ap config - Show/Set: mac, ssid, channel, hidden, security, key, hostname, reconects, txpower, pm")
+                print("wifi_ap config - Show/Set: mac, [e]ssid, password, channel, hidden, security, key, reconects, txpower, pm, authmode")
                 return
-            if len(args)==2:
-                print(args[1])
-                if "=" in args[1]:
-                    ap_if.config(args[1])
-                else:
-                    print(ap_if.config(args[1]))
+            
+            if len(args)>1:
+                #print(args[1])
+                p={}
+                for e in args[1:]:
+                    if "=" in e:
+                        tmp=e.split("=")
+                        # TODO: check type
+                        if tmp[0]in ["mac", "channel", "authmode", "key"]: tmp[1]=int(tmp[1])
+                        p[tmp[0]]=tmp[1]
+
+                    else:
+                        print(ap_if.config(e))
+                
+                if len(p)>0:
+                    #print(p)
+                    ap_if.config(**p)
+                    
         except Exception as ex:
-            print("config err: " + str(ex))
+            print("config err: " + str(ex) + ": " + str(e))
             if sdata.debug:
                 sys.print_exception(ex)
             pass
@@ -58,17 +66,15 @@ def __main__(args):
         """config=('192.168.178.107', '255.255.255.0', '192.168.178.1', '8.8.8.8')"""
         try:
             if len(args)==1:
-                print("wifi_ap ifconfig - Show/Set: (ip, mask, gateway, dns)")
-                return
-            if len(args)==1:
-                #w = network.WLAN(network.ap_if)
+                print("wifi_ap ifconfig - Show/Set: (ip, mask, gateway, dns)\n")
                 ic = ap_if.ifconfig()
-                print (f"WiFi sta: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
+                print (f"WiFi ap: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
                 print (f"      status: {'Active' if ap_if.isconnected() else 'Inactive'}")
                 print (f"      DNS {ic[3]}")
                 
             elif len(args)==5:
-                ap_if.ifconfig(args[1], args[2], args[3], args[4])
+                ap_if.ifconfig((args[1], args[2], args[3], args[4]))
+                
         except Exception as ex:
             print("ifconfig err: " + str(ex))
             if sdata.debug:

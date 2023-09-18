@@ -1,10 +1,8 @@
 import network
-import sdata
 from utime import sleep
 from utls import tspaces
 
-#TODO: If conected, disconnect first
-#      Prettify
+import sdata
 
 def __main__(args):
     
@@ -22,9 +20,6 @@ def __main__(args):
         print ("wifi ifconfig - list/set networks ip parms")
         print ("wifi connect <SSID> <PSK> [Tout] - connect to network")
         print ("wifi disconnect - disconnect wifi client") 
-        print ("wifi ap - prints Access Point status")
-        print ("wifi ap on - activate Access Point")
-        print ("wifi ap off - deactivate Access Point")
         return
 
     sta_if = network.WLAN(network.STA_IF)
@@ -47,9 +42,9 @@ def __main__(args):
             
     elif cmd == "scan":
         from ubinascii import hexlify
-        print ("SSID  \t\tBssid    \tCh   \tSig \tSec \tVis")
+        print ("SSID             \t  Bssid    \tCh   \tSig \tSec \tHid")
         for net in sta_if.scan():
-            print (f"{tspaces(net[0].decode(), n=12, ab="a")} \t{hexlify(net[1]).decode()}\t{net[2]}\t{net[3]}\t{net[4]}\t{net[5]}")
+            print (f"{tspaces(net[0].decode(), n=20, ab="a")}      {hexlify(net[1]).decode()}\t{net[2]}\t{net[3]}\t{net[4]}\t{net[5]}")
             
     elif cmd == "connect":
         """Conect <SSID> <pass> <Time out>"""
@@ -77,13 +72,33 @@ def __main__(args):
             print("Time out waiting connection")
     
     elif cmd == "config":
+        """sta_if if.config(essid='micropython',password=b"micropython",channel=11,authmode=network.AUTH_WPA_WPA2_PSK)  #Set up an access point"""
         try:
-            if len(args)==2:
-                print(sta_if.config(args[1]))
-            elif len(args)==3:
-                sta_if.config(args[1] + "=" + args[2])
+            if len(args)==1:
+                print("wifi_sta config - Show/Set: mac, [e]ssid, password, channel, hidden, security, key, reconects, txpower, pm, authmode")
+                return
+            
+            if len(args)>1:
+                #print(args[1])
+                p={}
+                for e in args[1:]:
+                    if "=" in e:
+                        tmp=e.split("=")
+                        # TODO: check type
+                        if tmp[0]in ["mac", "channel", "authmode", "key"]: tmp[1]=int(tmp[1])
+                        p[tmp[0]]=tmp[1]
+
+                    else:
+                        print(sta_if.config(e))
+                
+                if len(p)>0:
+                    #print(p)
+                    sta_if.config(**p)
+                    
         except Exception as ex:
-            print("config err: " + str(ex))
+            print("config err: " + str(ex) + ": " + str(e))
+            if sdata.debug:
+                sys.print_exception(ex)
             pass
         
     elif cmd == "ifconfig":
@@ -96,7 +111,8 @@ def __main__(args):
                 print (f"      DNS {ic[3]}")
                 
             elif len(args)==5:
-                sta_if.ifconfig(args[1], args[2], args[3], args[4])
+                sta_if.ifconfig((args[1], args[2], args[3], args[4]))
+                
         except Exception as ex:
             print("ifconfig err: " + str(ex))
             pass
@@ -107,13 +123,4 @@ def __main__(args):
             sta_if.disconnect()
             print("Disconnected")
                 
-    elif cmd == "ap":
-        ap_if = network.WLAN(network.AP_IF)
-        cmd = args[1]
-        if cmd == "on":
-            ap_if.active(True)
-        elif cmd == "off":
-            ap_if.active(False)
-        else:
-            print ('Access point is {"Active" if ap_if.active() == True else "Inactive"}')
 

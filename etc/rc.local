@@ -1,13 +1,24 @@
 # This file script is called after init.sh and may content user startup commands same as above script.
 
-#lshw -f             # List board hardware
+#i2cscan 0                    # Scan for i2c devices
 
-#i2cscan 0            # Scan for i2c devices
-
+# Wifi sta
 #wifi on                      # Turn on wifi in cliente mode
-#wifi scan
-#wifi connect <SSID> <PASS> 5 # Connect to wifi router
+#wifi config mac              # show mac
+#wifi scan                    # scan wifi APs
+#wifi connect <ssid> <password> <timeout> # Connect to wifi router
+#wifi ifconfig '192.168.178.107' '255.255.255.0' '192.168.178.1' '8.8.8.8' # set IP parameters (ip, mash, gw, dns)
+#wifi config ssid             # show ssid
+#wifi config channel          # show channel
 #ifconfig                     # Show Ip data
+
+# Wifi ap
+#wifi_ap on                  # Enable AP mode
+#wifi_ap config ssid=rafa password=hola channel=12 # Wifi AP set Connection parameters
+#wifi_ap config ssid         # show parameter ssid
+#wifi_ap config channel      # show parameter channel
+#wifi_ap ifconfig '192.168.178.107' '255.255.255.0' '192.168.178.1' '8.8.8.8' # set IP parameters (ip, mash, gw, dns)
+#wifi_ap ifconfig            # Show IP parameters
 
 #utelnetd start
 
