@@ -71,10 +71,12 @@ def __main__(args):
         try:
             if len(args)==1:
                 ic = ap_if.ifconfig()
+                from utls import mac2Str
                 print (f"WiFi ap: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
-                print (f"      status: {'Active' if ap_if.isconnected() else 'Inactive'}")
-                print (f"      DNS {ic[3]}")
-                
+                print (f"      MAC: {mac2Str(ap_if.config("mac"))}")
+                print (f"      DNS: {ic[3]}")
+                print (f"      status: {'Active' if ap_if.active() else 'Inactive'}")
+               
             elif len(args)==5:
                 ap_if.ifconfig((args[1], args[2], args[3], args[4]))
                 

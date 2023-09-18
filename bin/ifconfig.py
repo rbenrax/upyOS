@@ -11,10 +11,10 @@ def __main__(args):
         ic = nif.ifconfig()
         from utls import mac2Str
         print (f"WiFi {i}: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
-        print (f"      mac: {mac2Str(nif.config("mac"))}")
+        print (f"      MAC: {mac2Str(nif.config("mac"))}")
+        print (f"      DNS: {ic[3]}")
         print (f"      status: {'Active' if nif.active() else 'Inactive'}")
         print (f"              {'Connected' if i == "sta" and nif.isconnected() else 'Disconnected'}")
-        print (f"      DNS {ic[3]}")
     
     sta_if = network.WLAN(network.STA_IF)
     pif("sta", sta_if)
