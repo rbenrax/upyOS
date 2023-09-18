@@ -97,6 +97,9 @@ def tspaces(t, n=12, ab="a", fc=" "):
         t = (fc*f) + t
     return t
 
+def mac2Str(mac): # b'`U\xf9~x\xd0'
+    return ':'.join([f"{b:02X}" for b in mac])
+
 def getgpio(pin):
     """Get the gpio assigned to a pin"""
     gpios=sdata.board["gpio"][0]

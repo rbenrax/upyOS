@@ -1,4 +1,5 @@
 import network
+import sys
 from utime import sleep
 from utls import tspaces
 
@@ -89,7 +90,11 @@ def __main__(args):
                         p[tmp[0]]=tmp[1]
 
                     else:
-                        print(sta_if.config(e))
+                        if e == "mac":
+                            from utls import mac2Str
+                            print(mac2Str(sta_if.config(e)))
+                        else:
+                            print(sta_if.config(e))
                 
                 if len(p)>0:
                     #print(p)
