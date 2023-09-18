@@ -16,6 +16,7 @@ def __main__(args):
         print (f"  Status: {'Active' if nif.active() else 'Inactive'}")
         if i=="sta":
             print (f"          {'Connected' if i == "sta" and nif.isconnected() else 'Disconnected'}")
+        print("")
 
     # TODO: enumerate nic
     pif("sta", network.WLAN(network.STA_IF))
