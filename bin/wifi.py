@@ -104,7 +104,7 @@ def __main__(args):
     elif cmd == "ifconfig":
         try:
             if len(args)==1:
-                #w = network.WLAN(network.STA_IF)
+                print("STA ifconfig - Show/Set: (ip, mask, gateway, dns)\n")
                 ic = sta_if.ifconfig()
                 print (f"WiFi sta: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
                 print (f"      status: {'Active' if sta_if.isconnected() else 'Inactive'}")

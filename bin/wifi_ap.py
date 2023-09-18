@@ -66,7 +66,7 @@ def __main__(args):
         """config=('192.168.178.107', '255.255.255.0', '192.168.178.1', '8.8.8.8')"""
         try:
             if len(args)==1:
-                print("wifi_ap ifconfig - Show/Set: (ip, mask, gateway, dns)\n")
+                print("AP ifconfig - Show/Set: (ip, mask, gateway, dns)\n")
                 ic = ap_if.ifconfig()
                 print (f"WiFi ap: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
                 print (f"      status: {'Active' if ap_if.isconnected() else 'Inactive'}")
