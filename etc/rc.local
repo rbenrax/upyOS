@@ -64,6 +64,8 @@
 #if $0 == 5 return     # Ends shell script
 #if $0 == 5 asy_test & # Summit asy_test
 
+#uhttpd start &
+
 # Exit form OS to python REPL
 #exit
 

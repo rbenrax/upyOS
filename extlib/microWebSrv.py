@@ -11,6 +11,8 @@ import  socket
 import  gc
 import  re
 
+import sdata # To control where the thread is killed
+
 try :
     from microWebTemplate import MicroWebTemplate
 except :
@@ -28,7 +30,6 @@ class MicroWebSrvRoute :
         self.func          = func         
         self.routeArgNames = routeArgNames
         self.routeRegex    = routeRegex   
-
 
 class MicroWebSrv :
 
@@ -174,11 +175,13 @@ class MicroWebSrv :
     # ============================================================================
 
     def __init__( self,
+                  proc,
                   routeHandlers = [],
                   port          = 80,
                   bindIP        = '0.0.0.0',
                   webPath       = "/flash/www" ) :
 
+        self.proc           = proc
         self._srvAddr       = (bindIP, port)
         self._webPath       = webPath
         self._notFoundUrl   = None
@@ -215,6 +218,11 @@ class MicroWebSrv :
         self._started = True
         while True :
             try :
+                # rbenrax: control the process end when killed
+                if self.proc and self.proc.sts=="S":
+                    self.Stop()
+                    break
+
                 client, cliAddr = self._server.accept()
             except :
                 break

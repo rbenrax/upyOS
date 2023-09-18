@@ -168,6 +168,7 @@ class upyOS:
         self.user_commands = {
             "ps": self.ps,
             "kill": self.kill,
+            "killall": self.killall,
             #"getenv": self.getenv,
             #"setenv": self.setenv,
             #"unset": self.unset,
@@ -273,10 +274,11 @@ class upyOS:
                     ext  = ""
 
                 if len(parts) > 1 and parts[-1]=="&": # If new thread
-                    # RP-2040 suport only two threads, esp32 many
+                    # RP-2040 suport only two threads, esp32 and others, many
                     try:
                         from _thread import start_new_thread, stack_size
-                        if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
+                        #if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
+                        if uos.uname()[0]=="esp32": stack_size(8192)   # stack overflow in ESP32C3
                         newProc = Proc(self)
                         start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
                     except ImportError:
@@ -324,6 +326,12 @@ class upyOS:
                 i.sts="S"
                 break
             elif pid=="-a": #~ kill all process
+                i.sts="S"
+                
+    def killall(self, pn=""):
+        """ Kill process by name"""
+        for i in sdata.procs:
+            if pn in i.cmd:
                 i.sts="S"
 
     # Repeat command
