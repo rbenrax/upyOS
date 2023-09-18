@@ -16,8 +16,8 @@ def __main__(args):
         print ("wifi on - activate wifi client")
         print ("wifi off - deactivate wifi client")
         print ("wifi scan - list visible networks")
-        print ("wifi config - list/set networks connect parms")
-        print ("wifi ifconfig - list/set networks ip parms")
+        print ("wifi config - show/set networks connect parms (essid=<essid> password=<pass> ...")
+        print ("wifi ifconfig - show/set: IPs parms (ip, mask, gateway, dns)")
         print ("wifi connect <SSID> <PSK> [Tout] - connect to network")
         print ("wifi disconnect - disconnect wifi client") 
         return
@@ -104,7 +104,6 @@ def __main__(args):
     elif cmd == "ifconfig":
         try:
             if len(args)==1:
-                print("STA ifconfig - Show/Set: (ip, mask, gateway, dns)\n")
                 ic = sta_if.ifconfig()
                 print (f"WiFi sta: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
                 print (f"      status: {'Active' if sta_if.isconnected() else 'Inactive'}")
