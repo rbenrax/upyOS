@@ -115,6 +115,7 @@ def __main__(args):
                 print (f"      MAC: {mac2Str(sta_if.config("mac"))}")
                 print (f"      DNS: {ic[3]}")
                 print (f"      status: {'Active' if sta_if.active() else 'Inactive'}")
+                print (f"              {'Connected' if sta_if.isconnected() else 'Disconnected'}")
                 
             elif len(args)==5:
                 sta_if.ifconfig((args[1], args[2], args[3], args[4]))
