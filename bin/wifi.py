@@ -7,19 +7,19 @@ import sdata
 def __main__(args):
     
     if not sdata.board["wifi"]:
-        print ("wifi not available in this board")
+        print("wifi not available in this board")
         return
     
     if len(args) == 0:
-        print ("WIFI sta_if management command\n Usage:")
-        print ("wifi status - prints wifi client status")
-        print ("wifi on - activate wifi client")
-        print ("wifi off - deactivate wifi client")
-        print ("wifi scan - list visible networks")
-        print ("wifi config - show/set networks connect parms (essid=<essid> password=<pass> ...")
-        print ("wifi ifconfig - show/set: IPs parms (ip, mask, gateway, dns)")
-        print ("wifi connect <SSID> <PSK> [Tout] - connect to network")
-        print ("wifi disconnect - disconnect wifi client") 
+        print("WIFI sta_if management command\nUsage:")
+        print("wifi status - prints wifi client status")
+        print("wifi on - activate wifi client")
+        print("wifi off - deactivate wifi client")
+        print("wifi scan - list visible networks")
+        print("wifi config - show/set networks connect parms (essid=<essid> password=<pass> ...")
+        print("wifi ifconfig - show/set: IPs parms (ip, mask, gateway, dns)")
+        print("wifi connect <SSID> <PSK> [Tout] - connect to network")
+        print("wifi disconnect - disconnect wifi client") 
         return
 
     sta_if = network.WLAN(network.STA_IF)

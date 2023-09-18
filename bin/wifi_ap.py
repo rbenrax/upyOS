@@ -10,12 +10,12 @@ def __main__(args):
         return
     
     if len(args) == 0:
-        print ("WIFI AP management command\n Usage:")
-        print ("wifi status - prints wifi AP status")
-        print ("wifi on - activate wifi AP")
-        print ("wifi off - deactivate wifi AP")
-        print ("wifi config - show/set networks connect parms (essid=<essid> password=<pass> ...")
-        print ("wifi ifconfig - show/set: IPs parms (ip, mask, gateway, dns)")
+        print("WIFI AP management command\nUsage:")
+        print("wifi status - prints wifi AP status")
+        print("wifi on - activate wifi AP")
+        print("wifi off - deactivate wifi AP")
+        print("wifi config - show/set networks connect parms (essid=<essid> password=<pass> ...")
+        print("wifi ifconfig - show/set: IPs parms (ip, mask, gateway, dns)")
         return
 
     ap_if = network.WLAN(network.AP_IF)
