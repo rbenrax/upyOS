@@ -19,14 +19,14 @@ def __main__(args):
     if len(args) < 2:
         print("wifi management command\nUsage:")
         print("\t<nif>: sta/ap")
-        print("\twifi <nif> status - prints wifi client status")
-        print("\twifi <nif> on - activate wifi client")
-        print("\twifi <nif> off - deactivate wifi client")
-        print("\twifi <nif> scan - list visible networks")
-        print("\twifi <nif> config - show/set networks connect parms (essid=<essid> password=<pass> ...")
-        print("\twifi <nif> ifconfig - show/set: IPs parms (ip, mask, gateway, dns)")
-        print("\twifi <nif> connect <SSID> <PSK> [Tout] - connect to network")
-        print("\twifi <nif> disconnect - disconnect wifi client") 
+        print("\twifi <nif> status - prints wifi interfase status")
+        print("\twifi <nif> on - activate wifi interfase
+        print("\twifi <nif> off - deactivate wifi interfase
+        print("\twifi <nif> scan - list visible wireless networks")
+        print("\twifi <nif> config - show/set networks connection parameters (essid=<essid> password=<pass> ...")
+        print("\twifi <nif> ifconfig - show/set: IPs parmeters (ip, mask, gateway, dns)")
+        print("\twifi <nif> connect <SSID> <PSK> [Timeout] - connect to wireless network ap")
+        print("\twifi <nif> disconnect - disconnect wifi comnection") 
         return
 
     if args[0] not in ["sta", "ap"]:
