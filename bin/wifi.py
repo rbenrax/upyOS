@@ -1,5 +1,4 @@
 import network
-import sys
 from utime import sleep
 from utls import tspaces
 
