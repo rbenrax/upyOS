@@ -3,22 +3,30 @@
 #i2cscan 0                    # Scan for i2c devices
 
 # Wifi sta
-#wifi on                      # Turn on wifi in cliente mode
-#wifi config mac              # show mac
-#wifi scan                    # scan wifi APs
-#wifi connect <ssid> <password> <timeout> # Connect to wifi router
-#wifi ifconfig '192.168.178.107' '255.255.255.0' '192.168.178.1' '8.8.8.8' # set IP parameters (ip, mash, gw, dns)
-#wifi config ssid             # show ssid
-#wifi config channel          # show channel
+#wifi sta on                      # Turn on wifi in cliente mode
+#wifi sta status   
+#wifi sta config mac              # show mac
+#wifi sta scan                    # scan wifi APs
+#wifi sta connect WLAN-0579 Peguerinos 5 <timeout> # Connect to wifi router
+##wifi sta ifconfig 192.168.178.107 255.255.255.0 192.168.178.1 8.8.8.8 # set IP parameters (ip, mash, gw, dns)
+#wifi sta config ssid             # show ssid
+#wifi sta config channel          # show channel
+#wifi sta ifconfig
+#wifi sta disconnect
+#wifi sta off
+#wifi sta status
+
 #ifconfig                     # Show Ip data
 
 # Wifi ap
-#wifi_ap on                  # Enable AP mode
-#wifi_ap config ssid=rafa password=hola channel=12 # Wifi AP set Connection parameters
-#wifi_ap config ssid         # show parameter ssid
-#wifi_ap config channel      # show parameter channel
-#wifi_ap ifconfig '192.168.178.107' '255.255.255.0' '192.168.178.1' '8.8.8.8' # set IP parameters (ip, mash, gw, dns)
-#wifi_ap ifconfig            # Show IP parameters
+#wifi ap on                  # Enable AP mode
+#wifi ap status
+#wifi ap config ssid=rafa password=hola channel=12 # Wifi AP set Connection parameters
+#wifi ap config ssid         # show parameter ssid
+#wifi ap config channel      # show parameter channel
+#wifi ap ifconfig 192.168.3.100 255.255.255.0 192.168.3.1 8.8.8.8 # set IP parameters (ip, mash, gw, dns)
+#wifi ap ifconfig            # Show IP parameters
+#wifi ap off
 
 #utelnetd start
 
