@@ -17,7 +17,8 @@ def __main__(args):
     # Command: wifi sta config essid=RedQ password=xxx 
 
     if len(args) < 2:
-        print("wifi sta/ap management command\nUsage:")
+        print("wifi management command\nUsage:")
+        print("\t<nif>: sta/ap")
         print("\twifi <nif> status - prints wifi client status")
         print("\twifi <nif> on - activate wifi client")
         print("\twifi <nif> off - deactivate wifi client")
@@ -87,7 +88,7 @@ def __main__(args):
             return
     
         if _if.isconnected():
-            print(f"{arg[0]} already connected")
+            print(f"{args[0]} already connected")
             return
             
         tout=0
@@ -165,6 +166,8 @@ def __main__(args):
             elif len(args)==6:
                 _if.ifconfig((args[2], args[3], args[4], args[5]))
                 #_if.ifconfig(('192.168.3.4', '255.255.255.0', '192.168.3.1', '8.8.8.8'))
+            else:
+                print("Error, valid IPs parameters: wifi ifconfig <nif> <ip> <mask> <gw> <dns>")
                 
         except Exception as ex:
             print("wifi err: " + str(ex))

@@ -7,7 +7,7 @@
 #wifi sta status   
 #wifi sta config mac              # show mac
 #wifi sta scan                    # scan wifi APs
-#wifi sta connect WLAN-0579 Peguerinos 5 <timeout> # Connect to wifi router
+#wifi sta connect <ssid> <password> 5 <timeout> # Connect to wifi router
 ##wifi sta ifconfig 192.168.178.107 255.255.255.0 192.168.178.1 8.8.8.8 # set IP parameters (ip, mash, gw, dns)
 #wifi sta config ssid             # show ssid
 #wifi sta config channel          # show channel
