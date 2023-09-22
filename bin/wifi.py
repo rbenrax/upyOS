@@ -1,11 +1,17 @@
 import network
 from utime import sleep
 from utls import tspaces
+import sys
 
 import sdata
 
-def psts(nif, aif):
-    print (f'wifi {nif} is {"Active" if aif.active() == True else "Inactive"}')
+def psts(nic, aif):
+
+    print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({aif.status()})')
+    if nic=="sta":
+        print (f"wifi {nic}: {'Connected' if aif.isconnected() else 'Not connected'}")
+    else: # ap
+        print (f"wifi {nic}: {'Client connected' if aif.isconnected() else 'No Client connected'}")
 
 def __main__(args):
     
@@ -14,33 +20,33 @@ def __main__(args):
         return
 
     # Command: wifi sta config essid=RedQ password=xxx 
+    #print(f"{args=}")
 
     if len(args) < 2:
         print("wifi management command\nUsage:")
-        print("\t<nif>: sta/ap")
-        print("\twifi <nif> status - prints wifi interfase status")
-        print("\twifi <nif> on - activate wifi interfase
-        print("\twifi <nif> off - deactivate wifi interfase
-        print("\twifi <nif> scan - list visible wireless networks")
-        print("\twifi <nif> config - show/set networks connection parameters (essid=<essid> password=<pass> ...")
-        print("\twifi <nif> ifconfig - show/set: IPs parmeters (ip, mask, gateway, dns)")
-        print("\twifi <nif> connect <SSID> <PSK> [Timeout] - connect to wireless network ap")
-        print("\twifi <nif> disconnect - disconnect wifi comnection") 
+        print("\t<nic>: sta/ap")
+        print("\twifi <nic> status - prints wifi interfase status")
+        print("\twifi <nic> on - activate wifi interfase")
+        print("\twifi <nic> off - deactivate wifi interfase")
+        print("\twifi <nic> scan - list visible wireless networks")
+        print("\twifi <nic> config - show/set networks connection parameters (essid=<essid> password=<pass> ...")
+        print("\twifi <nic> ifconfig - show/set: IPs parmeters (ip, mask, gateway, dns)")
+        print("\twifi <nic> connect <SSID> <PSK> [Timeout] - connect to wireless network ap")
+        print("\twifi <nic> disconnect - disconnect wifi comnection") 
         return
 
-    if args[0] not in ["sta", "ap"]:
-        print("wifi, <nif> shoud be sta or ap")
+    nic = args[0]
+    if nic not in ["sta", "ap"]:
+        print("wifi, <nic> shoud be sta or ap")
         return
 
     _if=None
-    if args[0]=="sta":
+    if nic=="sta":
         _if = network.WLAN(network.STA_IF)
     else:
         _if = network.WLAN(network.AP_IF)
         
     cmd = args[1]
-    
-    #print(f"{args=}")
     
     if cmd == "on":
         _if.active(False)
@@ -50,18 +56,15 @@ def __main__(args):
         _if.active(False)
         
     elif cmd == "status":
-        psts(args[0], _if)
-        #print (f"Status {_if.status()}")
-        if args[0]=="sta" and _if.isconnected():
-            print (f'wifi connection is {"Established" if _if.isconnected() else "Not connected"}')
+        psts(nic, _if)
             
     elif cmd == "scan":
-        if args[0]=="ap":
+        if nic=="ap":
             print("Only applicable to sta if")
             return
 
         if not _if.active():
-            psts(args[0], _if)
+            psts(nic, _if)
             return
 
         try:
@@ -78,16 +81,16 @@ def __main__(args):
     elif cmd == "connect":
         """Conect <SSID> <pass> <Time out>"""
         
-        if args[0]=="ap":
+        if nic=="ap":
             print("Only applicable to sta if")
             return
    
         if not _if.active():
-            psts(args[0], _if)
+            psts(nic, _if)
             return
     
         if _if.isconnected():
-            print(f"{args[0]} already connected")
+            print(f"{nic} already connected")
             return
             
         tout=0
@@ -110,6 +113,8 @@ def __main__(args):
                 print("Connected")
             else:
                 print("Time out waiting connection")
+                _if.active(False)
+                _if.active(True)
                 
         except Exception as ex:
             print("wifi err: " + str(ex))
@@ -130,7 +135,7 @@ def __main__(args):
                     if "=" in e:
                         tmp=e.split("=")
                         # TODO: check type
-                        if tmp[0]in ["mac", "channel", "authmode", "key"]: tmp[1]=int(tmp[1])
+                        if tmp[0]in ["mac", "channel", "authmode", "key", "security"]: tmp[1]=int(tmp[1])
                         p[tmp[0]]=tmp[1]
 
                     else:
@@ -155,25 +160,27 @@ def __main__(args):
             if len(args)==2:
                 ic = _if.ifconfig()
                 from utls import mac2Str
-                print (f"wifi {args[0]}: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
+                print (f"wifi {nic}: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
                 print (f"     MAC: {mac2Str(_if.config("mac"))}")
                 print (f"     DNS: {ic[3]}")
-                print (f"  Status: {'Active' if _if.active() else 'Inactive'}")
-                if args[0]=="sta":
-                    print (f"          {'Connected' if _if.isconnected() else 'Disconnected'}")
+                print (f"  Status: {'Active' if _if.active() else 'Not active'}")
+                if nic=="sta":
+                    print (f"          {'Connected' if _if.isconnected() else 'Not connected'}")
+                else:
+                    print (f"          {'Clients connected' if _if.isconnected() else 'No Client connected'}")
                 
             elif len(args)==6:
                 _if.ifconfig((args[2], args[3], args[4], args[5]))
                 #_if.ifconfig(('192.168.3.4', '255.255.255.0', '192.168.3.1', '8.8.8.8'))
             else:
-                print("Error, valid IPs parameters: wifi ifconfig <nif> <ip> <mask> <gw> <dns>")
+                print("Error, valid IPs parameters: wifi ifconfig <nic> <ip> <mask> <gw> <dns>")
                 
         except Exception as ex:
             print("wifi err: " + str(ex))
             pass
         
     elif cmd == "disconnect":
-        if args[0]=="ap":
+        if nic=="ap":
             print("Only applicable to sta if")
             return
         

@@ -7,7 +7,7 @@
 #wifi sta status   
 #wifi sta config mac              # show mac
 #wifi sta scan                    # scan wifi APs
-#wifi sta connect <ssid> <password> 5 <timeout> # Connect to wifi router
+#wifi sta connect <ssid> <password> <timeout> # Connect to wifi router
 ##wifi sta ifconfig 192.168.178.107 255.255.255.0 192.168.178.1 8.8.8.8 # set IP parameters (ip, mash, gw, dns)
 #wifi sta config ssid             # show ssid
 #wifi sta config channel          # show channel
@@ -21,10 +21,11 @@
 # Wifi ap
 #wifi ap on                  # Enable AP mode
 #wifi ap status
-#wifi ap config ssid=rafa password=hola channel=12 # Wifi AP set Connection parameters
+#wifi ap config ssid=<ssid> password=<password> authmode=3 channel=12 # Wifi AP set Connection parameters
 #wifi ap config ssid         # show parameter ssid
 #wifi ap config channel      # show parameter channel
 #wifi ap ifconfig 192.168.3.100 255.255.255.0 192.168.3.1 8.8.8.8 # set IP parameters (ip, mash, gw, dns)
+#wifi ap status
 #wifi ap ifconfig            # Show IP parameters
 #wifi ap off
 

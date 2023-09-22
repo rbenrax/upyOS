@@ -7,15 +7,17 @@ def __main__(args):
         print ("wifi not available in this board")
         return
     
-    def pif(i, nif):
-        ic = nif.ifconfig()
+    def pif(nic, nif):
+        _if = nif.ifconfig()
         from utls import mac2Str
-        print (f"WiFi {i}: inet {ic[0]} netmask {ic[1]} broadcast {ic[2]}")
+        print (f"WiFi {nic}: inet {_if[0]} netmask {_if[1]} broadcast {_if[2]}")
         print (f"     MAC: {mac2Str(nif.config("mac"))}")
-        print (f"     DNS: {ic[3]}")
+        print (f"     DNS: {_if[3]}")
         print (f"  Status: {'Active' if nif.active() else 'Inactive'}")
-        if i=="sta":
-            print (f"          {'Connected' if i == "sta" and nif.isconnected() else 'Disconnected'}")
+        if nic=="sta":
+            print (f"          {'Connected' if nif.isconnected() else 'Disconnected'}")
+        else:
+            print (f"          {'Clients connected' if nif.isconnected() else 'No Client connected'}")
         print("")
 
     # TODO: enumerate nic
