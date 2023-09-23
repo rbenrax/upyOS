@@ -4,6 +4,44 @@ from utls import tspaces
 import sys
 
 import sdata
+ 
+ # <network> constant & functions
+ 
+ #network.STA_IF
+ #network.AP_IF
+ 
+ #network.PPP()      'ppp = network.PPP(modem.uart)'
+ 
+ #network.country()
+ #network.hostname()
+ #network.phy_mode
+ 
+ #network.AUTH_OPEN 0
+ #network.AUTH_WEP 1
+ #network.AUTH_WPA_PSK 2
+ #network.AUTH_WPA2_PSK 3
+ #network.AUTH_WPA_WPA2_PSK = 4
+ #network.AUTH_WPA2_ENTERPRISE 5
+ #network.AUTH_WPA3_PSK 6
+ #network.AUTH_WPA2_WPA3_PSK 7
+ #network.AUTH_WAPI_PSK 8
+ #network.AUTH_MAX 9
+ 
+ #network.MODE_11B 1
+ #network.MODE_11G 2
+ #network.MODE_11N 4
+ #network.MODE_LR 8
+ 
+ #network.STAT_ASSOC_FAIL 203
+ #network.STAT_BEACON_TIMEOUT 200
+ #network.STAT_CONNECTING 1001
+ #network.STAT_GOT_IP 1010
+ #network.STAT_HANDSHAKE_TIMEOUT 204
+ #network.STAT_IDLE 1000
+ #network.STAT_NO_AP_FOUND 201
+ #network.STAT_WRONG_PASSWORD 202
+
+
 
 def psts(nic, aif):
 
@@ -23,8 +61,7 @@ def __main__(args):
     #print(f"{args=}")
 
     if len(args) < 2:
-        print("wifi management command\nUsage:")
-        print("\t<nic>: sta/ap")
+        print("wifi management command\nUsage:   <nic>: sta/ap")
         print("\twifi <nic> status - prints wifi interfase status")
         print("\twifi <nic> on - activate wifi interfase")
         print("\twifi <nic> off - deactivate wifi interfase")
@@ -32,7 +69,8 @@ def __main__(args):
         print("\twifi <nic> config - show/set networks connection parameters (essid=<essid> password=<pass> ...")
         print("\twifi <nic> ifconfig - show/set: IPs parmeters (ip, mask, gateway, dns)")
         print("\twifi <nic> connect <SSID> <PSK> [Timeout] - connect to wireless network ap")
-        print("\twifi <nic> disconnect - disconnect wifi comnection") 
+        print("\twifi <nic> disconnect - disconnect wifi comnection")
+        print("\t--h parms info")
         return
 
     nic = args[0]
@@ -68,14 +106,15 @@ def __main__(args):
             return
 
         try:
-            from ubinascii import hexlify
-            print ("SSID             \t  Bssid    \tCh   \tSig \tSec \tHid")
-
+            from utls import mac2Str
+            print ("SSID             \t  Bssid    \t\tCh   \tSig \tSec \tHid")
+    
             for net in _if.scan():
-                print (f"{tspaces(net[0].decode(), n=20, ab="a")}      {hexlify(net[1]).decode()}\t{net[2]}\t{net[3]}\t{net[4]}\t{net[5]}")
+                print (f"{tspaces(net[0].decode(), n=20, ab="a")}      {mac2Str(net[1])}\t{net[2]}\t{net[3]}\t{net[4]}\t{net[5]}")
 
         except Exception as ex:
             print("wifi err: " + str(ex))
+            sys.print_exception(ex)
             pass
             
     elif cmd == "connect":
