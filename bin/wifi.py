@@ -7,11 +7,10 @@ import sdata
  
  # <network> constant & functions
  
- #network.STA_IF
- #network.AP_IF
- 
+ #network.STA_IF 0
+ #network.AP_IF 1
+ #network.WLAN()
  #network.PPP()      'ppp = network.PPP(modem.uart)'
- 
  #network.country()
  #network.hostname()
  #network.phy_mode
@@ -40,8 +39,6 @@ import sdata
  #network.STAT_IDLE 1000
  #network.STAT_NO_AP_FOUND 201
  #network.STAT_WRONG_PASSWORD 202
-
-
 
 def psts(nic, aif):
 
