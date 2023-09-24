@@ -3,6 +3,7 @@
 
 import uasyncio
 import machine
+import sys
 
 # Current process refeference (passed in call)
 proc=None
@@ -20,7 +21,7 @@ async def blink(led, period_ms):
         await uasyncio.sleep_ms(period_ms)
 
 async def main():
-    if proc.syscall.getplat()=="esp32":
+    if sys.platform=="esp32":
         t1 = uasyncio.create_task(blink(machine.Pin(12), 700))
     else:
         t1 = uasyncio.create_task(blink(machine.Pin(25), 700))

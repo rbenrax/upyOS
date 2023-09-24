@@ -57,6 +57,15 @@ def __main__(args):
     # Command: wifi sta config essid=RedQ password=xxx 
     #print(f"{args=}")
 
+    for a in args:
+        if "--h" in a:
+            with open("/bin/wifi.inf", 'r') as f:
+                while True:
+                    lin = f.readline()
+                    if not lin: break
+                    print(lin, end="")
+        return
+
     if len(args) < 2:
         print("wifi management command\nUsage:   <nic>: sta/ap")
         print("\twifi <nic> status - prints wifi interfase status")
