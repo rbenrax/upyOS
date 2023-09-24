@@ -55,7 +55,7 @@ def __main__(args):
         return
 
     # Command: wifi sta config essid=RedQ password=xxx 
-    #print(f"{args=}")
+    print(f"{args=}")
 
     for a in args:
         if "--h" in a:
