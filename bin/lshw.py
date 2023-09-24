@@ -1,6 +1,7 @@
 import uos
 import machine
 import sdata
+import sys
 
 def __main__(args):
 
@@ -12,6 +13,7 @@ def __main__(args):
     name = uos.uname()[0]
 
     print(f"\033[0mSystemID:\033[1m {sdata.sid}")
+    print(f"\033[0mPlatform:\033[1m {sys.platform}")
     print(f"\033[0mBoard:\033[1m {uos.uname()[4]}")
     print(f"\033[0m{sdata.name} :\033[1m {sdata.version} (size: {uos.stat('/lib/kernel.py')[6]} bytes)")
     print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")

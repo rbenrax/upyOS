@@ -278,7 +278,7 @@ class upyOS:
                     try:
                         from _thread import start_new_thread, stack_size
                         #if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
-                        if uos.uname()[0]=="esp32": stack_size(8192)   # stack overflow in ESP32C3
+                        if self.getplat()=="esp32": stack_size(8192)   # stack overflow in ESP32C3
                         newProc = Proc(self)
                         start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
                     except ImportError:
@@ -360,7 +360,10 @@ class upyOS:
         
         #raise SystemExit
         sys.exit()
-
+        
+    def getplat(self):
+        return sys.platform
+    
     def print_msg(self, message):
         print(f"\n\033[1;37;44m->{message}\033[0m")
 
