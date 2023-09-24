@@ -55,7 +55,7 @@ def __main__(args):
         return
 
     # Command: wifi sta config essid=RedQ password=xxx 
-    print(f"{args=}")
+    #print(f"{args=}")
 
     for a in args:
         if "--h" in a:
@@ -64,7 +64,7 @@ def __main__(args):
                     lin = f.readline()
                     if not lin: break
                     print(lin, end="")
-        return
+            return
 
     if len(args) < 2:
         print("wifi management command\nUsage:   <nic>: sta/ap")
