@@ -10,6 +10,7 @@
  #network.hostname()
  #network.phy_mode()
  
+ #authmodes:
  #network.AUTH_OPEN 0
  #network.AUTH_WEP 1
  #network.AUTH_WPA_PSK 2
@@ -21,11 +22,13 @@
  #network.AUTH_WAPI_PSK 8
  #network.AUTH_MAX 9
  
+ #phy_modes:
  #network.MODE_11B 1
  #network.MODE_11G 2
  #network.MODE_11N 4
  #network.MODE_LR 8
  
+ #status
  #network.STAT_ASSOC_FAIL 203
  #network.STAT_BEACON_TIMEOUT 200
  #network.STAT_CONNECTING 1001
