@@ -57,27 +57,53 @@ def __main__(args):
     # Command: wifi sta config essid=RedQ password=xxx 
     #print(f"{args=}")
 
+    if len(args) == 0:
+        print("wifi management command\nUsage:")
+        print("\twifi sta/ap status - prints wifi interfase status")
+        print("\twifi sta/ap on - activate wifi interfase")
+        print("\twifi sta/ap off - deactivate wifi interfase")
+        print("\twifi sta scan - list visible wireless networks")
+        print("\twifi sta/ap config - show/set networks connection parameters (essid=<essid> password=<pass> ...")
+        print("\twifi sta/ap ifconfig - show/set: IPs parmeters (ip, mask, gateway, dns)")
+        print("\twifi sta connect <SSID> <PSK> [Timeout] - connect to wireless network ap")
+        print("\twifi sta disconnect - disconnect wifi comnection")
+        print("\twifi country <country> - get/set country")
+        print("\twifi hostname <hostname> - get/set hostname")
+        print("\twifi phy_mode <phy_mode> - get/set phy_mode")
+        print("\twifi --info parm info")
+        return
+
     for a in args:
-        if "--h" in a:
+        if "--info" in a:
             with open("/bin/wifi.inf", 'r') as f:
                 while True:
                     lin = f.readline()
                     if not lin: break
                     print(lin, end="")
             return
-
-    if len(args) < 2:
-        print("wifi management command\nUsage:   <nic>: sta/ap")
-        print("\twifi <nic> status - prints wifi interfase status")
-        print("\twifi <nic> on - activate wifi interfase")
-        print("\twifi <nic> off - deactivate wifi interfase")
-        print("\twifi <nic> scan - list visible wireless networks")
-        print("\twifi <nic> config - show/set networks connection parameters (essid=<essid> password=<pass> ...")
-        print("\twifi <nic> ifconfig - show/set: IPs parmeters (ip, mask, gateway, dns)")
-        print("\twifi <nic> connect <SSID> <PSK> [Timeout] - connect to wireless network ap")
-        print("\twifi <nic> disconnect - disconnect wifi comnection")
-        print("\t--h parms info")
+    
+    if args[0] == "country":
+        if len(args) == 2:
+            network.country(args[1])
+        else:
+            print(network.country())
         return
+    
+    if args[0] == "hostname":
+        if len(args) == 2:
+            network.hostname(args[1])
+        else:
+            print(network.hostname())
+        return
+    
+    if args[0] == "phy_mode":
+        if len(args) == 2:
+            network.phy_mode(args[1])
+        else:
+            print(network.phy_mode())
+        return
+    
+#- - - - -
 
     nic = args[0]
     if nic not in ["sta", "ap"]:
