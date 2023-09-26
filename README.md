@@ -16,6 +16,12 @@ The target is to get a common base to use stand alone microcontroller, and fun u
 
 ![upyos02](media/upyos_02.png )
 
+![upyos03](media/upyos_03.png )
+
+![upyos04](media/upyos_04.png )
+
+![upyos05](media/upyos_05.png )
+
 
 upyOS Help:
 
