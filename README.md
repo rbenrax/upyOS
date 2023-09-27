@@ -127,15 +127,15 @@ Actual Development:
 - Shell script basic conditional execution:
 
       export var1=5   # Set variable 0 to "5" (variables can also be accesed from Python programs and embedded Python)
-      if $var1 == 5 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
+      if $var1 == 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
       < 1
       < 2
       < 3
       < 4
       < 5
       if $var1 == 3 return        # Ends shell script
-      if $var1 == 5 watch ps -t 5 # Launch command "watch ps" every 5 seconds
-      if $var1 == 6 asy_test &    # Summit asy_test process
+      if $var1 == 5 run watch ps -t 5 # Launch command "watch ps" every 5 seconds
+      if $var1 == 6 run asy_test &    # Summit asy_test process
 
 TODO List:
 - Enhance ls, cp, mv, etc. commands
