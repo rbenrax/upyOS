@@ -50,26 +50,42 @@ def __main__(args):
                             v=proc.syscall.getenv(e[1:])
                             cmdl = cmdl.replace(e, v)
 
-
+                # Unconditional commands
+                # End script
                 if cmdl[:6] =="return": break
+
+                # Skip lines
+                if cmdl[:5] =="skip ":
+                    tmp = cmdl.split()
+                    acca = tmp[1]
+                    if acca.isdigit():
+                       skip_lines=int(acca)
+                       continue
 
                 # Conditional execution: if $0 == 5 return (ex.)
                 if cmdl[:3] =="if ":
                     tmp = cmdl.split()
-                    arg1 = tmp[1]
-                    op   = tmp[2]
-                    arg2 = tmp[3]
-                    acc  = tmp[4]
+                    arg1 = tmp[1] # operand1
+                    op   = tmp[2] # operator
+                    arg2 = tmp[3] # operand2
+                    acc  = tmp[4] # action
                     
+                    if len(tmp) > 5:
+                        acca = tmp[5] # action arg
+                    else:
+                        acca=""
+                        
                     res = eval('"' + arg1 + '"' + op + '"' + arg2 + '"')
                     #if sdata.debug:
                     #    print(f"{line}: {cmdl[:-1]} {res=}")
 
                     if res:
                         if acc == "return": break
-                        elif acc.isdigit():
-                            skip_lines=int(acc)
+                        elif acc=="skip" and acca.isdigit():
+                            skip_lines=int(acca)
                             continue
+                        elif acc=="run":
+                            proc.syscall.run_cmd(" ".join(tmp[5:]))
                         else:
                             #if sdata.debug:
                             #    print(" ".join(tmp[4:]))
