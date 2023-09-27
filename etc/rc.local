@@ -67,16 +67,25 @@ export 0 opt
 #watch ps &
 
 # Conditional execution:
-#export 0 5   # set variable 0 to "5"
-#if $0 == 5 skip 3 # Skip 3 lines (will continue in 4, 5, etc)
+#export ?=5   # set variable 0 to "5"
+#if $? == 5 skip 3 # Skip 3 lines (will continue in 4, 5, etc)
 #< 1
 #< 2
 #< 3
 #< 4
 #< 5
 #if $0 == 5 return     # Ends shell script
-#if $0 == 5 run asy_test & # Summit asy_test
+#if $? == 5 run asy_test & # Summit asy_test
 
+#test -f /etc/rc.local -v
+#if $? == 1 run echo si $?
+#if $? == 0 run echo no $?
+
+#test -d /etc/rc.local -v
+#if $? == 1 run echo si $?
+#if $? == 0 run echo no $?
+
+#skip 1
 #uhttpd start &
 
 # Exit form OS to python REPL
