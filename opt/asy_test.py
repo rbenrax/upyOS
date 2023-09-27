@@ -8,8 +8,6 @@ import sys
 # Current process refeference (passed in call)
 proc=None
 
-from _thread import get_ident
-
 async def blink(led, period_ms):
     while True:
         
