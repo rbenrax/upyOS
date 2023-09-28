@@ -3,7 +3,7 @@ import sdata
 
 def __main__(args):
 
-    if len(args) < 1:
+    if len(args) == 1:
         print ("Wait for for a process end\nUsage: wait <pid>")
         return
 
