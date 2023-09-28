@@ -44,8 +44,6 @@ export 0 opt
 #unset 0
 #env
 
-
-
 #help
 
 # > = Execute Python code
@@ -63,6 +61,10 @@ export 0 opt
 # Threads launch
 #dht_test &
 #asy_test &
+#env
+#echo pid: $!
+#wait 13
+
 #thr_test &
 #watch ps &
 

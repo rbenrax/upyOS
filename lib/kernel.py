@@ -40,6 +40,7 @@ class Proc:
                 from _thread import get_ident
                 self.tid = get_ident()
                 print(f"\n[{self.pid}]")
+                self.syscall.setenv("!", str(self.pid))
         
             # External Python commands and programs
             if ext=="py" or ext=="":

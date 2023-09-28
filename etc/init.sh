@@ -22,7 +22,7 @@ free -h
 df -h
 
 led on 0             # Turn on led 0
-wait .05
+sleep .05
 led off 0            # Turn off led 0
 
 led rgb 1            # Test rgb led in board (if board has one)
