@@ -39,8 +39,8 @@ class Proc:
             if self.isthr:
                 from _thread import get_ident
                 self.tid = get_ident()
-                print(f"\n[{self.pid}]")
                 self.syscall.setenv("!", str(self.pid))
+                print(f"\n[{self.pid}]")
         
             # External Python commands and programs
             if ext=="py" or ext=="":
