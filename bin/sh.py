@@ -39,17 +39,8 @@ def __main__(args):
                 
                 if lin.strip()=="": continue
                 if len(lin)>0 and lin[0]=="#": continue
-                cmdl=lin.split("#")[0] # Left comment line part
+                cmdl=lin.split("#")[0] # Left part of commented line 
                 
-                # Translate env variables $*
-                tmp = cmdl.split()
-                
-                if not tmp[0] in ["export", "echo", "unset"]:
-                    for e in tmp:
-                        if e[0]=="$":
-                            v=proc.syscall.getenv(e[1:])
-                            cmdl = cmdl.replace(e, v)
-
                 # Unconditional commands
                 # End script
                 if cmdl[:6] =="return": break

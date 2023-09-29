@@ -37,9 +37,9 @@ class Proc:
             #print(f"{len(sdata.procs)=}")
 
             if self.isthr:
+                self.syscall.setenv("!", str(self.pid))
                 from _thread import get_ident
                 self.tid = get_ident()
-                self.syscall.setenv("!", str(self.pid))
                 print(f"\n[{self.pid}]")
         
             # External Python commands and programs
@@ -213,12 +213,21 @@ class upyOS:
  # - - - - - - - -
 
     def run_py_code(self, code):
+        print(f"{code}")
         exec(code.replace('\\n', '\n'))
 
     #@utls.timed_function
     def run_cmd(self, fcmd):
 
         fcmd=fcmd.strip()
+        
+        # Translate env variables $*
+        tmp = fcmd.split()
+        #if not tmp[0] in ["export", "echo", "unset"]:
+        for e in tmp:
+            if e[0]=="$":
+                v=self.getenv(e[1:])
+                fcmd = fcmd.replace(e, v)
 
         if fcmd[:2]=="> ":
             self.run_py_code(fcmd[2:])
@@ -282,6 +291,7 @@ class upyOS:
                         if sys.platform=="esp32": stack_size(8192)   # stack overflow in ESP32C3
                         newProc = Proc(self)
                         start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
+                        utime.sleep(.150)
                     except ImportError:
                         print("System has not thread support")
                     except Exception as ex:

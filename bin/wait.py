@@ -7,7 +7,7 @@ def __main__(args):
         print ("Wait for for a process end\nUsage: wait <pid>")
         return
 
-    sleep(0.200)
+    sleep(0.100)
     while True:
         found=False
         for i in sdata.procs:
