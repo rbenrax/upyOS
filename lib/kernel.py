@@ -34,7 +34,7 @@ class Proc:
         try:
 
             sdata.procs.append(self)
-            self.syscall.setenv("$$", str(self.pid))
+            self.syscall.setenv("_", str(self.pid))
             #print(f"{len(sdata.procs)=}")
 
             if self.isthr:
