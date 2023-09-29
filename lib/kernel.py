@@ -22,7 +22,7 @@ class Proc:
         self.args  = ""               # Arguments
         self.stt   = utime.ticks_ms() # Start time
         self.sts   = "S"              # Process status
-        self.rmmod = True             # Remove module, default True
+        self.rmmod = True             # Remove module ant end?, default True
         self.isthr = False
         
     def run(self, isthr, ext, cmd, args):
@@ -34,6 +34,7 @@ class Proc:
         try:
 
             sdata.procs.append(self)
+            self.syscall.setenv("$$", str(self.pid))
             #print(f"{len(sdata.procs)=}")
 
             if self.isthr:
@@ -86,12 +87,13 @@ class Proc:
                 sys.print_exception(e)
         finally:
 
-            # Check if several instances of module are running
+            # Check if multiple instances of a module are running
             for i in sdata.procs:
                 if i.cmd == self.cmd and i.pid != self.pid:
                     self.rmmod=False # There is another modules instance running
                     break
 
+            # Remove the module
             #print(f"{self.rmmod=}")
             if self.rmmod and self.cmd in sys.modules:
                 del sys.modules[self.cmd]
@@ -102,6 +104,7 @@ class Proc:
                     del sdata.procs[idx]
                     break
                 
+            # End of process
             if self.isthr:
                 print(f"[{self.pid}]+ Done\t {self.cmd}{'.' + self.ext if self.ext else ''}")
 
