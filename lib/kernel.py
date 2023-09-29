@@ -216,7 +216,6 @@ class upyOS:
  # - - - - - - - -
 
     def run_py_code(self, code):
-        print(f"{code}")
         exec(code.replace('\\n', '\n'))
 
     #@utls.timed_function
