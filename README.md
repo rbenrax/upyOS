@@ -130,7 +130,7 @@ Actual Development:
   
 - Shell script basic conditional execution:
 
-      export var1 5   # Set variable 0 to "5" (variables can also be accesed from Python programs and embedded Python)
+      export var1 5   # Set variable var1 to "5" (variables can also be accesed from Python programs and embedded Python)
       if $var1 == 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
       < 1
       < 2
