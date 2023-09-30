@@ -4,7 +4,10 @@
 # > (Execute Python code)
 # < (Print the Python code execution)
 
-cpufreq -turbo
+loadconfig   # You can choose another configuration file, without param default
+loadboard    # You can choose do not load or use another board configuration, without param default
+
+cpufreq -turbo # If no board configuration, this and others commands can fail and should not be used 
 
 < "\033[1;33;44m", end=""
 cat /etc/wellcome.txt
@@ -21,6 +24,7 @@ free -h
 < "\033[1mStorage:"
 df -h
 
+#If no board configuration, nexts commands can fail and should not be used 
 led on 0             # Turn on led 0
 sleep .05
 led off 0            # Turn off led 0

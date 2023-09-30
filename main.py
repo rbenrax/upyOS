@@ -4,4 +4,4 @@
 
 # Launch upyOS once generated the .board file, aprox 0.5kb ram saved
 import kernel
-upyos = kernel.upyOS("") # Boot_args: -r -n
+upyos = kernel.upyOS("") # Boot_args: -r

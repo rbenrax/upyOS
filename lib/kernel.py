@@ -111,10 +111,13 @@ class Proc:
 class upyOS:
     
     def __init__(self, boot_args):
-
         # Valid boot_args:
         # -r = Recovery mode
-        # -n = No board config load
+        
+        # sdata store all system data
+        sdata.name    = "upyOS-" + uos.uname()[0]
+        sdata.version = "0.5"
+        sdata.initime = utime.time()
 
         # Remove modules previusly loaded by grub
         try:
@@ -122,11 +125,6 @@ class upyOS:
             del sys.modules["grub"]
         except:
             pass
-        
-        # sdata store all system data
-        sdata.name    = "upyOS-" + uos.uname()[0]
-        sdata.version = "0.5"
-        sdata.initime = utime.time()
 
         # System ID
         from ubinascii import hexlify
@@ -144,41 +142,32 @@ class upyOS:
         sys.path.append("/bin")
         sys.path.append("/extlib")
 
-        # Clean screen and boot
-        print("\033[2J\033[HBooting upyOS...")
-
-        # Load system configuration and board definitions
-        try:
-            sdata.sysconfig=utls.load_conf_file("/etc/system.conf")
-            #print(sdata.sysconfig)
-            print("System cfg loaded.")
-            
-            if not "-n" in boot_args:
-                sdata.board=utls.load_conf_file("/etc/" + sdata.name + ".board")
-                #print(sdata.board)
-                print("Board cfg loaded.")
-            
-        except OSError as ex:
-            print("Problem loading configuration" + str(ex))
-            if sdata.debug:
-                sys.print_exception(ex)
-
-        except Exception as ex:
-            if sdata.debug:
-                sys.print_exception(ex)
-            pass
-
         # Internal Commands definition
         self.user_commands = {
             "ps": self.ps,
             "kill": self.kill,
             "killall": self.killall,
+            "loadconfig": self.loadconfig,
+            "loadboard": self.loadboard,
             #"getenv": self.getenv,
             #"setenv": self.setenv,
             #"unset": self.unset,
             "r": self.last_cmd,
             "exit" : self.exit
         }
+
+        # Clean screen and boot
+        print("\033[2J\033[HBooting upyOS...")
+
+        #self.loadconfig()
+        #self.loadboard()
+
+        if not "env" in sdata.sysconfig:
+            sdata.sysconfig={"ver"     : 1.0,
+                           "aliases" : {"edit": "vi"},
+                           "pfiles"  : ["/boot.py","/main.py"],
+                           "env"     : {"?": "", "0": ""}
+                           }
 
         if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
@@ -376,13 +365,29 @@ class upyOS:
         
     def print_msg(self, message):
         print(f"\n\033[1;37;44m->{message}\033[0m")
+        # Load system configuration and board definitions
+     
+    def loadconfig(self, conf="/etc/system.conf"):
+        if utls.file_exists(conf):
+            sdata.sysconfig=utls.load_conf_file(conf)
+            print("System cfg loaded.")
+        else:
+            print(f"{conf} not found")
+        
+    def loadboard(self, board=""):
+        if board == "": board = "/etc/" + sdata.name + ".board"
+        if utls.file_exists(board):
+            sdata.board=utls.load_conf_file(board)
+            print("Board cfg loaded.")
+        else:
+            print(f"{board} not found")
 
-    def getboard(self):
-        return sdata.board
-    
     def getconf(self):
         return sdata.sysconfig
 
+    def getboard(self):
+        return sdata.board
+
 # - -  
 if __name__ == "__main__":
-    upyos = upyOS("-n") # Boot_args: -r -n
+    upyos = upyOS("-n") # Boot_args: -r
