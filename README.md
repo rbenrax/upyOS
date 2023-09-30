@@ -12,9 +12,13 @@ upyOS - a tiny and simple operating system for MicroPython (targetting ESP8266, 
 This is a implementation tested over ESP32-C3, ESP8266 and YD-2040 by rbenrax.
 The target is to get a common base to use stand alone microcontroller, and fun using it. 
 
+Secreenshots of rp2040 module running upyOS:
+
 ![upyos01](media/upyos_01.png )
 
 ![upyos02](media/upyos_02.png )
+
+Secreenshots of esp32c3 module running upyOS:
 
 ![upyos03](media/upyos_03.png )
 
@@ -126,7 +130,7 @@ Actual Development:
   
 - Shell script basic conditional execution:
 
-      export var1=5   # Set variable 0 to "5" (variables can also be accesed from Python programs and embedded Python)
+      export var1 5   # Set variable 0 to "5" (variables can also be accesed from Python programs and embedded Python)
       if $var1 == 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
       < 1
       < 2
