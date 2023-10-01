@@ -9,7 +9,11 @@ def __main__(args):
         print ("List system hardware and interfaces\nUsage: lshw <options>, options: -f")
         return
     
-    mode=args[0]
+    if len(args)==0:
+        mode="-b"
+    else:
+        mode=args[0]
+        
     name = uos.uname()[0]
 
     print(f"\033[0mSystemID:\033[1m {sdata.sid}")
@@ -25,8 +29,10 @@ def __main__(args):
             print("\t"*p + f"{v}")
             
     def pdict(d, p=1):
-        for k, v in d.items():
-            print("\t"*p +f"{k} : {v}")
+        k = list(d.keys())
+        k.sort()
+        for i in k:
+            print("\t"*p +f"{i} : {d[i]}")
 
     def pboard(e):
         i=sdata.board[e]
@@ -55,7 +61,7 @@ def __main__(args):
             print(f"{e}: ")
             pdict(i, 1)
         else:
-            print(f"{e}: {i}")
+            print(f"{e}:\t{i}")
 
     # Full hardware
     if mode=="-f":
