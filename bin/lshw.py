@@ -32,6 +32,12 @@ def __main__(args):
         i=sdata.board[e]
         #print(type(i))
         if isinstance(i, list):
+            
+            if len(i) > 0 and not isinstance(i[0], list) and not isinstance(i[0], dict):  
+                print(f"{e}:")
+                plist(i, p=1)
+                return
+            
             for n, j in enumerate(i):
                 if len(i) > 1:
                     print(f"{e}{n}: ")
@@ -41,30 +47,39 @@ def __main__(args):
                 if isinstance(j, dict):
                     pdict(j, 1)
                 elif isinstance(j, list):
-                    print(f">>{j}: ")
-                    #plist(j, 1)
+                    plist(j, 1)
+                else:
+                    print(f"{j}")
+
         elif isinstance(i, dict):
             print(f"{e}: ")
             pdict(i, 1)
         else:
-            print(f"-{e}: {i}")
+            print(f"{e}: {i}")
 
     # Full hardware
     if mode=="-f":
         try:
             
-            print(f"\033[0m\n\nPinout descrition of hardware interfaces\n")
+            print(f"\033[0m\nPinout descrition of hardware interfaces\n")
             
-            top=["ver","text","board","mcu","eth","wifi","bt","ir","rtc","temp"]
+            top=["board","mcu","eth","wifi","bt","ir","rtc","temp","ver","text"]
+            bottom=["5v0","3v3","gnd","nc","other"]
+            
             for e in top:
+                if e in bottom: continue
                 pboard(e)  
             
             for e in sdata.board.keys():
-                if e in top: continue
+                if e in top or e in bottom: continue
                 pboard(e)
-                    
+            
+            for e in bottom:
+                pboard(e)
+            
         except Exception as ex:
             print("lshw error, " + str(ex))
+            sys.print_exception(ex)
             pass
 
 #if __name__ == '__main__':
