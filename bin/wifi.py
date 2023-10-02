@@ -59,7 +59,7 @@ def __main__(args):
 
     if len(args) == 0:
         print("wifi management command\nUsage:")
-        print("\twifi sta/ap status - prints wifi interfase status")
+        print("\twifi sta/ap status - show wifi interfase status")
         print("\twifi sta/ap on - activate wifi interfase")
         print("\twifi sta/ap off - deactivate wifi interfase")
         print("\twifi sta scan - list visible wireless networks")
