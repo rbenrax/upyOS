@@ -116,7 +116,7 @@ class upyOS:
         
         # sdata store all system data
         sdata.name    = "upyOS-" + uos.uname()[0]
-        sdata.version = "0.5"
+        sdata.version = "0.6"
         sdata.initime = utime.time()
 
         # Remove modules previusly loaded by grub
