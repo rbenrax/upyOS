@@ -8,7 +8,7 @@ import sys
 def __main__(args):
 
     if len(args) == 1 and args[0]=="--h":
-        print ("List system hardware and interfaces\nUsage: lshw <options>, options: -f")
+        print ("List system hardware and interfaces\nUsage: lshw <options>, options: -f [cat]")
         return
     
     if len(args)==0:
@@ -93,21 +93,25 @@ def __main__(args):
             
             print(f"\n{Ab}Board hardware interfaces, pinout and gpios descriptions{An}")
             
-            top=["board","mcu","eth","wifi","bt","ir","rtc","temp","ver","text"]
-            bottom=["5v0","3v3","gnd","nc","other"]
+            if len(args)>1:
+                pboard(args[1])
+            else:
             
-            for e in top:
-                if e in bottom: continue
-                pboard(e)  
-            
-            for e in sdata.board.keys():
-                if e in top or e in bottom: continue
-                pboard(e)
-            
-            for e in bottom:
-                pboard(e)
-            
-            print(f"{An}\nEnd of hardware definitions")
+                top=["board","mcu","eth","wifi","bt","ir","rtc","temp","ver","text"]
+                bottom=["5v0","3v3","gnd","nc","other"]
+                
+                for e in top:
+                    if e in bottom: continue
+                    pboard(e)  
+                
+                for e in sdata.board.keys():
+                    if e in top or e in bottom: continue
+                    pboard(e)
+                
+                for e in bottom:
+                    pboard(e)
+                
+                print(f"{An}\nEnd of hardware definitions")
             
         except Exception as ex:
             print("lshw error, " + str(ex))
