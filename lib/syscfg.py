@@ -4,7 +4,7 @@ class SysCfg():
 
         self.board={"ver"   : 1.0,
                     "board" : {"name": board, "vendor": "vcc-gnd studio"},
-                    "mcu"   : [{"type": "esp32-c3", "arch": "risc-v", "speed": {"slow": 80, "turbo": 160} }],
+                    "mcu"   : [{"type": "esp32-c3", "arch": "risc-v"}],
                     "eth"   : False,
                     "wifi"  : True,
                     "bt"    : True,

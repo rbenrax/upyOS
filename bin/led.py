@@ -16,8 +16,12 @@ def __main__(args):
 
     # Test rgb leds gpios with ln leds in each strip
     if cmd=="rgb":
+        if not sdata.board or not "rgbio" in sdata.board:
+            print ("led: This board has no rgbio pin(s) defined")
+            return            
         if ln < 1: return
         import neopixel
+        
         for pn in sdata.board["rgbio"][0].values():
            np = neopixel.NeoPixel(machine.Pin(pn), ln, bpp=4)
            for i in range(ln):
@@ -35,6 +39,10 @@ def __main__(args):
         np=None
         del sys.modules["neopixel"]
         return
+
+    if not sdata.board or not "ledio" in sdata.board:
+        print ("led: This board has no ledio pin(s) defined")
+        return 
 
     system_leds = []
     if "ledio" in sdata.board:
@@ -58,7 +66,6 @@ def __main__(args):
                led.value(0)
                utime.sleep(0.05)
        return
-    
 
 if __name__ == "__main__":
 

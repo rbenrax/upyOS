@@ -7,7 +7,7 @@
 loadconfig   # You can choose another configuration file, without param default
 loadboard    # You can choose do not load or use another board configuration, without param default
 
-cpufreq -turbo # If no board configuration, this and others commands can fail and should not be used 
+#cpufreq 160 # If no board configuration, this and others commands can fail and should not be used 
 
 < "\033[1;33;44m", end=""
 cat /etc/wellcome.txt
