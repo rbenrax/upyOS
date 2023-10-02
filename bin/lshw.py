@@ -56,6 +56,9 @@ def __main__(args):
                 #print("\t"*p + f"{An}{utls.tspaces(i, n=7)} : {Ab}{d[i]}")
                 
         def pboard(e):
+            
+            if not e in sdata.board: return
+            
             i=sdata.board[e]
             #print(type(i))
             print("")
