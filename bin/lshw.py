@@ -71,7 +71,7 @@ def __main__(args):
                 
                 for n, j in enumerate(i):
                     if len(i) > 1:
-                        print(f"{An}{e}{n}: ")
+                        print(f"{An}{e}[{n}]: ")
                     else:
                         print(f"{An}{e}: ")
                         
