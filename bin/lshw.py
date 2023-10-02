@@ -1,5 +1,7 @@
 import uos
 import machine
+import utls
+
 import sdata
 import sys
 
@@ -16,58 +18,77 @@ def __main__(args):
         
     name = uos.uname()[0]
 
-    print(f"\033[0mSystemID:\033[1m {sdata.sid}")
-    print(f"\033[0mPlatform:\033[1m {sys.platform}")
-    print(f"\033[0mBoard:\033[1m {uos.uname()[4]}")
-    print(f"\033[0m{sdata.name} :\033[1m {sdata.version} (size: {uos.stat('/lib/kernel.py')[6]} bytes)")
-    print(f"\033[0mMicroPython:\033[1m {uos.uname().release}")
-    print(f"\033[0mFirmware:\033[1m{uos.uname().version}")
-    print(f"\033[0mCPU Speed:\033[1m{machine.freq()*0.000001}MHz")
+    # ansi macros, or somethin like that!
+    from micropython import const
+    An=const("\033[0m")
+    Ab=const("\033[1m")
     
-    def plist(l, p=1):
-        for v in l:
-            print("\t"*p + f"{v}")
-            
-    def pdict(d, p=1):
-        k = list(d.keys())
-        k.sort()
-        for i in k:
-            print("\t"*p +f"{i} : {d[i]}")
-
-    def pboard(e):
-        i=sdata.board[e]
-        #print(type(i))
-        if isinstance(i, list):
-            
-            if len(i) > 0 and not isinstance(i[0], list) and not isinstance(i[0], dict):  
-                print(f"{e}:")
-                plist(i, p=1)
-                return
-            
-            for n, j in enumerate(i):
-                if len(i) > 1:
-                    print(f"{e}{n}: ")
-                else:
-                    print(f"{e}: ")
-                #print(f"Lista: {j}\n")
-                if isinstance(j, dict):
-                    pdict(j, 1)
-                elif isinstance(j, list):
-                    plist(j, 1)
-                else:
-                    print(f"{j}")
-
-        elif isinstance(i, dict):
-            print(f"{e}: ")
-            pdict(i, 1)
-        else:
-            print(f"{e}:\t{i}")
-
+    print(f"{An}SystemID:{Ab} {sdata.sid}")
+    print(f"{An}Platform:{Ab} {sys.platform}")
+    print(f"{An}Board:{Ab} {uos.uname()[4]}")
+    print(f"{An}{sdata.name} :{Ab} {sdata.version} (size: {uos.stat('/lib/kernel.py')[6]} bytes)")
+    print(f"{An}MicroPython:{Ab} {uos.uname().release}")
+    print(f"{An}Firmware:{Ab} {uos.uname().version}")
+    print(f"{An}CPU Speed:{Ab} {machine.freq()*0.000001}MHz{An}")
+    
     # Full hardware
     if mode=="-f":
+        
+        if not sdata.board:
+            print ("lshw -f: This board has no hardware configuration defined")
+            return   
+        
+        def plist(l, p=1):
+            for v in l:
+                print("\t"*p + f"{Ab}{v}")
+                
+        def pdict(d, p=1):
+            k = list(d.keys())
+            
+            if all(e.isdigit() for e in k):
+                k.sort(key=int)
+            else:
+                k.sort()
+                
+            for i in k:
+                #print("\t"*p +f"{An}{i} : {Ab}{d[i]}")
+                print("\t"*p +f"{An}{i} \t: {Ab}{d[i]}")
+                #print("\t"*p + f"{An}{utls.tspaces(i, n=7)} : {Ab}{d[i]}")
+                
+        def pboard(e):
+            i=sdata.board[e]
+            #print(type(i))
+            print("")
+            if isinstance(i, list):
+                
+                if len(i) > 0 and not isinstance(i[0], list) and not isinstance(i[0], dict):
+                    print(f"{An}{e}:")
+                    plist(i, p=1)
+                    return
+                
+                for n, j in enumerate(i):
+                    if len(i) > 1:
+                        print(f"{An}{e}{n}: ")
+                    else:
+                        print(f"{An}{e}: ")
+                        
+                    if isinstance(j, dict):
+                        pdict(j, 1)
+                    elif isinstance(j, list):
+                        plist(j, 1)
+                    else:
+                        print(f"{Ab}{j}")
+
+            elif isinstance(i, dict):
+                print(f"{An}{e}: ")
+                pdict(i, 1)
+            else:
+                print(f"{An}{e}:\t{Ab}{i}")
+        
+        
         try:
             
-            print(f"\033[0m\nPinout descrition of hardware interfaces\n")
+            print(f"\n{Ab}Board hardware interfaces, pinout and gpios descriptions{An}")
             
             top=["board","mcu","eth","wifi","bt","ir","rtc","temp","ver","text"]
             bottom=["5v0","3v3","gnd","nc","other"]
@@ -82,6 +103,8 @@ def __main__(args):
             
             for e in bottom:
                 pboard(e)
+            
+            print(f"{An}\nEnd of hardware definitions")
             
         except Exception as ex:
             print("lshw error, " + str(ex))
