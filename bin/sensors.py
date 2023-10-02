@@ -14,6 +14,8 @@ def __main__(args):
                 tf = esp32.raw_temperature()
                 tc = (tf-32.0)/1.8
                 print(f"Temp: {tf:d}F/{tc:.1f}C")
+
+                print(f"Hall: {esp32.hall_sensor()}")
     except ValueError as ve:
         print(ve)
         
