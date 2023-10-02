@@ -8,7 +8,7 @@ def __main__(args):
         return
 
     try:
-        if "temp" in sdata.board:
+        if "temp" in sdata.board and sdata.board["temp"]:
             if sys.platform=="esp32":
                 import esp32
                 tf = esp32.raw_temperature()
