@@ -34,7 +34,7 @@ def __main__(args):
 
     # sys
     import os
-    print(f"{os.uname()}")
+    print(f"{os.uname()=}")
     print(f"{os.statvfs("/")=}")
     print()
 
