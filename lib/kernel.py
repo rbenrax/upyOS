@@ -165,7 +165,7 @@ class upyOS:
                            "env"     : {"?": "", "0": ""}
                            }
 
-        #self.loadboard()
+        #self.loadboard() # Called from /etc/init.sh
 
         if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
@@ -313,23 +313,18 @@ class upyOS:
             del sdata.sysconfig["env"][var]
 
     def ps(self):
-        """ Process status """
         if len(sdata.procs)>0:
             print(f"  Proc Sts     Init_T   Elapsed   Thread_Id   Cmd/Args")
             for i in sdata.procs:
                 print(f"{i.pid:6}  {i.sts:3}  {i.stt:8}  {utime.ticks_ms() - i.stt:8}  {i.tid:10}   {i.cmd} {" ".join(i.args)}")
                 
     def kill(self, pid="0"):
-        """ Kill process """
         for i in sdata.procs:
             if pid.isdigit() and i.pid == int(pid):
                 i.sts="S"
                 break
-            elif pid=="-a": #~ kill all process
-                i.sts="S"
                 
     def killall(self, pn=""):
-        """ Kill process by name"""
         for i in sdata.procs:
             if pn in i.cmd:
                 i.sts="S"
@@ -342,14 +337,14 @@ class upyOS:
     def exit(self):
 
         if not sdata.debug:
-            s=input("\nSalir S/[N] : ")
+            s=input("\nExit upyOS S/[N] : ")
             if s.upper()!="S": return
 
         # Stop threads before exit
         if len(sdata.procs)>0:
             print("\nStoping process...")
             
-            self.kill("-a")
+            self.killall("")
             while True:
                 end=True
                 for p in sdata.procs:

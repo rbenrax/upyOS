@@ -2,7 +2,7 @@
 # we are in recovery mode and should exists init.rec
 # Internal and external commands can be used
 # > (Execute Python code)
-# < (Print the Python code execution)
+# < (Print the Python code execuion)
 
 #cpufreq 160 # If no board configuration, this and others commands can fail and should not be used 
 
@@ -10,8 +10,8 @@
 cat /etc/wellcome.txt
 < "\033[0m", end=""
 
-loadboard    # You can choose do not load or use another board configuration, without param default
-#loadboard /etc/upyOS-esp32c3.board
+#loadboard    # You can choose do not load or use another board configuration, without param default
+loadboard /etc/upyOS-esp32c3.board
 #loadboard /etc/upyOS-esp32-wroom-32.board
 
 < "\\n"
@@ -31,4 +31,3 @@ sleep .05
 led off 0            # Turn off led 0
 
 led rgb 1            # Test rgb led in board (if board has one)
-

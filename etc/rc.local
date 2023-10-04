@@ -61,8 +61,8 @@
 #echo $_ # Current PID
 
 # Threads launch
-dht_test &
-asy_test &
+#dht_test &
+#asy_test &
 #env
 #echo pid: $! # Last batch PID
 #wait $!
