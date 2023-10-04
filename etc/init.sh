@@ -4,7 +4,6 @@
 # > (Execute Python code)
 # < (Print the Python code execution)
 
-loadconfig   # You can choose another configuration file, without param default
 loadboard    # You can choose do not load or use another board configuration, without param default
 #loadboard /etc/upyOS-esp32c3.board
 #loadboard /etc/upyOS-esp32-wroom-32.board

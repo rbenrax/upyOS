@@ -140,7 +140,7 @@ class upyOS:
 
         # Set library path for modules finding, by default is /lib only
         sys.path.append("/bin")
-        sys.path.append("/extlib")
+        sys.path.append("/libx")
 
         # Internal Commands definition
         self.user_commands = {
@@ -149,9 +149,6 @@ class upyOS:
             "killall": self.killall,
             "loadconfig": self.loadconfig,
             "loadboard": self.loadboard,
-            #"getenv": self.getenv,
-            #"setenv": self.setenv,
-            #"unset": self.unset,
             "r": self.last_cmd,
             "exit" : self.exit
         }
@@ -159,8 +156,7 @@ class upyOS:
         # Clean screen and boot
         print("\033[2J\033[HBooting upyOS...")
 
-        #self.loadconfig()
-        #self.loadboard()
+        self.loadconfig()
 
         if not "env" in sdata.sysconfig:
             sdata.sysconfig={"ver"     : 1.0,
@@ -168,6 +164,8 @@ class upyOS:
                            "pfiles"  : ["/boot.py","/main.py"],
                            "env"     : {"?": "", "0": ""}
                            }
+
+        #self.loadboard()
 
         if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
