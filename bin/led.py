@@ -11,14 +11,14 @@ def __main__(args):
         return
 
     cmd=args[0]
-    lna=args[1]
-    ln=int(lna)
+    ln=int(args[1])
 
     # Test rgb leds gpios with ln leds in each strip
     if cmd=="rgb":
         if not sdata.board or not "rgbio" in sdata.board:
-            print ("led: This board has no rgbio pin(s) defined")
-            return            
+            #print ("led: This board has no rgbio pin(s) defined")
+            return
+        
         if ln < 1: return
         import neopixel
         
@@ -41,7 +41,7 @@ def __main__(args):
         return
 
     if not sdata.board or not "ledio" in sdata.board:
-        print ("led: This board has no ledio pin(s) defined")
+        #print ("led: This board has no ledio pin(s) defined")
         return 
 
     system_leds = []

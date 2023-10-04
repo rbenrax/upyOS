@@ -7,6 +7,7 @@
 loadconfig   # You can choose another configuration file, without param default
 loadboard    # You can choose do not load or use another board configuration, without param default
 #loadboard /etc/upyOS-esp32c3.board
+#loadboard /etc/upyOS-esp32-wroom-32.board
 
 #cpufreq 160 # If no board configuration, this and others commands can fail and should not be used 
 
