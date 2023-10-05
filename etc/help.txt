@@ -34,8 +34,8 @@ main.py         Micropython statup file (boot system)
 
     /bin        Commands and shell scripts
     /etc        Configuration files
-    /extlib     External libraries
     /lib        System implementations libraries
+    /libx       External libraries
     /opt        Specific solution or add-on programs (not in path)
     /tmp        Temporary directory (to put what you don't know where to put :-)
 
@@ -50,15 +50,19 @@ if <arg1> <comparison operator> <arg2> <action> <acc arg>
    - keyword: [run] <pgm>, Any program o command to run (ls, etc.)
    - keyword: skip <lines>, the number of lines to skip, empty lines included 
    - keyword: return, end script execution
+   - Keyword: goto, goto to :label
    
 Unconditional execution:
    - keyword: skip <lines>, the number of lines to skip, empty lines included 
    - keyword: return, end script execution
+   - Keyword: goto, goto to :label
    
 Internals commands:
 
-ps:      Show process status
-kill:    Kill process by pid
-killall: Kill process by name
-r:       Repeat last command
-exit:    Exit to Micropython shell
+ps:         Show process status
+kill:       Kill process by pid
+killall:    Kill process by name
+loadconfig: Load system config file
+loadboard:  Load board interfaces configuration file
+r:          Repeat last command
+exit:       Exit to Micropython shell
