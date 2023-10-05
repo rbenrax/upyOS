@@ -232,7 +232,8 @@ class upyOS:
                 fcmd = cwd + "/" + fcmd[2:]
 
         # Separate full command elements
-        parts = fcmd.split()
+        #parts = fcmd.split()
+        parts = utls.shlex(fcmd)
         
         if len(parts) > 0:
 

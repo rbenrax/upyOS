@@ -121,6 +121,26 @@ def getgpios(cat, ins):
                 #print(kps, k)
     return gps
 
+def shlex(ent):
+    args = []
+    argact = ""
+    incom = False
+
+    for c in ent:
+        if c == '"':
+            incom = not incom
+        elif c == ' ' and not incom:
+            if argact:
+                args.append(argact)
+            argact = ""
+        else:
+            argact += c
+
+    if argact:
+        args.append(argact)
+
+    return args
+
 # - - - -
 
 #if __name__ == "__main__":      
