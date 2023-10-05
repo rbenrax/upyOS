@@ -6,6 +6,6 @@ def __main__(args):
 #        for i, a in enumerate(args):
 #            if a[0]=="$":
 #                args[i] = proc.syscall.getenv(a[1:])
-        print(" ".join(args))
+        print("".join(args))
     else:
         print("Show msg + env variable\nUsage: echo const/<var>: var $?, $1, ..., any")
