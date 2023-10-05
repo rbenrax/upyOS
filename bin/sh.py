@@ -6,16 +6,18 @@ proc=None
 # Shell script conditional execution
 # Basic language:
 #
-# if <arg1> <comparison operator> <arg2> <action>
+# if <arg1> <comparison operator> <arg2> <action> <action arg>
 #
 # <args>: String constant and environment variables (ex: $0, $?, $path, etc)
 # <comparison operator>: Like Python (==, <, >, etc)
 # <action>:
-#    - run or the program o command to run (ls, etc.)
-#    - An integer, the number of lines to skip, empty lines included
-#    - return, end script execution
-#    - skip n, skip n lines 
+#    - run and/or the program o command to run (ls, etc.)
+#    - skip and an integer, the number of lines to skip, empty lines included
+#    - return, end script execution 
 #    - allowed labels (:label) and goto command
+#
+# unconditional, skip n, return and goto
+#
 
 labels={}
 
