@@ -62,7 +62,7 @@ def run(ssf, label):
                    skip_lines=int(acca)
                    continue
             # Goto :label
-            elif cmdl[:5 == "goto ":
+            elif cmdl[:5] == "goto ":
                 tmp = cmdl.split()
                 acca = tmp[1]            
                 label=labels[acca]

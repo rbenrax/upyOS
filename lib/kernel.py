@@ -310,7 +310,7 @@ class upyOS:
 
     def unset(self, var=""):
         """Remove a environment variable"""
-        if sdata.sysconfig["env"][var]:
+        if var in sdata.sysconfig["env"]:
             del sdata.sysconfig["env"][var]
 
     def ps(self):
