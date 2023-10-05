@@ -142,12 +142,11 @@ Actual Development:
       if $var1 == 6 run asy_test &    # Summit asy_test process
 
 TODO List:
-- Enhance ls, cp, mv, etc. commands
-- Add diff, tar, uname, hostname and other usefull commands.
-- Complete wifi and bluetooth support
+- Add diff, tar, uname, read and other usefull commands.
+- Bluetooth support
 - Add Syslog
 - Upgrade procedure
-- Fix errors
+- jobq?
 
 Wishlist is open ;)
 
