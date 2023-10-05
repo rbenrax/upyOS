@@ -102,13 +102,13 @@ Actual Development:
 
 - Added recovery mode, to avoid load of start up failed commands
 
-- Added env envinment variables in scripts and python programs, export, echo, unset sdata.getenv() ans sdata.setenv().
+- Added environment variables in scripts and python programs, export, echo, unset sdata.getenv() ans sdata.setenv().
 
 - ls command is now full functional, or so I hope.
 
-- Now shell scripts can translate environment variables.
+- Now commands translate environment variables.
 
-- From command line prompt is possible input python code directly:
+- From command line prompt and shell scripts is possible input python code directly:
 
       ">" command allow input python code:
       / $: > import ftptiny
@@ -123,7 +123,7 @@ Actual Development:
       / $: < 2+2
       4
 
-- Simple support for thread management and asyncio, tests availables:
+- Management support for multiples threads and asyncio, tests availables (&, kill, killall, wait):
   
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
@@ -131,10 +131,10 @@ Actual Development:
 - Shell script basic conditional execution:
 
       export var1 5   # Set variable var1 to "5" (variables can also be accesed from Python programs and embedded Python)
-      if $var1 == 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
+      if $var1 != 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
       < 1
       < 2
-      < 3
+      < skip 2
       < 4
       < 5
       if $var1 == 3 return        # Ends shell script
