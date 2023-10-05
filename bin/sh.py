@@ -11,13 +11,15 @@ proc=None
 # <args>: String constant and environment variables (ex: $0, $?, $path, etc)
 # <comparison operator>: Like Python (==, <, >, etc)
 # <action>:
-#    - Any program o command to run (ls, etc.)
+#    - run or the program o command to run (ls, etc.)
 #    - An integer, the number of lines to skip, empty lines included
-#    - keyword: return, end script execution
+#    - return, end script execution
+#    - skip n, skip n lines 
+#    - allowed labels (:label) and goto command
+
 labels={}
 
 def run(ssf, label):
-    print(ssf)
     line=0
     with open(ssf,'r') as f:
 
@@ -28,15 +30,15 @@ def run(ssf, label):
             if not lin: break
             line+=1
 
-            if label > 0 and line <= label: # Skip lines in goto
+            if label > 0 and line <= label: # Skip lines for goto label command
                 continue
 
-            if skip_lines > 0: # Skip lies in skip
+            if skip_lines > 0: # Skip lines forward in skip command
                 skip_lines-=1
                 continue
             
-            if lin.strip()=="": continue
-            if len(lin)>0 and lin[0]=="#": continue
+            if lin.strip()=="": continue   # Empty lines skipped
+            if len(lin)>0 and lin[0]=="#": continue # Commanted lines skipped
             cmdl=lin.split("#")[0] # Left part of commented line
             
             global labels
@@ -61,6 +63,7 @@ def run(ssf, label):
             # Conditional execution: if $0 == 5 return (ex.)
             if cmdl[:3] =="if ":
                 tmp = cmdl.split()
+                
                 # Translate env vars
                 for i, e in enumerate(tmp):
                     if e[0]=="$":
@@ -80,17 +83,20 @@ def run(ssf, label):
                 #if sdata.debug:
                 #    print(f"{line}: {cmdl[:-1]} {res=}")
 
-                if res:
+                if res: # Eval result
                     if acc == "goto":
                         label=labels[acca]
-                        return label
+                        return label # return the label line number, and rerun the script 
                        
                     if acc == "return": break
+                    
                     elif acc=="skip" and acca.isdigit():
                         skip_lines=int(acca)
                         continue
+                    
                     elif acc=="run":
                         proc.syscall.run_cmd(" ".join(tmp[5:]))
+                        
                     else:
                         #if sdata.debug:
                         #    print(" ".join(tmp[4:]))
@@ -110,15 +116,15 @@ def __main__(args):
     
     ssf=args[0]
     
-    # Run shell script
+    # Run shell script file
     if utls.file_exists(ssf):
-        label=0
+        label=0 
         while True:
-            ret = run(ssf, label) # Call script once on every label
-            if ret==0:
-                break
-            else:
-                label=ret
+            label = run(ssf, label) # Call script once on every label
+            # if label = 0 then end the script
+            # if label <> 0 then goto statement in course
+            if label==0:
+                break   
     else:
         print(f"{ssf}: script not found")
 
