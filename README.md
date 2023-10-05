@@ -84,6 +84,9 @@ esp32-c3
 VCC-GND Studio YD-2040
 ![VCC-GND Studio](media/YD-2040-PIN.png)
 
+GOOUUU ESP32 WROOM-32
+![ESP32](media/ESP32-38-Pin-Pinout.jpg)
+
 NodeMCU
 ![NodeMCU esp8266](media/Node-MCU-Pinout.png )
 
