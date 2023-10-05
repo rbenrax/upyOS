@@ -9,5 +9,5 @@ def __main__(args):
     
     with open(args[0], "a") as file:
         for a in args[1:]:
-            file.write(a + " ")
+            file.write(a)
         file.write("\n")
