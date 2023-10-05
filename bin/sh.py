@@ -52,18 +52,23 @@ def run(ssf, label):
             
             # Unconditional commands
             # End script
-            if cmdl[:6] =="return": break
-
+            if cmdl[:6] =="return": 
+                break
             # Skip lines
-            if cmdl[:5] =="skip ":
+            elif cmdl[:5] =="skip ":
                 tmp = cmdl.split()
                 acca = tmp[1]
                 if acca.isdigit():
                    skip_lines=int(acca)
                    continue
-
+            # Goto :label
+            elif cmdl[:5 == "goto ":
+                tmp = cmdl.split()
+                acca = tmp[1]            
+                label=labels[acca]
+                return label
             # Conditional execution: if $0 == 5 return (ex.)
-            if cmdl[:3] =="if ":
+            elif cmdl[:3] =="if ":
                 tmp = cmdl.split()
                 
                 # Translate env vars
