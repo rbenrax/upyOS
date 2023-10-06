@@ -14,7 +14,8 @@ def __main__(args):
     sysconfig=proc.syscall.getconf()
     #print(sysconfig)
     
-    for i in range(10):
+    for i in range(20):
+        if proc and proc.sts=="S": break # if Thread, stop instruction
         print(i)
         utime.sleep(2)
 
