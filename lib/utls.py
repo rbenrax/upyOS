@@ -8,9 +8,8 @@ from json import load as jload
 
 import sdata
 
-MONTH = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
-#WEEKDAY = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
+MONTH = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
+WEEKDAY = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
 
 def file_exists(filename):
     return get_mode(filename) & 0xc000 != 0
@@ -31,34 +30,34 @@ def get_stat(filename):
     try:
         return stat(filename)
     except OSError:
+        print ("Error: utls.get_stat")
         return (0,) * 10
 
-def timed_function(f, *args, **kwargs):
-    fname = str(f).split(' ')[1]
-    def new_func(*args, **kwargs):
-        t = utime.ticks_us()
-        result = f(*args, **kwargs)
-        delta = utime.ticks_diff(utime.ticks_us(), t)
-        print(f"Function {fname} {args[1]} Time = {delta/1000:6.3f}ms")
-        return result
-    return new_func
+#def timed_function(f, *args, **kwargs):
+#    fname = str(f).split(' ')[1]
+#    def new_func(*args, **kwargs):
+#        t = utime.ticks_us()
+#        result = f(*args, **kwargs)
+#        delta = utime.ticks_diff(utime.ticks_us(), t)
+#        print(f"Function {fname} {args[1]} Time = {delta/1000:6.3f}ms")
+#        return result
+#    return new_func
 
 # ---
 
-def dump(obj, file):
-    jdump(obj, file)
+#def dump(obj, file):
+#    jdump(obj, file)
     
-def load(file):
-    return jload(file)
-
-
-def load_conf_file(path):
-    with open(path, "r") as cf:
-        return load(cf)
+#def load(file):
+#    return jload(file)
 
 def save_conf_file(obj, path):
     with open(path, "w") as cf:
-        dump(obj, cf)
+        jdump(obj, cf)
+
+def load_conf_file(path):
+    with open(path, "r") as cf:
+        return jload(cf)
 
 # ---
 
@@ -109,7 +108,7 @@ def getgpio(pin):
     return 0
 
 def getgpios(cat, ins):
-    """Get a dict of pins for a specific service category"""
+    """Get a dict of pins for a specific service category and controller"""
     gps={}
     gpios=sdata.board["gpio"][0]
     #print(gpios)
@@ -122,6 +121,7 @@ def getgpios(cat, ins):
     return gps
 
 def shlex(ent):
+    """cmd line sh lexical parser"""
     args = []
     argact = ""
     incom = False
