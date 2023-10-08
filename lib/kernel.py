@@ -64,7 +64,7 @@ class upyOS:
             sdata.sysconfig={"ver"     : 1.0,
                            "aliases" : {"edit": "vi"},
                            "pfiles"  : ["/boot.py","/main.py"],
-                           "env"     : {"?": "", "0": ""}
+                           "env"     : {"TZ": "+2", "?": "", "0": ""}
                            }
 
         #self.loadboard() # Called from /etc/init.sh
