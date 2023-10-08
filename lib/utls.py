@@ -33,6 +33,14 @@ def get_stat(filename):
         print ("Error: utls.get_stat")
         return (0,) * 10
 
+def date2s(tms):
+    localt = utime.gmtime(tms)
+    return f"{localt[2]:0>2}/{localt[1]}/{localt[0]:0>4}"
+
+def time2s(tms):
+    localt = utime.gmtime(tms)
+    return f"{localt[3]:0>2}:{localt[4]:0>2}:{localt[5]:0>2}"
+
 #def timed_function(f, *args, **kwargs):
 #    fname = str(f).split(' ')[1]
 #    def new_func(*args, **kwargs):
