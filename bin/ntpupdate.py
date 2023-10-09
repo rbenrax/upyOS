@@ -19,14 +19,7 @@ def __main__(args):
         from machine import RTC
         rtc = RTC()
         
-        ## --- M1 (not fine)
-        #date_time = list(rtc.datetime())
-        #date_time[4] = date_time[4] + offset 
-        #date_time = tuple(date_time)
-        ##print(f"P1{date_time}")
-        #rtc.datetime(date_time)
-        
-        ## --- M2
+        ## --- M1
         y, mo, d, _, h, m, s, _ = rtc.datetime()
         
         # Calcular el desplazamiento en segundos
@@ -46,8 +39,16 @@ def __main__(args):
         #print(f"P1{y} {mo} {d} {nh} {nm} {ns}")
         rtc.datetime((y, mo, d, 0, nh, nm, ns, 0))
         
-        # --- M3 (Bad)
+        del sys.modules["ntptime"]
         
+        ## --- M2 (not fine)
+        #date_time = list(rtc.datetime())
+        #date_time[4] = date_time[4] + offset 
+        #date_time = tuple(date_time)
+        ##print(f"P1{date_time}")
+        #rtc.datetime(date_time)
+        
+        # --- M3 (Bad)
         #sec = utime.mktime(rtc.datetime())
         #sec = utime.mktime(utime.localtime())
         #sec = sec + (tz * 3600)
