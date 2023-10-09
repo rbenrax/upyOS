@@ -7,7 +7,7 @@ proc=None
 def __main__(args):
 
     if len(args) == 0:
-        print("Update time from NTP server\nUsage: updatentp <ntp server ip>")
+        print("Update system time from NTP server\nUsage: ntpupdate <ntp server ip>")
         return
     
     try:
