@@ -1,5 +1,6 @@
 import ntptime
 import utime
+import sys
 
 proc=None
 
