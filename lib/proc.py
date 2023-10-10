@@ -1,5 +1,6 @@
 import sys
 import utime
+import utls
 
 import sdata
 
@@ -30,11 +31,11 @@ class Proc:
         try:
 
             sdata.procs.append(self)
-            self.syscall.setenv("_", str(self.pid))
+            utls.setenv("_", str(self.pid))
             #print(f"{len(sdata.procs)=}")
 
             if self.isthr:
-                self.syscall.setenv("!", str(self.pid))
+                utls.setenv("!", str(self.pid))
                 from _thread import get_ident
                 self.tid = get_ident()
                 print(f"\n[{self.pid}]")

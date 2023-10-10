@@ -114,10 +114,10 @@ class upyOS:
         
         # Translate env variables $*
         tmp = fcmd.split()
-        #if not tmp[0] in ["export", "echo", "unset"]:
+ 
         for e in tmp:
             if e[0]=="$":
-                v=self.getenv(e[1:])
+                v=utls.getenv(e[1:])
                 fcmd = fcmd.replace(e, v)
 
         if fcmd[:2]=="> ":
@@ -198,22 +198,14 @@ class upyOS:
 
 # - - -
            
-    def getenv(self, var=""):
-        """Get a value from environment variables"""
-        #print(sysconfig["env"])
-        for k, v in sdata.sysconfig["env"].items():
-            if k == var:
-                return v
-        return("")
+#    def getenv(self, var=""):
+#        return utls.getenv(var)
 
-    def setenv(self, var="", val=""):
-        """Set a value to a environment variable"""
-        sdata.sysconfig["env"][var]=val
-
-    def unset(self, var=""):
-        """Remove a environment variable"""
-        if var in sdata.sysconfig["env"]:
-            del sdata.sysconfig["env"][var]
+#    def setenv(self, var="", val=""):
+#        utls.setenv(var, val)
+ 
+#    def unset(self, var=""):
+#        utls.unset(var)
 
     def ps(self):
         if len(sdata.procs)>0:

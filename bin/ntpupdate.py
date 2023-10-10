@@ -2,6 +2,8 @@ import ntptime
 import utime
 import sys
 
+import utls
+
 proc=None
 
 def __main__(args):
@@ -12,7 +14,7 @@ def __main__(args):
     
     try:
         
-        tz = int(proc.syscall.getenv("TZ"))
+        tz = int(utls.getenv("TZ"))
         
         ntptime.host = args[0]
         ntptime.settime()

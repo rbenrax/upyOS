@@ -74,9 +74,14 @@ def run(ssf, label):
                 # Translate env vars
                 for i, e in enumerate(tmp):
                     if e[0]=="$":
-                        v=proc.syscall.getenv(e[1:])
-                        tmp[i] = v
-                        
+                        #print(e[0])
+                        v=utls.getenv(e[1:])
+                        #print(v)
+                        tmp[i] =  v
+                
+                #print(sdata.sysconfig["env"])
+                #print(tmp)
+                            
                 arg1 = tmp[1] # operand1
                 op   = tmp[2] # operator
                 arg2 = tmp[3] # operand2
@@ -86,9 +91,10 @@ def run(ssf, label):
                 if len(tmp) > 5:
                     acca = tmp[5] # action arg
                     
-                res = eval('"' + arg1 + '"' + op + '"' + arg2 + '"')
-                #if sdata.debug:
-                #    print(f"{line}: {cmdl[:-1]} {res=}")
+                #res = eval('"' + arg1 + '"' + op + '"' + arg2 + '"')
+                res = eval(arg1 + " " + op + " " + arg2)
+                
+                #print(f"{line}: {cmdl[:-1]} {res=}")
 
                 if res: # Eval result
                     if acc == "goto":

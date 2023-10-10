@@ -1,6 +1,7 @@
 import network
 from utime import sleep
 from utls import tspaces
+from utls import setenv
 import sys
 
 import sdata
@@ -47,7 +48,17 @@ def psts(nic, aif):
         print (f"wifi {nic}: {'Connected' if aif.isconnected() else 'Not connected'}")
     else: # ap
         print (f"wifi {nic}: {'Client connected' if aif.isconnected() else 'No Client connected'}")
-
+        
+    if aif.active():
+        setenv("0", "1")
+    else:
+        setenv("0", "0")
+        
+    if aif.isconnected():
+        setenv("1", "1")
+    else:
+        setenv("1", "0")
+        
 def __main__(args):
     
     if not sdata.board or not sdata.board["wifi"]:

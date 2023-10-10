@@ -33,6 +33,27 @@ def get_stat(filename):
         print ("Error: utls.get_stat")
         return (0,) * 10
 
+def getenv(var):
+    """Get a value from environment variables"""
+    if var in sdata.sysconfig["env"]:
+        return sdata.sysconfig["env"][var]
+    else:
+        return""
+    #for k, v in sdata.sysconfig["env"].items():
+    #    if k == var:
+    #        return v
+    #return("")
+
+def setenv(var, val):
+    """Set a value to a environment variable"""
+    if var=="" or val == "": return        
+    sdata.sysconfig["env"][var]=val
+    
+def unset(var):
+    """Remove a environment variable"""
+    if var in sdata.sysconfig["env"]:
+        del sdata.sysconfig["env"][var]
+
 def date2s(tms):
     localt = utime.gmtime(tms)
     return f"{localt[2]:0>2}/{localt[1]}/{localt[0]:0>4}"

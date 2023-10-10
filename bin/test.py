@@ -1,8 +1,6 @@
 import uos
 import utls
 
-proc=None
-
 def __main__(args):
 
     #print(f"{args}")
@@ -23,9 +21,9 @@ def __main__(args):
             ret = utls.isdir(args[1])
                 
         if ret:
-            proc.syscall.setenv("?", "1")
+            utls.setenv("?", "1")
             if "-v" in a: print(f"{args[1]} exist")
         else:
-            proc.syscall.setenv("?", "0")
+            utls.setenv("?", "0")
             if "-v" in a: print(f"{args[1]} not exist")
     
