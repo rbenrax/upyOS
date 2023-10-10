@@ -23,11 +23,12 @@ labels={}
 
 def run(ssf, label):
     line=0
-    ltf="" # Forward label to find
+    
     with open(ssf,'r') as f:
 
         skip_lines = 0
-            
+        ltf="" # Forward label to find
+        
         while True:
             lin = f.readline()
             if not lin: break
@@ -156,3 +157,4 @@ def __main__(args):
         
 
         
+
