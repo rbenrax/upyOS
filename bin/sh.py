@@ -23,6 +23,7 @@ labels={}
 
 def run(ssf, label):
     line=0
+    ltf="" # Forward label to find
     with open(ssf,'r') as f:
 
         skip_lines = 0
@@ -46,6 +47,11 @@ def run(ssf, label):
             global labels
             #print(cmdl)
             if cmdl[0]==":":
+                if ltf==cmdl[1:]:
+                    ltf=""
+                else:
+                    continue
+                
                 labels[cmdl[1:-1]]=line # Save labels and his line
                 #print(labels)
                 continue
@@ -64,9 +70,13 @@ def run(ssf, label):
             # Goto :label
             elif cmdl[:5] == "goto ":
                 tmp = cmdl.split()
-                acca = tmp[1]            
-                label=labels[acca]
-                return label
+                acca = tmp[1]
+                if not acca in labels:
+                    ltf=acca
+                    continue
+                else:
+                    label=labels[acca]
+                    return label
             # Conditional execution: if $0 == 5 return (ex.)
             elif cmdl[:3] =="if ":
                 tmp = cmdl.split()
