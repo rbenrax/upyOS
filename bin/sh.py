@@ -107,6 +107,11 @@ def run(ssf, label):
                 if len(tmp) > 5:
                     acca = tmp[5] # action arg
                     
+                if arg1=="" or arg2=="" or acc=="":
+                    print(f"Invalid args: {cmdl[:-1]}")
+                    print(f"Values: {tmp}")
+                    return 0
+                
                 #res = eval('"' + arg1 + '"' + op + '"' + arg2 + '"')
                 #print(tmp)
                 res = eval(arg1 + " " + op + " " + arg2)

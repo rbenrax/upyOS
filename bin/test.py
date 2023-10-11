@@ -21,9 +21,9 @@ def __main__(args):
             ret = utls.isdir(args[1])
                 
         if ret:
-            utls.setenv("?", "1")
+            utls.setenv("0", "1")
             if "-v" in a: print(f"{args[1]} exist")
         else:
-            utls.setenv("?", "0")
+            utls.setenv("0", "0")
             if "-v" in a: print(f"{args[1]} not exist")
     
