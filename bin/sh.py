@@ -52,7 +52,7 @@ def run(ssf, label):
             #print(cmdl)
             if cmdl[0]==":":
                 #print(ltf, cmdl[1:-1])
-                if ltf==cmdl[1:-1]:
+                if ltf==cmdl[1:-1]:  # -1 is carriage return at end of the line
                     #print("encontrada")
                     ltf=""
                 
