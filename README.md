@@ -167,32 +167,32 @@ example.sh
 
 sh example script
 
-#
-# upyos sh script example
-#
+      #
+      # upyos sh script example
+      #
 
-# Wifi sta
-wifi sta on                       # Turn on wifi in cliente nic
+      # Wifi sta
+      wifi sta on                       # Turn on wifi in cliente nic
 
-#wifi sta scan                    # scan wifi APs
+      #wifi sta scan                    # scan wifi APs
 
-wifi sta connect DIGIFIBRA-cGPRi password 10 # Connect to wifi router <ssid> <password> <timeout>
+      wifi sta connect DIGIFIBRA-cGPRi password 10 # Connect to wifi router <ssid> <password> <timeout>
 
-wifi sta status                   # Save two env vars with the status status
-if $0 == 0 goto salir             # $0 = enabled/disabled
-if $1 == 0 goto salir             # $1 = enabled/disabled
+      wifi sta status                   # Save two env vars with the status status
+      if $0 == 0 goto salir             # $0 = enabled/disabled
+      if $1 == 0 goto salir             # $1 = enabled/disabled
 
-ntpupdate es.pool.ntp.org         # ntp time update
-date                              # show current date and time
+      ntpupdate es.pool.ntp.org         # ntp time update
+      date                              # show current date and time
 
-wifi sta ifconfig                 # sta ip config status
-uhttpd start &                    # start http server as thread
+      wifi sta ifconfig                 # sta ip config status
+      uhttpd start &                    # start http server as thread
 
-:salir                            # If error label target
-echo error
-wifi sta off                      # disable nic
+      :salir                            # If error label target
+      echo error
+      wifi sta off                      # disable nic
 
-exit
+      exit
 
 
 TODO List:
