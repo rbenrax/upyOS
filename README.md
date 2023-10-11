@@ -178,7 +178,7 @@ sh example script
 
       wifi sta connect DIGIFIBRA-cGPRi password 10 # Connect to wifi router <ssid> <password> <timeout>
 
-      wifi sta status                   # Save two env vars with the status status
+      wifi sta status                   # save two env vars with the status status
       if $0 == 0 goto salir             # $0 = enabled/disabled
       if $1 == 0 goto salir             # $1 = enabled/disabled
 
@@ -186,10 +186,9 @@ sh example script
       date                              # show current date and time
 
       wifi sta ifconfig                 # sta ip config status
-      uhttpd start &                    # start http server as thread
-
+      
       :salir                            # If error label target
-      echo error
+      echo salir
       wifi sta off                      # disable nic
 
       exit
