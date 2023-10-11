@@ -21,7 +21,7 @@ proc=None
 
 labels={}
 
-def run(ssf, label):
+def run(ssf, lbl_ln):
     line=0
     
     with open(ssf,'r') as f:
@@ -32,12 +32,12 @@ def run(ssf, label):
         while True:
             lin = f.readline()
             if not lin:
-                if ltf!="": print(f"Label {ltf} not found, ending")
+                if ltf!="": print(f"sh - Label {ltf} not found, ending")
                 break
             
             line+=1
 
-            if label > 0 and line <= label: # Skip lines for goto label command
+            if lbl_ln > 0 and line <= lbl_ln: # Skip lines for goto label command
                 continue
 
             if skip_lines > 0: # Skip lines forward in skip command
@@ -81,8 +81,8 @@ def run(ssf, label):
                     ltf=acca
                     continue
                 else:
-                    label=labels[acca]
-                    return label
+                    lbl_ln=labels[acca]
+                    return lbl_ln
             # Conditional execution: if $0 == 5 return (ex.)
             elif cmdl[:3] =="if ":
                 tmp = cmdl.split()
@@ -108,8 +108,8 @@ def run(ssf, label):
                     acca = tmp[5] # action arg
                     
                 if arg1=="" or arg2=="" or acc=="":
-                    print(f"Invalid args: {cmdl[:-1]}")
-                    print(f"Values: {tmp}")
+                    print(f"sh - Invalid args: {cmdl[:-1]}")
+                    print(f"sh - Values: {tmp}")
                     return 0
                 
                 #res = eval('"' + arg1 + '"' + op + '"' + arg2 + '"')
@@ -124,8 +124,8 @@ def run(ssf, label):
                             ltf=acca
                             continue
                         else:
-                            label=labels[acca]
-                            return label # return the label line number, and rerun the script 
+                            lbl_ln=labels[acca]
+                            return lbl_ln # return the label line number, and rerun the script 
                        
                     if acc == "return": break
                     
@@ -157,12 +157,12 @@ def __main__(args):
     
     # Run shell script file
     if utls.file_exists(ssf):
-        label=0 
+        lbl_ln=0 
         while True:
-            label = run(ssf, label) # Call script once on every label
-            # if label = 0 then end the script
-            # if label <> 0 then goto statement in course
-            if label==0:
+            lbl_ln = run(ssf, lbl_ln) # Call script once on every label
+            # if lbl_ln = 0 then end the script
+            # if lbl_ln <> 0 then goto statement in course
+            if lbl_ln==0:
                 break   
     else:
         print(f"{ssf}: script not found")
