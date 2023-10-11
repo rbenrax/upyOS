@@ -22,7 +22,7 @@ def __main__(args):
     
     if mode=="-p":
         d={"total": t, "alloc": a, "free": f, "%": p, "s": s}
-        print(d)
+        utls.setenv("0", d)
     elif mode == "-h":
         print(f'\033[0mTotal:\033[1m {utls.human(t)}')
         print(f'\033[0mAlloc:\033[1m {utls.human(a)}')

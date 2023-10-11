@@ -25,7 +25,7 @@ def __main__(args):
 
     if mode=="-p":
         d={"total": t, "used": u, "free": f}
-        print(d) 
+        utls.setenv("0", d) 
     elif mode=="-h":
         print(f'\033[0mTotal space:\033[1m {utls.human(t)}')
         print(f'\033[0mUsed space.:\033[1m {utls.human(u)}')
