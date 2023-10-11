@@ -194,6 +194,8 @@ sh example script
 
       exit
 
+Script execution in boot:
+![upyos06](media/upyos_06.png )
 
 TODO List:
 - Add diff, tar, uname, read and other usefull commands.
