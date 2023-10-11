@@ -31,7 +31,10 @@ def run(ssf, label):
         
         while True:
             lin = f.readline()
-            if not lin: break
+            if not lin:
+                if ltf!="": print(f"Label {ltf} not found, ending")
+                break
+            
             line+=1
 
             if label > 0 and line <= label: # Skip lines for goto label command
@@ -48,14 +51,16 @@ def run(ssf, label):
             global labels
             #print(cmdl)
             if cmdl[0]==":":
-                if ltf==cmdl[1:]:
+                #print(ltf, cmdl[1:-1])
+                if ltf==cmdl[1:-1]:
+                    #print("encontrada")
                     ltf=""
-                else:
-                    continue
                 
                 labels[cmdl[1:-1]]=line # Save labels and his line
                 #print(labels)
-                continue
+                continue # Lbels are not procesed
+            
+            if ltf != "": continue # looking for a label
             
             # Unconditional commands
             # End script
@@ -103,14 +108,19 @@ def run(ssf, label):
                     acca = tmp[5] # action arg
                     
                 #res = eval('"' + arg1 + '"' + op + '"' + arg2 + '"')
+                #print(tmp)
                 res = eval(arg1 + " " + op + " " + arg2)
                 
                 #print(f"{line}: {cmdl[:-1]} {res=}")
 
                 if res: # Eval result
                     if acc == "goto":
-                        label=labels[acca]
-                        return label # return the label line number, and rerun the script 
+                        if not acca in labels:
+                            ltf=acca
+                            continue
+                        else:
+                            label=labels[acca]
+                            return label # return the label line number, and rerun the script 
                        
                     if acc == "return": break
                     
