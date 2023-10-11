@@ -196,6 +196,18 @@ sh example script
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
 
+And loops!:
+
+      :cont
+      incr a
+      if $a <= 5 goto cont
+      echo $a
+
+      :cont2
+      decr a
+      if $a > 4 goto cont2
+      echo $a
+
 TODO List:
 - Add diff, tar, uname, read and other usefull commands.
 - Bluetooth support
