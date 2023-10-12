@@ -4,7 +4,7 @@ import sdata
 def __main__(args):
 
     if len(args) == 0:
-        print ("Wait for for a process end\nUsage: wait <pid>")
+        print ("Wait for a process to finish\nUsage: wait <pid>")
         return
 
     sleep(0.100)
