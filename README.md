@@ -61,7 +61,7 @@ Directories structure:
 
       /bin        Commands and shell scripts
       /etc        Configuration files
-      /extlib     External libraries
+      /libx       External libraries
       /lib        System implementations libraries
       /opt        Specific solution or add-on programs (not in path)
       /tmp        Temporary directory (to put what you don't know where to put :-)
