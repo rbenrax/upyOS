@@ -181,7 +181,7 @@ sh example script
 
       wifi sta status                   # save two env vars with the status status
       if $0 == 0 goto salir             # $0 = enabled/disabled
-      if $1 == 0 goto salir             # $1 = enabled/disabled
+      if $1 == 0 goto salir             # $1 = connected/disconnected
 
       ntpupdate es.pool.ntp.org         # ntp time update
       date                              # show current date and time
