@@ -69,10 +69,11 @@ Directories structure:
 
 Internals commands:
 
-- r:      Repeat last command
-- ps:     Show (alternative) process status
-- kill:   Kill (alternative) process
-- exit:   Exit to Micropython shell
+- r:       Repeat last command
+- ps:      Show process status
+- kill:    Kill a process by pid
+- killall: kill all process [or process by name]
+- exit:    Exit to Micropython shell
 
 Actual external commands:
 
