@@ -49,10 +49,11 @@ class upyOS:
             #"ps": self.ps,
             #"kill": self.kill,
             #"killall": self.killall,
+            #"exit" : self.exit,
             "loadconfig": self.loadconfig,
             "loadboard": self.loadboard,
-            "r": self.last_cmd,
-            "exit" : self.exit
+            "r": self.last_cmd
+            
         }
 
         # Clean screen and boot
@@ -91,7 +92,8 @@ class upyOS:
                 self.run_cmd(user_input)
                 
             except KeyboardInterrupt:
-                self.exit()
+                self.run_cmd("poweroff")
+                #self.exit()
 
             except EOFError:
                 self.print_msg("Send EOF")
@@ -229,29 +231,29 @@ class upyOS:
         self.run_cmd(self.prev_cmd)
 
     # System exit
-    def exit(self):
-
-        if not sdata.debug:
-            s=input("\nExit upyOS S/[N] : ")
-            if s.upper()!="S": return
-
-        # Stop threads before exit
-        if len(sdata.procs)>0:
-            print("\nStoping process...")
-            
-            self.killall("")
-            while True:
-                end=True
-                for p in sdata.procs:
-                    if p.isthr: end=False
-                if end: break
-                utime.sleep(.5)
-
-        self.print_msg("Shutdown upyOS..., bye.")
-        print("")
-        
-        #raise SystemExit
-        sys.exit()
+#    def exit(self):
+#
+#        if not sdata.debug:
+#            s=input("\nExit upyOS S/[N] : ")
+#            if s.upper()!="S": return
+#
+#        # Stop threads before exit
+#        if len(sdata.procs)>0:
+#            print("\nStoping process...")
+#            
+#            self.killall("")
+#            while True:
+#                end=True
+#                for p in sdata.procs:
+#                    if p.isthr: end=False
+#                if end: break
+#                utime.sleep(.5)
+#
+#        self.print_msg("Shutdown upyOS..., bye.")
+#        print("")
+#        
+#        #raise SystemExit
+#        sys.exit()
         
     def print_msg(self, message):
         print(f"\n\033[1;37;44m->{message}\033[0m")

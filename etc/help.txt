@@ -39,7 +39,7 @@ main.py         Micropython statup file (boot system)
     /opt        Specific solution or add-on programs (not in path)
     /tmp        Temporary directory (to put what you don't know where to put :-)
 
-Shell script b asic language:
+Shell script basic language:
 
 Conditional execution:
 if <arg1> <comparison operator> <arg2> <action> <acc arg>
@@ -59,9 +59,6 @@ Unconditional execution:
    
 Internals commands:
 
-ps:         Show process status
-kill:       Kill process by pid
-killall:    Kill process by name
 loadconfig: Load system config file
 loadboard:  Load board interfaces configuration file
 r:          Repeat last command
