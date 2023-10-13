@@ -48,7 +48,7 @@ class upyOS:
         self.user_commands = {
             #"ps": self.ps,
             #"kill": self.kill,
-            "killall": self.killall,
+            #"killall": self.killall,
             "loadconfig": self.loadconfig,
             "loadboard": self.loadboard,
             "r": self.last_cmd,
