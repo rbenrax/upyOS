@@ -1,18 +1,17 @@
 import sdata
-import utime
 
 def __main__(args):
 
-    print("This command should be analized, caos")
-    return
+    pid="0"
+        
+    if len(args) > 0:
+        if args[0] == "--h":
+            print("Kill a process by pid: kill <pid>")
+            return
+        else:
+            pid=args[0]
 
-    if len(args) == 0:
-        print("Kill process\nUsage: kill <pid>")
-        return
-    
-    # Kill process
-    for i in sdata.procs:
-        if i.pid == int(args[0]):
-            i.sts="S"
-            utime.sleep(.2)
-            break
+        for i in sdata.procs:
+            if pid.isdigit() and i.pid == int(pid):
+                i.sts="S"
+                break

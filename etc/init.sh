@@ -10,8 +10,8 @@
 cat /etc/wellcome.txt
 < "\033[0m", end=""
 
-loadboard    # You can choose do not load or use another board configuration, without param default
-#loadboard /etc/upyOS-esp32c3.board
+#loadboard    # You can choose do not load or use another board configuration, without param default
+loadboard /etc/upyOS-esp32c3.board
 #loadboard /etc/upyOS-esp32-wroom-32.board
 
 < "\\n"

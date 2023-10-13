@@ -46,8 +46,8 @@ class upyOS:
 
         # Internal Commands definition
         self.user_commands = {
-            "ps": self.ps,
-            "kill": self.kill,
+            #"ps": self.ps,
+            #"kill": self.kill,
             "killall": self.killall,
             "loadconfig": self.loadconfig,
             "loadboard": self.loadboard,
@@ -207,17 +207,17 @@ class upyOS:
 #    def unset(self, var=""):
 #        utls.unset(var)
 
-    def ps(self):
-        if len(sdata.procs)>0:
-            print(f"  Proc Sts     Init_T   Elapsed   Thread_Id   Cmd/Args")
-            for i in sdata.procs:
-                print(f"{i.pid:6}  {i.sts:3}  {i.stt:8}  {utime.ticks_ms() - i.stt:8}  {i.tid:10}   {i.cmd} {" ".join(i.args)}")
+#    def ps(self):
+#        if len(sdata.procs)>0:
+#            print(f"  Proc Sts     Init_T   Elapsed   Thread_Id   Cmd/Args")
+#            for i in sdata.procs:
+#                print(f"{i.pid:6}  {i.sts:3}  {i.stt:8}  {utime.ticks_ms() - i.stt:8}  {i.tid:10}   {i.cmd} {" ".join(i.args)}")
                 
-    def kill(self, pid="0"):
-        for i in sdata.procs:
-            if pid.isdigit() and i.pid == int(pid):
-                i.sts="S"
-                break
+#    def kill(self, pid="0"):
+#        for i in sdata.procs:
+#            if pid.isdigit() and i.pid == int(pid):
+#                i.sts="S"
+#                break
                 
     def killall(self, pn=""):
         for i in sdata.procs:
