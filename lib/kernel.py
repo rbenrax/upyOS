@@ -63,7 +63,7 @@ class upyOS:
 
         if not "env" in sdata.sysconfig:
             sdata.sysconfig={"ver"     : 1.0,
-                           "aliases" : {"edit": "vi"},
+                           "aliases" : {"": ""},
                            "pfiles"  : ["/boot.py","/main.py"],
                            "env"     : {"TZ": "+2", "?": "", "0": ""}
                            }
