@@ -69,15 +69,14 @@ Directories structure:
 
 Internals commands:
 
-- r:       Repeat last command
-- ps:      Show process status
-- kill:    Kill a process by pid
-- killall: kill all process [or process by name]
-- exit:    Exit to Micropython shell
+- loadconfig: Load system config file
+- loadboard:  Load board interfaces configuration file
+- r:          Repeat last command
+- exit:       Exit to Micropython shell
 
 Actual external commands:
 
-cat, cd, clear, cp, cpufreq, df, echo, env, exit, export, fileup, find, free, grep, help, i2cscan, ifconfig, iperf3, kill, led, ls, lshw, lsmod, mi, mkdir, mv, ping, ps, pwd, reboot, recovery, rm, rmdir, rmmod, sh, touch, uhttpd, unset, uptime, utelnetd, vi, wait, watch, wget, wifi
+cat, cd, clear, cp, cpufreq, date, decr, df, echo, env, export, fileup, find, free, grep, help, i2cscan, ifconfig, incr, iperf3, kill, killall, led, ls, lshw, lsmod, mi, mkdir, mv, ntpupdate, ping, ps, pwd, read, reboot, recovery, reset, rm, rmdir, rmmod, sensors, sh, si, sleep, test, touch, uhttpd, unset, uptime, vi, wait, watch, wget, wifi.inf, wifi
 
 esp32-c3
 ![luatos](media/luatos_CORE-ESP32_pinout.webp)
