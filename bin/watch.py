@@ -18,14 +18,19 @@ def __main__(args):
         cmd=" ".join(args)
         
     while True:
-        print(f"\033[2J\033[HEvery: {t}s: {cmd}")
-        proc.syscall.run_cmd(cmd)
-        utime.sleep(t)
+        
         if proc.sts=="S":break
         
         if proc.sts=="H":
             utime.sleep(1)
             continue
+        
+        print(f"\033[2J\033[HEvery: {t}s: {cmd}")
+        proc.syscall.run_cmd(cmd)
+        utime.sleep(t)
+        
+        
+
 
 
         
