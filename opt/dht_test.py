@@ -3,6 +3,7 @@
 import dht
 from machine import Pin
 from time import sleep
+import utime
 
 from utls import getgpio
 
@@ -16,6 +17,10 @@ def __main__(args):
       try:
         
         if proc.sts=="S":break
+        
+        if proc.sts=="H":
+            utime.sleep(1)
+            continue
         
         sleep(2)
         sensor.measure()

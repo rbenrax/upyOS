@@ -16,6 +16,11 @@ def __main__(args):
     
     for i in range(20):
         if proc and proc.sts=="S": break # if Thread, stop instruction
+        
+        if proc.sts=="H":
+            utime.sleep(1)
+            continue
+        
         print(i)
         utime.sleep(2)
 

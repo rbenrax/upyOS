@@ -3,6 +3,7 @@
 
 import utime
 from _thread import get_ident
+import utime
 
 # Current process refeference (passed in call)
 proc=None
@@ -17,6 +18,10 @@ def __main__(args):
 
         if proc.sts=="S":break
 
+        if proc.sts=="H":
+            utime.sleep(1)
+            continue
+        
 if __name__ == "__main__":
     args =[""]
     __main__(args)

@@ -4,6 +4,7 @@
 import uasyncio
 import machine
 import sys
+import utime
 
 # Current process refeference (passed in call)
 proc=None
@@ -12,6 +13,10 @@ async def blink(led, period_ms):
     while True:
         
         if proc.sts=="S":break
+        
+        if proc.sts=="H":
+            utime.sleep(1)
+            continue
 
         led.on()
         await uasyncio.sleep_ms(5)

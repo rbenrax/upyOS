@@ -222,6 +222,10 @@ class MicroWebSrv :
                 if self.proc and self.proc.sts=="S":
                     self.Stop()
                     break
+                
+                if self.proc and self.proc.sts=="H":
+                    utime.sleep(1)
+                    continue
 
                 client, cliAddr = self._server.accept()
             except :

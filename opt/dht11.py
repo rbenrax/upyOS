@@ -3,6 +3,7 @@
 from machine import Pin
 from time import sleep
 import dht
+import utime
 
 proc=None
 
@@ -17,6 +18,10 @@ def __main__(args):
         try:
         
             if proc and proc.sts == "S": break # If thread, stop instruction
+            
+            if proc.sts=="H":
+                utime.sleep(1)
+                continue
 
             sleep(2)
             sensor.measure()

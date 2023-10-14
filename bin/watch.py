@@ -22,6 +22,10 @@ def __main__(args):
         proc.syscall.run_cmd(cmd)
         utime.sleep(t)
         if proc.sts=="S":break
+        
+        if proc.sts=="H":
+            utime.sleep(1)
+            continue
 
 
         
