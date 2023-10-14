@@ -3,6 +3,7 @@ import utime
 import sys
 
 import utls
+import sdata
 
 proc=None
 
@@ -13,6 +14,8 @@ def __main__(args):
         return
     
     try:
+        
+        it=utime.time() # Time from bootup if not updated
         
         tz = int(utls.getenv("TZ"))
         
@@ -41,6 +44,13 @@ def __main__(args):
         # Configurar la nueva fecha y hora en el RTC
         #print(f"P1{y} {mo} {d} {nh} {nm} {ns}")
         rtc.datetime((y, mo, d, 0, nh, nm, ns, 0))
+        
+        if it<100000: # Regularize times
+            nwt=utime.time()
+            sdata.initime=nwt - it
+            
+            for p in sdata.procs:
+                p.stt=nwt - it
         
         del sys.modules["ntptime"]
         
