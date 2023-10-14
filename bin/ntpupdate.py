@@ -47,10 +47,11 @@ def __main__(args):
         
         if it<100000: # Regularize times
             nwt=utime.time()
+            
             sdata.initime=nwt - it
             
             for p in sdata.procs:
-                p.stt=nwt - it
+                p.stt=nwt - (it + p.stt)
         
         del sys.modules["ntptime"]
         
