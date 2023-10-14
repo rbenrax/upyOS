@@ -93,5 +93,5 @@
 #uhttpd start &
 
 # Exit form OS to python REPL
-#exit
+#poweroff
 

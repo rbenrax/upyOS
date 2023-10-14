@@ -51,7 +51,7 @@ def __main__(args):
             sdata.initime=nwt - it
             
             for p in sdata.procs:
-                p.stt=nwt - (it + p.stt)
+                p.stt=nwt - (it - p.stt)
         
         del sys.modules["ntptime"]
         
