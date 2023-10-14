@@ -50,6 +50,7 @@ class upyOS:
             #"kill": self.kill,
             #"killall": self.killall,
             #"exit" : self.exit,
+            "halt": self.halt,
             "loadconfig": self.loadconfig,
             "loadboard": self.loadboard,
             "r": self.last_cmd
@@ -258,6 +259,9 @@ class upyOS:
     def print_msg(self, message):
         print(f"\n\033[1;37;44m->{message}\033[0m")
         # Load system configuration and board definitions
+     
+    def halt(self):
+        sys.exit()
      
     def loadconfig(self, conf="/etc/system.conf"):
         if utls.file_exists(conf):

@@ -17,7 +17,7 @@ class Proc:
         self.ext   = ""               # File extention / Call type
         self.cmd   = ""               # Command
         self.args  = ""               # Arguments
-        self.stt   = utime.ticks_ms() # Start time
+        self.stt   = utime.time()     # Start time
         self.sts   = "S"              # Process status
         self.rmmod = True             # Remove module ant end?, default True
         self.isthr = False
