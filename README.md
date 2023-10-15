@@ -154,7 +154,7 @@ example.sh
       < "Option 1 160MHz"
       < "Option 2 240Mhz"
       < "Option 3 return"
-      < "Option 0 poweroff"
+      < "Option 0 exit"
       < ""
       echo "Last option: " $v1
       read v1 "Enter option: "
@@ -162,7 +162,7 @@ example.sh
       if $v1 == 2 cpufreq 240
       if $v1 == 3 return
       if $v1 != 0 goto loop
-      poweroff
+      exit
 
 sh example script
 
@@ -190,7 +190,7 @@ sh example script
       echo salir
       wifi sta off                      # disable nic
 
-      poweroff
+      exit
 
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
