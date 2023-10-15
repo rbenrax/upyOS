@@ -8,10 +8,7 @@ def __main__(args):
     print(f"Hello World: {args=}")
     proc.syscall.print_msg(f"Hello World from syscall: {args=}")
     
-    sysconfig=proc.syscall.getconf()
-    #print(sysconfig)
-    
-    for i in range(20):
+    for i in range(50):
         if proc and proc.sts=="S": break # if Thread, stop instruction
         
         if proc.sts=="H":
