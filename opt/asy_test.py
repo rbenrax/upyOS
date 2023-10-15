@@ -15,7 +15,8 @@ async def blink(led, period_ms):
         if proc.sts=="S":break
         
         if proc.sts=="H":
-            utime.sleep(1)
+            #utime.sleep(1)
+            await uasyncio.sleep(1)
             continue
 
         led.on()
