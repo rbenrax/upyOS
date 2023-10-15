@@ -8,9 +8,6 @@ def __main__(args):
     print(f"Hello World: {args=}")
     proc.syscall.print_msg(f"Hello World from syscall: {args=}")
     
-    board=proc.syscall.getboard()
-    #print(board)
-    
     sysconfig=proc.syscall.getconf()
     #print(sysconfig)
     
