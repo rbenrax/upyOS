@@ -50,7 +50,7 @@ class upyOS:
             #"kill": self.kill,
             #"killall": self.killall,
             "exit" : self.exit,
-            "halt": self.halt,
+            #"halt": self.halt,
             "loadconfig": self.loadconfig,
             "loadboard": self.loadboard,
             "r": self.last_cmd
@@ -263,8 +263,8 @@ class upyOS:
         print(f"\n\033[1;37;44m->{message}\033[0m")
         # Load system configuration and board definitions
      
-    def halt(self):
-        sys.exit()
+#    def halt(self):
+#        sys.exit()
      
     def loadconfig(self, conf="/etc/system.conf"):
         if utls.file_exists(conf):
@@ -281,11 +281,11 @@ class upyOS:
         else:
             print(f"{board} not found")
 
-    def getconf(self):
-        return sdata.sysconfig
+#    def getconf(self):
+#        return sdata.sysconfig
 
-    def getboard(self):
-        return sdata.board
+#    def getboard(self):
+#        return sdata.board
 
 # - -  
 if __name__ == "__main__":

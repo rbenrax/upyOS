@@ -31,7 +31,7 @@ class Proc:
         try:
 
             sdata.procs.append(self)
-            utls.setenv("_", str(self.pid))
+            utls.setenv("#", str(self.pid))
             #print(f"{len(sdata.procs)=}")
 
             if self.isthr:
