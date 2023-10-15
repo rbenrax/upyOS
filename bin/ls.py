@@ -43,8 +43,8 @@ def info(path="", mode="-l"):
         ssize = f"{size:7}"
         
     if not "n" in mode:
-        print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} " + \
-              f"{localtime[2]:0>2} {localtime[4]:0>2} {localtime[5]:0>2} {filename}")
+        print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} {localtime[2]:0>2} " + \
+              f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
           
     return size
 
