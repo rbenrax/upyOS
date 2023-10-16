@@ -44,7 +44,7 @@ def info(path="", mode="-l"):
         
     if not "n" in mode:
         
-        if "x" in mode: # Extended
+        if "d" in mode: # Extended
             print(f"{fattr} {ssize} {localtime[0]:>4} {localtime[1]:0>2} {localtime[2]:0>2} " + \
                   f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
         else:
@@ -59,11 +59,6 @@ def ls(path="", mode="-l"):
     if "-" in path:
         mode = path
         path=""
-
-    if "--h" in mode:
-        print("List files and directories, ls <path> <options>, --h -lhasnk")
-        print("-h: human readable, -a: incl. hidden, -s: subdirectories, -k: no totals, -n: no file details, -x: extended view")
-        return
 
     cur_dir=uos.getcwd()
     #print("0", cur_dir)
@@ -106,29 +101,22 @@ def ls(path="", mode="-l"):
     
     return tsize
 
-def help():
-    print("List files, ls <path> <options>: [-lahnkx --h] (list, hidden, human, no details, no totals, extended) ")
-    
 def __main__(args):
 
     path=""
     mode="-l"
 
-    if len(args)>1:
-        if "--h" in args:
-            help()
-            return
+    if "--h" in args:
+        print("List files and directories, ls <path> <options>, --h -lhasnkd")
+        print("-h: human readable, -a: incl. hidden, -s: subdirectories, -k: no totals, -n: no file details, -d: full date")
+        return
 
+    if len(args)>1:
         path=args[0]
         mode=args[1]
-
     elif len(args)==1:
        path=args[0]
         
     ls(path, mode)
 
-#if __name__ == "__main__":
-
-#    args = ["", "-l"]
-#    __main__(args)
 
