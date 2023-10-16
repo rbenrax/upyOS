@@ -56,10 +56,6 @@ def info(path="", mode="-l"):
 
 def ls(path="", mode="-l"):
 
-    if "-" in path:
-        mode = path
-        path=""
-
     cur_dir=uos.getcwd()
     #print("0", cur_dir)
     
@@ -104,19 +100,27 @@ def ls(path="", mode="-l"):
 def __main__(args):
 
     path=""
-    mode="-l"
+    mod="-l"
 
     if "--h" in args:
         print("List files and directories, ls <path> <options>, --h -lhasnkd")
         print("-h: human readable, -a: incl. hidden, -s: subdirectories, -k: no totals, -n: no file details, -d: full date")
         return
 
-    if len(args)>1:
-        path=args[0]
-        mode=args[1]
-    elif len(args)==1:
-       path=args[0]
+    if len(args)==1:
+        if "-" in args[0]:
+            mod=args[0]
+        else:
+            path=args[0]
+            
+    elif len(args)>1:
+        if "-" in args[0]:
+            mod = args[0]
+            path = args[1]
+        else:
+            mod = args[1]
+            path = args[0]
         
-    ls(path, mode)
+    ls(path, mod)
 
 
