@@ -178,16 +178,16 @@ sh example script
       wifi sta connect DIGIFIBRA-cGPRi password 10 # Connect to wifi router <ssid> <password> <timeout>
 
       wifi sta status                   # save two env vars with the status status
-      if $0 == 0 goto salir             # $0 = enabled/disabled
-      if $1 == 0 goto salir             # $1 = connected/disconnected
+      if $0 == 0 goto exit             # $0 = enabled/disabled
+      if $1 == 0 goto exit             # $1 = connected/disconnected
 
       ntpupdate es.pool.ntp.org         # ntp time update
       date                              # show current date and time
 
       wifi sta ifconfig                 # sta ip config status
       
-      :salir                            # If error label target
-      echo salir
+      :exit                            # If error label target
+      echo exit
       wifi sta off                      # disable nic
 
       exit
