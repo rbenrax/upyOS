@@ -44,12 +44,12 @@ def info(path="", mode="-l"):
         
     if not "n" in mode:
         
-        if "x" in mode:
-            print(f"{fattr} {ssize} {localtime[0]:>4} {utls.MONTH[localtime[1]]} {localtime[2]:0>2} " + \
+        if "x" in mode: # Extended
+            print(f"{fattr} {ssize} {localtime[0]:>4} {localtime[1]:0>2} {localtime[2]:0>2} " + \
                   f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
         else:
             print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} {localtime[2]:0>2} " + \
-                  f"{localtime[3]:0>2}:{localtime[4]:0>2} {filename}")
+                  f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
           
     return size
 
