@@ -62,7 +62,7 @@ def ls(path="", mode="-l"):
 
     if "--h" in mode:
         print("List files and directories, ls <path> <options>, --h -lhasnk")
-        print("-h: human readable, -a: incl. hidden, -s: subdirectories, -k: no totals, -n: no file details")
+        print("-h: human readable, -a: incl. hidden, -s: subdirectories, -k: no totals, -n: no file details, -x: extended view")
         return
 
     cur_dir=uos.getcwd()
