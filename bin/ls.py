@@ -43,8 +43,13 @@ def info(path="", mode="-l"):
         ssize = f"{size:7}"
         
     if not "n" in mode:
-        print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} {localtime[2]:0>2} " + \
-              f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
+        
+        if "x" in mode:
+            print(f"{fattr} {ssize} {localtime[0]:>4} {utls.MONTH[localtime[1]]} {localtime[2]:0>2} " + \
+                  f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
+        else:
+            print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} {localtime[2]:0>2} " + \
+                  f"{localtime[3]:0>2}:{localtime[4]:0>2} {filename}")
           
     return size
 
@@ -102,7 +107,7 @@ def ls(path="", mode="-l"):
     return tsize
 
 def help():
-    print("List files, ls <path> <options>: [-lahnk --h] (list, hidden, human, no details, no totals) ")
+    print("List files, ls <path> <options>: [-lahnkx --h] (list, hidden, human, no details, no totals, extended) ")
     
 def __main__(args):
 
