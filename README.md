@@ -1,16 +1,11 @@
-# upyOS (formerly rbenrax/smolOS)
+# upyOS
 
-The project already has enough changes to propose a name change, the new name will be upyOS.
-
-upyOS - a tiny and simple operating system for MicroPython (targetting ESP8266, RP2040, etc.) giving the user POSIX-like environment, originally developed by Krzysztof Krystian Jankowski and adapted by me.
+upyOS is a modular flash Operating System for microcontrollers based in Micropython, giving the user POSIX-like environment, original idea by Krzysztof Krystian Jankowski and adapted by me.
 
 [smolOS original github site](https://github.com/w84death/smolOS/tree/main)
 
-[smolos docs site](http://smol.p1x.in/os/)
 
-
-This is a implementation tested over ESP32-C3, ESP8266 and YD-2040 by rbenrax.
-The target is to get a common base to use stand alone microcontroller, and fun using it. 
+The target is to get a common modular base to use stand alone microcontroller, and fun using it. 
 
 Secreenshots of rp2040 module running upyOS:
 
