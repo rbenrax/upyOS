@@ -1,11 +1,11 @@
 # upyOS
 
-upyOS is a modular flash Operating System for microcontrollers based in Micropython, giving the user POSIX-like environment, original idea by Krzysztof Krystian Jankowski and adapted by me.
+upyOS is a modular flash Operating System for microcontrollers based on Micropython, giving the user POSIX-like environment, original idea by Krzysztof Krystian Jankowski and adapted by me.
 
 [smolOS original github site](https://github.com/w84death/smolOS/tree/main)
 
 
-The target is to get a common modular base to use stand alone microcontroller, and fun using it. 
+The target is to get a common modular base to use stand alone microcontroller, avoiding monolithics programs, reuse modules and fun using it. 
 
 Secreenshots of rp2040 module running upyOS:
 
