@@ -16,8 +16,11 @@ def __main__(args):
                 print(f"Temp: {tf:d}F/{tc:.1f}C")
 
                 print(f"Hall: {esp32.hall_sensor()}")
-    except ValueError as ve:
-        print(ve)
+                
+    except OSError as ve:
+        if sdata.debug:
+            print(ve)
+        pass
         
         
 
