@@ -250,7 +250,7 @@ class upyOS:
                 utime.sleep(.5)
                 
         # Launch shutdown script
-        if utls.file_exists("/etc/down.sh") and not "-r" in boot_args:
+        if utls.file_exists("/etc/down.sh"):
             self.run_cmd("sh /etc/down.sh")
 
         self.print_msg("Shutdown upyOS..., bye.")

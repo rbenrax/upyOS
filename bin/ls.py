@@ -24,6 +24,7 @@ def info(path="", mode="-l"):
 
     if utls.isdir(path):
         fattr= "d"
+        if size > 1000000: size = 0  # TODO: Correct hudge size in dirs
     else:
         fattr= " "
 
@@ -43,7 +44,7 @@ def info(path="", mode="-l"):
         ssize = f"{size:7}"
         
     if not "n" in mode:
-        
+       
         if "d" in mode: # Extended
             print(f"{fattr} {ssize} {localtime[0]:>4} {localtime[1]:0>2} {localtime[2]:0>2} " + \
                   f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
