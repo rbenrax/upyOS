@@ -22,13 +22,9 @@ Secreenshots of esp32c3 module running upyOS:
 ![upyos05](media/upyos_05.png )
 
 
-upyOS Help:
+upyOS explanation:
 
-Adapted by rbenrax, source available in https://github.com/rbenrax/upyOS, based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
-
-Explanation:
-
-The objective is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of more simple programs that can be complemented in a more flexible way, obviously at the cost of lower performance and efficiency, but giving more facilities for those who start using microcontrollers.
+The target is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of more simple programs that can be complemented in a more flexible way, obviously at cost of lower performance and efficiency, but giving more facilities and flexibility for those who start using microcontrollers.
 
 In main.py we can launch grub or upyOS directly (see files).
 
@@ -38,15 +34,15 @@ In upyOS boot, two shell scripts are executed, init.sh and rc.local, init.sh wil
 
 Exists internal and external commands, and internal and externals shell scripts, internal located in /bin directory and are exceuted without extention, external can be located in any directory and are executed directly, external commands are self-explanatory and some have help (--h).
 
-The system can be extended with more external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough.
+The system can be extended with more external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough, every program to be executed must define a "def __main__(args):" function.
 
 The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, environment variables, etc., allowing access to these parameters between programs and scripts.
 
-If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa.
+If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa, alternatively on any moment the os can be loaded in recovery mode by sending "import upyos" command.
 
 RP2040 has only two threads and is limited to this number, but ESP32 and others may have more. Python programs can be submitted in a separate thread by ending the command with '&' symbol, and asyncio programs may also be used."
 
-Threads may be stopped by kill command, but then must be controlled in main loop inside the procces, see examples in /opt directory.
+Threads may be stopped by kill/killall commands, but then must be controlled in main loop inside the program, see examples in /opt directory.
 
 I hope it is useful for you!, there are things to do, and to improve.
 
