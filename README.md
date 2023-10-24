@@ -78,13 +78,13 @@ GOOUUU ESP32 WROOM-32
 ![ESP32](media/ESP32-38-Pin-Pinout.jpg)
 
 NodeMCU
-![NodeMCU esp8266](media/Node-MCU-Pinout.png )
+![NodeMCU esp8266](media/Node-MCU-Pinout.png)
 
 YD-ESP32-C3
-![YD-ESP32-C3](media/media/YD-ESP32-C3-Pinout.jpg)
+![YD-ESP32-C3](media/YD-ESP32-C3-Pinout.jpg)
 
 YD-ESP32-S3 with 8Mb PSRAM
-![YD-ESP32-S3](media/media/YD-ESP32-S3-Pinout.jpg)
+![YD-ESP32-S3](media/YD-ESP32-S3-Pinout.jpg)
 
 
 Actual Development:
