@@ -68,6 +68,8 @@ Actual external commands:
 
 cat, cd, clear, cp, cpufreq, date, decr, df, echo, env, export, fileup, find, free, grep, help, i2cscan, ifconfig, incr, iperf3, kill, killall, led, ls, lshw, lsmod, mi, mkdir, mv, ntpupdate, ping, ps, pwd, read, reboot, recovery, reset, rm, rmdir, rmmod, sensors, sh, si, sleep, test, touch, uhttpd, unset, uptime, vi, wait, watch, wget, wifi.inf, wifi
 
+Tested Boards:
+
 esp32-c3
 ![luatos](media/luatos_CORE-ESP32_pinout.webp)
 
