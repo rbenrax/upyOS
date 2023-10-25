@@ -19,8 +19,14 @@ def __main__(args):
             #ftp.stop()
             #del sys.modules["ftptiny"]
             proc.syscall.run_cmd("killall uftpd")
-            #proc.syscall.run_cmd("wget http://localhost:21")
+            
+            #False connection to close de thread
+            import socket
+            sock = socket.socket()
+            sock.connect(("127.0.0.1", 21))
+            sock.close()
             del sys.modules["ftp"]
+
         else:
             print("Invalid argument")
     else:
