@@ -19,7 +19,7 @@ def __main__(args):
             #ftp.stop()
             #del sys.modules["ftptiny"]
             proc.syscall.run_cmd("killall uftpd")
-            proc.syscall.run_cmd("wget http://localhost:21")
+            #proc.syscall.run_cmd("wget http://localhost:21")
             del sys.modules["ftp"]
         else:
             print("Invalid argument")
