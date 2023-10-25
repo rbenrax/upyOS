@@ -211,7 +211,7 @@ def ftpserver(proc, port=21, timeout=None):
                                    format(addr.replace('.', ','), DATA_PORT >> 8,
                                           DATA_PORT % 256))
                         dataclient, data_addr = datasocket.accept()
-                        print("FTP Data connection from:", data_addr)
+                        #print("FTP Data connection from:", data_addr)
                         DATA_PORT = 13333
                         active = False
                     elif command == "PORT":
@@ -226,7 +226,7 @@ def ftpserver(proc, port=21, timeout=None):
                                                        socket.SOCK_STREAM)
                             dataclient.settimeout(10)
                             dataclient.connect((data_addr, DATA_PORT))
-                            print("FTP Data connection with:", data_addr)
+                            #print("FTP Data connection with:", data_addr)
                             cl.sendall('200 OK\r\n')
                             active = True
                         else:
