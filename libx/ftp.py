@@ -143,7 +143,7 @@ def ftpserver(proc, port=21, timeout=None):
             print("No active connection")
             return
 
-    print("FTP Server started on ", addr)
+    #print("FTP Server started on ", addr)
     try:
         dataclient = None
         fromname = None
