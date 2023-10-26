@@ -41,13 +41,15 @@ import sdata
  #network.STAT_NO_AP_FOUND 201
  #network.STAT_WRONG_PASSWORD 202
 
-def psts(nic, aif):
+def psts(mods, nic, aif):
 
-    print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({aif.status()})')
-    if nic=="sta":
-        print (f"wifi {nic}: {'Connected' if aif.isconnected() else 'Not connected'}")
-    else: # ap
-        print (f"wifi {nic}: {'Client connected' if aif.isconnected() else 'No Client connected'}")
+    if not "-n" in mods:
+        print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({aif.status()})')
+
+        if nic=="sta":
+            print (f"wifi {nic}: {'Connected' if aif.isconnected() else 'Not connected'}")
+        else: # ap
+            print (f"wifi {nic}: {'Client connected' if aif.isconnected() else 'No Client connected'}")
         
     if aif.active():
         setenv("0", "1")
@@ -84,14 +86,19 @@ def __main__(args):
         print("\twifi --info parm info")
         return
 
-    for a in args:
-        if "--info" in a:
-            with open("/bin/wifi.inf", 'r') as f:
-                while True:
-                    lin = f.readline()
-                    if not lin: break
-                    print(lin, end="")
-            return
+    mods=[]
+
+    for a in args:      # adds modifiers
+        if a[0] == "-":
+            mods.append(a)
+            
+    if "--info" in mods:
+        with open("/bin/wifi.inf", 'r') as f:
+            while True:
+                lin = f.readline()
+                if not lin: break
+                print(lin, end="")
+        return
     
     if args[0] == "country":
         if len(args) == 2:
@@ -137,7 +144,7 @@ def __main__(args):
         _if.active(False)
         
     elif cmd == "status":
-        psts(nic, _if)
+        psts(mods, nic, _if)
             
     elif cmd == "scan":
         if nic=="ap":
@@ -145,7 +152,7 @@ def __main__(args):
             return
 
         if not _if.active():
-            psts(nic, _if)
+            psts(mods, nic, _if)
             return
 
         try:
@@ -168,7 +175,7 @@ def __main__(args):
             return
    
         if not _if.active():
-            psts(nic, _if)
+            psts(mods, nic, _if)
             return
     
         if _if.isconnected():
@@ -267,9 +274,11 @@ def __main__(args):
             return
         
         if _if.isconnected():
-            print("Disconnecting...")
+            if not "-n" in mods:
+                print("Disconnecting...")
             _if.disconnect()
-            print("Disconnected")
+            if not "-n" in mods:
+                print("Disconnected")
                 
     else:
         print(f"Invalid wifi commad {cmd}")

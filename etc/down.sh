@@ -8,6 +8,6 @@ if $0 == 1 uftpd stop
 test -p uhttpd
 if $0 == 1 uhttpd stop
 
-wifi sta status
+wifi sta status -n
 if $1 == 1 wifi sta disconnect
 if $0 == 1 wifi sta off
