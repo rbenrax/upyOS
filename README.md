@@ -163,34 +163,40 @@ example.sh
       if $v1 != 0 goto loop
       exit
 
-sh example script
+services startup sh script
 
       #
-      # upyos sh script example
-      #
-
-      # Wifi sta
-      wifi sta on                       # Turn on wifi in cliente nic
-
-      #wifi sta scan                    # scan wifi APs
-
-      wifi sta connect DIGIFIBRA-cGPRi <password> 10 # Connect to wifi router <ssid> <password> <timeout>
-
-      wifi sta status                   # save two env vars with the status of enabled and connected
-      if $0 == 0 goto exit              # $0 = enabled/disabled
-      if $1 == 0 goto exit              # $1 = connected/disconnected
-
-      ntpupdate es.pool.ntp.org         # ntp time update
-      date                              # show current date and time
-
-      wifi sta ifconfig                 # sta ip config status
-
+      # WiFi connnection and and services startup
+      # 
+      
+      loadboard /etc/upyOS-esp32c3_luatos.board
+      
+      wifi sta on
+      
+      #wifi sta scan
+      
+      wifi sta connect DIGIFIBRA-cGPRi <password> 10
+      
+      wifi sta status             # status subcommand save in env var if active and connected status
+      if $0 == 0 goto exit        # If not active
+      if $1 == 0 goto exit        # If not connected
+      
+      ntpupdate es.pool.ntp.org
+      date
+      wifi sta ifconfig
+      unset 0 1
+      
       utelnetd start
-
-      :exit                             # If error label target
-      #wifi sta disconnect              # disconnect wifi
-      #wifi sta off                     # disable nic
-
+      uftpd start &
+      
+      #> import micropython
+      #> micropython.kbd_intr(-1)
+      
+      :exit
+      echo end
+      #wifi sta disconnect
+      #wifi sta off
+      #exit
 
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
