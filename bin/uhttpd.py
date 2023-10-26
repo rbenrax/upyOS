@@ -11,7 +11,7 @@ def __main__(args):
         from microWebSrv import MicroWebSrv
 
         if args[0]=="start":
-            print(f"Starting httpd service on {dport} port")
+            print(f"Starting httpd service on port {dport}")
             mws = MicroWebSrv(proc, routeHandlers=[], port=dport, bindIP='0.0.0.0', webPath="/www")
             mws.Start(threaded=False)
             

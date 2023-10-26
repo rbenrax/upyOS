@@ -13,7 +13,7 @@ def __main__(args):
         dport=21
         if args[0]=="start":
             #ftp.start()
-            print(f"Starting ftpd service on {dport} port")
+            print(f"Starting ftpd service on port {dport}")
             while not proc.sts=="S":
                 ftp.ftpserver(proc, port=dport, timeout=None)
                 
