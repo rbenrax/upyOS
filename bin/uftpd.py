@@ -10,10 +10,12 @@ def __main__(args):
         #ftp = ftptiny.FtpTiny()
         import ftp
         
+        dport=21
         if args[0]=="start":
             #ftp.start()
+            print(f"Starting ftpd service on {dport} port")
             while not proc.sts=="S":
-                ftp.ftpserver(proc, port=21, timeout=None)
+                ftp.ftpserver(proc, port=dport, timeout=None)
                 
         elif args[0]=="stop":
             #ftp.stop()
@@ -23,7 +25,7 @@ def __main__(args):
             #False connection to close de thread
             import socket
             sock = socket.socket()
-            sock.connect(("127.0.0.1", 21))
+            sock.connect(("127.0.0.1", dport))
             sock.close()
             del sys.modules["ftp"]
 

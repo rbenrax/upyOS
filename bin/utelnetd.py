@@ -7,6 +7,7 @@ def __main__(args):
         import utelnetserver
         
         if args[0]=="start":
+            print(f"Starting telnetd service")
             utelnetserver.start()
         elif args[0]=="stop":
             utelnetserver.stop()
