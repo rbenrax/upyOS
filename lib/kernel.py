@@ -269,7 +269,7 @@ class upyOS:
     def loadconfig(self, conf="/etc/system.conf"):
         if utls.file_exists(conf):
             sdata.sysconfig=utls.load_conf_file(conf)
-            print("System cfg loaded.")
+            print(f"System cfg loaded: {conf}")
         else:
             print(f"{conf} not found")
         
@@ -277,7 +277,7 @@ class upyOS:
         if board == "": board = "/etc/" + sdata.name + ".board"
         if utls.file_exists(board):
             sdata.board=utls.load_conf_file(board)
-            print("Board cfg loaded.")
+            print(f"Board cfg loaded: {board}")
         else:
             print(f"{board} not found")
 
