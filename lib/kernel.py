@@ -240,7 +240,11 @@ class upyOS:
         # Stop threads before exit
         if len(sdata.procs)>0:
             print("\nStoping process...")
-            
+
+            # Launch shutdown services script
+            if utls.file_exists("/etc/down.sh"):
+                self.run_cmd("sh /etc/down.sh")
+
             self.killall("")
             while True:
                 end=True
@@ -249,10 +253,6 @@ class upyOS:
                 if end: break
                 utime.sleep(.5)
                 
-        # Launch shutdown script
-        if utls.file_exists("/etc/down.sh"):
-            self.run_cmd("sh /etc/down.sh")
-
         self.print_msg("Shutdown upyOS..., bye.")
         print("")
         
