@@ -87,9 +87,12 @@
 #if $? == 1 run echo si $?
 #if $? == 0 run echo no $?
 
-#skip 1
+# Services startup, connect wifi before
+#telnet start
+#uftpd start &
 #uhttpd start &
 
 # Exit form OS to python REPL
 #exit
 
+#/local/w.sh
