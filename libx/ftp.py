@@ -151,7 +151,9 @@ def ftpserver(proc, port=21, timeout=None):
         while do_run:
             cl, remote_addr = ftpsocket.accept()
             
-            if proc.sts=="S": break
+            if proc.sts=="S":
+                do_run = False
+                break
             
             cl.settimeout(300)
             cwd = '/'
@@ -162,7 +164,9 @@ def ftpserver(proc, port=21, timeout=None):
                     gc.collect()
                     data = cl.readline().decode("utf-8").rstrip("\r\n")
                     
-                    if proc.sts=="S": break
+                    if proc.sts=="S":
+                        do_run = False
+                        break
                     
                     if len(data) <= 0:
                         print("Client disappeared")
