@@ -89,10 +89,10 @@
 
 # Services startup, connect wifi before
 #telnet start
-#uftpd start &
+#uftpd start
 #uhttpd start &
 
 # Exit form OS to python REPL
 #exit
 
-#/local/w.sh
+/local/w.sh
