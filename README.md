@@ -187,7 +187,7 @@ services startup sh script
       unset 0 1
       
       utelnetd start
-      uftpd start &
+      uftpd start
       
       #> import micropython
       #> micropython.kbd_intr(-1)
