@@ -201,7 +201,7 @@ services startup sh script
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
 
-And loops!:
+loops in shell scripts!:
 
       :cont
       incr a
@@ -212,6 +212,15 @@ And loops!:
       decr a
       if $a > 4 goto cont2
       echo $a
+
+upyOS remote development:
+- Start in remote mcu telnet service (utelnet start)
+- Start in remote mcu ftpserver service (uftpd start)
+- Install in local machine curlftpfs package
+- In local machine mount remote directory with "curlftpfs user@<mcuip> <local path>"
+- With Tonny you can develop in <local path>
+- Access with telnet to the mcu console ip to run commands and programs
+
 
 TODO List:
 - Add diff, tar, uname, read and other usefull commands.
