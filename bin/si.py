@@ -12,12 +12,15 @@ def __main__(args):
     print()
 
     # platform
-    import uplatform
-    dir(uplatform)
-    print(f"{uplatform.libc_ver()=}")
-    print(f"{uplatform.platform()=}")
-    print(f"{uplatform.python_compiler()=}")
-    print()
+    try:
+        import uplatform
+        dir(uplatform)
+        print(f"{uplatform.libc_ver()=}")
+        print(f"{uplatform.platform()=}")
+        print(f"{uplatform.python_compiler()=}")
+        print()
+    except:
+        pass
 
     # sys
     import sys
@@ -46,3 +49,8 @@ def __main__(args):
     print(f"{micropython.mem_info(1)=}")
     print()
 
+
+if __name__ == "__main__":
+    args = ["/main.py", "/boot.py", "-nf"]
+    #args = ["/main.py", "/boot.py", ">", "/out.txt"]
+    __main__(args)
