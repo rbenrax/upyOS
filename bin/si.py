@@ -51,6 +51,5 @@ def __main__(args):
 
 
 if __name__ == "__main__":
-    args = ["/main.py", "/boot.py", "-nf"]
-    #args = ["/main.py", "/boot.py", ">", "/out.txt"]
+    args = [""]
     __main__(args)
