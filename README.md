@@ -28,6 +28,8 @@ The target is to provide one more layer to micropython that allows us to manage 
 
 On upyOS boot, /etc/init.sh will launch system start up commands, you can remove commands you don't need and make the boot as fast as you want, as well as, include commands or programs that you need run on statup.
 
+On upyOS exit, /etc/end.sh will be lanched to send commans to disconnect os close process.
+
 The system can be extended with external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough, every program to be executed must define a "def __main__(args):" function.
 
 The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, environment variables, etc., allowing access to these parameters between programs and scripts.
