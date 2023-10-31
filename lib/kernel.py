@@ -61,7 +61,7 @@ class upyOS:
         # Create sysconfig
         if not utls.file_exists("/etc/system.conf"):
             sco = syscfg.SysCfg(board) # create class with default structures
-            utls.save_conf_file(sco.getSysConf(), "/etc/system.conf")
+            utls.save_conf_file(sco.getConf(), "/etc/system.conf")
             print(f"/etc/system.conf file created.")
 
         self.loadconfig()
@@ -78,9 +78,9 @@ class upyOS:
                     if not sco:
                         sco = syscfg.SysCfg(board) # create class with default structures
                     utls.save_conf_file(sco.getBoard(), file)
-                    print(f"Board config file generated, you may config {file} before continue.")
+                    print(f"\nBoard config file generated, you may config {file} before continue.")
                     
-                    #loadboard(board)
+                    #self.loadboard(file)
 
         else:
             self.print_msg("Recovery mode boot")
