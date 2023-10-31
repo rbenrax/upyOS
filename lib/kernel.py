@@ -11,19 +11,24 @@ import proc
 import syscfg
 
 class upyOS:
-    
+
+    # Valid boot_args:
+    # -r = Recovery mode
+
     def __init__(self, boot_args):
         
-        # Valid boot_args:
-        # -r = Recovery mode
+        # Clean screen and boot
+        print("\033[2J\033[HBooting upyOS...")
         
         # sdata store all system data
         sdata.name    = "upyOS-" + uos.uname()[0]
         sdata.version = "0.7"
         sdata.initime = utime.time()
-
+        
         # Initialization
-            
+
+        board = uos.uname()[4]
+
         if not utls.file_exists("/etc"):
             uos.mkdir("/etc")
 
@@ -38,23 +43,6 @@ class upyOS:
         sys.path.append("/bin")
         sys.path.append("/libx")
 
-        # Create sysconfig
-        if not utls.file_exists("/etc/system.conf"):
-            utls.save_conf_file(sco.getSysConf(), "/etc/system.conf")
-            print(f"/etc/system.conf file created.")
-
-        # Clean screen and boot
-        print("\033[2J\033[HBooting upyOS...")
-
-        self.loadconfig()
-
-#        if not "env" in sdata.sysconfig:
-#            sdata.sysconfig={"ver"     : 1.0,
-#                           "aliases" : {"": ""},
-#                           "pfiles"  : ["/boot.py","/main.py"],
-#                           "env"     : {"TZ": "+2", "?": "", "0": ""}
-#                           }
-
         # System ID
         from ubinascii import hexlify
         from machine import unique_id
@@ -68,6 +56,16 @@ class upyOS:
             "loadboard": self.loadboard
         }
 
+        sco=None # class with default configuration
+        
+        # Create sysconfig
+        if not utls.file_exists("/etc/system.conf"):
+            sco = syscfg.SysCfg(board) # create class with default structures
+            utls.save_conf_file(sco.getSysConf(), "/etc/system.conf")
+            print(f"/etc/system.conf file created.")
+
+        self.loadconfig()
+
         if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
             #print("Launching init.sh:")
@@ -75,12 +73,14 @@ class upyOS:
 
             if not sdata.board:
                 file = "/etc/" + sdata.name + ".board"
-                board = uos.uname()[4]
-                sco = syscfg.SysCfg(board)
-
+                
                 if not utls.file_exists(file):
+                    if not sco:
+                        sco = syscfg.SysCfg(board) # create class with default structures
                     utls.save_conf_file(sco.getBoard(), file)
                     print(f"Board config file generated, you may config {file} before continue.")
+                    
+                    #loadboard(board)
 
         else:
             self.print_msg("Recovery mode boot")
@@ -149,11 +149,6 @@ class upyOS:
 
             # Get command 
             cmd = parts[0]
-            
-            # Translate command aliases
-            if sdata.sysconfig:
-                if cmd in sdata.sysconfig["aliases"]:    
-                    cmd=sdata.sysconfig["aliases"][cmd]
             
             args=[]
             
