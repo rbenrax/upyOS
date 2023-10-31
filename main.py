@@ -1,7 +1,3 @@
-# Launch upyOS with grub the first time to generate the /etc .board file
-# import grub
-# grub.mbr()
-
-# Launch upyOS once generated the .board file, aprox 0.5kb ram saved
+# Launch upyOS
 import kernel
 upyos = kernel.upyOS("") # Boot_args: -r

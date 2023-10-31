@@ -26,19 +26,15 @@ upyOS explanation:
 
 The target is to provide one more layer to micropython that allows us to manage a microcontroller in a similar way to what we use every day in a common computer, with the use of more simple programs that can be complemented in a more flexible way, obviously at cost of lower performance and efficiency, but giving more facilities and flexibility for those who start using microcontrollers.
 
-In main.py we can launch grub or upyOS directly (see files).
+On upyOS boot, /etc/init.sh will launch system start up commands, you can remove commands you don't need and make the boot as fast as you want, as well as, include commands or programs that you need run on statup.
 
-Grub will create in /etc dir a file (if doesn't exists) for configure the specific board pins, gpios and other parameters, you can remove unused parameter to optimize the memory use, also allow stop the system boot if any program hung the load.
+On upyOS exit, /etc/end.sh will be lanched to send commans to disconnect os close process.
 
-In upyOS boot, two shell scripts are executed, init.sh and rc.local, init.sh will launch system start up commands, and rc.local programa and commands specifics for a user solution, you can remove the commands you don't need and make the boot as fast as you want, as well as include commands or programs that you need.
-
-Exists internal and external commands, and internal and externals shell scripts, internal located in /bin directory and are exceuted without extention, external can be located in any directory and are executed directly, external commands are self-explanatory and some have help (--h).
-
-The system can be extended with more external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough, every program to be executed must define a "def __main__(args):" function.
+The system can be extended with external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough, every program to be executed must define a "def __main__(args):" function.
 
 The sdata module contains all the system data, allowing access to the board configuration parameters, system configuration parameters, environment variables, etc., allowing access to these parameters between programs and scripts.
 
-If system hungs in boot (ex. defective program), we can delete init.sh, then the system wil boot in recovery mode, also we can use recovery command in any time, which moves init.sh to init.rec and viceversa, alternatively on any moment the os can be loaded in recovery mode by sending "import upyos" command.
+If system hungs in boot (ex. defective program), we can boot in recovery mode by sending "import utls" and "utls.recovery()" commands.
 
 RP2040 has only two threads and is limited to this number, but ESP32 and others may have more. Python programs can be submitted in a separate thread by ending the command with '&' symbol, and asyncio programs may also be used."
 
@@ -60,13 +56,13 @@ Directories structure:
 
 Internals commands:
 
+- exit
 - loadconfig: Load system config file
 - loadboard:  Load board interfaces configuration file
-- r:          Repeat last command
 
 Actual external commands:
 
-cat, cd, clear, cp, cpufreq, date, decr, df, echo, env, export, fileup, find, free, grep, help, i2cscan, ifconfig, incr, iperf3, kill, killall, led, ls, lshw, lsmod, mi, mkdir, mv, ntpupdate, ping, ps, pwd, read, reboot, recovery, reset, rm, rmdir, rmmod, sensors, sh, si, sleep, test, touch, uhttpd, unset, uptime, vi, wait, watch, wget, wifi.inf, wifi
+cat, cd, clear, cp, cpufreq, date, decr, df, echo, env, export, fileup, find, free, grep, help, hold, i2cscan, ifconfig, incr, iperf3, kill, killall, led, ls, lshw, lsmod, mi, mkdir, mv, ntpupdate, ping, ps, pwd, read, reboot, reset, resume, rm, rmdir, rmmod, sensors, sh, si, sleep, test, touch, uftpd, uhttpd, unset, uptime, utelnetd, vi, wait, watch, wget, wifi.inf, wifi
 
 Tested Boards:
 
@@ -187,7 +183,7 @@ services startup sh script
       unset 0 1
       
       utelnetd start
-      uftpd start &
+      uftpd start
       
       #> import micropython
       #> micropython.kbd_intr(-1)

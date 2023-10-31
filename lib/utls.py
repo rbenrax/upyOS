@@ -170,7 +170,12 @@ def shlex(ent):
 
     return args
 
-# - - - -
+# Recovery mode:
+#import utls
+#utls.recovery()
+def recovery():
+    import kernel
+    upyos = kernel.upyOS("-r") # Boot_args: -r
 
 #if __name__ == "__main__":      
 #    print(human(1257))

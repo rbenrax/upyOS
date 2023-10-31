@@ -26,7 +26,7 @@ def __main__(args):
     print(f"{An}SystemID:{Ab} {sdata.sid}")
     print(f"{An}Platform:{Ab} {sys.platform}")
     print(f"{An}Board:{Ab} {uos.uname()[4]}")
-    print(f"{An}{sdata.name} :{Ab} {sdata.version} (size: {uos.stat('/lib/kernel.py')[6]} bytes)")
+    print(f"{An}{sdata.name} :{Ab} {sdata.version}")
     print(f"{An}MicroPython:{Ab} {uos.uname().release}")
     print(f"{An}Firmware:{Ab} {uos.uname().version}")
     print(f"{An}CPU Speed:{Ab} {machine.freq()*0.000001}MHz{An}")

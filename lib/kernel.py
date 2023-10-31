@@ -8,31 +8,30 @@ import utime
 import sdata
 import utls
 import proc
+import syscfg
 
 class upyOS:
-    
+
+    # Valid boot_args:
+    # -r = Recovery mode
+
     def __init__(self, boot_args):
         
-        # Valid boot_args:
-        # -r = Recovery mode
+        # Clean screen and boot
+        print("\033[2J\033[HBooting upyOS...")
         
         # sdata store all system data
         sdata.name    = "upyOS-" + uos.uname()[0]
-        sdata.version = "0.6"
+        sdata.version = "0.7"
         sdata.initime = utime.time()
-
-        # Remove modules previusly loaded by grub
-        try:
-            del sys.modules["syscfg"]
-            del sys.modules["grub"]
-        except:
-            pass
-
-        # System ID
-        from ubinascii import hexlify
-        from machine import unique_id
-        sdata.sid=hexlify(unique_id()).decode()
         
+        # Initialization
+
+        board = uos.uname()[4]
+
+        if not utls.file_exists("/etc"):
+            uos.mkdir("/etc")
+
         # Create directories
         if not utls.file_exists("/opt"): # Specific solutions directory
             uos.mkdir("/opt")
@@ -44,46 +43,53 @@ class upyOS:
         sys.path.append("/bin")
         sys.path.append("/libx")
 
+        # System ID
+        from ubinascii import hexlify
+        from machine import unique_id
+        sdata.sid=hexlify(unique_id()).decode()
+
         # Internal Commands definition
         self.user_commands = {
-            #"ps": self.ps,
-            #"kill": self.kill,
-            #"killall": self.killall,
             "exit" : self.exit,
             #"halt": self.halt,
             "loadconfig": self.loadconfig,
-            "loadboard": self.loadboard,
-            "r": self.last_cmd
-            
+            "loadboard": self.loadboard
         }
 
-        # Clean screen and boot
-        print("\033[2J\033[HBooting upyOS...")
+        sco=None # class with default configuration
+        
+        # Create sysconfig
+        if not utls.file_exists("/etc/system.conf"):
+            sco = syscfg.SysCfg(board) # create class with default structures
+            utls.save_conf_file(sco.getConf(), "/etc/system.conf")
+            print(f"/etc/system.conf file created.")
 
         self.loadconfig()
 
-        if not "env" in sdata.sysconfig:
-            sdata.sysconfig={"ver"     : 1.0,
-                           "aliases" : {"": ""},
-                           "pfiles"  : ["/boot.py","/main.py"],
-                           "env"     : {"TZ": "+2", "?": "", "0": ""}
-                           }
-
-        #self.loadboard() # Called from /etc/init.sh
-
         if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
-            
             #print("Launching init.sh:")
             self.run_cmd("sh /etc/init.sh")
 
-            #/etc/rc.local
-            print("Launching rc.local:")
-            self.run_cmd("sh /etc/rc.local")
+            if not sdata.board:
+                file = "/etc/" + sdata.name + ".board"
+                
+                if not utls.file_exists(file):
+                    if not sco:
+                        sco = syscfg.SysCfg(board) # create class with default structures
+                    utls.save_conf_file(sco.getBoard(), file)
+                    print(f"\nBoard config file generated, you may config {file} before continue.")
+                    
+                    #self.loadboard(file)
+
         else:
             self.print_msg("Recovery mode boot")
-        
-        self.prev_cmd=""
+            
+        try:
+            del sys.modules["syscfg"]
+        except:
+            pass
+
         self.print_msg("Type 'help' for a upyOS manual.")
 
         # Main command processing loop
@@ -144,15 +150,6 @@ class upyOS:
             # Get command 
             cmd = parts[0]
             
-            # Translate command aliases
-            if sdata.sysconfig:
-                if cmd in sdata.sysconfig["aliases"]:    
-                    cmd=sdata.sysconfig["aliases"][cmd]
-            
-            # Last command repeat 
-            if cmd!="r":
-                self.prev_cmd = fcmd
-            
             args=[]
             
             # Get command arguments
@@ -199,36 +196,14 @@ class upyOS:
                     newProc.run(False, ext, cmdl, args)
 
 # - - -
-           
-#    def getenv(self, var=""):
-#        return utls.getenv(var)
-
-#    def setenv(self, var="", val=""):
-#        utls.setenv(var, val)
- 
-#    def unset(self, var=""):
-#        utls.unset(var)
-
-#    def ps(self):
-#        if len(sdata.procs)>0:
-#            print(f"  Proc Sts     Init_T   Elapsed   Thread_Id   Cmd/Args")
-#            for i in sdata.procs:
-#                print(f"{i.pid:6}  {i.sts:3}  {i.stt:8}  {utime.ticks_ms() - i.stt:8}  {i.tid:10}   {i.cmd} {" ".join(i.args)}")
-                
-#    def kill(self, pid="0"):
-#        for i in sdata.procs:
-#            if pid.isdigit() and i.pid == int(pid):
-#                i.sts="S"
-#                break
                 
     def killall(self, pn=""):
         for i in sdata.procs:
             if pn in i.cmd:
                 i.sts="S"
 
-    # Repeat command
-    def last_cmd(self):
-        self.run_cmd(self.prev_cmd)
+#    def halt(self):
+#        sys.exit()
 
     # System exit
     def exit(self):
@@ -242,8 +217,8 @@ class upyOS:
             print("\nStoping process...")
 
             # Launch shutdown services script
-            if utls.file_exists("/etc/down.sh"):
-                self.run_cmd("sh /etc/down.sh")
+            if utls.file_exists("/etc/end.sh"):
+                self.run_cmd("sh /etc/end.sh")
 
             self.killall("")
             while True:
@@ -258,13 +233,10 @@ class upyOS:
         
         #raise SystemExit
         sys.exit()
-        
+
     def print_msg(self, message):
         print(f"\n\033[1;37;44m->{message}\033[0m")
         # Load system configuration and board definitions
-     
-#    def halt(self):
-#        sys.exit()
      
     def loadconfig(self, conf="/etc/system.conf"):
         if utls.file_exists(conf):
@@ -280,12 +252,6 @@ class upyOS:
             print(f"Board cfg loaded: {board}")
         else:
             print(f"{board} not found")
-
-#    def getconf(self):
-#        return sdata.sysconfig
-
-#    def getboard(self):
-#        return sdata.board
 
 # - -  
 if __name__ == "__main__":

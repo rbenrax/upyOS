@@ -52,7 +52,6 @@ class SysCfg():
                     }
 
         self.sysconf={"ver"     : 1.0,
-                      "aliases" : {"edit": "vi"},
                       "pfiles"  : ["/boot.py","/main.py"],
                       "env"     : {"TZ": "+2", "?": "", "0": ""}
                      }
@@ -63,7 +62,7 @@ class SysCfg():
 #    def setBoard(self, board):
 #        self.board=board
  
-    def getSysConf(self):
+    def getConf(self):
         return self.sysconf
     
 #    def setSysConf(self, obj):
