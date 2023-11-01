@@ -2,7 +2,18 @@ import socket
 import network
 import uos
 import errno
-from uio import IOBase 
+from uio import IOBase
+
+#-----
+import sdata
+
+def byte2string(bData):
+    try:
+        return bData.decode('utf-8')
+    except:
+        return ''.join(map(chr, bData))
+
+#-----
 
 last_client_socket = None
 server_socket = None
@@ -46,6 +57,7 @@ class TelnetWrapper(IOBase):
         # we need to write all the data but it's a non-blocking socket
         # so loop until it's all written eating EAGAIN exceptions
         while len(data) > 0:
+        
             try:
                 written_bytes = self.socket.write(data)
                 data = data[written_bytes:]
@@ -73,15 +85,57 @@ def accept_telnet_connect(telnet_server):
     
     last_client_socket, remote_addr = telnet_server.accept()
     print("Telnet connection from:", remote_addr)
+    
+#----- Authentication benrax ------>
+    
+#     last_client_socket.sendall(bin(sdata.sid))
+    print(sdata.sid)
+    
+    if sdata.sysconfig["auth"]["pass"]!="":
+    
+        last_client_socket.setblocking(True)
+        
+        last_client_socket.sendall(b'\nLogin: ')
+        user=''
+        while True:
+            data = last_client_socket.readline()
+            if b"\r\n" in data:
+                #print(data)
+                user=byte2string(data).split("#")[1]
+                break
+        
+#         last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
+        
+        last_client_socket.sendall(b'Password: ')
+        pas=''
+        while True:
+            data = last_client_socket.readline()
+            if b"\r\n" in data:
+                #print(data)
+                pas=byte2string(data)
+                break
+
+        if sdata.sysconfig["auth"]["user"] != user[:-2] and sdata.sysconfig["auth"]["pass"] != pas[:-2]:
+            last_client_socket.sendall(b'Not logged in.\r\n')
+            uos.dupterm(None)
+            last_client_socket.close()
+        else:
+            last_client_socket.sendall(b'ok\r\n')
+            
+        #last_client_socket.sendall(b'ok')
+    
+#----- Authentication benrax ------<
+    
     last_client_socket.setblocking(False)
     
     # dupterm_notify() not available under MicroPython v1.1
     last_client_socket.setsockopt(socket.SOL_SOCKET, 20, uos.dupterm_notify)
-    
+        
     last_client_socket.sendall(bytes([255, 252, 34])) # dont allow line mode
     last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
-    
+        
     uos.dupterm(TelnetWrapper(last_client_socket))
+    
 
 def stop():
     global server_socket, last_client_socket

@@ -53,7 +53,8 @@ class SysCfg():
 
         self.sysconf={"ver"     : 1.0,
                       "pfiles"  : ["/boot.py","/main.py"],
-                      "env"     : {"TZ": "+2", "?": "", "0": ""}
+                      "env"     : {"TZ": "+2", "?": "", "0": ""},
+                      "auth"    : {"user": "admin", "pass": "rborbo"}
                      }
 
     def getBoard(self):

@@ -28,6 +28,8 @@ import errno
 from time import sleep_ms, localtime
 from micropython import alloc_emergency_exception_buf
 
+import sdata
+
 # constant definitions
 _CHUNK_SIZE = const(1024)
 _SO_REGISTER_HANDLER = const(20)
@@ -221,16 +223,30 @@ class FTP_client:
 
             if command == "USER":
                 # self.logged_in = True
-                cl.sendall("230 Logged in.\r\n")
+                ##cl.sendall("230 Logged in.\r\n")
                 # If you want to see a password,return
                 #   "331 Need password.\r\n" instead
                 # If you want to reject an user, return
                 #   "530 Not logged in.\r\n"
+                
+                if sdata.sysconfig["auth"]["pass"]=="":
+                    cl.sendall("230 Logged in.\r\n")
+                else:
+                    if payload != sdata.sysconfig["auth"]["user"]:
+                        cl.sendall("530 Not logged in.\r\n")
+                    else:
+                        cl.sendall("331 Need password.\r\n")
+                
             elif command == "PASS":
                 # you may check here for a valid password and return
                 # "530 Not logged in.\r\n" in case it's wrong
                 # self.logged_in = True
-                cl.sendall("230 Logged in.\r\n")
+                ##cl.sendall("230 Logged in.\r\n")
+                if sdata.sysconfig["auth"]["pass"]==payload:
+                    cl.sendall("230 Logged in.\r\n")
+                else:
+                    cl.sendall("530 Not logged in.\r\n")
+                    
             elif command == "SYST":
                 cl.sendall("215 UNIX Type: L8\r\n")
             elif command in ("TYPE", "NOOP", "ABOR"):  # just accept & ignore
