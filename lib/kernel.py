@@ -46,7 +46,7 @@ class upyOS:
         # System ID
         from ubinascii import hexlify
         from machine import unique_id
-        sdata.sid=hexlify(unique_id()).decode()
+        sdata.sid=hexlify(unique_id()).decode().upper()
 
         # Internal Commands definition
         self.user_commands = {

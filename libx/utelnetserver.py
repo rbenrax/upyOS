@@ -120,7 +120,7 @@ def accept_telnet_connect(telnet_server):
             uos.dupterm(None)
             last_client_socket.close()
         else:
-            last_client_socket.sendall(b'ok\r\n\r\n')
+            last_client_socket.sendall(b'ok\r\n\')
             
         #last_client_socket.sendall(b'ok')
     
