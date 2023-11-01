@@ -88,8 +88,8 @@ def accept_telnet_connect(telnet_server):
     
 #----- Authentication benrax ------>
     
-#     last_client_socket.sendall(bin(sdata.sid))
-    print(sdata.sid)
+    last_client_socket.sendall(sdata.sid)
+    #print(sdata.sid)
     
     if sdata.sysconfig["auth"]["pass"]!="":
     
@@ -120,7 +120,7 @@ def accept_telnet_connect(telnet_server):
             uos.dupterm(None)
             last_client_socket.close()
         else:
-            last_client_socket.sendall(b'ok\r\n')
+            last_client_socket.sendall(b'ok\r\n\r\n')
             
         #last_client_socket.sendall(b'ok')
     
