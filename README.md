@@ -219,7 +219,7 @@ Script execution in boot:
 
 - Added user and password authentication to access by telnet and ftp servers, user and password are stored in /etc/system.conf file, if no password is set then authentication is disabled.
 
-- By starting utelnet and uftpd, you can develop remotely from android by using "Serial wifi terminal" and "Squircle CE" apps for Google Play.
+- By starting utelnet and uftpd on boot, you can develop remotely from Android by using "Serial wifi terminal" and "Squircle CE" apps from Google Play, Termux is an excelent option too as telnet client.
 
 TODO List:
 - Add diff, tar, uname, read and other usefull commands.
