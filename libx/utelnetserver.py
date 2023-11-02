@@ -101,7 +101,7 @@ def accept_telnet_connect(telnet_server):
 
         #print(user, pasw)
         
-        if sdata.sysconfig["auth"]["user"] != user and sdata.sysconfig["auth"]["paswd"] != pasw:
+        if sdata.sysconfig["auth"]["user"] != user or sdata.sysconfig["auth"]["paswd"] != pasw:
             last_client_socket.sendall(b'Not logged in.\r\n')
             uos.dupterm(None)
             last_client_socket.close()
