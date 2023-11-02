@@ -4,16 +4,9 @@ import uos
 import errno
 from uio import IOBase
 
-#-----
+#-- Auth rbenrax -->
 import sdata
-
-def byte2string(bData):
-    try:
-        return bData.decode('utf-8')
-    except:
-        return ''.join(map(chr, bData))
-
-#-----
+#-- Auth rbenrax --<
 
 last_client_socket = None
 server_socket = None
@@ -86,45 +79,41 @@ def accept_telnet_connect(telnet_server):
     last_client_socket, remote_addr = telnet_server.accept()
     print("Telnet connection from:", remote_addr)
     
-#----- Authentication benrax ------>
+#-- Auth rbenrax -->
+
+    last_client_socket.sendall(b'System: ' + sdata.sid + b', Press enter')
     
-    last_client_socket.sendall(sdata.sid)
-    #print(sdata.sid)
-    
-    if sdata.sysconfig["auth"]["pass"]!="":
+    if sdata.sysconfig["auth"]["paswd"]!="":
     
         last_client_socket.setblocking(True)
         
-        last_client_socket.sendall(b'\nLogin: ')
-        user=''
-        while True:
-            data = last_client_socket.readline()
-            if b"\r\n" in data:
-                #print(data)
-                user=byte2string(data).split("#")[1]
-                break
+        # Fake read with telnet protocol commands
+        data = last_client_socket.readline()
+        #print(data)
         
-#         last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
+        last_client_socket.sendall(b'Login: ')
+        user=last_client_socket.readline().decode()[:-2] # remove CR
+        
+#        last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
         
         last_client_socket.sendall(b'Password: ')
-        pas=''
-        while True:
-            data = last_client_socket.readline()
-            if b"\r\n" in data:
-                #print(data)
-                pas=byte2string(data)
-                break
+        pasw=last_client_socket.readline().decode()[:-2] # remove CR
 
-        if sdata.sysconfig["auth"]["user"] != user[:-2] and sdata.sysconfig["auth"]["pass"] != pas[:-2]:
+        #print(user, pasw)
+        
+        if sdata.sysconfig["auth"]["user"] != user and sdata.sysconfig["auth"]["paswd"] != pasw:
             last_client_socket.sendall(b'Not logged in.\r\n')
             uos.dupterm(None)
             last_client_socket.close()
+            if sdata.debug:
+                print(f"Telnet: Rejected connection from: {remote_addr} {user}")
+            return
         else:
-            last_client_socket.sendall(b'ok\r\n')
-            
-        #last_client_socket.sendall(b'ok')
+            if sdata.debug:
+                print(f"Telnet: Accepted connection from: {remote_addr} {user}")
+            last_client_socket.sendall(b'Logged in ok, Press enter\r\n')
     
-#----- Authentication benrax ------<
+#-- Auth rbenrax --<
     
     last_client_socket.setblocking(False)
     

@@ -229,7 +229,7 @@ class FTP_client:
                 # If you want to reject an user, return
                 #   "530 Not logged in.\r\n"
                 
-                if sdata.sysconfig["auth"]["pass"]=="":
+                if sdata.sysconfig["auth"]["paswd"]=="":
                     cl.sendall("230 Logged in.\r\n")
                 else:
                     if payload != sdata.sysconfig["auth"]["user"]:
@@ -242,7 +242,7 @@ class FTP_client:
                 # "530 Not logged in.\r\n" in case it's wrong
                 # self.logged_in = True
                 ##cl.sendall("230 Logged in.\r\n")
-                if sdata.sysconfig["auth"]["pass"]==payload:
+                if sdata.sysconfig["auth"]["paswd"]==payload:
                     cl.sendall("230 Logged in.\r\n")
                 else:
                     cl.sendall("530 Not logged in.\r\n")
