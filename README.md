@@ -127,7 +127,7 @@ Actual Development:
   
 - Shell script basic conditional execution:
 
-example.sh
+- example.sh
 
       export var1 5   # Set variable var1 to "5" (variables can also be accesed from Python programs and embedded Python)
       if $var1 != 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
@@ -140,7 +140,7 @@ example.sh
       if $var1 == 5 run watch ps -t 5 # Launch command "watch ps" every 5 seconds
       if $var1 == 6 run asy_test &    # Summit asy_test process
 
-  menu.sh
+- menu.sh
   
       :loop
       clear
@@ -159,7 +159,7 @@ example.sh
       if $v1 != 0 goto loop
       exit
 
-services startup sh script
+- services startup sh script
 
       #
       # WiFi connnection and and services startup
@@ -197,7 +197,7 @@ services startup sh script
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
 
-loops in shell scripts!:
+- loops in shell scripts!:
 
       :cont
       incr a
@@ -209,14 +209,17 @@ loops in shell scripts!:
       if $a > 4 goto cont2
       echo $a
 
-upyOS remote development:
-- Start in remote mcu telnet service (utelnet start)
-- Start in remote mcu ftpserver service (uftpd start)
-- Install in local machine curlftpfs package
-- In local machine mount remote directory with "curlftpfs user@<mcuip> <local path>"
-- With Tonny you can develop in <local path>
-- Access with telnet to the mcu console ip to run commands and programs
+- upyOS remote development:
+      - Start in remote mcu telnet service (utelnet start)
+      - Start in remote mcu ftpserver service (uftpd start)
+      - Install in local machine curlftpfs package
+      - In local machine mount remote directory with "curlftpfs user@<mcuip> <local path>"
+      - With Tonny you can develop in <local path>
+      - Access with telnet to the mcu console ip to run commands and programs
 
+- Added user and password authentication to access by telnet and ftp servers, user and password are stored in /etc/system.conf file, if no password is set then authentication is disabled.
+
+- By starting utelnet and uftpd, you can develop remotely from android by using "Serial wifi terminal" and "Squircle CE" apps for Google Play.
 
 TODO List:
 - Add diff, tar, uname, read and other usefull commands.
