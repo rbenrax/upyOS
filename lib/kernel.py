@@ -29,10 +29,10 @@ class upyOS:
 
         board = uos.uname()[4]
 
+        # Create directories
         if not utls.file_exists("/etc"):
             uos.mkdir("/etc")
-
-        # Create directories
+            
         if not utls.file_exists("/opt"): # Specific solutions directory
             uos.mkdir("/opt")
 
