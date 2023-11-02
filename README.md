@@ -28,7 +28,7 @@ The target is to provide one more layer to micropython that allows us to manage 
 
 On upyOS boot, /etc/init.sh will launch system start up commands, you can remove commands you don't need and make the boot as fast as you want, as well as, include commands or programs that you need run on statup.
 
-On upyOS exit, /etc/end.sh will be lanched to send commans to disconnect os close process.
+On upyOS exit, /etc/end.sh will be lanched to send commans to disconnect os close processes.
 
 The system can be extended with external commands and programs with the aim of keeping the memory footprint as low as possible, because the ram is quite small but the flash is big enough, every program to be executed must define a "def __main__(args):" function.
 
@@ -87,23 +87,21 @@ YD-ESP32-S3 with 8Mb PSRAM
 
 Actual Development:
 
-- /lib/grubs.py the first process in boot, will create .board file in /etc directory if does not exists, this file shoud be edited to acomodate all the board resources available, if the .board file exists, upyOS process will read its content and will enable the resources to be used by the system, modules, external commands, etc.
+- /lib/kernel.py is the first module loaded, is the OS core of de system, the first time create in /etc directory the .board file if doesn't exists, external commands are in /bin directory.
 
-- /lib/kernel.py upyos class is the next load, is the OS core, has internal and external commands (/bin directory), all commands will be moved to external commands to reduce the memory use.
-
-- Actual implementation also can call simple shell scripts, including /etc/init.sh and /etc/rc.local, the start up scripts.
+- Actual implementation also can call simple shell scripts, including /etc/init.sh and /etc/end.sh, the start up scripts and system down scripts.
 
 - Added editor from https://github.com/octopusengine/micropython-shell/tree/master
 
-- Reduced memory usage to fit on esp8266
+- Reduced memory usage to fit on esp8266.
 
-- Added recovery mode, to avoid load of start up failed commands
+- Added recovery mode, to avoid load of start up failed commands or programs.
 
 - Added environment variables in scripts and python programs, export, echo, unset sdata.getenv() ans sdata.setenv().
 
 - ls command is now full functional, or so I hope.
 
-- Now commands translate environment variables.
+- Now, commands translate environment variables.
 
 - From command line prompt and shell scripts is possible input python code directly:
 
@@ -120,12 +118,12 @@ Actual Development:
       / $: < 2+2
       4
 
-- Management support for multiples threads and asyncio, tests availables (&, kill, killall, wait):
+- Management support for multiples threads and asyncio, tests availables (&, ps, kill, killall, wait, hold and resume):
   
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
   
-- Shell script basic conditional execution:
+- Shell script basic conditional execution, also are supported labels and goto instruction:
 
 - example.sh
 
@@ -159,7 +157,7 @@ Actual Development:
       if $v1 != 0 goto loop
       exit
 
-- services startup sh script
+- services startup sh script (can be called from init.sh)
 
       #
       # WiFi connnection and and services startup
@@ -185,14 +183,21 @@ Actual Development:
       utelnetd start
       uftpd start
       
-      #> import micropython
-      #> micropython.kbd_intr(-1)
-      
       :exit
-      echo end
-      #wifi sta disconnect
-      #wifi sta off
-      #exit
+
+- end.script example:
+
+        # Script triggered on system exit
+
+        test -p uhttpd
+        if $0 == 1 uhttpd stop
+
+        uftpd stop
+        utelnetd stop
+
+        wifi sta status -n
+        if $1 == 1 wifi sta disconnect -n
+        if $0 == 1 wifi sta off
 
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
