@@ -1,4 +1,4 @@
-upyOS Help:
+upyOS Help: (Obsolete, see https://github.com/rbenrax/upyos for update help)
 
 Developed by rbenrax, source available in https://github.com/rbenrax/upyOS, based in Krzysztof Krystian Jankowski work available in smol.p1x.in/os/
 
