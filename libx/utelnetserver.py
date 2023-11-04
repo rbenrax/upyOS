@@ -81,7 +81,7 @@ def accept_telnet_connect(telnet_server):
     
 #-- Auth rbenrax -->
 
-    last_client_socket.sendall(b'System: ' + sdata.sid + b', Press enter')
+    #last_client_socket.sendall(b'System: ' + sdata.sid + b', Press enter')
     
     if sdata.sysconfig["auth"]["paswd"]!="":
     
@@ -105,7 +105,7 @@ def accept_telnet_connect(telnet_server):
             last_client_socket.sendall(b'Not logged in.\r\n')
             uos.dupterm(None)
             last_client_socket.close()
-            if sdata.debug:
+            if sdata.log:
                 print(f"Telnet: Rejected connection from: {remote_addr} {user}")
             return
         else:
