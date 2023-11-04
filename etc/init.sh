@@ -36,3 +36,6 @@ led off 0            # Turn off led 0
 
 led rgb 1            # Test rgb led in board (if board has one)
 
+# Run local script
+test -f /local/w.sh       # Check if script exists, save result in $0 env var
+if $0 == 1 /local/w.sh

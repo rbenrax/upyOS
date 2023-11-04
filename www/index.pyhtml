@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 Web Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  {{py}}
+  import sdata
+  {{end}}
+  
+</head>
+<body>
+  <h1>ESP32 Web Server</h1>
+  <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
+  <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
+  
+  
+  
+  <p><a href="/on"><button class="button">ON</button></a></p>
+  <p><a href="/off"><button class="button button2">OFF</button></a></p>
+</body>
+</html>
