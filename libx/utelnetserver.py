@@ -109,7 +109,7 @@ def accept_telnet_connect(telnet_server):
             log(f"Telnet", f"Rejected connection from: {remote_addr} {user}")
             return
         else:
-            log:(f"Telnet", f"Accepted connection from: {remote_addr} {user}")
+            log(f"Telnet", f"Accepted connection from: {remote_addr} {user}")
             last_client_socket.sendall(b'Logged in ok, Press enter\r\n')
     
 #-- Auth rbenrax --<
