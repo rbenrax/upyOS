@@ -170,6 +170,10 @@ def shlex(ent):
 
     return args
 
+def log(src, msg):
+    if sdata.log:
+        print(f"{src}: {msg}")
+
 # Recovery mode:
 #import utls
 #utls.recovery()
