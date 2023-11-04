@@ -6,6 +6,7 @@ from uio import IOBase
 
 #-- Auth rbenrax -->
 import sdata
+from utls import log
 #-- Auth rbenrax --<
 
 last_client_socket = None
@@ -77,8 +78,7 @@ def accept_telnet_connect(telnet_server):
         last_client_socket.close()
     
     last_client_socket, remote_addr = telnet_server.accept()
-    if sdata.log:
-        print("Telnet connection from:", remote_addr)
+    log(f"Telnet", f"Connection from: {remote_addr}")
     
 #-- Auth rbenrax -->
 
@@ -106,12 +106,10 @@ def accept_telnet_connect(telnet_server):
             last_client_socket.sendall(b'Not logged in.\r\n')
             uos.dupterm(None)
             last_client_socket.close()
-            if sdata.log:
-                print(f"Telnet: Rejected connection from: {remote_addr} {user}")
+            log(f"Telnet", f"Rejected connection from: {remote_addr} {user}")
             return
         else:
-            if sdata.log:
-                print(f"Telnet: Accepted connection from: {remote_addr} {user}")
+            log:(f"Telnet", f"Accepted connection from: {remote_addr} {user}")
             last_client_socket.sendall(b'Logged in ok, Press enter\r\n')
     
 #-- Auth rbenrax --<
