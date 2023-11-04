@@ -82,7 +82,7 @@ def accept_telnet_connect(telnet_server):
     
 #-- Auth rbenrax -->
 
-    #last_client_socket.sendall(b'System: ' + sdata.sid + b', Press enter')
+    last_client_socket.sendall(b'System: ' + sdata.sid + b', Press enter')
     
     if sdata.sysconfig["auth"]["paswd"]!="":
     
