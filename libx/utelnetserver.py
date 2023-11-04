@@ -77,7 +77,8 @@ def accept_telnet_connect(telnet_server):
         last_client_socket.close()
     
     last_client_socket, remote_addr = telnet_server.accept()
-    print("Telnet connection from:", remote_addr)
+    if sdata.log:
+        print("Telnet connection from:", remote_addr)
     
 #-- Auth rbenrax -->
 
@@ -109,7 +110,7 @@ def accept_telnet_connect(telnet_server):
                 print(f"Telnet: Rejected connection from: {remote_addr} {user}")
             return
         else:
-            if sdata.debug:
+            if sdata.log:
                 print(f"Telnet: Accepted connection from: {remote_addr} {user}")
             last_client_socket.sendall(b'Logged in ok, Press enter\r\n')
     
