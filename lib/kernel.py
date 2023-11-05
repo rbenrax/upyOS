@@ -4,6 +4,7 @@
 import sys
 import uos
 import utime
+from machine import reset as reboot
 
 import sdata
 import utls
@@ -99,7 +100,11 @@ class upyOS:
                 self.run_cmd(user_input)
                 
             except KeyboardInterrupt:
-                self.exit()
+                if "utelnetserver" in sys.modules: # avoid ctrl+c from telnet
+                    print("Can not break execution while telnet is running, stop it or use reset instead")
+                    pass                    
+                else:
+                    self.exit()
 
             except EOFError:
                 self.print_msg("Send EOF")
@@ -206,11 +211,19 @@ class upyOS:
 #        sys.exit()
 
     # System exit
-    def exit(self):
+    def exit(self, mod=""):
 
-        if not sdata.debug:
-            s=input("\nExit upyOS S/[N] : ")
-            if s.upper()!="S": return
+#        if not sdata.debug:
+
+        while True:
+            try:
+                s=input("\nExit upyOS S/[N] : ")
+                if s.upper()!="S":
+                    return
+                else:
+                    break
+            except KeyboardInterrupt:
+                pass
 
         # Stop threads before exit
         if len(sdata.procs)>0:
@@ -231,8 +244,11 @@ class upyOS:
         self.print_msg("Shutdown upyOS..., bye.")
         print("")
         
-        #raise SystemExit
-        sys.exit()
+        if mod=="-r":
+            reboot()
+        else:
+            #raise SystemExit
+            sys.exit()
 
     def print_msg(self, message):
         print(f"\n\033[1;37;44m->{message}\033[0m")
