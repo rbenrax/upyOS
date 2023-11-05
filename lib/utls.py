@@ -58,9 +58,13 @@ def date2s(tms):
     localt = utime.gmtime(tms)
     return f"{localt[2]:0>2}/{localt[1]}/{localt[0]:0>4}"
 
-def time2s(tms):
+def time2s(tms, mod):
     localt = utime.gmtime(tms)
-    return f"{localt[3]:0>2}:{localt[4]:0>2}:{localt[5]:0>2}"
+    
+    if "e" in mod: # Time elapsed
+        return f"{localt[7]-1:3}d {localt[3]:0>2}:{localt[4]:0>2}:{localt[5]:0>2}"
+    else:       # Time regular
+        return f"{localt[3]:0>2}:{localt[4]:0>2}:{localt[5]:0>2}"
 
 #def timed_function(f, *args, **kwargs):
 #    fname = str(f).split(' ')[1]
