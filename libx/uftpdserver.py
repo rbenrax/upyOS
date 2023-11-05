@@ -45,15 +45,12 @@ ftpsockets = []
 datasocket = None
 client_list = []
 verbose_l = 0
+
 client_busy = False
-#-- Auth rbenrax -->
-user=""
-#-- Auth rbenrax --<
 # Interfaces: (IP-Address (string), IP-Address (integer), Netmask (integer))
 
 _month_name = ("", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-
 
 class FTP_client:
 
@@ -73,6 +70,9 @@ class FTP_client:
         self.DATA_PORT = 20
         self.active = True
         self.pasv_data_addr = local_addr
+        #-- Auth rbenrax -->
+        self.user=""
+        #-- Auth rbenrax --<
 
     def send_list_data(self, path, data_client, full):
         try:
@@ -225,9 +225,8 @@ class FTP_client:
             command = data.split()[0].upper()
             payload = data[len(command):].lstrip()  # partition is missing
             path = self.get_absolute_path(self.cwd, payload)
-            log_msg(1, "Command={}, Payload={}".format(command, payload))
-
-            global user
+            
+            log_msg(2, "Command={}, Payload={}".format(command, payload))
             
             if command == "USER":
                 # self.logged_in = True
@@ -237,15 +236,16 @@ class FTP_client:
                 # If you want to reject an user, return
                 #   "530 Not logged in.\r\n"
                 
+                self.user=payload
+                
                 if sdata.sysconfig["auth"]["paswd"]=="":
-                    log(f"Ftp", f"{user} user logged in")
+                    log_msg(0, f"user {self.user} logged in from {self.remote_addr}")
                     cl.sendall("230 Logged in.\r\n")
                 else:
                     #if payload != sdata.sysconfig["auth"]["user"]:
                     #    cl.sendall("530 Not logged in.\r\n")
                     #else:
                     #    cl.sendall("331 Need password.\r\n")
-                    user=payload
                     cl.sendall("331 Need password.\r\n")
                 
             elif command == "PASS":
@@ -253,12 +253,12 @@ class FTP_client:
                 # "530 Not logged in.\r\n" in case it's wrong
                 # self.logged_in = True
                 ##cl.sendall("230 Logged in.\r\n")
-                if user == sdata.sysconfig["auth"]["user"] and payload==sdata.sysconfig["auth"]["paswd"]:
+                if self.user == sdata.sysconfig["auth"]["user"] and payload==sdata.sysconfig["auth"]["paswd"]:
                     cl.sendall("230 Logged in.\r\n")
-                    log(f"Ftp", f"{user} user logged in")
+                    log_msg(0, f"user {self.user} logged in from {self.remote_addr}")
                 else:
                     cl.sendall("530 Not logged in.\r\n")
-                    log(f"Ftp", f"{user} user not logged in")
+                    log_msg(0, f"user {self.user} NOT logged in from {self.remote_addr}")
                     
             elif command == "SYST":
                 cl.sendall("215 UNIX Type: L8\r\n")
@@ -267,6 +267,7 @@ class FTP_client:
             elif command == "QUIT":
                 cl.sendall('221 Bye.\r\n')
                 close_client(cl)
+                log_msg(0, f"user {self.user} logged out from {self.remote_addr}")
             elif command == "PWD" or command == "XPWD":
                 cl.sendall('257 "{}"\r\n'.format(self.cwd))
             elif command == "CWD" or command == "XCWD":
@@ -428,8 +429,7 @@ def log_msg(level, *args):
     global verbose_l
     if verbose_l >= level:
         #print(*args)
-        log("Ftp", "level: " + str(level) + " " +  " ".join(args))
-
+        log("Ftp", "level " + str(level) + " " +  " ".join(args))
 
 # close client and remove it from the list
 def close_client(cl):
@@ -439,7 +439,6 @@ def close_client(cl):
         if client.command_client == cl:
             del client_list[i]
             break
-
 
 def accept_ftp_connect(ftpsocket, local_addr):
     # Accept new calls for the server
@@ -454,12 +453,10 @@ def accept_ftp_connect(ftpsocket, local_addr):
         except:
             pass
 
-
 def num_ip(ip):
     items = ip.split(".")
     return (int(items[0]) << 24 | int(items[1]) << 16 |
             int(items[2]) << 8 | int(items[3]))
-
 
 def stop():
     global ftpsockets, datasocket
@@ -480,7 +477,6 @@ def stop():
     if datasocket is not None:
         datasocket.close()
         datasocket = None
-
 
 # start listening for ftp connections on port 21
 def start(port=21, verbose=0, splash=True):
@@ -522,6 +518,5 @@ def restart(port=21, verbose=0, splash=True):
     stop()
     sleep_ms(200)
     start(port, verbose, splash)
-
 
 #start(splash=True)
