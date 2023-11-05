@@ -43,6 +43,7 @@ datasocket = None
 client_list = []
 verbose_l = 0
 client_busy = False
+user=""
 # Interfaces: (IP-Address (string), IP-Address (integer), Netmask (integer))
 
 _month_name = ("", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -221,6 +222,8 @@ class FTP_client:
             path = self.get_absolute_path(self.cwd, payload)
             log_msg(1, "Command={}, Payload={}".format(command, payload))
 
+            global user
+            
             if command == "USER":
                 # self.logged_in = True
                 ##cl.sendall("230 Logged in.\r\n")
@@ -232,17 +235,19 @@ class FTP_client:
                 if sdata.sysconfig["auth"]["paswd"]=="":
                     cl.sendall("230 Logged in.\r\n")
                 else:
-                    if payload != sdata.sysconfig["auth"]["user"]:
-                        cl.sendall("530 Not logged in.\r\n")
-                    else:
-                        cl.sendall("331 Need password.\r\n")
+                    #if payload != sdata.sysconfig["auth"]["user"]:
+                    #    cl.sendall("530 Not logged in.\r\n")
+                    #else:
+                    #    cl.sendall("331 Need password.\r\n")
+                    user=payload
+                    cl.sendall("331 Need password.\r\n")
                 
             elif command == "PASS":
                 # you may check here for a valid password and return
                 # "530 Not logged in.\r\n" in case it's wrong
                 # self.logged_in = True
                 ##cl.sendall("230 Logged in.\r\n")
-                if sdata.sysconfig["auth"]["paswd"]==payload:
+                if user == sdata.sysconfig["auth"]["user"] and payload==sdata.sysconfig["auth"]["paswd"]:
                     cl.sendall("230 Logged in.\r\n")
                 else:
                     cl.sendall("530 Not logged in.\r\n")
