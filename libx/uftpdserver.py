@@ -28,7 +28,10 @@ import errno
 from time import sleep_ms, localtime
 from micropython import alloc_emergency_exception_buf
 
+#-- Auth rbenrax -->
 import sdata
+from utls import log
+#-- Auth rbenrax --<
 
 # constant definitions
 _CHUNK_SIZE = const(1024)
@@ -43,7 +46,9 @@ datasocket = None
 client_list = []
 verbose_l = 0
 client_busy = False
+#-- Auth rbenrax -->
 user=""
+#-- Auth rbenrax --<
 # Interfaces: (IP-Address (string), IP-Address (integer), Netmask (integer))
 
 _month_name = ("", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -56,7 +61,7 @@ class FTP_client:
         self.command_client, self.remote_addr = ftpsocket.accept()
         self.remote_addr = self.remote_addr[0]
         self.command_client.settimeout(_COMMAND_TIMEOUT)
-        log_msg(1, "FTP Command connection from:", self.remote_addr)
+        log_msg(1, "Command connection from:", self.remote_addr)
         self.command_client.setsockopt(socket.SOL_SOCKET,
                                        _SO_REGISTER_HANDLER,
                                        self.exec_ftp_command)
@@ -177,10 +182,10 @@ class FTP_client:
             data_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             data_client.settimeout(_DATA_TIMEOUT)
             data_client.connect((self.act_data_addr, self.DATA_PORT))
-            log_msg(1, "FTP Data connection with:", self.act_data_addr)
+            log_msg(1, "Data connection with:", self.act_data_addr)
         else:  # passive mode
             data_client, data_addr = datasocket.accept()
-            log_msg(1, "FTP Data connection with:", data_addr[0])
+            log_msg(1, "Data connection with:", data_addr[0])
         return data_client
 
     def exec_ftp_command(self, cl):
@@ -233,6 +238,7 @@ class FTP_client:
                 #   "530 Not logged in.\r\n"
                 
                 if sdata.sysconfig["auth"]["paswd"]=="":
+                    log(f"Ftp", f"{user} user logged in")
                     cl.sendall("230 Logged in.\r\n")
                 else:
                     #if payload != sdata.sysconfig["auth"]["user"]:
@@ -249,8 +255,10 @@ class FTP_client:
                 ##cl.sendall("230 Logged in.\r\n")
                 if user == sdata.sysconfig["auth"]["user"] and payload==sdata.sysconfig["auth"]["paswd"]:
                     cl.sendall("230 Logged in.\r\n")
+                    log(f"Ftp", f"{user} user logged in")
                 else:
                     cl.sendall("530 Not logged in.\r\n")
+                    log(f"Ftp", f"{user} user not logged in")
                     
             elif command == "SYST":
                 cl.sendall("215 UNIX Type: L8\r\n")
@@ -419,7 +427,8 @@ class FTP_client:
 def log_msg(level, *args):
     global verbose_l
     if verbose_l >= level:
-        print(*args)
+        #print(*args)
+        log("Ftp", "level: " + str(level) + " " +  " ".join(args))
 
 
 # close client and remove it from the list
