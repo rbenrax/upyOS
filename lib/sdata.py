@@ -5,7 +5,7 @@ version = ""
 sid     = 0
 initime = 0
 
-debug   = False
+debug   = True
 log     = False
 
 board={}
