@@ -7,6 +7,21 @@ upyOS is a modular flash Operating System for microcontrollers based on Micropyt
 
 The target is to get a common modular base to use stand alone microcontroller, avoiding monolithics programs, reuse modules and fun using it. 
 
+
+Installation:
+
+      git clone https://github.com/rbenrax/upyOS.git
+      
+      cd upyOS
+      
+      mpremote fs -v cp main.py :main.py
+      
+      mpremote fs -r -v cp bin etc lib libx opt tmp www :
+      
+      mpremote
+      Ctrl+D
+
+
 Secreenshots of rp2040 module running upyOS:
 
 ![upyos01](media/upyos_01.png )
