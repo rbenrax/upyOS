@@ -100,11 +100,7 @@ class upyOS:
                 self.run_cmd(user_input)
                 
             except KeyboardInterrupt:
-                if "utelnetserver" in sys.modules: # avoid ctrl+c from telnet
-                    print("Can not break execution while telnet is running, stop it or use reset instead")
-                    pass                    
-                else:
-                    self.exit()
+                self.exit()
 
             except EOFError:
                 self.print_msg("Send EOF")
@@ -207,48 +203,52 @@ class upyOS:
             if pn in i.cmd:
                 i.sts="S"
 
-#    def halt(self):
-#        sys.exit()
-
     # System exit
     def exit(self, mod=""):
 
-#        if not sdata.debug:
-
-        while True:
-            try:
-                s=input("\nExit upyOS S/[N] : ")
-                if s.upper()!="S":
-                    return
-                else:
-                    break
-            except KeyboardInterrupt:
-                pass
-
-        # Stop threads before exit
-        if len(sdata.procs)>0:
-            print("\nStoping process...")
-
-            # Launch shutdown services script
-            if utls.file_exists("/etc/end.sh"):
-                self.run_cmd("sh /etc/end.sh")
-
-            self.killall("")
+        if not sdata.debug:
             while True:
-                end=True
-                for p in sdata.procs:
-                    if p.isthr: end=False
-                if end: break
-                utime.sleep(.5)
+                try:
+                    if "utelnetserver" in sys.modules:
+                        print("Telnet is active, stop it, or use reset instead")
+                        return            
                 
-        self.print_msg("Shutdown upyOS..., bye.")
-        print("")
-        
-        if mod=="-r":
-            reboot()
-        else:
-            #raise SystemExit
-            sys.exit()
+                    s=input("\nExit upyOS S/[N] : ")
+                    if s.upper()!="S":
+                        return
+                    else:
+                        break
+                except KeyboardInterrupt:
+                    pass
+
+        try:
+            # Stop threads before exit
+            if len(sdata.procs)>0:
+                print("\nStoping process...")
+
+                # Launch shutdown services script
+                if utls.file_exists("/etc/end.sh"):
+                    self.run_cmd("sh /etc/end.sh")
+
+                self.killall("")
+                while True:
+                    end=True
+                    for p in sdata.procs:
+                        if p.isthr: end=False
+                    if end: break
+                    utime.sleep(.5)
+                    
+            self.print_msg("Shutdown upyOS..., bye.")
+            print("")
+            
+            if mod=="-r":
+                reboot()
+            else:
+                #raise SystemExit
+                sys.exit()
+                
+        except KeyboardInterrupt:
+            pass
 
     def print_msg(self, message):
         print(f"\n\033[1;37;44m->{message}\033[0m")

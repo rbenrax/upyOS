@@ -16,7 +16,7 @@ def __main__(args):
             
         elif args[0]=="stop":
             uftpdserver.stop()
-            del sys.modules["uftpd"]
+            del sys.modules["uftpdserver"]
 
         elif args[0]=="restart":
             uftpdserver.restart()
