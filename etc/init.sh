@@ -4,6 +4,8 @@
 # > (Execute Python code)
 # < (Print the Python code execuion)
 
+# > sdata.debug=False
+
 #cpufreq 133
 
 < "\033[1;33;44m", end=""
@@ -29,13 +31,39 @@ free -h
 < "\033[1mStorage:"
 df -h
 
-# If no board configuration, nexts commands can fail and should not be used 
+# Test System Leds
 led on 0             # Turn on led 0
 sleep .05
 led off 0            # Turn off led 0
 
 led rgb 1            # Test rgb led in board (if board has one)
 
+< "\\n"
+# Wifi
+#wifi sta on                      # Turn on wifi in cliente mode
+
+#wifi sta status   
+#wifi sta scan                   # scan wifi APs
+
+#wifi sta connect DIGIFIBRA-cGPRi <password> 10 # SSID PASS Timeout
+
+#wifi sta status -n
+#if $0 == 0 goto exit
+#if $1 == 0 goto exit
+
+#ntpupdate es.pool.ntp.org
+#date
+
+#wifi sta ifconfig
+
+#utelnetd start
+#uhttpd start &
+#uftpd start &
+
+:exit
+
 # Run local script
 test -f /local/w.sh       # Check if script exists, save result in $0 env var
 if $0 == 1 /local/w.sh
+
+

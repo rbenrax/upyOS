@@ -213,8 +213,8 @@ class upyOS:
                         print("Telnet is active, stop it, or use reset instead")
                         return            
                 
-                    s=input("\nExit upyOS S/[N] : ")
-                    if s.upper()!="S":
+                    s=input("\nExit upyOS Y/[N] : ")
+                    if s.upper()!="Y":
                         return
                     else:
                         break
