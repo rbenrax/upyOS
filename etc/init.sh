@@ -1,18 +1,19 @@
-# This script file is the first script called in boot, this is normal mode, if does not exists,
-# we are in recovery mode and should exists init.rec
+# This script is called in boot, this is normal mode, 
+# if does not exists, then recovery mode
+
 # Internal and external commands can be used
 # > (Execute Python code)
 # < (Print the Python code execuion)
 
-# > sdata.debug=False
+# > sdata.debug=False    # Debug mode
 
-#cpufreq 133
+#cpufreq 133  # set mcu clock speed
 
 < "\033[1;33;44m", end=""
 cat /etc/wellcome.txt
 < "\033[0m", end=""
 
-loadboard    # You can choose do not load or use another board configuration, without param, default board
+loadboard    # You can choose load different boards configuration, without param, default board
 #loadboard /etc/upyOS-esp32c3_luatos.board
 #loadboard /etc/upyOS-esp32c3_vcc_gnd.board
 #loadboard /etc/upyOS-esp32s3_vcc_gnd.board
