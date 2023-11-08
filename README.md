@@ -229,6 +229,44 @@ Script execution in boot:
       if $a > 4 goto cont2
       echo $a
 
+Wifi upgrade procedure:
+
+   upgrade.sh
+
+      #!/bin/sh
+      HOST='IP address'
+      USER='admin''
+      PASSWD='password'
+
+      ftp -n $HOST <<END_SCRIPT
+      quote USER $USER
+      quote PASS $PASSWD
+      binary
+      prompt
+      
+      lcd bin
+      cd bin
+      mput *
+      lcd ..
+      cd ..
+      
+      lcd lib
+      cd lib
+      mput *
+      lcd ..
+      cd ..
+
+      lcd libx
+      cd libx
+      mput *
+      lcd ..
+      cd ..
+      
+      quit
+
+# Require ftp server service running in mcu and setauth command to set user and password to login. 
+
+
 - upyOS remote development:
       - Start in remote mcu telnet service (utelnet start)
       - Start in remote mcu ftpserver service (uftpd start)
