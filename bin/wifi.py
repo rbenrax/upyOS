@@ -47,9 +47,9 @@ def psts(mods, nic, aif):
         print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({aif.status()})')
 
         if nic=="sta":
-            print (f"wifi {nic}: {'Connected' if aif.isconnected() else 'Not connected'}")
+            print (f"          {'Connected' if aif.isconnected() else 'Not connected'}")
         else: # ap
-            print (f"wifi {nic}: {'Client connected' if aif.isconnected() else 'No Client connected'}")
+            print (f"          {'Client connected' if aif.isconnected() else 'No Client connected'}")
         
     if aif.active():
         setenv("0", "1")
