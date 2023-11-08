@@ -33,6 +33,7 @@ import sdata
  #network.MODE_LR 8
  
 def nicsts(code):
+    
     if code==203:
         return "Association fail"  #network.STAT_ASSOC_FAIL 203
     elif code==200:
