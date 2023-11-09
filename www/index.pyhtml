@@ -14,21 +14,31 @@
   
   bit_tuple = uos.statvfs("/")
   blksize = bit_tuple[0]  # system block size  
-  t = bit_tuple[2] * blksize
+  ts = bit_tuple[2] * blksize
+  fs = bit_tuple[3] * blksize
+  us = ts - fs
+  ps = f'({fs/ts*100:.2f}%)' 
+  
+  fm = gc.mem_free()
+  am = gc.mem_alloc()
+  tm = fm+am
+  pm = f'({fm/tm*100:.2f}%)'
   
   {{end}}
   
 </head>
 <body>
-  <h1>upyOS MicroWebSrv</h1>
+  <h1>MicroWebSrv upyOS</h1>
   <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
   <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
  
-  <p>RAM: <strong> {{utls.human(gc.mem_free())}} </strong></p>
-  <p>Storage: <strong> {{utls.human(t)}} </strong></p>
+  <p>Memory Total: <strong> {{utls.human(tm)}} </strong> Free: <strong> {{utls.human(fm)}} {{pm}}</strong></p>
   
-  <p><a href="/on"><button class="button">ON</button></a></p>
-  <p><a href="/off"><button class="button button2">OFF</button></a></p>
+  <p>Storage Total: <strong> {{utls.human(ts)}} </strong> Free: <strong> {{utls.human(fs)}} {{ps}}</strong></p>
+  
+  
+  <p><a href="/on"><button class="button">ON</button></a>
+  <a href="/off"><button class="button button2">OFF</button></a></p>
   
   
   <p>dir(): <strong> {{dir()}} </strong></p>
