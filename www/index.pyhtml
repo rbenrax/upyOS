@@ -1,23 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ESP32 Web Server</title>
+  <title>upyOS MicroWebSrv</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" type="text/css" href="style.css">
+  
   {{py}}
   import sdata
+  import utls
+  import gc
+  import uos 
+  
+  bit_tuple = uos.statvfs("/")
+  blksize = bit_tuple[0]  # system block size  
+  t = bit_tuple[2] * blksize
+  
   {{end}}
   
 </head>
 <body>
-  <h1>ESP32 Web Server</h1>
+  <h1>upyOS MicroWebSrv</h1>
   <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
   <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
-  
-  
+ 
+  <p>RAM: <strong> {{utls.human(gc.mem_free())}} </strong></p>
+  <p>Storage: <strong> {{utls.human(t)}} </strong></p>
   
   <p><a href="/on"><button class="button">ON</button></a></p>
   <p><a href="/off"><button class="button button2">OFF</button></a></p>
+  
+  
+  <p>dir(): <strong> {{dir()}} </strong></p>
+  
+  <p>env: <strong> {{sdata.sysconfig["env"]}} </strong></p>
+  
+  
+  
 </body>
 </html>
