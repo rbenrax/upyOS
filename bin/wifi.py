@@ -6,15 +6,16 @@ import sys
 
 import sdata
 
-# <network> constant & functions
+# <network> Class, functions & constant 
 
-#network.STA_IF 0
-#network.AP_IF 1
 #network.WLAN()
 #network.PPP()      'ppp = network.PPP(modem.uart)'
 #network.country()
 #network.hostname()
 #network.phy_mode
+
+#network.STA_IF 0
+#network.AP_IF 1
 
 #network.AUTH_OPEN 0
 #network.AUTH_WEP 1
@@ -35,6 +36,8 @@ AUTHMODE = {0: "open", 1: "WEP", 2: "WPA-PSK", 3: "WPA2-PSK", \
 #network.MODE_11G 2
 #network.MODE_11N 4
 #network.MODE_LR 8
+
+NETMODE = {1: "11B", 2: "11G", 4: "11N", 8: "LR"}
 
 #network.STAT_ASSOC_FAIL 203
 #network.STAT_BEACON_TIMEOUT 200
