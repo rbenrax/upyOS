@@ -6,64 +6,54 @@ import sys
 
 import sdata
 
-AUTHMODE = {0: "open", 1: "WEP", 2: "WPA-PSK", 3: "WPA2-PSK", 4: "WPA/WPA2-PSK"}
+# <network> constant & functions
 
- # <network> constant & functions
+#network.STA_IF 0
+#network.AP_IF 1
+#network.WLAN()
+#network.PPP()      'ppp = network.PPP(modem.uart)'
+#network.country()
+#network.hostname()
+#network.phy_mode
+
+#network.AUTH_OPEN 0
+#network.AUTH_WEP 1
+#network.AUTH_WPA_PSK 2
+#network.AUTH_WPA2_PSK 3
+#network.AUTH_WPA_WPA2_PSK = 4
+#network.AUTH_WPA2_ENTERPRISE 5
+#network.AUTH_WPA3_PSK 6
+#network.AUTH_WPA2_WPA3_PSK 7
+#network.AUTH_WAPI_PSK 8
+#network.AUTH_MAX 9
  
- #network.STA_IF 0
- #network.AP_IF 1
- #network.WLAN()
- #network.PPP()      'ppp = network.PPP(modem.uart)'
- #network.country()
- #network.hostname()
- #network.phy_mode
+AUTHMODE = {0: "open", 1: "WEP", 2: "WPA-PSK", 3: "WPA2-PSK", \
+            4: "WPA/WPA2-PSK", 5: "WPA2/ENTERPRISE",  6: "WPA3/PSK", \
+            7: "WPA2/WPA3-PSK", 8: "WAPI-PSK", 9: "MAX"}
  
- #network.AUTH_OPEN 0
- #network.AUTH_WEP 1
- #network.AUTH_WPA_PSK 2
- #network.AUTH_WPA2_PSK 3
- #network.AUTH_WPA_WPA2_PSK = 4
- #network.AUTH_WPA2_ENTERPRISE 5
- #network.AUTH_WPA3_PSK 6
- #network.AUTH_WPA2_WPA3_PSK 7
- #network.AUTH_WAPI_PSK 8
- #network.AUTH_MAX 9
- 
- #network.MODE_11B 1
- #network.MODE_11G 2
- #network.MODE_11N 4
- #network.MODE_LR 8
- 
-def nicsts(code):
-    
-    if code==203:
-        return "Association fail"  #network.STAT_ASSOC_FAIL 203
-    elif code==200:
-        return "Beacon timeout"    #network.STAT_BEACON_TIMEOUT 200
-    elif code==1001:
-        return "Connecting"        #network.STAT_CONNECTING 1001
-    elif code==1010:
-        return "Got IP"            #network.STAT_GOT_IP 1010
-    elif code==204:
-        return "Handshake timeout" #network.STAT_HANDSHAKE_TIMEOUT 204
-    elif code==1000:
-        return "Idle"              #network.STAT_IDLE 1000
-    elif code==201:
-        return "No AP found"       #network.STAT_NO_AP_FOUND 201
-    elif code==202:
-        return "Wrong password"    #network.STAT_WRONG_PASSWORD 202
-    else:
-        return "Unknown"
-    
+#network.MODE_11B 1
+#network.MODE_11G 2
+#network.MODE_11N 4
+#network.MODE_LR 8
+
+#network.STAT_ASSOC_FAIL 203
+#network.STAT_BEACON_TIMEOUT 200
+#network.STAT_CONNECTING 1001
+#network.STAT_GOT_IP 1010
+#network.STAT_HANDSHAKE_TIMEOUT 204
+#network.STAT_IDLE 1000
+#network.STAT_NO_AP_FOUND 201
+#network.STAT_WRONG_PASSWORD 202
+
 def psts(mods, nic, aif):
 
     if not "-n" in mods:
-        print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({nicsts(aif.status())})')
+        print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({aif.status()})')
 
         if nic=="sta":
-            print (f"          {'Connected' if aif.isconnected() else 'Not connected'}")
+            print (f"wifi {nic}: {'Connected' if aif.isconnected() else 'Not connected'}")
         else: # ap
-            print (f"          {'Client connected' if aif.isconnected() else 'No Client connected'}")
+            print (f"wifi {nic}: {'Client connected' if aif.isconnected() else 'No Client connected'}")
         
     if aif.active():
         setenv("0", "1")
@@ -97,6 +87,7 @@ def __main__(args):
         print("\twifi country <country> - get/set country")
         print("\twifi hostname <hostname> - get/set hostname")
         print("\twifi phy_mode <phy_mode> - get/set phy_mode")
+        print("\twifi --info parm info")
         return
 
     mods=[]
@@ -104,6 +95,14 @@ def __main__(args):
     for a in args:      # adds modifiers
         if a[0] == "-":
             mods.append(a)
+            
+    if "--info" in mods:
+        with open("/bin/wifi.inf", 'r') as f:
+            while True:
+                lin = f.readline()
+                if not lin: break
+                print(lin, end="")
+        return
     
     if args[0] == "country":
         if len(args) == 2:
