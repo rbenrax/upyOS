@@ -5,7 +5,9 @@ from utls import setenv
 import sys
 
 import sdata
- 
+
+AUTHMODE = {0: "open", 1: "WEP", 2: "WPA-PSK", 3: "WPA2-PSK", 4: "WPA/WPA2-PSK"}
+
  # <network> constant & functions
  
  #network.STA_IF 0
@@ -157,10 +159,10 @@ def __main__(args):
 
         try:
             from utls import mac2Str
-            print ("SSID             \t  Bssid    \t\tCh   \tSig \tSec \tHid")
+            print ("SSID             \t  Bssid    \t\tCh   \tSig \tSec \t\tHid")
     
             for net in _if.scan():
-                print (f"{tspaces(net[0].decode(), n=20, ab="a")}      {mac2Str(net[1])}\t{net[2]}\t{net[3]}\t{net[4]}\t{net[5]}")
+                print (f"{tspaces(net[0].decode(), n=20, ab="a")}      {mac2Str(net[1])}\t{net[2]}\t{net[3]}\t{net[4]}-{AUTHMODE[net[4]]}\t{net[5]}")
 
         except Exception as ex:
             print("wifi err: " + str(ex))
