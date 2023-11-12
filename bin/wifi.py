@@ -45,10 +45,13 @@ AUTHMODE = {0: "open", 1: "WEP", 2: "WPA-PSK", 3: "WPA2-PSK", \
 #network.STAT_NO_AP_FOUND 201
 #network.STAT_WRONG_PASSWORD 202
 
+NETSTAT = {203: "Association fail", 200: "Beacon timeout", 1001: "Connecting", 1010: "Got IP", \
+            204: "Handshake timeout", 1000: "Idle", 201: "No AP found",  202: "Wrong password"}
+
 def psts(mods, nic, aif):
 
     if not "-n" in mods:
-        print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({aif.status()})')
+        print (f'wifi {nic}: {"Active" if aif.active() == True else "Not active"} ({NETSTAT[aif.status()]})')
 
         if nic=="sta":
             print (f"wifi {nic}: {'Connected' if aif.isconnected() else 'Not connected'}")
