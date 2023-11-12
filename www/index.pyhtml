@@ -1,23 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ESP32 Web Server</title>
+  <title>upyOS MicroWebSrv</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" type="text/css" href="style.css">
+  
   {{py}}
   import sdata
+  import utls
+  import gc
+  import uos 
+  
+  bit_tuple = uos.statvfs("/")
+  blksize = bit_tuple[0]  # system block size  
+  ts = bit_tuple[2] * blksize
+  fs = bit_tuple[3] * blksize
+  us = ts - fs
+  ps = f'({fs/ts*100:.2f}%)' 
+  
+  fm = gc.mem_free()
+  am = gc.mem_alloc()
+  tm = fm+am
+  pm = f'({fm/tm*100:.2f}%)'
+  
   {{end}}
   
 </head>
 <body>
-  <h1>ESP32 Web Server</h1>
+  <h1>MicroWebSrv upyOS</h1>
   <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
   <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
+ 
+  <p>Memory Total: <strong> {{utls.human(tm)}} </strong> Free: <strong> {{utls.human(fm)}} {{pm}}</strong></p>
+  
+  <p>Storage Total: <strong> {{utls.human(ts)}} </strong> Free: <strong> {{utls.human(fs)}} {{ps}}</strong></p>
+  
+  
+  <p><a href="/on"><button class="button">ON</button></a>
+  <a href="/off"><button class="button button2">OFF</button></a></p>
+  
+  
+  <p>dir(): <strong> {{dir()}} </strong></p>
+  
+  <p>env: <strong> {{sdata.sysconfig["env"]}} </strong></p>
   
   
   
-  <p><a href="/on"><button class="button">ON</button></a></p>
-  <p><a href="/off"><button class="button button2">OFF</button></a></p>
 </body>
 </html>
