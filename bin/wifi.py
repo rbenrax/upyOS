@@ -93,7 +93,6 @@ def __main__(args):
         print("\twifi country <country> - get/set country")
         print("\twifi hostname <hostname> - get/set hostname")
         print("\twifi phy_mode <phy_mode> - get/set phy_mode")
-        print("\twifi --info parm info")
         return
 
     mods=[]
@@ -101,14 +100,6 @@ def __main__(args):
     for a in args:      # adds modifiers
         if a[0] == "-":
             mods.append(a)
-            
-    if "--info" in mods:
-        with open("/bin/wifi.inf", 'r') as f:
-            while True:
-                lin = f.readline()
-                if not lin: break
-                print(lin, end="")
-        return
     
     if args[0] == "country":
         if len(args) == 2:
