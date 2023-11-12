@@ -143,7 +143,11 @@ def __main__(args):
         _if = network.WLAN(network.STA_IF)
     else:
         _if = network.WLAN(network.AP_IF)
-        
+    
+    if len(args)==1:
+        print("Usage: wifi <nic> <command> ...")
+        return
+    
     cmd = args[1]
     
     if cmd == "on":
