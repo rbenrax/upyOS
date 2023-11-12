@@ -49,7 +49,13 @@ NETMODE = {1: "11B", 2: "11G", 4: "11N", 8: "LR"}
 #network.STAT_WRONG_PASSWORD 202
 
 NETSTAT = {203: "Association fail", 200: "Beacon timeout", 1001: "Connecting", 1010: "Got IP", \
-           204: "Handshake timeout", 1000: "Idle", 201: "No AP found",  202: "Wrong password"}
+           204: "Handshake timeout", 1000: "Idle", 201: "No AP found",  202: "Wrong password", 8: "Unknown"}
+
+#def netsts(sts):
+#    try:
+#        return str(sts) + "-" + NETSTAT[sts]
+#    except:
+#        return str(sts) + "-Unknown"
 
 def psts(mods, nic, aif):
 
@@ -189,6 +195,9 @@ def __main__(args):
             
         tout=0
         if len(args)==5:
+            if not args[4].lstrip("-").isdigit():
+                print("wifi, Timeout is not a number")
+                return
             tout=int(args[4])
  
         print (f"Connecting to {args[2]}{', Time out in ' + str(tout) + 's.' if tout > 0 else ''}")
