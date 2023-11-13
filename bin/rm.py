@@ -3,7 +3,7 @@ import utls
 
 def __main__(args):
 
-    if len(args) == 0 or args[0]="--h":
+    if len(args) == 0 or args[0]=="--h":
         print("Remove file\nUsage: rm <path>")
         return
     else:
