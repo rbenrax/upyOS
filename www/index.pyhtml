@@ -29,6 +29,10 @@
 </head>
 <body>
   <h1>MicroWebSrv upyOS</h1>
+  
+  <p>MCU: <strong> {{sdata.board["mcu"][0]["type"]}} </strong></p>
+  <p>Arch: <strong> {{sdata.board["mcu"][0]["arch"]}} </strong></p>
+  
   <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
   <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
  
