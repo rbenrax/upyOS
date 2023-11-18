@@ -36,7 +36,7 @@ def __main__(args):
             print(f"Curren user is {sdata.sysconfig["auth"]["user"]}")
             
         elif args[0] == "-d":
-            sdata.sysconfig["auth"]["passwd"] = ""
+            sdata.sysconfig["auth"]["paswd"] = ""
             utls.save_conf_file(sdata.sysconfig, "/etc/system.conf")
             print(f"Security has been disabled")
             
