@@ -9,14 +9,7 @@ def mv(sp, dp):
         dp += sf
     
     print(sp + " -> " + dp)
-    with open(sp, 'rb') as fs:
-        with open(dp, "wb") as fd:
-            while True:
-                buf = fs.read(256)
-                if not buf:
-                    break
-                fd.write(buf)
-
+    uos.rename(sp, dp)
 
 def __main__(args):
 
