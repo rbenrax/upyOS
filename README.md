@@ -172,13 +172,11 @@ Actual Development:
       if $v1 != 0 goto loop
       exit
 
-- services startup sh script (can be called from init.sh)
+- wifi startup sh script example (can be called from init.sh)
 
       #
       # WiFi connnection and and services startup
-      # 
-      
-      loadboard /etc/upyOS-esp32c3_luatos.board
+      #
       
       wifi sta on
       
@@ -200,7 +198,7 @@ Actual Development:
       
       :exit
 
-- end.script example:
+- end script example for stop running services:
 
         # Script triggered on system exit
 
@@ -229,7 +227,7 @@ Script execution in boot:
       if $a > 4 goto cont2
       echo $a
 
-Wifi upgrade procedure:
+upyos upgrade procedure with ftp:
 
    upgrade.sh
 
