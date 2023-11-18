@@ -21,7 +21,7 @@ def cp(sp, dp):
 def __main__(args):
 
     if len(args) != 2:
-        print("Copy file\nUsage: cp <spath> <dpath>")
+        print("Copy a file or all files in a directory\nUsage: cp <spath> <dpath>")
         return
     else:
         spath=args[0]
