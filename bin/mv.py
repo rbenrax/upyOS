@@ -21,7 +21,7 @@ def mv(sp, dp):
 def __main__(args):
 
     if len(args) != 2:
-        print("Move a file or files in directory\nUsage: mv <spath> <dpath>")
+        print("Move a file or all files in directory\nUsage: mv <spath> <dpath>")
         return
     else:
         spath=args[0]
