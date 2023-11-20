@@ -1,5 +1,5 @@
 import os
-import urequest
+import urequests
 import machine
 
 user='rbenrax'
@@ -9,13 +9,13 @@ default_branch = 'main'
 #------
 
 #giturl = f'https://github.com/{user}/{repository}'
-url_tree = f'https://api.github.com/repos/{user}/{repository}/git/trees/{default_branch}?recursive=1'
+#url_tree = f'https://api.github.com/repos/{user}/{repository}/git/trees/{default_branch}?recursive=1'
 url_raw = f'https://raw.githubusercontent.com/{user}/{repository}/master/'
 
-def pull_git_tree(u_tree):
-    headers = {'User-Agent': 'upyOS'} 
-    r = urequests.get(u_tree, headers=headers)
-    print(r.content.decode('utf-8'))
+#def pull_git_tree(u_tree):
+#    headers = {'User-Agent': 'upyOS'} 
+#    r = urequests.get(u_tree, headers=headers)
+#    #print(r.content.decode('utf-8'))
 
 def pull(f_path, raw_url):
 
@@ -37,6 +37,7 @@ def __main__(args):
         print("Upgrade upyOS from git repository\nUsage: upgrade")
         return
     else:
+    
         uf="/upgrade.inf"
         pull(uf, url_raw + uf[1:])
         
@@ -45,11 +46,12 @@ def __main__(args):
             while True:
                 fp=f.readline()
                 if not fp: break
+                fp=fp[:-1] # remove ending CR
                 print(fp)
-                fn=fp.split("/")[-1]
-                pull(fp, url_raw + fn)
-
-   
-        
-
-        
+                pull(fp, url_raw + fp[1:])
+                
+        os.remove(uf)
+        if len(args) == 1 and args[0]=="-r":
+            machine.soft_reset()
+					 
+					 
