@@ -277,6 +277,9 @@ upyos upgrade procedure with ftp:
 
 - By starting utelnet and uftpd on boot, you can develop remotely from Android by using "Serial wifi terminal" and "Squircle CE" apps from Google Play, Termux is an excelent option too as telnet client.
 
+- Added upgrade command for OTA upgrade from github repository.
+
+  
 TODO List:
 - Add diff, tar, uname, read and other usefull commands.
 - Bluetooth support
