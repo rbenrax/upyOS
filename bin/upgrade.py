@@ -97,14 +97,19 @@ def __main__(args):
         return
     else:
     
-        print("Initiating Upgrade, downloading upgradde list")
+        print("upyOs OTA Upgrade, downloading upgradde list")
         uf="/etc/upgrade.inf"
         pull2(uf, url_raw + uf[1:])
         
         if not utls.file_exists(uf):
-            print("No upgrade file available, system not upgraded")
+            print("No upgrade file available, system can not be upgraded")
             return
-        
+            
+        r = input("Confirm upyOS upgrade (y/N)? ")
+        if r!="y":
+            print("Upgrade canceled"
+            return
+              
         print("Upgrading from upyOS git repsitory, wait...")
         with open(uf, 'r') as f:
             while True:
