@@ -92,12 +92,17 @@ def pull(f_path, raw_url):
     
 def __main__(args):
 
-    if len(args) == 1 and args[0]=="--h":
-        print("Upgrade upyOS from git repository\nUsage: upgrade <options>: -r reboot after upgrade")
+    mod="" 
+    for i in args:
+        if "-" in i: mod+=i
+
+    if "--h" in mod:
+        print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f do not ask confirmation, -r reboot after upgrade")
         return
+    
     else:
     
-        print("upyOs OTA Upgrade")
+        print("upyOs OTA Upgrade, downloading upgradde list")
         uf="/etc/upgrade.inf"
         pull2(uf, url_raw + uf[1:])
         
@@ -105,12 +110,13 @@ def __main__(args):
             print("No upgrade file available, system can not be upgraded")
             return
             
-        r = input("Confirm upyOS upgrade (y/N)? ")
-        if r!="y":
-            print("Upgrade canceled")
-            return
+        if not "-f" in mod:
+            r = input("Confirm upyOS upgrade (y/N)? ")
+            if r!="y":
+                print("Upgrade canceled")
+                return
               
-        print("Upgrading from upyOS git repository, wait...")
+        print("Upgrading from upyOS git repsitory, wait...")
         with open(uf, 'r') as f:
             while True:
                 fp=f.readline()
@@ -123,7 +129,7 @@ def __main__(args):
         print("\nUpgrade complete")
         utime.sleep(2)
         
-        if len(args) == 1 and args[0]=="-r":
+        if "-r" in mod:
             print("Rebooting...")
             utime.sleep(2)
             machine.soft_reset()
