@@ -107,7 +107,7 @@ def __main__(args):
             
         r = input("Confirm upyOS upgrade (y/N)? ")
         if r!="y":
-            print("Upgrade canceled"
+            print("Upgrade canceled")
             return
               
         print("Upgrading from upyOS git repsitory, wait...")
