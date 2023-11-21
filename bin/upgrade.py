@@ -22,7 +22,7 @@ url_raw = f'https://raw.githubusercontent.com/{user}/{repository}/master/'
 def pull2(f_path, url):
     _, _, host, path = url.split('/', 3)
     
-    #print(f"{url} {host} {path}")
+    #print(f"{f_path} {url} {host} {path}")
     
     # Crear un socket
     s = usocket.socket()
@@ -51,6 +51,7 @@ def pull2(f_path, url):
             if not chunk:
                 break
             
+            #print(chunk.decode('utf8'))
             if not headers_received:
                 # Buscar el final de las cabeceras
                 end_of_headers = chunk.find(b'\r\n\r\n')
@@ -59,7 +60,6 @@ def pull2(f_path, url):
                     # Agregar solo el cuerpo de la respuesta después del final de las cabeceras
                     #data += chunk[end_of_headers + 4:]
                     f.write(chunk[end_of_headers + 4:].decode('utf-8'))
-                    #print(chunk.decode())
                 else:
                     # Si no se han recibido las cabeceras completas, continuar leyendo
                     continue
@@ -95,8 +95,12 @@ def __main__(args):
     else:
     
         print("Initiating Upgrade, downloading upgradde list")
-        uf="/upgrade.inf"
+        uf="/etc/upgrade.inf"
         pull2(uf, url_raw + uf[1:])
+        
+        #if not file_exit(uf):
+        #    print("Upgrade file not exit, system not upgraded")
+        #    return
         
         print("Upgrading from upyOS git repsitory, wait...")
         with open(uf, 'r') as f:
@@ -107,8 +111,9 @@ def __main__(args):
                 print(fp)
                 pull2(fp, url_raw + fp[1:])
                 
-        print("Upgrade complete")
         os.remove(uf)
+        print("Upgrade complete")
+        
         if len(args) == 1 and args[0]=="-r":
             print("Rebooting...")
             machine.soft_reset()

@@ -9,7 +9,7 @@ def __main__(args):
         fr=["/boot.py","/main.py"]        
         fi=["system.conf","init.sh","end.sh"]
         dr=["/bin","/lib","/libx","/etc"]
-        with open("/upgrade.inf", "w") as fu:
+        with open("/etc/upgrade.inf", "w") as fu:
             for f in fr:
                 fu.write(f+"\n")
                 
