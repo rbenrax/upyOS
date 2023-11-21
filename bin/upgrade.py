@@ -97,7 +97,7 @@ def __main__(args):
         return
     else:
     
-        print("upyOs OTA Upgrade, downloading upgradde list")
+        print("upyOs OTA Upgrade")
         uf="/etc/upgrade.inf"
         pull2(uf, url_raw + uf[1:])
         
