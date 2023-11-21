@@ -110,7 +110,7 @@ def __main__(args):
             print("Upgrade canceled")
             return
               
-        print("Upgrading from upyOS git repsitory, wait...")
+        print("Upgrading from upyOS git repository, wait...")
         with open(uf, 'r') as f:
             while True:
                 fp=f.readline()
