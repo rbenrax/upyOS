@@ -1,6 +1,8 @@
 import os
 import urequests
 import machine
+import usocket
+import ussl
 
 user='rbenrax'
 repository='upyOS'
@@ -17,6 +19,60 @@ url_raw = f'https://raw.githubusercontent.com/{user}/{repository}/master/'
 #    r = urequests.get(u_tree, headers=headers)
 #    #print(r.content.decode('utf-8'))
 
+def pull2(f_path, url):
+    _, _, host, path = url.split('/', 3)
+    
+    #print(f"{url} {host} {path}")
+    
+    # Crear un socket
+    s = usocket.socket()
+    
+    ai = usocket.getaddrinfo(host, 443)
+    addr = ai[0][-1]
+    
+    # Conectar al servidor
+    s.connect(addr)
+    
+    # Crear un socket SSL
+    ssl_socket = ussl.wrap_socket(s)
+    
+    # Agregar un encabezado 'User-Agent' a la solicitud HTTPS
+    solicitud = 'GET /%s HTTP/1.0\r\nHost: %s\r\nUser-Agent: upyOS\r\n\r\n' % (path, host)
+    
+    # Enviar la solicitud al servidor
+    ssl_socket.write(bytes(solicitud, 'utf8'))
+    # Leer la respuesta del servidor
+
+    headers_received = False
+
+    with open(f_path, 'w') as f:            
+        while True:
+            chunk = ssl_socket.read(512)  # Puedes ajustar el tamaño del búfer según tus necesidades
+            if not chunk:
+                break
+            
+            if not headers_received:
+                # Buscar el final de las cabeceras
+                end_of_headers = chunk.find(b'\r\n\r\n')
+                if end_of_headers != -1:
+                    headers_received = True
+                    # Agregar solo el cuerpo de la respuesta después del final de las cabeceras
+                    #data += chunk[end_of_headers + 4:]
+                    f.write(chunk[end_of_headers + 4:].decode('utf-8'))
+                    #print(chunk.decode())
+                else:
+                    # Si no se han recibido las cabeceras completas, continuar leyendo
+                    continue
+            else:
+                f.write(chunk.decode('utf-8'))
+
+    
+    # Cerrar el socket después de leer todos los datos
+    ssl_socket.close()
+    s.close()
+
+    return
+
 def pull(f_path, raw_url):
 
     try:
@@ -26,7 +82,7 @@ def pull(f_path, raw_url):
   
         with open(f_path, 'w') as f:
             f.write(r.content.decode('utf-8'))
-            print(r.content.decode('utf-8'))
+            #print(r.content.decode('utf-8'))
             
     except Exception as ex:
         print('pull error: ' + ex)
@@ -34,12 +90,13 @@ def pull(f_path, raw_url):
 def __main__(args):
 
     if len(args) == 1 and args[0]=="--h":
-        print("Upgrade upyOS from git repository\nUsage: upgrade")
+        print("Upgrade upyOS from git repository\nUsage: upgrade <options>: -r reboot after upgrade")
         return
     else:
     
+        print("Initiating Upgrade, downloading upgradde list")
         uf="/upgrade.inf"
-        pull(uf, url_raw + uf[1:])
+        pull2(uf, url_raw + uf[1:])
         
         print("Upgrading from upyOS git repsitory, wait...")
         with open(uf, 'r') as f:
@@ -48,10 +105,11 @@ def __main__(args):
                 if not fp: break
                 fp=fp[:-1] # remove ending CR
                 print(fp)
-                pull(fp, url_raw + fp[1:])
+                pull2(fp, url_raw + fp[1:])
                 
+        print("Upgrade complete")
         os.remove(uf)
         if len(args) == 1 and args[0]=="-r":
+            print("Rebooting...")
             machine.soft_reset()
-					 
-					 
+
