@@ -1,8 +1,11 @@
 import os
 import urequests
 import machine
+import utime
 import usocket
 import ussl
+
+import utls
 
 user='rbenrax'
 repository='upyOS'
@@ -98,9 +101,9 @@ def __main__(args):
         uf="/etc/upgrade.inf"
         pull2(uf, url_raw + uf[1:])
         
-        #if not file_exit(uf):
-        #    print("Upgrade file not exit, system not upgraded")
-        #    return
+        if not utls.file_exists(spath):
+            print("No upgrade file available, system not upgraded")
+            return
         
         print("Upgrading from upyOS git repsitory, wait...")
         with open(uf, 'r') as f:
@@ -111,10 +114,12 @@ def __main__(args):
                 print(fp)
                 pull2(fp, url_raw + fp[1:])
                 
-        os.remove(uf)
+        #os.remove(uf)
         print("Upgrade complete")
+        utime.sleep(1)
         
         if len(args) == 1 and args[0]=="-r":
             print("Rebooting...")
+            utime.sleep(1)
             machine.soft_reset()
 
