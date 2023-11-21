@@ -115,11 +115,11 @@ def __main__(args):
                 pull2(fp, url_raw + fp[1:])
                 
         #os.remove(uf)
-        print("Upgrade complete")
-        utime.sleep(1)
+        print("\nUpgrade complete")
+        utime.sleep(2)
         
         if len(args) == 1 and args[0]=="-r":
             print("Rebooting...")
-            utime.sleep(1)
+            utime.sleep(2)
             machine.soft_reset()
 
