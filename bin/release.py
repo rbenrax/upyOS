@@ -3,13 +3,14 @@ import uos
 def __main__(args):
 
     if len(args) == 1 and args[0]=="--h":
-        print("Create new release of upyOS\nUsage: release")
+        print("Create new release index file for upyOS upgrade\nUsage: release")
         return
     else:
-        fr=["/boot.py","/main.py"]        
-        fi=["system.conf","init.sh","end.sh"]
-        dr=["/bin","/lib","/libx","/etc"]
-        with open("/etc/upgrade.inf", "w") as fu:
+        fd="/etc/upgrade.inf"
+        fr=["/boot.py","/main.py"] # Files to include       
+        fi=["system.conf","init.sh","end.sh"] # Files to avoid
+        dr=["/bin","/lib","/libx","/etc"] # Direcrories to include
+        with open(fd, "w") as fu:
             for f in fr:
                 fu.write(f+"\n")
                 
@@ -19,7 +20,8 @@ def __main__(args):
                     if f in fi: continue
                     print(d + "/" + f)
                     fu.write(d + "/" + f + "\n")
-            
+                    
+        print(f"\nFile {fd} successful created, shoud to be uploaded to git repository")
 
 
 
