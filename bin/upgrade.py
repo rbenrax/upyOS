@@ -101,7 +101,7 @@ def __main__(args):
         uf="/etc/upgrade.inf"
         pull2(uf, url_raw + uf[1:])
         
-        if not utls.file_exists(spath):
+        if not utls.file_exists(uf):
             print("No upgrade file available, system not upgraded")
             return
         
