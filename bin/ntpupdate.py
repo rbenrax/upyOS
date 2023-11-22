@@ -19,6 +19,7 @@ def __main__(args):
         
         tz = int(utls.getenv("TZ"))
         
+        print(f"NTP update {args[0]}...")
         ntptime.host = args[0]
         ntptime.settime()
 
