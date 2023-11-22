@@ -7,51 +7,52 @@ import ussl
 
 import utls
 
-user='rbenrax'
-repository='upyOS'
-    
-#------
-url_raw = f'https://raw.githubusercontent.com/{user}/{repository}/main/'
+url_raw = f'https://raw.githubusercontent.com/rbenrax/upyOS/main/'
 
-def pull(f_path, url):
-    _, _, host, path = url.split('/', 3)
-    
+def pull(f_path, url):    
     #print(f"{f_path} {url} {host} {path}")
+    s=None
+    ssl_socket=None
+    
+    try:
+        _, _, host, path = url.split('/', 3)
+        
+        s = usocket.socket()
+        
+        ai = usocket.getaddrinfo(host, 443)
+        addr = ai[0][-1]
+        
+        s.connect(addr)
+        
+        ssl_socket = ussl.wrap_socket(s)
+        
+        solicitud = 'GET /%s HTTP/1.0\r\nHost: %s\r\nUser-Agent: upyOS\r\n\r\n' % (path, host)
+        
+        ssl_socket.write(bytes(solicitud, 'utf8'))
 
-    s = usocket.socket()
-    
-    ai = usocket.getaddrinfo(host, 443)
-    addr = ai[0][-1]
-    
-    s.connect(addr)
-    
-    ssl_socket = ussl.wrap_socket(s)
-    
-    solicitud = 'GET /%s HTTP/1.0\r\nHost: %s\r\nUser-Agent: upyOS\r\n\r\n' % (path, host)
-    
-    ssl_socket.write(bytes(solicitud, 'utf8'))
+        headers_received = False
 
-    headers_received = False
-
-    with open(f_path, 'w') as f:            
-        while True:
-            chunk = ssl_socket.read(512)
-            if not chunk:
-                break
-            
-            #print(chunk.decode('utf8'))
-            if not headers_received:
-                end_of_headers = chunk.find(b'\r\n\r\n')
-                if end_of_headers != -1:
-                    headers_received = True
-                    f.write(chunk[end_of_headers + 4:].decode('utf-8'))
+        with open(f_path, 'w') as f:            
+            while True:
+                chunk = ssl_socket.read(512)
+                if not chunk:
+                    break
+                
+                #print(chunk.decode('utf8'))
+                if not headers_received:
+                    end_of_headers = chunk.find(b'\r\n\r\n')
+                    if end_of_headers != -1:
+                        headers_received = True
+                        f.write(chunk[end_of_headers + 4:].decode('utf-8'))
+                    else:
+                        continue
                 else:
-                    continue
-            else:
-                f.write(chunk.decode('utf-8'))
-
-    ssl_socket.close()
-    s.close()
+                    f.write(chunk.decode('utf-8'))
+    except Exceptio as ex:
+        print("upgrade/pull: " + ex)
+    finally:
+        ssl_socket.close()
+        s.close()
 
     return
     
@@ -59,10 +60,10 @@ def __main__(args):
 
     mod="" 
     for i in args:
-        if "-" in i: mod+=i
+        if "-" in i: mod+=i[1:]
 
-    if "--h" in mod:
-        print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade- -v view file list")
+    if "h" in mod:
+        print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
         return
     
     else:
@@ -75,7 +76,7 @@ def __main__(args):
             print("No upgrade file available, system can not be upgraded")
             return
             
-        if not "-f" in mod:
+        if not "f" in mod:
             r = input("Confirm upyOS upgrade (y/N)? ")
             if r!="y":
                 print("Upgrade canceled")
@@ -87,7 +88,7 @@ def __main__(args):
                 fp=f.readline()
                 if not fp: break
                 fp=fp[:-1] # remove ending CR
-                if "-v" in mod:
+                if "v" in mod:
                     print(fp)
                 else:
                     print(".", end="")
@@ -97,7 +98,7 @@ def __main__(args):
         print("100%\nUpgrade complete")
         utime.sleep(2)
         
-        if "-r" in mod:
+        if "r" in mod:
             print("Rebooting...")
             utime.sleep(2)
             machine.soft_reset()
