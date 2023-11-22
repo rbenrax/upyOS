@@ -90,7 +90,7 @@ def __main__(args):
                 print("Upgrade canceled")
                 return
               
-        print("Upgrading from upyOS git repsitory, wait...")
+        print("Upgrading from upyOS git repsitory, wait...\n[")
         with open(uf, 'r') as f:
             while True:
                 fp=f.readline()
@@ -103,7 +103,7 @@ def __main__(args):
                 pull(fp, url_raw + fp[1:])
                 
         os.remove(uf)
-        print("OK\n100% Upgrade complete")
+        print("]OK\n100% Upgrade complete")
         utime.sleep(2)
         
         if "r" in mod:
