@@ -48,11 +48,11 @@ def pull(f_path, url):
                         continue
                 else:
                     f.write(chunk.decode('utf-8'))
-    except Exceptio as ex:
-        print("upgrade/pull: " + ex)
+    except Exception as ex:
+        print("\nupgrade/pull: " + ex)
     finally:
-        ssl_socket.close()
-        s.close()
+        if ssl_socket: ssl_socket.close()
+        if s: s.close()
 
     return
     
