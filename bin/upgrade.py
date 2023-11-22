@@ -74,9 +74,10 @@ def __main__(args):
     
     else:
     
-        print("upyOS OTA Upgrade, \nDownloading upgrade list")
+        print("upyOS OTA Upgrade, \nDownloading upgrade list...", end="")
         uf="/etc/upgrade.inf"
         pull(uf, url_raw + uf[1:])
+        print(",OK")
         
         if not utls.file_exists(uf):
             print("No upgrade file available, system can not be upgraded")
