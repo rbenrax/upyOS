@@ -67,7 +67,7 @@ def __main__(args):
     
     else:
     
-        print("upyOs OTA Upgrade, \nDownloading upgradde list")
+        print("upyOS OTA Upgrade, \nDownloading upgradde list")
         uf="/etc/upgrade.inf"
         pull(uf, url_raw + uf[1:])
         
@@ -94,7 +94,7 @@ def __main__(args):
                 pull(fp, url_raw + fp[1:])
                 
         os.remove(uf)
-        print("\nUpgrade complete")
+        print("100%\nUpgrade complete")
         utime.sleep(2)
         
         if "-r" in mod:
