@@ -6,6 +6,7 @@ import usocket
 import ussl
 
 import utls
+import sdata
 
 url_raw = f'https://raw.githubusercontent.com/rbenrax/upyOS/main/'
 
@@ -61,6 +62,10 @@ def __main__(args):
     mod="" 
     for i in args:
         if "-" in i: mod+=i[1:]
+
+    if len(sdata.procs)>1:
+        print("Stop all process before upgrade")
+        return
 
     if "h" in mod:
         print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
