@@ -8,10 +8,16 @@ def protected(p):
     else:
         False
 
+def osremove(path):
+    if utls.file_exists(path):
+        uos.remove(path)
+    else:
+        print("not found")
+        
 def remove(path):
     if not utls.isdir(path):
         if not protected(path):
-            uos.remove(path)
+            osremove(path)
     else:
           r = input("remove all files in dir " + path + "? ")
           if r=="y":
@@ -19,7 +25,7 @@ def remove(path):
                for f in tmp:
                    if not utls.isdir(f):
                        if not protected(f):
-                           uos.remove(path + "/" + f)
+                           osremove(path + "/" + f)
                    else:
                        remove(path + "/" + f)
 
