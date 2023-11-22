@@ -63,9 +63,10 @@ def __main__(args):
     for i in args:
         if "-" in i: mod+=i[1:]
 
-    if len(sdata.procs)>1:
-        print("Stop all process before upgrade")
-        return
+    for p in sdata.procs:
+        if p.isthr:
+            print("Stop all process before upgrade")
+            return
 
     if "h" in mod:
         print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
