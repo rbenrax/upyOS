@@ -95,7 +95,7 @@ def __main__(args):
                 pull(fp, url_raw + fp[1:])
                 
         os.remove(uf)
-        print("100% Upgrade complete")
+        print("OK\n100% Upgrade complete")
         utime.sleep(2)
         
         if "r" in mod:
