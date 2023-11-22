@@ -27,7 +27,8 @@ def pull(f_path, url):
         
         ssl_socket = ussl.wrap_socket(s)
         
-        solicitud = 'GET /%s HTTP/1.0\r\nHost: %s\r\nUser-Agent: upyOS\r\n\r\n' % (path, host)
+        #solicitud = 'GET /%s HTTP/1.0\r\nHost: %s\r\nUser-Agent: upyOS\r\n\r\n' % (path, host)
+        solicitud = f"GET /{path} HTTP/1.0\r\nHost: {host}\r\nUser-Agent: upyOS\r\n\r\n"
         
         ssl_socket.write(bytes(solicitud, 'utf8'))
 
