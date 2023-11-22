@@ -97,7 +97,7 @@ def __main__(args):
                 if not fp: break
                 fp=fp[:-1] # remove ending CR
                 if "v" in mod:
-                    print(fp)
+                    print(fp, end=", ")
                 else:
                     print(".", end="")
                 pull(fp, url_raw + fp[1:])
