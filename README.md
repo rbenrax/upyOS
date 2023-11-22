@@ -262,7 +262,7 @@ upyos upgrade procedure with ftp:
       
       quit
 
-# Require ftp server service running in mcu and setauth command to set user and password to login. 
+      Require ftp server service running in mcu and setauth command to set user and password to login. 
 
 
 - upyOS remote development:
