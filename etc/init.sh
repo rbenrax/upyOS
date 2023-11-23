@@ -13,9 +13,9 @@
 cat /etc/wellcome.txt
 < "\033[0m", end=""
 
-loadboard    # You can choose load different boards configuration, without param, default board
+# loadboard    # You can choose load different boards configuration, without param, default board
 #loadboard /etc/upyOS-esp32c3_luatos.board
-#loadboard /etc/upyOS-esp32c3_vcc_gnd.board
+loadboard /etc/upyOS-esp32c3_vcc_gnd.board
 #loadboard /etc/upyOS-esp32s3_vcc_gnd.board
 #loadboard /etc/upyOS-esp8266.board
 #loadboard /etc/upyOS-esp32-wroom-32.board
@@ -53,6 +53,8 @@ led rgb 1            # Test rgb led in board (if board has one)
 #if $1 == 0 goto exit
 
 #ntpupdate es.pool.ntp.org
+#ntpupdate 150.214.5.121
+
 #date
 
 #wifi sta ifconfig
