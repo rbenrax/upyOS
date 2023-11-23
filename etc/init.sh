@@ -52,7 +52,7 @@ led rgb 1            # Test rgb led in board (if board has one)
 #if $0 == 0 goto exit
 #if $1 == 0 goto exit
 
-#ntpupdate hora.cica.es 
+ntpupdate 185.90.148.209 
 #ntpupdate es.pool.ntp.org
 
 #date

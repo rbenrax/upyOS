@@ -50,8 +50,8 @@ def pull(f_path, url):
                         continue
                 else:
                     f.write(chunk.decode('utf-8'))
-    except Exception as ex:
-        print("\nupgrade/pull: " + ex)
+    except OSError as osr:
+        print(f"\nupgrade/pull: {f_path} - {str(osr)}")
     finally:
         if ssl_socket: ssl_socket.close()
         if s: s.close()
