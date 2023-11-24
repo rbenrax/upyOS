@@ -88,7 +88,7 @@ def __main__(args):
             print("Upgrade canceled")
             return
           
-    print("Upgrading from upyOS git repsitory, wait...")
+    print("Upgrading from upyOS github repository, wait...")
     print("[", end="")
     with open(uf, 'r') as f:
         while True:
