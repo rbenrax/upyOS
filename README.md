@@ -279,6 +279,14 @@ upyos upgrade procedure with ftp:
 
 - Added upgrade command for OTA upgrade from github repository.
 
+      / $: upgrade
+      upyOS OTA Upgrade,
+      Downloading upgrade list..., OK
+      Confirm upyOS upgrade (y/N)? y
+      Upgrading from upyOS github repository, wait...
+      [.......................................................................................]OK
+      100% Upgrade complete
+      / $:
   
 TODO List:
 - Add diff, tar, uname, read and other usefull commands.
