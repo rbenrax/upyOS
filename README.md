@@ -289,11 +289,8 @@ upyos upgrade procedure with ftp:
       / $:
   
 TODO List:
-- Add diff, tar, uname, read and other usefull commands.
-- Bluetooth support
+- Add other usefull commands.
 - Add Syslog
-- Upgrade procedure
-- jobq?
 
 Wishlist is open ;)
 
