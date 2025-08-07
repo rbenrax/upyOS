@@ -14,6 +14,7 @@
   
   bit_tuple = uos.statvfs("/")
   blksize = bit_tuple[0]  # system block size  
+<<<<<<< Updated upstream
   ts = bit_tuple[2] * blksize
   fs = bit_tuple[3] * blksize
   us = ts - fs
@@ -23,11 +24,15 @@
   am = gc.mem_alloc()
   tm = fm+am
   pm = f'({fm/tm*100:.2f}%)'
+=======
+  t = bit_tuple[2] * blksize
+>>>>>>> Stashed changes
   
   {{end}}
   
 </head>
 <body>
+<<<<<<< Updated upstream
   <h1>MicroWebSrv upyOS</h1>
   
   <p>MCU: <strong> {{sdata.board["mcu"][0]["type"]}} </strong></p>
@@ -51,5 +56,24 @@
   
   
   
+=======
+  <h1>upyOS MicroWebSrv</h1>
+  <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
+  <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
+ 
+  <p>RAM: <strong> {{utls.human(gc.mem_free())}} </strong></p>
+  <p>Storage: <strong> {{utls.human(t)}} </strong></p>
+  
+  <p><a href="/on"><button class="button">ON</button></a></p>
+  <p><a href="/off"><button class="button button2">OFF</button></a></p>
+  
+  
+  <p>dir(): <strong> {{dir()}} </strong></p>
+  
+  <p>env: <strong> {{sdata.sysconfig["env"]}} </strong></p>
+  
+  
+  
+>>>>>>> Stashed changes
 </body>
 </html>
