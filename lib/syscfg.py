@@ -43,7 +43,7 @@ class SysCfg():
                                 "9": 30, 
                                 "10": 21, 
                                 "11": 24, 
-                                "12": 04, 
+                                "12": 4, 
                                 "13": 10, 
                                 "18": 5, 
                                 "19": 6 }],
@@ -68,3 +68,4 @@ class SysCfg():
     
 #    def setSysConf(self, obj):
 #        self.sysconf=obj
+
