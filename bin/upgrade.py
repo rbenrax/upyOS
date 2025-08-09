@@ -3,7 +3,7 @@ import urequests
 import machine
 import utime
 import usocket
-import ussl
+import ssl
 
 import utls
 import sdata
@@ -26,7 +26,7 @@ def pull(f_path, url):
         
         s.connect(addr)
         
-        ssl_socket = ussl.wrap_socket(s)
+        ssl_socket = ssl.wrap_socket(s)
         
         solicitud = f"GET /{path} HTTP/1.0\r\nHost: {host}\r\nUser-Agent: upyOS\r\n\r\n"
         
