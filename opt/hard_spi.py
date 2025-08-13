@@ -1,0 +1,92 @@
+from machine import Pin, SPI
+import ssd1306
+import time
+import network
+import dht
+import utls
+
+proc=None
+
+#ESP32-C3  ->  Display SSD1306
+#-----------------------------
+#GND       ->  GND
+#3.3V      ->  VCC
+#GPIO6     ->  SCL/SCK (Reloj SPI) D0
+#GPIO7     ->  SDA/MOSI (Datos SPI) D1
+#GPIO8     ->  RES (Reset, opcional)
+#GPIO11    ->  DC (Data/Command)
+#GPIO10    ->  CS (Chip Select, si está disponible)
+
+def __main__(args):
+
+    #Display
+    hspi = SPI(1)  # sck=6 (scl), mosi=7 (sda), miso=2 (unused)
+    rst = Pin(11)  # reset
+    dc = Pin(3)    # data/command
+    cs = Pin(10)   # chip select, some modules do not have a pin for this
+
+    display = ssd1306.SSD1306_SPI(128, 64, hspi, dc, rst, cs)
+
+    # Temp
+    pin=utls.getgpio(29)
+    #print(pin)
+    sensor = dht.DHT11(Pin(pin))
+
+    while True:
+        try:
+        
+            if proc and proc.sts == "S":
+                display.fill(0)
+                display.text("Finalizado", 0, 0, 1)
+                display.show()
+                break # If thread, stop instruction
+            
+            if proc.sts=="H":
+                utime.sleep(5)
+                continue
+
+            sta_if = network.WLAN(network.STA_IF)
+            ip = sta_if.ifconfig()[0]
+
+            sensor.measure()
+            temp = sensor.temperature()
+            hum = sensor.humidity()
+            #temp_f = temp * (9/5) + 32.0
+            #print('\nTemperature: %3.1f C' %temp)
+            #print('Temperature: %3.1f F' %temp_f)
+            #print('Humidity: %3.1f %%' %hum)
+
+            # Limpiar la pantalla
+            display.fill(0)
+            display.show()
+
+            # Dibujar texto
+            display.text('Hola ESP32-C3!', 0, 0, 1)
+            display.text('MicroPython', 0, 16, 1)
+            display.text('SSD1306 SPI HW', 0, 26, 1)
+            display.show()
+
+            #print(ip)
+            display.text(ip, 0, 36, 1)
+            display.show()
+
+            # Mostrar temp/hum
+            t='T:%3.1f C' % temp
+            h='H:%3.1f %%' % hum
+            display.text(t + "/" + h , 0, 46, 1)
+            display.show()
+
+            # Dibujar una línea
+            display.line(0, 56, 127, 56, 1)
+            display.show()
+            time.sleep(5)
+           
+        except OSError as e:
+            print('Failed to read sensor.'+ str(e))
+    
+
+
+
+
+
+
