@@ -11,37 +11,26 @@ proc=None
 #-----------------------------
 #GND       ->  GND
 #3.3V      ->  VCC
-#GPIO6     ->  SCL/SCK (Reloj SPI) D0
-#GPIO7     ->  SDA/MOSI (Datos SPI) D1
-#GPIO8     ->  RES (Reset, opcional)
-#GPIO11    ->  DC (Data/Command)
-#GPIO10    ->  CS (Chip Select, si está disponible)
-
-hspi = SPI(1)  # sck=6 (scl), mosi=7 (sda), miso=2 (unused)
-rst = Pin(11)  # reset
-dc = Pin(3)    # data/command
-cs = Pin(10)   # chip select, some modules do not have a pin for this
-display = ssd1306.SSD1306_SPI(128, 64, hspi, dc, rst, cs)
-
-display.fill(0)
-display.show()
-
-# Dibujar texto
-display.text('Hola ESP32-C3!', 0, 0, 1)
-display.text('MicroPython', 0, 16, 1)
-display.text('SSD1306 SPI SW', 0, 26, 1)
-display.show()
+#GPIO6     ->  SCK  D0
+#GPIO7     ->  MOSI D1
+#GPIO2     ->  MISO (unused)
+#GPIO11    ->  RES (Reset)
+#GPIO3     ->  DC (Data/Command)
+#GPIO10    ->  CS (Chip Select)
 
 def __main__(args):
 
     #Display
-    spi = SoftSPI(baudrate=500000, polarity=1, phase=0, sck=Pin(6), mosi=Pin(7), miso=Pin(2))
+#     sspi = SoftSPI(baudrate=500000, polarity=1, phase=0, sck=Pin(6), mosi=Pin(7), miso=Pin(2))
 
-    rst = Pin(11)   # reset
-    dc  = Pin(3)    # data/command
-    cs  = Pin(10)   # chip select, some modules do not have a pin for this
+#     rst = Pin(11)   # reset
+#     dc  = Pin(3)    # data/command
+#     cs  = Pin(10)   # chip select, some modules do not have a pin for this
 
-    display = ssd1306.SSD1306_SPI(128, 64, spi, dc, rst, cs)
+#     display = ssd1306.SSD1306_SPI(128, 64, sspi, dc, rst, cs)
+
+    import sdata
+    display = sdata.d0
 
     # Temp
     pin=utls.getgpio(29)
@@ -79,7 +68,7 @@ def __main__(args):
             # Dibujar texto
             display.text('Hola ESP32-C3!', 0, 0, 1)
             display.text('MicroPython', 0, 16, 1)
-            display.text('SSD1306 SPI', 0, 26, 1)
+            display.text('SSD1306 SPI SW', 0, 26, 1)
             display.show()
 
             #print(ip)

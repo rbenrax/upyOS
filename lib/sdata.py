@@ -14,4 +14,5 @@ sysconfig={}
 _pid=0
 procs=[]
 
-
+#Display0
+d0=None
