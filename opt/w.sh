@@ -12,7 +12,7 @@
 #GPIO3     ->  DC (Data/Command)
 #GPIO10    ->  CS (Chip Select)
 
-# Display0 driver load
+# Display0 ssd1306 hw spi driver load
 > from machine import Pin, SPI
 > import ssd1306
 > sdata.d0 = ssd1306.SSD1306_SPI(128, 64, SPI(1), Pin(3), Pin(11), Pin(10))
