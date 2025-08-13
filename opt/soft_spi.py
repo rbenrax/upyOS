@@ -21,16 +21,16 @@ proc=None
 def __main__(args):
 
     #Display
-#     sspi = SoftSPI(baudrate=500000, polarity=1, phase=0, sck=Pin(6), mosi=Pin(7), miso=Pin(2))
+     sspi = SoftSPI(baudrate=500000, polarity=1, phase=0, sck=Pin(6), mosi=Pin(7), miso=Pin(2))
 
-#     rst = Pin(11)   # reset
-#     dc  = Pin(3)    # data/command
-#     cs  = Pin(10)   # chip select, some modules do not have a pin for this
+     rst = Pin(11)   # reset
+     dc  = Pin(3)    # data/command
+     cs  = Pin(10)   # chip select, some modules do not have a pin for this
 
-#     display = ssd1306.SSD1306_SPI(128, 64, sspi, dc, rst, cs)
+     display = ssd1306.SSD1306_SPI(128, 64, sspi, dc, rst, cs)
 
-    import sdata
-    display = sdata.d0
+#    import sdata
+#    display = sdata.d0
 
     # Temp
     pin=utls.getgpio(29)
