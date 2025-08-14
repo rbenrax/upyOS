@@ -23,7 +23,7 @@ class upyOS:
         
         # sdata store all system data
         sdata.name    = "upyOS-" + uos.uname()[0]
-        sdata.version = "0.8"
+        sdata.version = "0.9"
         sdata.initime = utime.time()
         
         # Initialization
@@ -244,8 +244,8 @@ class upyOS:
             if mod=="-r":
                 reboot()
             else:
-                #raise SystemExit
-                sys.exit()
+                raise SystemExit
+                #sys.exit()
                 
         except KeyboardInterrupt:
             pass
