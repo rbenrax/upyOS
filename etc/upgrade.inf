@@ -69,6 +69,7 @@
 /libx/editstr.py
 /libx/microWebSrv.py
 /libx/microWebTemplate.py
+/libx/ssd1306.py
 /libx/terminal.py
 /libx/uftpdserver.py
 /libx/ugit.py
