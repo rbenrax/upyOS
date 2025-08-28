@@ -5,6 +5,8 @@ version = ""
 sid     = 0
 initime = 0
 
+# FS cache control (Default true, if memory is required, may be disabled)
+cache_enabled = True
 debug   = True
 log     = False
 
