@@ -290,6 +290,8 @@ upyos upgrade procedure with ftp:
       100% Upgrade complete
       / $:
   
+- Added call caching to FS; on systems with low memory, it should be disabled in sdata.py. On systems with more memory (e.g., ESP32S3 with 8MB of PSRAM), enabling it speeds up file system access.
+  
 TODO List:
 - Add other usefull commands.
 - Add Syslog
