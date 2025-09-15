@@ -31,11 +31,11 @@ class Proc:
         try:
 
             sdata.procs.append(self)
-            utls.setenv("#", str(self.pid))
+            utls.setenv("#", self.pid)
             #print(f"{len(sdata.procs)=}")
 
             if self.isthr:
-                utls.setenv("!", str(self.pid))
+                utls.setenv("!", self.pid)
                 from _thread import get_ident
                 self.tid = get_ident()
                 print(f"\n[{self.pid}]")
