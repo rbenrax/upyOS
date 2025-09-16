@@ -91,9 +91,8 @@ def run(ssf, lbl_ln):
                 for i, e in enumerate(tmp):
                     if e[0]=="$":
                         #print(e[0])
-                        v=utls.getenv(e[1:])
-                        #print(v)
-                        tmp[i] =  v
+                        tmp[i]=str(utls.getenv(e[1:]))
+                        #print(tmp[i])
                 
                 #print(sdata.sysconfig["env"])
                 #print(tmp)
