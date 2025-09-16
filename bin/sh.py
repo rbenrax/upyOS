@@ -86,36 +86,66 @@ def run(ssf, lbl_ln):
             # Conditional execution: if $0 == 5 return (ex.)
             elif cmdl[:3] =="if ":
                 tmp = cmdl.split()
-                
+
                 # Translate env vars
                 for i, e in enumerate(tmp):
-                    if e[0]=="$":
-                        #print(e[0])
-                        tmp[i]=str(utls.getenv(e[1:]))
-                        #print(tmp[i])
-                
-                #print(sdata.sysconfig["env"])
-                #print(tmp)
-                            
-                arg1 = tmp[1] # operand1
-                op   = tmp[2] # operator
-                arg2 = tmp[3] # operand2
-                acc  = tmp[4] # action
-                
-                acca=""
+                    if e[0] == "$":
+                        tmp[i] = str(utls.getenv(e[1:]))
+
+                arg1 = tmp[1]  # operand1
+                op = tmp[2]    # operator
+                arg2 = tmp[3]  # operand2
+                acc = tmp[4]   # action
+
+                acca = ""
                 if len(tmp) > 5:
-                    acca = tmp[5] # action arg
-                    
-                if arg1=="" or arg2=="" or acc=="":
+                    acca = tmp[5]  # action arg
+
+                if arg1 == "" or arg2 == "" or acc == "":
                     print(f"sh - Invalid args: {cmdl[:-1]}")
                     print(f"sh - Values: {tmp}")
                     return 0
-                
-                #res = eval('"' + arg1 + '"' + op + '"' + arg2 + '"')
-                #print(tmp)
-                res = eval(arg1 + " " + op + " " + arg2)
-                
-                #print(f"{line}: {cmdl[:-1]} {res=}")
+
+                # Función para convertir valores a su tipo apropiado
+                def conv_v(value):
+                    try:
+                        # Intentar convertir a entero
+                        return int(value)
+                    except ValueError:
+                        try:
+                            # Intentar convertir a float
+                            return float(value)
+                        except ValueError:
+                            # Si no es numérico, devolver como cadena (sin comillas adicionales)
+                            return value
+
+                # Convertir operandos a sus tipos apropiados
+                try:
+                    arg1_c = conv_v(arg1)
+                    arg2_c = conv_v(arg2)
+                    
+                    # Evaluar la expresión
+                    if op == "==":
+                        res = arg1_c == arg2_c
+                    elif op == "!=":
+                        res = arg1_c != arg2_c
+                    elif op == "<":
+                        res = arg1_c < arg2_c
+                    elif op == ">":
+                        res = arg1_c > arg2_c
+                    elif op == "<=":
+                        res = arg1_c <= arg2_c
+                    elif op == ">=":
+                        res = arg1_c >= arg2_c
+                    else:
+                        print(f"sh - Operador no válido: {op}")
+                        return 0
+                        
+                except Exception as e:
+                    print(f"sh - Error al evaluar expresión: {e}")
+                    return 0
+
+# Resto del código para manejar la acción (acc)...
 
                 if res: # Eval result
                     if acc == "goto":
