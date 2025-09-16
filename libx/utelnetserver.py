@@ -82,15 +82,19 @@ def accept_telnet_connect(telnet_server):
     
 #-- Auth rbenrax -->
 
-    last_client_socket.sendall(b'System: ' + sdata.sid + b', Press enter')
+    last_client_socket.sendall(b'System: ' + sdata.sid + b'\r\n')
     
     if sdata.sysconfig["auth"]["paswd"]!="":
     
         last_client_socket.setblocking(True)
         
-        # Fake read with telnet protocol commands
-        data = last_client_socket.readline()
-        #print(data)
+        # Añadido para queitar el Enter
+        last_client_socket.settimeout(10)
+        try:
+            last_client_socket.recv(1024)  # Limpiar buffer inicial
+        except:
+            pass
+        # Fin añadido para queitar el Enter
         
         last_client_socket.sendall(b'Login: ')
         user=last_client_socket.readline().decode()[:-2] # remove CR
@@ -111,7 +115,10 @@ def accept_telnet_connect(telnet_server):
         else:
             log(f"Telnet", f"Accepted connection from: {remote_addr} {user}")
             last_client_socket.sendall(b'Logged in ok, Press enter\r\n')
-    
+
+    else:
+        last_client_socket.sendall(b'No password has been set, Press enter\r\n')
+        
 #-- Auth rbenrax --<
     
     last_client_socket.setblocking(False)
@@ -123,7 +130,6 @@ def accept_telnet_connect(telnet_server):
     last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
         
     uos.dupterm(TelnetWrapper(last_client_socket))
-    
 
 def stop():
     global server_socket, last_client_socket
