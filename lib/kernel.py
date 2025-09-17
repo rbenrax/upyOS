@@ -128,7 +128,7 @@ class upyOS:
             if e[0]=="$":
                 #v=utls.getenv(e[1:])
                 #fcmd = fcmd.replace(e, v)
-                fcmd = fcmd.replace(e, str(utls.getenv(e[1:])))
+                fcmd = fcmd.replace(e, '"' + str(utls.getenv(e[1:])) + '"' )
         if fcmd[:2]=="> ":
             self.run_py_code(fcmd[2:])
             return
