@@ -1,10 +1,19 @@
-#import utls
+import utls
+
+# This command allows you to redirect the output to an environment variable.
+# Afterwards, it is possible to send it to a file using the 'touch' command: "touch <filename> <var, ...>"
 
 def __main__(args):
     if len(args) > 0:
-#        for i, a in enumerate(args):
-#            if a[0]=="$":
-#                args[i] = utls.getenv(a[1:])
-        print("".join(args))
+        if ">" in args:
+            try:
+                r = args.index(">")
+                p = args[r+1]
+                utls.setenv(p, "".join(args[:r]))
+                #del args[r:]
+            except IndexError:
+                print("Error: falta el nombre de la variable destino después de '>'")
+        else:
+            print("".join(args))
     else:
-        print("Show msg + env variable\nUsage: echo const/<var>: var $?, $1, ..., any")
+        print("Show msg + env variable\nUsage: echo const/<var> [> <var>]")
