@@ -1,6 +1,9 @@
 import utls
 
 def __main__(args):
+
+    args = [a for a in args if a != "="]
+
     if len(args) == 2:
         utls.setenv(args[0], args[1])
     elif len(args) == 3:
