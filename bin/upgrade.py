@@ -11,54 +11,46 @@ import sdata
 url_raw = f'https://raw.githubusercontent.com/rbenrax/upyOS/main/'
 
 def pull(f_path, url):    
-    
-    s=None
-    ssl_socket=None
+    s = None
+    ssl_socket = None
     
     try:
         _, _, host, path = url.split('/', 3)
-        #print(f"{f_path} {url} {host} {path}")
         
         s = usocket.socket()
-        
         ai = usocket.getaddrinfo(host, 443)
         addr = ai[0][-1]
-        
         s.connect(addr)
-        
         ssl_socket = ssl.wrap_socket(s)
         
         solicitud = f"GET /{path} HTTP/1.0\r\nHost: {host}\r\nUser-Agent: upyOS\r\n\r\n"
-        
         ssl_socket.write(bytes(solicitud, 'utf8'))
 
-        headers_received = False
+        # Leer headers línea por línea
+        header_buffer = b''
+        headers_complete = False
+        
+        while not headers_complete:
+            chunk = ssl_socket.read(1)
+            if not chunk:
+                break
+            header_buffer += chunk
+            if header_buffer.endswith(b'\r\n\r\n'):
+                headers_complete = True
 
-        with open(f_path, 'w') as f:            
+        # Ahora leer el contenido del archivo
+        with open(f_path, 'wb') as f:  # Abrir en modo binario
             while True:
                 chunk = ssl_socket.read(512)
                 if not chunk:
                     break
+                f.write(chunk)
                 
-                #print(chunk.decode('utf8'))
-                if not headers_received:
-                    end_of_headers = chunk.find(b'\r\n\r\n')
-                    if end_of_headers != -1:
-                        headers_received = True
-                        #f.write(chunk[end_of_headers + 4:].decode('utf-8'))
-                        f.write(chunk[end_of_headers + 4:].decode('utf-8', 'ignore'))
-                    else:
-                        continue
-                else:
-                    #f.write(chunk.decode('utf-8'))
-                    f.write(chunk.decode('utf-8', 'ignore'))
-    except OSError as osr:
-        print(f"\nupgrade/pull: {f_path} - {str(osr)}")
+    except Exception as e:
+        print(f"\nupgrade/pull: {f_path} - {str(e)}")
     finally:
         if ssl_socket: ssl_socket.close()
         if s: s.close()
-
-    return
     
 def __main__(args):
 
