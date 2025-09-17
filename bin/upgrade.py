@@ -45,11 +45,13 @@ def pull(f_path, url):
                     end_of_headers = chunk.find(b'\r\n\r\n')
                     if end_of_headers != -1:
                         headers_received = True
-                        f.write(chunk[end_of_headers + 4:].decode('utf-8'))
+                        #f.write(chunk[end_of_headers + 4:].decode('utf-8'))
+                        f.write(chunk[end_of_headers + 4:].decode('utf-8', 'ignore'))
                     else:
                         continue
                 else:
-                    f.write(chunk.decode('utf-8'))
+                    #f.write(chunk.decode('utf-8'))
+                    f.write(chunk.decode('utf-8', 'ignore'))
     except OSError as osr:
         print(f"\nupgrade/pull: {f_path} - {str(osr)}")
     finally:
