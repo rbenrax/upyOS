@@ -4,7 +4,7 @@ import utls
 def __main__(args):
 
     if "--h" in args:
-        print("Show current data and time (default) -d=date, -t=time [> <var>]")
+        print("Show current date and time (default) -d=date, -t=time [> <var>]")
         return
     
     ret=""
