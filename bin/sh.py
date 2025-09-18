@@ -103,7 +103,7 @@ def run(ssf, lbl_ln):
 
                 if arg1 == "" or arg2 == "" or acc == "":
                     print(f"sh - Invalid args: {cmdl[:-1]}")
-                    print(f"sh - Values: {tmp}")
+                    print(f"sh - Values: {tmp} in {ssf} - {line} - {cmdl}")
                     return 0
 
                 # Función para convertir valores a su tipo apropiado
@@ -138,14 +138,14 @@ def run(ssf, lbl_ln):
                     elif op == ">=":
                         res = arg1_c >= arg2_c
                     else:
-                        print(f"sh - Operador no válido: {op}")
+                        print(f"sh - Operador no válido: {op} in {ssf} - {line} - {cmdl}")
                         return 0
                         
                 except Exception as e:
-                    print(f"sh - Error al evaluar expresión: {e}")
+                    print(f"sh - Evaluating expression error:\n{ssf} - {line} - {cmdl}{e}")
                     return 0
 
-# Resto del código para manejar la acción (acc)...
+                # Resto del código para manejar la acción (acc)...
 
                 if res: # Eval result
                     if acc == "goto":
