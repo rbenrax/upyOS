@@ -68,14 +68,14 @@ def psts(mods, nic, aif):
             print (f"         {'Client connected' if aif.isconnected() else 'No Client connected'}")
         
     if aif.active():
-        setenv("0", "1")
+        setenv("wa", True)
     else:
-        setenv("0", "0")
+        setenv("wa", False)
         
     if aif.isconnected():
-        setenv("1", "1")
+        setenv("wc", True)
     else:
-        setenv("1", "0")
+        setenv("wc", False)
         
 def __main__(args):
     

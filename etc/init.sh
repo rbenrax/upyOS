@@ -49,8 +49,8 @@ led rgb 1            # Test rgb led in board (if board has one)
 #wifi sta connect DIGIFIBRA-cGPRi <password> 10 # SSID PASS Timeout
 
 #wifi sta status -n
-#if $0 == 0 goto exit
-#if $1 == 0 goto exit
+#if $wa == False goto exit # wifi active
+#if $wc == False goto exit # wifi connected
 
 #ntpupdate 150.214.5.121  
 #ntpupdate es.pool.ntp.org
@@ -66,7 +66,8 @@ led rgb 1            # Test rgb led in board (if board has one)
 :exit
 
 # Run local script
-test -f /local/init.sh       # Check if script exists, save result in $0 env var
-if $0 == 1 /local/init.sh
+test -f /local/init.sh > 0      # Check if script exists, save bool result in $0 env var
+if $0 == True /local/init.sh
+unset 0
 
 
