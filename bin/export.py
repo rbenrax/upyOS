@@ -12,7 +12,7 @@ def __main__(args):
         elif args[2] == '-f':
             utls.setenv(args[0], float(args[1]))
         elif args[2] == '-b':
-            if args[1].lower() == "True":
+            if args[1] == "True":
                 utls.setenv(args[0], True)
             else:
                 utls.setenv(args[0], False)
