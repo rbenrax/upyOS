@@ -8,9 +8,7 @@ def __main__(args):
         if ">" in args:
             try:
                 r = args.index(">")
-                p = args[r+1]
-                utls.setenv(p, "".join(args[:r]))
-                #del args[r:]
+                utls.setenv(args[r+1], "".join(args[:r]))
             except IndexError:
                 print("Error: falta el nombre de la variable destino después de '>'")
         else:

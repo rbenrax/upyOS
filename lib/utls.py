@@ -227,6 +227,20 @@ def recovery():
     import kernel
     upyos = kernel.upyOS("-r") # Boot_args: -r
 
+# Redirect output to an env var
+def redir(args, val):
+    if ">" in args:
+        try:
+            r = args.index(">")
+            setenv(args[r+1], val)
+            #del args[r:]
+            return True
+        except IndexError:
+            print("Error: falta el nombre de la variable destino después de '>'")
+            return False
+    else:
+        return False        
+
 #if __name__ == "__main__":      
 #    print(human(1257))
 #    print(tspaces("rafa", 12, "b", " "))

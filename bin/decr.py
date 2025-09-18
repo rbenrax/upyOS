@@ -1,30 +1,33 @@
-import utls
+import utl
 import sdata
 
 def __main__(args):
 
     if len(args) == 0:
-        print("Decrement an env variable\nUsage: decr <var> [<decr>]:")
+        print("Decrease an env variable\nUsage: decr <var> [<decr>]:")
         return
     
-    val=0
-    dec=1
-    
-    if len(args) > 0:
-        
-        if not args[0] in sdata.sysconfig["env"]:
-            utls.setenv(args[0], "0")
-            
-        tmp = utls.getenv(args[0])
-        
-        if tmp.lstrip("-").isdigit():
-            val = int(tmp)
-        else:
-            print(f"Variable {args[0]} is not numeric")
-            return
+    val = 0
+    dec = 1
+
+    var_name = args[0]
+
+    if var_name not in sdata.sysconfig["env"]:
+        utls.setenv(var_name, 0)  # Inicializar como entero
+
+    tmp = utls.getenv(var_name)
+
+    if isinstance(tmp, int):
+        val = tmp
+    else:
+        print(f"Variable {var_name} is not an integer")
+        return
 
     if len(args) == 2:
-        if args[1].isdigit():
-            dec=int(args[1])
+        try:
+            dec = int(args[1])
+        except ValueError:
+            print(f"Decrement value '{args[1]}' is not an integer")
+            return
 
-    utls.setenv(args[0], str(val - dec))
+    utls.setenv(var_name, val - dec)
