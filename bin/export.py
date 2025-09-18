@@ -12,7 +12,11 @@ def __main__(args):
         elif args[2] == '-f':
             utls.setenv(args[0], float(args[1]))
         elif args[2] == '-b':
-            if args[1] == "True":
+            v = args[1]
+            if v not in ["True", "False"]:
+                print(f"export error: only True or False are valid values")
+                return
+            if v == "True":
                 utls.setenv(args[0], True)
             else:
                 utls.setenv(args[0], False)
