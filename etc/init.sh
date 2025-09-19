@@ -1,5 +1,5 @@
-# This script is called in boot, this is normal mode, 
-# if does not exists, then recovery mode
+# This script is called on boot, this is normal mode, 
+# if does not exists, then is recovery mode
 
 # Internal and external commands can be used
 # > (Execute Python code)
