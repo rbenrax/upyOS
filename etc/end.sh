@@ -8,5 +8,5 @@ uftpd stop
 utelnetd stop
 
 wifi sta status -n
-if $wa == True wifi sta disconnect -n
-if $wc == True wifi sta off
+if $wc == True wifi sta disconnect -n
+if $wa == True wifi sta off
