@@ -1,7 +1,8 @@
 # Script triggered on system exit
 
-test -p uhttpd
-if $0 == 1 uhttpd stop
+test -p uhttpd > 0
+if $0 == True uhttpd stop
+unset 0
 
 uftpd stop
 utelnetd stop
