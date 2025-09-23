@@ -66,13 +66,6 @@ def get_stat(filename):
         return (0,) * 10
     return file_stat
 
-def getenv(var):
-    """Get a value from environment variables"""
-    if var in sdata.sysconfig["env"]:
-        return sdata.sysconfig["env"][var]
-    else:
-        return ""
-
 # -- Env var
 
 def getenv(var):
@@ -80,11 +73,7 @@ def getenv(var):
     if var in sdata.sysconfig["env"]:
         return sdata.sysconfig["env"][var]
     else:
-        return""
-    #for k, v in sdata.sysconfig["env"].items():
-    #    if k == var:
-    #        return v
-    #return("")
+        return ""
 
 def setenv(var, val):
     """Set a value to a environment variable"""
@@ -95,6 +84,8 @@ def unset(var):
     """Remove a environment variable"""
     if var in sdata.sysconfig["env"]:
         del sdata.sysconfig["env"][var]
+
+# Date time
 
 def date2s(tms):
     localt = utime.gmtime(tms)
