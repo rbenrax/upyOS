@@ -38,12 +38,18 @@
   
   <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
   <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
+ 
+  <p>Memory Total: <strong> {{utls.human(tm)}} </strong> Free: <strong> {{utls.human(fm)}} {{pm}}</strong></p>
   
-  <p>
-  <a href="/on.pyhtml"><button class="button">ON</button></a>
-  <a href="/off.pyhtml"><button class="button button2">OFF</button></a>
-  <a href="/info.pyhtml"><button class="button button2">Info</button></a>
-  </p>
+  <p>Storage Total: <strong> {{utls.human(ts)}} </strong> Free: <strong> {{utls.human(fs)}} {{ps}}</strong></p>
+  
+  
+  <p><a href="/index.pyhtml"><button class="button">Main</button></a></p>
+  
+  
+  <p>dir(): <strong> {{dir()}} </strong></p>
+  
+  <p>env: <strong> {{sdata.sysconfig["env"]}} </strong></p>
   
   
 </body>
