@@ -60,8 +60,8 @@ led rgb 1            # Test rgb led in board (if board has one)
 #wifi sta ifconfig
 
 #utelnetd start
+#uftpd start
 #uhttpd start &
-#uftpd start &
 
 :exit
 
