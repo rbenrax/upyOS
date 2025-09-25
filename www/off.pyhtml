@@ -7,9 +7,16 @@
   <link rel="stylesheet" type="text/css" href="style.css">
   
   {{py}}
-  import sdata
+
+  #import sdata
+  #import machine
+  #led=machine.Pin(8, machine.Pin.OUT)
+  #led.value(0)
   
+  sdata.upyos.run_cmd("led off 0")
   
+  sdata.upyos.run_cmd("led rgb 1")
+
   {{end}}
   
 </head>

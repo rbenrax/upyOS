@@ -25,6 +25,7 @@ class upyOS:
         sdata.name    = "upyOS-" + uos.uname()[0]
         sdata.version = "0.9"
         sdata.initime = utime.time()
+        sdata.upyos   = self
         
         # Initialization
 
