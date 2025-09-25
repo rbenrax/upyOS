@@ -8,7 +8,7 @@
   
   {{py}}
   
-  #import sdata
+  import sdata
   #import machine
   #led=machine.Pin(8, machine.Pin.OUT)
   #led.value(1)
