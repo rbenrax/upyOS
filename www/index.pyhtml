@@ -51,14 +51,13 @@
         <button type="submit">Ejecutar</button>
     </form>
     
-    <form action="/runcmd2" method="post">
+    <form action="/runcmd2" method="POST">
         <div>
             <label for="l2">Comando (Post):</label>
             <input type="text" id="c2" name="cmd2">
             <button type="Ejecutar">Enviar</button>
         </div>
     </form>
-    
     
 </body>
 </html>
