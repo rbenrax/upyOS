@@ -45,6 +45,20 @@
   <a href="/info.pyhtml"><button class="button button2">Info</button></a>
   </p>
   
-  
+    <form action="/runcmd1" method="GET">
+        <label for="l1">Comando (Get):</label>
+        <input type="text" id="c1" name="cmd1" required>
+        <button type="submit">Ejecutar</button>
+    </form>
+    
+    <form action="/runcmd2" method="post">
+        <div>
+            <label for="l2">Comando (Post):</label>
+            <input type="text" id="c2" name="cmd2">
+            <button type="Ejecutar">Enviar</button>
+        </div>
+    </form>
+    
+    
 </body>
 </html>
