@@ -182,7 +182,7 @@ class upyOS:
                         from _thread import start_new_thread, stack_size
                         #if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
                         if sys.platform=="esp32": stack_size(8192)   # stack overflow in ESP32C3
-                        newProc = proc.Proc(self)
+                        newProc = proc.Proc()
                         start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
                         utime.sleep(.150)
                     except ImportError:
@@ -194,7 +194,7 @@ class upyOS:
                             sys.print_exception(ex)
                         
                 else:
-                    newProc = proc.Proc(self)
+                    newProc = proc.Proc()
                     newProc.run(False, ext, cmdl, args)
 
 # - - -

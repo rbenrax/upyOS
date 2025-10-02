@@ -6,7 +6,7 @@ import sdata
 # Process class
 class Proc:
     
-    def __init__(self, kernel):
+    def __init__(self):
         sdata._pid += 1               # Increment process Id
         self.pid   = sdata._pid       # Process id
         self.tid   = 0                # Thread id
