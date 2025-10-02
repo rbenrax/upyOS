@@ -1,8 +1,6 @@
 import utls
 import sdata
 
-proc=None
-
 # Shell script conditional execution
 # Basic language:
 #
@@ -58,7 +56,7 @@ def run(ssf, lbl_ln):
                 
                 labels[cmdl[1:-1]]=line # Save labels and his line
                 #print(labels)
-                continue # Lbels are not procesed
+                continue # Labels are not procesed
             
             if ltf != "": continue # looking for a label
             
@@ -163,15 +161,15 @@ def run(ssf, lbl_ln):
                         continue
                     
                     elif acc=="run":
-                        proc.syscall.run_cmd(" ".join(tmp[5:]))
+                        sdata.upyos.run_cmd(" ".join(tmp[5:]))
                         
                     else:
                         #if sdata.debug:
                         #    print(" ".join(tmp[4:]))
-                        proc.syscall.run_cmd(" ".join(tmp[4:]))
+                        sdata.upyos.run_cmd(" ".join(tmp[4:]))
                 continue
 
-            proc.syscall.run_cmd(cmdl)
+            sdata.upyos.run_cmd(cmdl)
             
         return 0
 

@@ -94,7 +94,7 @@ def __main__(args):
             mws.Start(threaded=False)
 
         elif args[0]=="stop":
-            proc.syscall.run_cmd("killall uhttpd")
+            sdata.upyos.run_cmd("killall uhttpd")
             
             import usocket
             sock = usocket.socket()

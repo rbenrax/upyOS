@@ -1,16 +1,12 @@
 import sys
 import utime
 import utls
-
 import sdata
 
 # Process class
 class Proc:
     
-    def __init__(self, syscall):
-        
-        self.syscall = syscall       # upyOS instance, for sytem calls
-        
+    def __init__(self, kernel):
         sdata._pid += 1               # Increment process Id
         self.pid   = sdata._pid       # Process id
         self.tid   = 0                # Thread id
@@ -61,9 +57,9 @@ class Proc:
                 
                 try:
                     if not "/" in cmd:
-                        self.syscall.run_cmd("sh /bin/" + cmd + ".sh")
+                        sdata.upyos.run_cmd("sh /bin/" + cmd + ".sh")
                     else:
-                        self.syscall.run_cmd("sh " + cmd + ".sh")
+                        sdata.upyos.run_cmd("sh " + cmd + ".sh")
                 except Exception as e:
                     print(f"Error executing script {cmd}")
                     if sdata.debug:

@@ -1,7 +1,4 @@
-import machine
-import sys
-
-proc=None
+import sdata
 
 def __main__(args):
-    proc.syscall.run_cmd("exit -r")
+    sdata.upyos.run_cmd("exit -r")

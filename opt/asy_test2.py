@@ -50,7 +50,6 @@ async def main():
         results = await uasyncio.gather(t1, t2)
 
 def __main__(args):
-    #print(proc.syscall.user_commands)
     uasyncio.run(main())
 
 if __name__ == "__main__":

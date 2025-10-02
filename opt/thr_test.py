@@ -9,7 +9,7 @@ import utime
 proc=None
 
 def __main__(args):
-    #proc.syscall.run_cmd("ps")
+    #sdata.upyos.run_cmd("ps")
     cont=0
     while True:
         cont+=1

@@ -1,4 +1,5 @@
 import utime
+import sdata
 
 # Proc ref pass in call
 proc=None
@@ -26,7 +27,7 @@ def __main__(args):
             continue
         
         print(f"\033[2J\033[HEvery: {t}s: {cmd}")
-        proc.syscall.run_cmd(cmd)
+        sdata.upyos.run_cmd(cmd)
         utime.sleep(t)
         
         
