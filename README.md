@@ -7,7 +7,12 @@ upyOS is a modular flash Operating System for microcontrollers based on Micropyt
 [smolOS original github site](https://github.com/w84death/smolOS/tree/main)
 
 
-The target is to get a common modular base to use stand alone microcontroller, avoiding monolithics programs, reuse modules and fun using it. 
+The target is to get a common modular base to use stand alone microcontroller, avoiding monolithics programs, reuse modules and fun using it.
+
+
+Secreenshot of developping in a ESP32 mcu with upyOS + Visual Studio Code + (rclone or CurlFtpFS) and telnet remote, without the need to constantly restart the mcu, also possible locally:
+
+![upyos01](media/upyos_07.png )
 
 
 Installation:
@@ -22,7 +27,6 @@ Installation:
       
       mpremote
       Ctrl+D
-
 
 Secreenshots of rp2040 module running upyOS:
 
