@@ -21,4 +21,5 @@ def __main__(args):
                     ret=True
                     break
 
-        utls.redir(args, ret)
+        if not utls.redir(args, ret):
+            print(ret)

@@ -15,7 +15,7 @@ board	= {}  	# Board model spec
 sysconfig={}	# System configuration
 
 _pid=0
-procs=[]		# Proccess running
+procs=[]		# Running proccesses
 
 #Display0
 d0=None			# Global ref to display 0 (if exist)

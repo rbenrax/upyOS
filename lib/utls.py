@@ -218,19 +218,43 @@ def recovery():
     import kernel
     upyos = kernel.upyOS("-r") # Boot_args: -r
 
-# Redirect output to an env var
+# Redirect output to an env var or file
 def redir(args, val):
-    if ">" in args:
-        try:
-            r = args.index(">")
-            setenv(args[r+1], val)
-            #del args[r:]
-            return True
-        except IndexError:
-            print("Error: falta el nombre de la variable destino después de '>'")
+    if ">>" not in args and ">" not in args:
+        return False
+
+    try:
+        # Detectar operador y modo de apertura
+        if ">>" in args:
+            idx, mode = args.index(">>"), "a"
+        else:
+            idx, mode = args.index(">"), "w"
+
+        # Validar destino
+        if idx + 1 >= len(args):
+            print("Error: falta destino después de '>'")
             return False
-    else:
-        return False        
+
+        target = args[idx + 1]
+        
+        # Redirigir a archivo
+        if "." in target or "/" in target:
+            with open(target, mode) as f:
+                f.write(str(val) + "\n")
+        else:
+            # Redirigir a "variable de entorno"
+            if mode == "a":
+                current = getenv(target)
+                setenv(target, current + val)
+            else:
+                setenv(target, val)
+
+        return True
+
+    except Exception as e:
+        print(f"Error redir: {e}")
+        return False
+
 
 #if __name__ == "__main__":      
 #    print(human(1257))
