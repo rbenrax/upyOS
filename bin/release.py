@@ -8,7 +8,7 @@ def __main__(args):
     else:
         fd="/etc/upgrade.inf"
         fr=["/boot.py","/main.py"] # Files to include       
-        fi=["system.conf","init.sh","end.sh"] # Files to avoid
+        fi=["system.conf"] # Files to avoid
         dr=["/bin","/lib","/libx","/etc"] # Direcrories to include
         with open(fd, "w") as fu:
             for f in fr:
