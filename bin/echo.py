@@ -32,7 +32,7 @@ def __main__(args):
                         utls.setenv(target, "".join(args[:idx]))
 
             except Exception as e:
-                print(f"Error redir: {e}")
+                print(f"Error echo: {e}")
                 return
 
         else:

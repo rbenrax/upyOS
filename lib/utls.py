@@ -1,16 +1,20 @@
 # Utility functions
 
 import utime
-from uos import stat, getcwd
-from json import dump as jdump, load as jload
+from uos import stat
+from uos import getcwd
+from json import dump as jdump
+from json import load as jload
+
 import sdata
 
 MONTH = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
 WEEKDAY = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
 
-# Cache control, avoid repeated filesystem calls
+# -- Cache control
+# Cached stat results to avoid repeated filesystem calls
 _stat_cache = {}
-_cache_timeout = const(1000)  # 1 second cache timeout
+_cache_timeout = 1000  # 1 second cache timeout
 
 def _get_cached_stat(filename):
     """Get file stat with caching to reduce filesystem calls"""
@@ -23,11 +27,11 @@ def _get_cached_stat(filename):
             return cached_stat
     
     try:
-        fs = stat(filename)
+        file_stat = stat(filename)
         # Only cache if enabled
         if sdata.cache_enabled:
-            _stat_cache[filename] = (fs, current_time)
-        return fs
+            _stat_cache[filename] = (file_stat, current_time)
+        return file_stat
     except OSError:
         # Cache negative results too, but only if enabled
         if sdata.cache_enabled:
@@ -36,31 +40,31 @@ def _get_cached_stat(filename):
 
 def file_exists(filename):
     """Check if file exists using cached stat"""
-    fs = _get_cached_stat(filename)
-    return fs is not None and (fs[0] & 0xc000) != 0
+    file_stat = _get_cached_stat(filename)
+    return file_stat is not None and (file_stat[0] & 0xc000) != 0
 
 def isdir(filename):
     """Check if path is directory using cached stat"""
-    fs = _get_cached_stat(filename)
-    return fs is not None and (fs[0] & 0x4000) != 0
+    file_stat = _get_cached_stat(filename)
+    return file_stat is not None and (file_stat[0] & 0x4000) != 0
 
 def isfile(filename):
     """Check if path is file using cached stat"""
-    fs = _get_cached_stat(filename)
-    return fs is not None and (fs[0] & 0x8000) != 0
+    file_stat = _get_cached_stat(filename)
+    return file_stat is not None and (file_stat[0] & 0x8000) != 0
 
 def get_mode(filename):
     """Get file mode using cached stat"""
-    fs = _get_cached_stat(filename)
-    return fs[0] if fs else 0
+    file_stat = _get_cached_stat(filename)
+    return file_stat[0] if file_stat else 0
 
 def get_stat(filename):
     """Get full file stat with error handling"""
-    fs = _get_cached_stat(filename)
-    if fs is None:
+    file_stat = _get_cached_stat(filename)
+    if file_stat is None:
         print("Error: utls.get_stat")
         return (0,) * 10
-    return fs
+    return file_stat
 
 # -- Env var
 
@@ -82,6 +86,7 @@ def unset(var):
         del sdata.sysconfig["env"][var]
 
 # Date time
+
 def date2s(tms):
     localt = utime.gmtime(tms)
     return f"{localt[2]:0>2}/{localt[1]}/{localt[0]:0>4}"
@@ -93,6 +98,18 @@ def time2s(tms, mod):
         return f"{localt[7]-1:3}d {localt[3]:0>2}:{localt[4]:0>2}:{localt[5]:0>2}"
     else:       # Time regular
         return f"{localt[3]:0>2}:{localt[4]:0>2}:{localt[5]:0>2}"
+
+#def timed_function(f, *args, **kwargs):
+#    fname = str(f).split(' ')[1]
+#    def new_func(*args, **kwargs):
+#        t = utime.ticks_us()
+#        result = f(*args, **kwargs)
+#        delta = utime.ticks_diff(utime.ticks_us(), t)
+#        print(f"Function {fname} {args[1]} Time = {delta/1000:6.3f}ms")
+#        return result
+#    return new_func
+
+# ---
 
 #def dump(obj, file):
 #    jdump(obj, file)
@@ -107,6 +124,7 @@ def save_conf_file(obj, path):
 def load_conf_file(path):
     with open(path, "r") as cf:
         return jload(cf)
+
 # ---
 
 def protected(path):
@@ -200,9 +218,11 @@ def recovery():
     import kernel
     upyos = kernel.upyOS("-r") # Boot_args: -r
 
-# Redirect output to an env var or file
-def redir(args, val):
+# Redirect output to an env var or file or print in terminal
+def outs(args, val, prt=True):
     if ">>" not in args and ">" not in args:
+        if prt:
+            print(val)
         return False
 
     try:
@@ -234,8 +254,9 @@ def redir(args, val):
         return True
 
     except Exception as e:
-        print(f"Error redir: {e}")
+        print(f"Error outs: {e}")
         return False
+
 
 #if __name__ == "__main__":      
 #    print(human(1257))
