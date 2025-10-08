@@ -25,7 +25,7 @@ upyOS Installation:
       mpremote
       Ctrl+D
       
-![ftpfs](media/ftpfs.py) Linux instalation:
+![ftpfs](media/ftpfs.py) Linux instalation (Optional):
 
 	sudo apt-get install fuse libfuse-dev python3-pip
 	pip3 install fusepy
