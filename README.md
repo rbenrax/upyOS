@@ -41,6 +41,8 @@ upyOS Installation:
 
 	# Unmount
 	fusermount -u ~/ftp_montado
+	
+Android alternative: Squircle CE + termux Apps
 
 Secreenshots of rp2040 module running upyOS:
 
