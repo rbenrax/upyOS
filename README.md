@@ -10,7 +10,7 @@ upyOS is a modular flash Operating System for microcontrollers based on Micropyt
 The target is to get a common modular base to use stand alone microcontroller, avoiding monolithics programs, reuse modules and fun using it.
 
 
-Secreenshot of developping in a ESP32 mcu with upyOS + VS Code + ![upyos01](media/ftpfs.py) and telnet, local and remotely:
+Secreenshot of developping in a ESP32 mcu with upyOS + VS Code + ![ftpfs](media/ftpfs.py) and telnet, local and remotely:
 
 ![upyos01](media/upyos_07.png )
 
@@ -27,7 +27,7 @@ Installation:
       mpremote
       Ctrl+D
       
-![upyos01](media/ftpfs.py) Linux instalation:
+![ftpfs](media/ftpfs.py) Linux instalation:
 
 sudo apt-get install fuse libfuse-dev python3-pip
 pip3 install fusepy
