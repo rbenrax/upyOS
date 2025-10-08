@@ -9,11 +9,6 @@ upyOS is a modular flash Operating System for microcontrollers based on Micropyt
 
 The target is to get a common modular base to use stand alone microcontroller, avoiding monolithics programs, reuse modules and fun using it.
 
-
-Secreenshot of developping in a ESP32 mcu with upyOS + VS Code + ![ftpfs](media/ftpfs.py) and telnet, local and remotely:
-
-![upyos01](media/upyos_07.png )
-
 upyOS Installation:
 
       git clone https://github.com/rbenrax/upyOS.git
@@ -24,25 +19,6 @@ upyOS Installation:
 
       mpremote
       Ctrl+D
-      
-![ftpfs](media/ftpfs.py) Linux instalation (Optional):
-
-	sudo apt-get install fuse libfuse-dev python3-pip
-	pip3 install fusepy
-
-	ftpfs use:
-
-	# Mount
-	mkdir ~/ftp_montado
-	python3 ftpfs.py ftp.ejemplo.com ~/ftp_montado -u usuario -P pass
-
-	# Directorio use
-	ls ~/ftp_montado
-
-	# Unmount
-	fusermount -u ~/ftp_montado
-	
-Android alternative: Squircle CE + termux Apps
 
 Secreenshots of rp2040 module running upyOS:
 
@@ -311,6 +287,30 @@ upyos upgrade procedure with ftp:
       / $:
   
 - Added call caching to FS; on systems with low memory, it should be disabled in sdata.py. On systems with more memory (e.g., ESP32S3 with 8MB of PSRAM), enabling it speeds up file system access.
+
+Secreenshot of developping in a ESP32 mcu with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS code or others IDEs, local and remotely:
+
+![Geany, VS code or others IDEs](media/upyos_07.png )
+      
+![ftpfs](media/ftpfs.py) Linux instalation (Optional):
+
+	sudo apt-get install fuse libfuse-dev python3-pip
+	pip3 install fusepy
+
+	ftpfs use:
+
+	# Mount
+	mkdir ~/ftp_montado
+	python3 ftpfs.py ftp.ejemplo.com ~/ftp_montado -u usuario -P pass
+
+	# Directorio use
+	ls ~/ftp_montado
+
+	# Unmount
+	fusermount -u ~/ftp_montado
+	
+Android alternative: Squircle CE + termux Apps
+
   
 TODO List:
 - Add other usefull commands.
