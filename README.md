@@ -14,35 +14,33 @@ Secreenshot of developping in a ESP32 mcu with upyOS + VS Code + ![ftpfs](media/
 
 ![upyos01](media/upyos_07.png )
 
-Installation:
+upyOS Installation:
 
       git clone https://github.com/rbenrax/upyOS.git
       
       cd upyOS
-      
       mpremote fs -v cp main.py :main.py
-      
       mpremote fs -r -v cp bin etc lib libx opt tmp www :
-      
+
       mpremote
       Ctrl+D
       
 ![ftpfs](media/ftpfs.py) Linux instalation:
 
-sudo apt-get install fuse libfuse-dev python3-pip
-pip3 install fusepy
+	sudo apt-get install fuse libfuse-dev python3-pip
+	pip3 install fusepy
 
-ftpfs use:
+	ftpfs use:
 
-# Mount
-mkdir ~/ftp_montado
-python3 ftpfs.py ftp.ejemplo.com ~/ftp_montado -u usuario -P pass
+	# Mount
+	mkdir ~/ftp_montado
+	python3 ftpfs.py ftp.ejemplo.com ~/ftp_montado -u usuario -P pass
 
-# Directorio use
-ls ~/ftp_montado
+	# Directorio use
+	ls ~/ftp_montado
 
-# Unmount
-fusermount -u ~/ftp_montado
+	# Unmount
+	fusermount -u ~/ftp_montado
 
 Secreenshots of rp2040 module running upyOS:
 
