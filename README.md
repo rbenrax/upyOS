@@ -67,7 +67,7 @@ Directories structure:
       /lib        System implementations libraries
       /opt        Specific solution or add-on programs (not in path)
       /tmp        Temporary directory (to put what you don't know where to put :-)
-      /www	  Web server directory
+      /www        Web server directory
 ```
 
 Internals commands:
@@ -207,7 +207,7 @@ Actual Development:
 ```
 - end script example for stop running services:
 
-# Script triggered on system exit
+- Script triggered on system exit
 
 ```
 	test -p uhttpd > 0
