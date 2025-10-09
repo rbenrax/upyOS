@@ -113,11 +113,35 @@ Actual Development:
 
 - Added recovery mode, to avoid load of start up failed commands or programs.
 
-- Added environment variables in scripts and python programs, export, echo, unset utls.getenv(<var>) and utls.setenv(<var>, <val>).
+- Added environment variables in scripts and python programs, export, echo, unset utls.getenv(var) and utls.setenv(var, val).
 
 - ls command is now full functional, or so I hope.
 
 - Now, commands translate environment variables.
+
+- Basic upyOS program structure:
+```
+import xxxx
+
+proc=None			# Reference to de current process
+
+def __main__(args):		# Entry point and command line arguments
+
+   # Your code ...
+    
+   while True:			# Main loop (for, while, etc)
+   
+        if proc.sts=="S":break	# Mechanism to stop the process if it is launched in batch (&)
+        
+        if proc.sts=="H":	# Mechanism to hold and resume the process if it is launched in batch (&) and holded
+            utime.sleep(1)
+            continue
+        
+        # Your code ...
+        
+   # Your code ...
+
+```
 
 - From command line prompt and shell scripts is possible input python code directly:
 ```
@@ -314,9 +338,9 @@ Script execution in boot:
 - upyOS remote development:
       - Start in remote mcu telnet service (utelnet start)
       - Start in remote mcu ftpserver service (uftpd start)
-      - Install in local machine curlftpfs package
-      - In local machine mount remote directory with "curlftpfs user@<mcuip> <local path>"
-      - With Tonny you can develop in <local path>
+      - Install in local machine ~~curlftpfs~~(The curlftpfs package is considered unmaintained, and removed fron Linux distros) use instead ftpfs package in my owns repositories
+      - In local machine mount remote directory with ~~curlftpfs user@<mcuip> <local path>~~ see ftpfs instructions
+      - With Tonny you can develop in <local path> mounted directory
       - Access with telnet to the mcu console ip to run commands and programs
 
 - Added user and password authentication to access by telnet and ftp servers, user and password are stored in /etc/system.conf file, if no password is set then authentication is disabled.
@@ -333,6 +357,8 @@ Script execution in boot:
 	[.......................................................................................]OK
 	100% Upgrade complete
 	/ $:
+	
+	Note: On systems with low memory (e.g., ESP32-C3), the MCU must boot only with the Telnet service, without any other services, due to the memory requirements of the encryption system for performing the update.
 ```
 - Added call caching to FS; on systems with low memory, it should be disabled in sdata.py. On systems with more memory (e.g., ESP32S3 with 8MB of PSRAM), enabling it speeds up file system access.
 
