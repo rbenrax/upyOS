@@ -334,7 +334,6 @@ Script execution in boot:
 	unset passw
 ```
 
-
 - upyOS remote development:
       - Start in remote mcu telnet service (utelnet start)
       - Start in remote mcu ftpserver service (uftpd start)
