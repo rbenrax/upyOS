@@ -176,39 +176,45 @@ Actual Development:
       # WiFi connnection and and services startup
       #
       
-      wifi sta on
+      wifi sta on                      # Turn on wifi in cliente mode
+
+      wifi sta status 
       
-      #wifi sta scan
-      
-      wifi sta connect DIGIFIBRA-cGPRi <password> 10
-      
-      wifi sta status             # status subcommand save in env var if active and connected status
-      if $0 == 0 goto exit        # If not active
-      if $1 == 0 goto exit        # If not connected
-      
+      #wifi sta scan                   # scan wifi APs
+
+      wifi sta connect <SSID> <password> 10 # SSID PASS Timeout
+
+      wifi sta status -n
+      if $wa == False goto exit # wifi active
+      if $wc == False goto exit # wifi connected
+
       ntpupdate es.pool.ntp.org
+
       date
+
       wifi sta ifconfig
-      unset 0 1
-      
+
       utelnetd start
       uftpd start
+      uhttpd start &
       
       :exit
 
 - end script example for stop running services:
 
-        # Script triggered on system exit
+# Script triggered on system exit
 
-        test -p uhttpd
-        if $0 == 1 uhttpd stop
+      test -p uhttpd > 0
+      if $0 == True uhttpd stop
+      unset 0
 
-        uftpd stop
-        utelnetd stop
+      uftpd stop
+      utelnetd stop
 
-        wifi sta status -n
-        if $1 == 1 wifi sta disconnect -n
-        if $0 == 1 wifi sta off
+      wifi sta status -n
+      if $wc == True wifi sta disconnect -n
+      if $wa == True wifi sta off
+
 
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
@@ -225,42 +231,74 @@ Script execution in boot:
       if $a > 4 goto cont2
       echo $a
 
-upyos upgrade procedure with ftp:
+- init.sh example with SSD1306 Oled display and start of process:
 
-   upgrade.sh
+	# Init shell script 
+	loadboard /etc/upyOS-esp32c3_vcc_gnd.board
 
-      #!/bin/sh
-      HOST='IP address'
-      USER='admin''
-      PASSWD='password'
+	#ESP32-C3  ->  Display SSD1306
+	#-----------------------------
+	#GND       ->  GND
+	#3.3V      ->  VCC
+	#GPIO6     ->  SCK  D0
+	#GPIO7     ->  MOSI D1
+	#GPIO2     ->  MISO (unused)
+	#GPIO11    ->  RES (Reset)
+	#GPIO3     ->  DC (Data/Command)
+	#GPIO10    ->  CS (Chip Select)
 
-      ftp -n $HOST <<END_SCRIPT
-      quote USER $USER
-      quote PASS $PASSWD
-      binary
-      prompt
-      
-      lcd bin
-      cd bin
-      mput *
-      lcd ..
-      cd ..
-      
-      lcd lib
-      cd lib
-      mput *
-      lcd ..
-      cd ..
+	# Display0 driver load
+	> from machine import Pin, SPI
+	> import ssd1306
+	> sdata.d0 = ssd1306.SSD1306_SPI(128, 64, SPI(1), Pin(3), Pin(11), Pin(10)) # Gpios assignment
+	> d0 = sdata.d0 	# Global reference for use in others programs
 
-      lcd libx
-      cd libx
-      mput *
-      lcd ..
-      cd ..
-      
-      quit
+	> d0.fill(0)
+	> d0.text(sdata.name + " " + sdata.version, 0, 0, 1)
+	> d0.line(0, 15, 127, 15, 1)
+	> d0.text("Iniciando...", 0, 16, 1)
+	> d0.show()
 
-      Require ftp server service running in mcu and setauth command to set user and password to login. 
+	# Wifi sta
+	wifi sta on                      	# Turn on wifi in cliente mode
+
+	#wifi sta status
+	#wifi sta scan                   	# scan wifi APs
+
+	# Crear variable de entorno
+	export essid <essid>
+	export passw <password>
+
+	> d0.text("Try.. " + utls.getenv("essid"), 0, 26, 1)  # Get environment Variable to show in display
+	> d0.show()
+
+	wifi sta connect $essid $passw 10 	# Connect to wifi router
+
+	wifi sta status -n
+	if $wa == False goto exit 		# wifi active
+	if $wc == False goto exit 		# wifi connected
+
+	> d0.text("Conected", 0, 36, 1)
+	> d0.show()
+
+	ntpupdate es.pool.ntp.org		# Time sync
+	date
+
+	> d0.text("ntpupdate", 0, 46, 1)
+	> d0.text("Ready", 0, 56, 1)
+	> d0.show()
+
+	wifi sta ifconfig
+
+	utelnetd start				# Start telset server
+	uftpd start# 				# Start ftp server
+	uhttpd start &				# Start web server
+
+	#/local/dsp.py &			@ Start utility program as thread
+
+	:exit
+	unset essid				# Remove enviroment variables
+	unset passw
 
 
 - upyOS remote development:
