@@ -1,1 +1,134 @@
-{"ir": false, "rtc": false, "adc": [{"adc": 31, "adc": 32, "adc": 34, "adc": 35}], "ver": 1.0, "usart": [{"tx": 1, "rx": 2 }, {"tx": 6, "rx": 7}], "gnd": [3, 8, 13, 18, 23, 28, 33, 38], "temp": false, "ctrl": [{"run": 30}], "other": [{"swclk": 0, "swdio": 0, "vin": 39, "vout": 40, "key0io": 24}], "pwm": [{"pwm": 0, "pwm": 0}], "spi": [{"mosi": 25, "miso": 21, "cs": 22, "ck": 24}], "nc": [], "ledio": [{"d5": 25}], "bt": false, "wifi": false, "3v3": [36], "5v0": [], "text": "VCC-GND YD2040, dual core, dual threaded, no comms, 2 usart and 2 i2c can used in others pins", "resv": [], "gpio": [{"0": 1, "1": 2, "2": 4, "3": 5, "4": 6, "5": 7, "6": 9, "7": 10, "8": 11, "9": 12, "10": 14, "11": 15, "12": 16, "13": 17, "14": 19, "15": 20, "16": 21, "17": 22, "18": 24, "19": 25, "20": 26, "21": 27, "22": 29, "26": 31, "27": 32, "28": 34, "29": 35, "23": 37}], "rgbio": [{"l1": 23}], "eth": false, "i2c": [{"sda": 1, "scl": 2}, {"sda": 4, "scl": 5}], "mcu": [{"arch": "arm", "type": "rp2040 dual arm Cortex-M0+"}], "board": {"name": "Arduino Nano RP2040 Connect with RP2040", "vendor": "vcc-gnd studio"}}
+{
+    "ir": false,
+    "rtc": false,
+    "adc": [
+        {
+            "adc": 31,
+            "adc": 32,
+            "adc": 34,
+            "adc": 35
+        }
+    ],
+    "ver": 1.0,
+    "usart": [
+        {
+            "tx": 1,
+            "rx": 2
+        },
+        {
+            "tx": 6,
+            "rx": 7
+        }
+    ],
+    "gnd": [
+        3,
+        8,
+        13,
+        18,
+        23,
+        28,
+        33,
+        38
+    ],
+    "temp": false,
+    "ctrl": [
+        {
+            "run": 30
+        }
+    ],
+    "other": [
+        {
+            "swclk": 0,
+            "swdio": 0,
+            "vin": 39,
+            "vout": 40,
+            "key0io": 24
+        }
+    ],
+    "pwm": [
+        {
+            "pwm": 0,
+            "pwm": 0
+        }
+    ],
+    "spi": [
+        {
+            "mosi": 25,
+            "miso": 21,
+            "cs": 22,
+            "ck": 24
+        }
+    ],
+    "nc": [],
+    "ledio": [
+        {
+            "d5": 25
+        }
+    ],
+    "bt": false,
+    "wifi": false,
+    "3v3": [
+        36
+    ],
+    "5v0": [],
+    "text": "VCC-GND YD2040, dual core, dual threaded, no comms, 2 usart and 2 i2c can used in others pins",
+    "resv": [],
+    "gpio": [
+        {
+            "0": 1,
+            "1": 2,
+            "2": 4,
+            "3": 5,
+            "4": 6,
+            "5": 7,
+            "6": 9,
+            "7": 10,
+            "8": 11,
+            "9": 12,
+            "10": 14,
+            "11": 15,
+            "12": 16,
+            "13": 17,
+            "14": 19,
+            "15": 20,
+            "16": 21,
+            "17": 22,
+            "18": 24,
+            "19": 25,
+            "20": 26,
+            "21": 27,
+            "22": 29,
+            "26": 31,
+            "27": 32,
+            "28": 34,
+            "29": 35,
+            "23": 37
+        }
+    ],
+    "rgbio": [
+        {
+            "l1": 23
+        }
+    ],
+    "eth": false,
+    "i2c": [
+        {
+            "sda": 1,
+            "scl": 2
+        },
+        {
+            "sda": 4,
+            "scl": 5
+        }
+    ],
+    "mcu": [
+        {
+            "arch": "arm",
+            "type": "rp2040 dual arm Cortex-M0+"
+        }
+    ],
+    "board": {
+        "name": "Arduino Nano RP2040 Connect with RP2040",
+        "vendor": "vcc-gnd studio"
+    }
+}
