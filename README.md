@@ -205,9 +205,7 @@ Actual Development:
 
 	:exit
 ```
-- end script example for stop running services:
-
-- Script triggered on system exit
+- Script triggered on system exit for stop running services
 
 ```
 	test -p uhttpd > 0
@@ -334,7 +332,7 @@ Script execution in boot:
 ```
 - Added call caching to FS; on systems with low memory, it should be disabled in sdata.py. On systems with more memory (e.g., ESP32S3 with 8MB of PSRAM), enabling it speeds up file system access.
 
-- creenshot of developping in a ESP32 mcu with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS code or others IDEs, local and remotely:
+- Screenshot of developping in a ESP32 mcu with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS code or others IDEs, local and remotely:
 
 ![Geany, VS code or others IDEs](media/upyos_07.png )
       
@@ -356,7 +354,7 @@ Script execution in boot:
 	fusermount -u ~/ftp_montado
 ```
 	
-- droid alternative: Squircle CE + termux Apps
+- Android alternative: Squircle CE + termux Apps
 
   
 TODO List:
