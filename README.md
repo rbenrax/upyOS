@@ -119,30 +119,6 @@ Actual Development:
 
 - Now, commands translate environment variables.
 
-- Basic upyOS program structure:
-```
-import xxxx
-
-proc=None			# Reference to de current process
-
-def __main__(args):		# Entry point and command line arguments
-
-   # Your code ...
-    
-   while True:			# Main loop (for, while, etc)
-   
-        if proc.sts=="S":break	# Mechanism to stop the process if it is launched in batch (&)
-        
-        if proc.sts=="H":	# Mechanism to hold and resume the process if it is launched in batch (&) and holded
-            utime.sleep(1)
-            continue
-        
-        # Your code ...
-        
-   # Your code ...
-
-```
-
 - From command line prompt and shell scripts is possible input python code directly:
 ```
 	">" command allow input python code:
@@ -168,6 +144,30 @@ def __main__(args):		# Entry point and command line arguments
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
 ```
+- Basic upyOS program structure:
+```
+import xxxx
+
+proc=None			# Reference to de current process
+
+def __main__(args):		# Entry point and command line arguments
+
+   # Your code ...
+    
+   while True:			# Main loop (for, while, etc)
+   
+        if proc.sts=="S":break	# Mechanism to stop the process if it is launched in batch (&)
+        
+        if proc.sts=="H":	# Mechanism to hold and resume the process if it is launched in batch (&) and holded
+            utime.sleep(1)
+            continue
+        
+        # Your code ...
+        
+   # Your code ...
+
+```
+
 - Shell script basic conditional execution, also are supported labels and goto instruction:
 
 - example.sh
@@ -183,7 +183,7 @@ def __main__(args):		# Entry point and command line arguments
 	if $var1 == 5 run watch ps -t 5 # Launch command "watch ps" every 5 seconds
 	if $var1 == 6 run asy_test &    # Summit asy_test process
 ```
-- menu.sh
+- menu.sh, example of loops use
 ```
 	:loop
 	clear
@@ -338,8 +338,8 @@ Script execution in boot:
 - upyOS remote development:
       - Start in remote mcu telnet service (utelnet start)
       - Start in remote mcu ftpserver service (uftpd start)
-      - Install in local machine ~~curlftpfs~~(The curlftpfs package is considered unmaintained, and removed fron Linux distros) use instead ftpfs package in my owns repositories
-      - In local machine mount remote directory with ~~curlftpfs user@<mcuip> <local path>~~ see ftpfs instructions
+      - Install in local machine ~~curlftpfs~~ (The curlftpfs package is considered unmaintained, and removed fron Linux distros) use instead ftpfs package in my owns repositories
+      - In local machine mount remote directory with ~~curlftpfs user@<mcuip> <local path>~~, see ftpfs instructions
       - With Tonny you can develop in <local path> mounted directory
       - Access with telnet to the mcu console ip to run commands and programs
 
