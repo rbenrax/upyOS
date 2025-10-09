@@ -10,15 +10,16 @@ upyOS is a modular flash Operating System for microcontrollers based on Micropyt
 The target is to get a common modular base to use stand alone microcontroller, avoiding monolithics programs, reuse modules and fun using it.
 
 upyOS Installation:
+```
+	git clone https://github.com/rbenrax/upyOS.git
 
-      git clone https://github.com/rbenrax/upyOS.git
-      
-      cd upyOS
-      mpremote fs -v cp main.py :main.py
-      mpremote fs -r -v cp bin etc lib libx opt tmp www :
+	cd upyOS
+	mpremote fs -v cp main.py :main.py
+	mpremote fs -r -v cp bin etc lib libx opt tmp www :
 
-      mpremote
-      Ctrl+D
+	mpremote
+	Ctrl+D
+```
 
 Secreenshots of rp2040 module running upyOS:
 
@@ -59,13 +60,15 @@ Directories structure:
 - boot.py         Micropython statup file
 - main.py         Micropython statup file (boot system)
 
+```
       /bin        Commands and shell scripts
       /etc        Configuration files
       /libx       External libraries
       /lib        System implementations libraries
       /opt        Specific solution or add-on programs (not in path)
       /tmp        Temporary directory (to put what you don't know where to put :-)
-
+      /www	  Web server directory
+```
 
 Internals commands:
 
@@ -117,119 +120,123 @@ Actual Development:
 - Now, commands translate environment variables.
 
 - From command line prompt and shell scripts is possible input python code directly:
+```
+	">" command allow input python code:
+	/ $: > import ftptiny
+	/ $: > ftp = ftptiny.FtpTiny()
+	/ $: > ftp.start()
 
-      ">" command allow input python code:
-      / $: > import ftptiny
-      / $: > ftp = ftptiny.FtpTiny()
-      / $: > ftp.start()
-      
-      "<" command allow print any python expression:
-      
-      / $: < sys.modules
-      {'kernel': <module 'kernel' from '/lib/kernel.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
-      
-      / $: < 2+2
-      4
+	"<" command allow print any python expression:
+
+	/ $: < sys.modules
+	{'kernel': <module 'kernel' from '/lib/kernel.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
+
+	/ $: < 2+2
+	4
+```
 
 - Management support for multiples threads and asyncio, tests availables (&, ps, kill, killall, wait, hold and resume):
-  
+```
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
-  
+```
 - Shell script basic conditional execution, also are supported labels and goto instruction:
 
 - example.sh
-
-      export var1 5   # Set variable var1 to "5" (variables can also be accesed from Python programs and embedded Python)
-      if $var1 != 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
-      < 1
-      < 2
-      < skip 2
-      < 4
-      < 5
-      if $var1 == 3 return        # Ends shell script
-      if $var1 == 5 run watch ps -t 5 # Launch command "watch ps" every 5 seconds
-      if $var1 == 6 run asy_test &    # Summit asy_test process
-
+```
+	export var1 5   # Set variable var1 to "5" (variables can also be accesed from Python programs and embedded Python)
+	if $var1 != 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
+	< 1
+	< 2
+	< skip 2
+	< 4
+	< 5
+	if $var1 == 3 return        # Ends shell script
+	if $var1 == 5 run watch ps -t 5 # Launch command "watch ps" every 5 seconds
+	if $var1 == 6 run asy_test &    # Summit asy_test process
+```
 - menu.sh
-  
-      :loop
-      clear
-      < "Options Menu"
-      < ""
-      < "Option 1 160MHz"
-      < "Option 2 240Mhz"
-      < "Option 3 return"
-      < "Option 0 exit"
-      < ""
-      echo "Last option: " $v1
-      read v1 "Enter option: "
-      if $v1 == 1 cpufreq 160
-      if $v1 == 2 cpufreq 240
-      if $v1 == 3 return
-      if $v1 != 0 goto loop
-      exit
+```
+	:loop
+	clear
+	< "Options Menu"
+	< ""
+	< "Option 1 160MHz"
+	< "Option 2 240Mhz"
+	< "Option 3 return"
+	< "Option 0 exit"
+	< ""
+	echo "Last option: " $v1
+	read v1 "Enter option: "
+	if $v1 == 1 cpufreq 160
+	if $v1 == 2 cpufreq 240
+	if $v1 == 3 return
+	if $v1 != 0 goto loop
+	exit
+```
 
 - wifi startup sh script example (can be called from init.sh)
+```
+	#
+	# WiFi connnection and and services startup
+	#
 
-      #
-      # WiFi connnection and and services startup
-      #
-      
-      wifi sta on                      # Turn on wifi in cliente mode
+	wifi sta on                      # Turn on wifi in cliente mode
 
-      wifi sta status 
-      
-      #wifi sta scan                   # scan wifi APs
+	wifi sta status 
 
-      wifi sta connect <SSID> <password> 10 # SSID PASS Timeout
+	#wifi sta scan                   # scan wifi APs
 
-      wifi sta status -n
-      if $wa == False goto exit # wifi active
-      if $wc == False goto exit # wifi connected
+	wifi sta connect <SSID> <password> 10 # SSID PASS Timeout
 
-      ntpupdate es.pool.ntp.org
+	wifi sta status -n
+	if $wa == False goto exit # wifi active
+	if $wc == False goto exit # wifi connected
 
-      date
+	ntpupdate es.pool.ntp.org
 
-      wifi sta ifconfig
+	date
 
-      utelnetd start
-      uftpd start
-      uhttpd start &
-      
-      :exit
+	wifi sta ifconfig
 
+	utelnetd start
+	uftpd start
+	uhttpd start &
+
+	:exit
+```
 - end script example for stop running services:
 
 # Script triggered on system exit
 
-      test -p uhttpd > 0
-      if $0 == True uhttpd stop
-      unset 0
+```
+	test -p uhttpd > 0
+	if $0 == True uhttpd stop
+	unset 0
 
-      uftpd stop
-      utelnetd stop
+	uftpd stop
+	utelnetd stop
 
-      wifi sta status -n
-      if $wc == True wifi sta disconnect -n
-      if $wa == True wifi sta off
-
+	wifi sta status -n
+	if $wc == True wifi sta disconnect -n
+	if $wa == True wifi sta off
+```
 
 Script execution in boot:
 ![upyos06](media/upyos_06.png )
 
 - loops in shell scripts!:
+```
+	:cont
+	incr a
+	if $a <= 5 goto cont
+	echo $a
 
-      :cont
-      incr a
-      if $a <= 5 goto cont
-      echo $a
-
-      :cont2
-      decr a
-      if $a > 4 goto cont2
-      echo $a
+	:cont2
+	decr a
+	if $a > 4 goto cont2
+	echo $a
+```
 
 - init.sh example with SSD1306 Oled display and start of process:
 ```
@@ -294,7 +301,7 @@ Script execution in boot:
 	uftpd start# 				# Start ftp server
 	uhttpd start &				# Start web server
 
-	#/local/dsp.py &			@ Start utility program as thread
+	#/local/dsp.py &			# Start utility program as thread
 
 	:exit
 	unset essid				# Remove enviroment variables
@@ -315,24 +322,24 @@ Script execution in boot:
 - By starting utelnet and uftpd on boot, you can develop remotely from Android by using "Serial wifi terminal" and "Squircle CE" apps from Google Play, Termux is an excelent option too as telnet client.
 
 - Added upgrade command for OTA upgrade from github repository.
-
-      / $: upgrade
-      upyOS OTA Upgrade,
-      Downloading upgrade list..., OK
-      Confirm upyOS upgrade (y/N)? y
-      Upgrading from upyOS github repository, wait...
-      [.......................................................................................]OK
-      100% Upgrade complete
-      / $:
-  
+```
+	/ $: upgrade
+	upyOS OTA Upgrade,
+	Downloading upgrade list..., OK
+	Confirm upyOS upgrade (y/N)? y
+	Upgrading from upyOS github repository, wait...
+	[.......................................................................................]OK
+	100% Upgrade complete
+	/ $:
+```
 - Added call caching to FS; on systems with low memory, it should be disabled in sdata.py. On systems with more memory (e.g., ESP32S3 with 8MB of PSRAM), enabling it speeds up file system access.
 
-Secreenshot of developping in a ESP32 mcu with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS code or others IDEs, local and remotely:
+- creenshot of developping in a ESP32 mcu with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS code or others IDEs, local and remotely:
 
 ![Geany, VS code or others IDEs](media/upyos_07.png )
       
 ![ftpfs](media/ftpfs.py) Linux instalation (Optional):
-
+```
 	sudo apt-get install fuse libfuse-dev python3-pip
 	pip3 install fusepy
 
@@ -347,8 +354,9 @@ Secreenshot of developping in a ESP32 mcu with upyOS + ![ftpfs](media/ftpfs.py) 
 
 	# Unmount
 	fusermount -u ~/ftp_montado
+```
 	
-Android alternative: Squircle CE + termux Apps
+- droid alternative: Squircle CE + termux Apps
 
   
 TODO List:
