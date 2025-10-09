@@ -113,7 +113,7 @@ Actual Development:
 
 - Added recovery mode, to avoid load of start up failed commands or programs.
 
-- Added environment variables in scripts and python programs, export, echo, unset sdata.getenv() ans sdata.setenv().
+- Added environment variables in scripts and python programs, export, echo, unset utls.getenv(<var>) and utls.setenv(<var>, <val>).
 
 - ls command is now full functional, or so I hope.
 
@@ -133,6 +133,10 @@ Actual Development:
 
 	/ $: < 2+2
 	4
+	
+	/ $: > import esp32
+	/ $: < esp32.mcu_temperature()
+	31
 ```
 
 - Management support for multiples threads and asyncio, tests availables (&, ps, kill, killall, wait, hold and resume):
