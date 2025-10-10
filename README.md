@@ -365,12 +365,13 @@ Script execution in boot:
 
 ![Geany, VS code or others IDEs](media/upyos_07.png )
       
-![ftpfs](media/ftpfs.py) Linux instalation (Optional):
+![ftpfs](media/ftpfs.py) Remote development environment, Linux instalation:
 ```
+	# Install Linux dependencies
 	sudo apt-get install fuse libfuse-dev python3-pip
 	pip3 install fusepy
 
-	ftpfs use:
+	ftpfs use to access mcu filesystem:
 
 	# Mount
 	mkdir ~/dev_upyos
@@ -380,10 +381,10 @@ Script execution in boot:
 	ls ~/dev_upyos
 	
 	# Open favorite IDE
-	code, geany, etc.
+	VScode, geany, gedit, etc.
 	Open mounted dir (/dev_upyos), and use telnet from IDE terminar to connect to mcu
 
-	# Uo unmount
+	# To unmount
 	fusermount -u ~/dev_upyos
 ```
 	
