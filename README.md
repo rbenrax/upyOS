@@ -111,12 +111,13 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 ### Internal Commands
 
 * `exit`: Exits the current shell or script.
+* `killall`: Stops all running processes
 * `loadconfig`: Loads the system configuration file.
 * `loadboard`: Loads the board interfaces configuration file.
 
 ### Actual External Commands
 
-`cat`, `cd`, `clear`, `cp`, `cpufreq`, `date`, `decr`, `df`, `echo`, `env`, `export`, `fileup`, `find`, `free`, `grep`, `help`, `hold`, `i2cscan`, `ifconfig`, `incr`, `iperf3`, `kill`, `killall`, `led`, `ls`, `lshw`, `lsmod`, `mi`, `mkdir`, `mv`, `ntpupdate`, `ping`, `ps`, `pwd`, `read`, `reboot`, `reset`, `resume`, `rm`, `rmdir`, `rmmod`, `sensors`, `sh`, `si`, `sleep`, `test`, `touch`, `uftpd`, `uhttpd`, `unset`, `uptime`, `utelnetd`, `vi`, `wait`, `watch`, `wget`, `wifi.inf`, `wifi`
+`cat`, `cd`, `clear`, `cp`, `cpufreq`, `date`, `decr`, `df`, `echo`, `env`, `export`, `fileup`, `find`, `free`, `grep`, `help`, `hold`, `i2cscan`, `ifconfig`, `incr`, `iperf3`, `kill`, `killall`, `led`, `ls`, `lshw`, `lsmod`, `mi`, `mkdir`, `mv`, `ntpupdate`, `ping`, `ps`, `pwd`, `read`, `reboot`, `release`,`reset`, `resume`, `rm`, `rmdir`, `rmmod`, `sensors`, `setauth`, `sh`, `si`, `sleep`, `test`, `touch`, `uftpd`, `uhttpd`, `unset`, `upgrade`, `uptime`, `utelnetd`, `vi`, `wait`, `watch`, `wget`, `wifi`
 
 ---
 
