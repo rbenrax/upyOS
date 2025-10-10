@@ -367,24 +367,23 @@ Script execution in boot:
       
 ![ftpfs](media/ftpfs.py) Remote development environment, Linux instalation:
 ```
-	# Install Linux dependencies
+	# Install Linux dependencies:
 	sudo apt-get install fuse libfuse-dev python3-pip
 	pip3 install fusepy
 
-	ftpfs use to access mcu filesystem:
-
-	# Mount
+	# ftpfs use to access mcu filesystem:
+	# Create a local directory and mount
 	mkdir ~/dev_upyos
 	python3 ftpfs.py mcu_IP ~/dev_upyos -u admin -P pass (Default user is admin and no password, use setauth upyOS command to set a password)
 
-	# Directorio use
+	# Check directorio use:
 	ls ~/dev_upyos
 	
-	# Open favorite IDE
+	# Open favorite IDE:
 	VScode, geany, gedit, etc.
 	Open mounted dir (/dev_upyos), and use telnet from IDE terminar to connect to mcu
 
-	# To unmount
+	# To unmount:
 	fusermount -u ~/dev_upyos
 ```
 	
