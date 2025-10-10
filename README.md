@@ -53,6 +53,30 @@ The aim of **upyOS** is to provide an additional layer to MicroPython, allowing 
 
 The system can be extended with external commands and programs, aiming to keep the memory footprint as low as possible. RAM is quite small, but flash is usually big enough. Every program to be executed must define a `def __main__(args):` function.
 
+### Basic upyOS Program Structure
+
+```python
+import xxxx
+
+proc=None			# Reference to the current process
+
+def __main__(args):		# Entry point and command line arguments
+
+   # Your code ...
+    
+   while True:			# Main loop (for, while, etc)
+   
+        if proc.sts=="S":break	# Mechanism to stop the process if it is launched in batch (&)
+        
+        if proc.sts=="H":	# Mechanism to hold and resume the process if it is launched in batch (&) and held
+            utime.sleep(1)
+            continue
+        
+        # Your code ...
+        
+   # Your code ...
+````
+
 ### System Data
 
 The **sdata** module contains all the system data, providing access to board configuration parameters, system configuration parameters, environment variables, and more, allowing these parameters to be accessed across programs and scripts.
@@ -147,30 +171,6 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
       / $: /opt/thr_test &            # thread test
       / $: /opt/asy_test &            # asyncio test in new thread
     ```
-
-### Basic upyOS Program Structure
-
-```python
-import xxxx
-
-proc=None			# Reference to the current process
-
-def __main__(args):		# Entry point and command line arguments
-
-   # Your code ...
-    
-   while True:			# Main loop (for, while, etc)
-   
-        if proc.sts=="S":break	# Mechanism to stop the process if it is launched in batch (&)
-        
-        if proc.sts=="H":	# Mechanism to hold and resume the process if it is launched in batch (&) and held
-            utime.sleep(1)
-            continue
-        
-        # Your code ...
-        
-   # Your code ...
-````
 
 ### Shell Scripting
 
