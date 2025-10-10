@@ -397,12 +397,12 @@ Added call caching to the File System (FS). On systems with low memory, this sho
 ## Remote Development Environment Example
 
 ![Geany, VS code or others IDEs](media/upyos_07.png )
-Screenshot of developing on an ESP32 MCU with upyOS +  and telnet in Geany, VS Code, or other IDEs, both locally and remotely:
+Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS Code, or other IDEs, both locally and remotely:
 
 ### ftpfs Remote Development Environment, Linux Installation
 
 ```bash
-	# ftpfs used to access mcu filesystem:
+	# ![ftpfs](media/ftpfs.py) used to access mcu filesystem:
 	
 	# Install Linux dependencies:
 	sudo apt-get install fuse libfuse-dev python3-pip
