@@ -401,8 +401,10 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 
 ### ftpfs Remote Development Environment, Linux Installation
 
+![Download ftpfs](media/ftpfs.py)
+
 ```bash
-	# ftpfs ![ftpfs](media/ftpfs.py) used to access mcu filesystem:
+	# ftpfs used to access mcu filesystem:
 	
 	# Install Linux dependencies:
 	sudo apt-get install fuse libfuse-dev python3-pip
