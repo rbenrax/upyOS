@@ -474,10 +474,10 @@ def main():
         print(f"Error: {args.mountpoint} no existe o no es un directorio")
         sys.exit(1)
     
-    print(f"Montando {args.host} en {args.mountpoint}")
-    print(f"Usuario: {args.user}")
-    print(f"Para desmontar: fusermount -u {args.mountpoint}")
-    print("Esta versión incluye soporte mejorado para guardado desde editores como VS Code")
+    print(f"Monting {args.host} en {args.mountpoint}")
+    print(f"User: {args.user}")
+    print(f"To unmount: fusermount -u {args.mountpoint}")
+    print("VS Code suppot version")
     
     # Crear filesystem
     ftpfs = FTPFS(
