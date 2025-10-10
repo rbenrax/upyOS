@@ -373,14 +373,18 @@ Script execution in boot:
 	ftpfs use:
 
 	# Mount
-	mkdir ~/ftp_montado
-	python3 ftpfs.py ftp.ejemplo.com ~/ftp_montado -u usuario -P pass
+	mkdir ~/dev_upyos
+	python3 ftpfs.py mcu_IP ~/dev_upyos -u admin -P pass (Default user is admin and no password, use setauth upyOS command to set a password)
 
 	# Directorio use
-	ls ~/ftp_montado
+	ls ~/dev_upyos
+	
+	# Open favorite IDE
+	code, geany, etc.
+	Open mounted dir (/dev_upyos), and use telnet from IDE terminar to connect to mcu
 
-	# Unmount
-	fusermount -u ~/ftp_montado
+	# Uo unmount
+	fusermount -u ~/dev_upyos
 ```
 	
 - Android alternative: Squircle CE + termux Apps
