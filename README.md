@@ -407,7 +407,7 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 	
 	# Install Linux dependencies:
 	sudo apt-get install fuse libfuse-dev python3-pip
-	pip3 install fusepy
+	pip3 install fusepy # add --break-system-packages parm or create a virtual environment
 
 	# Create a local directory and mount:
 	mkdir ~/dev_upyos
