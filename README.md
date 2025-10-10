@@ -406,7 +406,7 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 	# ftpfs used to access mcu filesystem:
 	
 	# Install Linux dependencies:
-    sudo apt-get install libfuse2t64:amd64 fuse3 libfuse3-dev python3-pip
+    sudo apt-get install libfuse2t64 fuse3 libfuse3-dev python3-pip  # (Caution!)
 	pip3 install fusepy # add --break-system-packages parm or create a virtual environment
 
 	# Create a local directory and mount:
