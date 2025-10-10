@@ -73,21 +73,13 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 
 * `boot.py`: MicroPython startup file.
 * `main.py`: MicroPython startup file (boots the system).
-
-  /bin        Commands and shell scripts
-  
-  /etc        Configuration files
-  
-  /libx       External libraries
-  
-  /lib        System implementations libraries
-  
-  /opt        Specific solution or add-on programs (not in path)
-  
-  /tmp        Temporary directory (for files you don't know where else to put :-)
-  
-  /www        Web server directory
-  
+* /bin        Commands and shell scripts
+* /etc        Configuration files
+* /libx       External libraries
+* /lib        System implementations libraries
+* /opt        Specific solution or add-on programs (not in path)
+* /tmp        Temporary directory (for files you don't know where else to put :-)
+* /www        Web server directory
 ---
 
 ## Commands
