@@ -13,7 +13,7 @@ The goal is to provide a common, modular base for using microcontrollers in a **
 ## upyOS Installation
 
 ```
-git clone [https://github.com/rbenrax/upyOS.git](https://github.com/rbenrax/upyOS.git)
+git clone https://github.com/rbenrax/upyOS.git
 
 cd upyOS
 mpremote fs -v cp main.py :main.py
