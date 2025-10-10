@@ -366,13 +366,15 @@ Script execution in boot:
 ![Geany, VS code or others IDEs](media/upyos_07.png )
       
 ![ftpfs](media/ftpfs.py) Remote development environment, Linux instalation:
+
 ```
+	# ftpfs use to access mcu filesystem:
+	
 	# Install Linux dependencies:
 	sudo apt-get install fuse libfuse-dev python3-pip
 	pip3 install fusepy
 
-	# ftpfs use to access mcu filesystem:
-	# Create a local directory and mount
+	# Create a local directory and mount:
 	mkdir ~/dev_upyos
 	python3 ftpfs.py mcu_IP ~/dev_upyos -u admin -P pass (Default user is admin and no password, use setauth upyOS command to set a password)
 
@@ -385,6 +387,7 @@ Script execution in boot:
 
 	# To unmount:
 	fusermount -u ~/dev_upyos
+
 ```
 	
 - Android alternative: Squircle CE + termux Apps
