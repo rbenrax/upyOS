@@ -261,6 +261,7 @@ Basic **conditional execution** in shell scripts is supported, as well as **labe
     ```
 
   * Script execution on boot:
+  ![upyos06](media/upyos_06.png )
 
   * Loops in shell scripts:
 
