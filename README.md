@@ -402,7 +402,6 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 ### ftpfs Remote Development Environment, Linux Installation
 
 ![Download ftpfs](media/ftpfs.py)
-
 ```bash
 	# ftpfs used to access mcu filesystem:
 	
