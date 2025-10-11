@@ -136,23 +136,6 @@ Each board must have a .board file, which defines its specifications and capabil
 
 ---
 
-## Tested Boards
-
-* **ESP32-C3**
-    ![luatos](media/luatos_CORE-ESP32_pinout.webp)
-* **VCC-GND Studio YD-2040**
-    ![VCC-GND Studio](media/YD-2040-PIN.png)
-* **GOOUUU ESP32 WROOM-32**
-    ![ESP32](media/ESP32-38-Pin-Pinout.jpg)
-* **NodeMCU**
-    ![NodeMCU esp8266](media/Node-MCU-Pinout.png)
-* **YD-ESP32-C3**
-    ![YD-ESP32-C3](media/YD-ESP32-C3-Pinout.jpg)
-* **YD-ESP32-S3 with 8Mb PSRAM**
-    ![YD-ESP32-S3](media/YD-ESP32-S3-Pinout.jpg)
-
----
-
 ## Current Development
 
 * **/lib/kernel.py** is the first module loaded; it's the OS core of the system. The first time it runs, it creates the `.board` file in the `/etc` directory if it doesn't exist. External commands are located in the `/bin` directory.
@@ -453,3 +436,19 @@ The Wishlist is open\! 😉
 
 ```
 ```
+## Tested Boards
+
+* **ESP32-C3**
+    ![luatos](media/luatos_CORE-ESP32_pinout.webp)
+* **VCC-GND Studio YD-2040**
+    ![VCC-GND Studio](media/YD-2040-PIN.png)
+* **GOOUUU ESP32 WROOM-32**
+    ![ESP32](media/ESP32-38-Pin-Pinout.jpg)
+* **NodeMCU**
+    ![NodeMCU esp8266](media/Node-MCU-Pinout.png)
+* **YD-ESP32-C3**
+    ![YD-ESP32-C3](media/YD-ESP32-C3-Pinout.jpg)
+* **YD-ESP32-S3 with 8Mb PSRAM**
+    ![YD-ESP32-S3](media/YD-ESP32-S3-Pinout.jpg)
+
+---
