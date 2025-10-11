@@ -110,7 +110,7 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 
 ### Internal Commands
 
-* `exit`: Exits the current shell or script.
+* `exit`: Stop upyOS and all running processes.
 * `killall`: Stops all running processes
 * `loadconfig`: Loads the system configuration file.
 * `loadboard`: Loads the board interfaces configuration file.
@@ -118,6 +118,14 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 ### Actual External Commands
 
 `cat`, `cd`, `clear`, `cp`, `cpufreq`, `date`, `decr`, `df`, `echo`, `env`, `export`, `fileup`, `find`, `free`, `grep`, `help`, `hold`, `i2cscan`, `ifconfig`, `incr`, `iperf3`, `kill`, `killall`, `led`, `ls`, `lshw`, `lsmod`, `mi`, `mkdir`, `mv`, `ntpupdate`, `ping`, `ps`, `pwd`, `read`, `reboot`, `release`,`reset`, `resume`, `rm`, `rmdir`, `rmmod`, `sensors`, `setauth`, `sh`, `si`, `sleep`, `test`, `touch`, `uftpd`, `uhttpd`, `unset`, `upgrade`, `uptime`, `utelnetd`, `vi`, `wait`, `watch`, `wget`, `wifi`
+
+---
+
+### Command output redirection
+
+Some commands allow you to redirect output (>, >>), if the variable name contains / or . characters, the output will be to a file; if it doesn't contain any of those characters, the output will be redirected to an environment variable, If you want to send the output to a file without extension, you must indicate the complete path.. 
+
+Environment variables can have any specific type since they are also used with interprocess communication.
 
 ---
 
