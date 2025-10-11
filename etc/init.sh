@@ -1,5 +1,5 @@
 # This script is called on boot, this is normal mode, 
-# if does not exists, then is recovery mode
+# if does not exist, then is recovery mode
 
 # Internal and external commands can be used
 # > (Execute Python code)
@@ -10,7 +10,7 @@
 #cpufreq 133  # set mcu clock speed
 
 < "\033[1;33;44m", end=""
-cat /etc/wellcome.txt
+cat /etc/welcome.txt
 < "\033[0m", end=""
 
 # loadboard    # You can choose load different boards configuration, without param, default board
