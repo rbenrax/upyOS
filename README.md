@@ -1,6 +1,6 @@
 # upyOS
 
-***MicroPython 1.26.0 Upgraded***
+***MicroPython 1.26.1 Upgraded***
 
 **upyOS** is a modular flash **Operating System** for microcontrollers based on **MicroPython**. It provides the user with a **POSIX-like environment**. The original idea is by Krzysztof Krystian Jankowski and has been adapted by me.
 
