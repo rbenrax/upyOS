@@ -129,6 +129,13 @@ Environment variables can have any specific type since they are also used with i
 
 ---
 
+### Board definition files (.board files in etc directory)
+
+Each board must have a .board file, which defines its specifications and capabilities, also defines the assignment of GPIOS to the pins and the GPIOS of the different buses and resources, it must be loaded in the script /etc/init.sh and can be consulted with the command lshw -f, in programming you can use different functions to access the resources, for example: utls.getgpio(5) and utls.getgpios("i2c",0)
+
+
+---
+
 ## Tested Boards
 
 * **ESP32-C3**
