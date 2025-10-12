@@ -21,4 +21,9 @@ def __main__(args):
                     ret=True
                     break
 
+        if "-g" in args:
+            from machine import Pin            
+            v = Pin(int(args[1]), Pin.IN).value()
+            ret = True if v == 1 else False 
+
         utls.outs(args, ret)
