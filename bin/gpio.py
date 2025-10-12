@@ -1,18 +1,28 @@
 import utls
+from machine import Pin
 
 def __main__(args):
-
-    if len(args) == 0 or "--h" in args:
+    if not args or "--h" in args:
         print("Get or set gpio value\nUsage: gpio --h <gpio> [value] [>[>] <var>/<file>]")
+        return
+
+    # Detectar redirección con > o >>
+    if ">" in args:
+        i = args.index(">")
+    elif ">>" in args:
+        i = args.index(">>")
     else:
+        i = -1
 
-        ret = 0
-        from machine import Pin
+    nargs = args[:i] if i > 0 else args
 
-        if len(args)==1:
-            ret = Pin(int(args[0]), Pin.IN).value()
-        else:
-            ret=1 if int(args[1]) > 0 else 0
-            Pin(int(args[0]), Pin.OUT).value(ret)
+    # Obtener o establecer valor del pin GPIO
+    pin = int(nargs[0])
+    if len(nargs) == 1:
+        val = Pin(pin, Pin.IN).value()
+    else:
+        val = 1 if int(nargs[1]) > 0 else 0
+        Pin(pin, Pin.OUT).value(val)
 
-        utls.outs(args, ret)
+    # Salida a archivo, variable, etc.
+    utls.outs(args, val)
