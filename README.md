@@ -392,7 +392,7 @@ Added call caching to the File System (FS). On systems with low memory, this sho
 
 -----
 
-## Remote Development Environment Example
+## Remote Development Environment Example Visual Studio Code
 
 ![Geany, VS code or others IDEs](media/upyos_07.png )
 Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS Code, or other IDEs, both locally and remotely:
