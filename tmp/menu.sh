@@ -15,4 +15,3 @@ if $v1 == 2 cpufreq 240
 if $v1 == 3 return
 if $v1 != 0 goto loop
 exit
-
