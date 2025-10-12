@@ -424,7 +424,7 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 ```
 
   * **Android Alternative:** Squircle CE + Termux Apps
-
+![Android development environment](media/Screenshot_20251012_092146_Termux.jpg)
 -----
 
 ## TODO List
