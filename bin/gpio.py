@@ -12,7 +12,7 @@ def __main__(args):
         if len(args)==1:
             ret = Pin(int(args[0]), Pin.IN).value()
         else:
-            ret=int(args[1])
+            ret=1 if int(args[1]) > 0 else 0
             Pin(int(args[0]), Pin.OUT).value(ret)
 
         utls.outs(args, ret)
