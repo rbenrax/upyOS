@@ -19,7 +19,7 @@ The goal is to provide a common, modular base for using microcontrollers in a **
 - You may also need to install the `esptool` package in order to load the micropython package from you host computer to the target microcontroller.
 - Your host computer needs the `micropython-mpremote` package installed in order to communicate with the target microcontroller.
 
-Once these requirements are met, you can proceed with the installation of upyOS:-
+Now you can continue with the installation of upyOS:-
 
 
 ```
