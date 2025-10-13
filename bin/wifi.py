@@ -295,5 +295,5 @@ def __main__(args):
                 print("Disconnected")
                 
     else:
-        print(f"Invalid wifi commad {cmd}")
+        print(f"Invalid wifi command {cmd}")
 

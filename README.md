@@ -12,6 +12,16 @@ The goal is to provide a common, modular base for using microcontrollers in a **
 
 ## upyOS Installation
 
+#### Prerequisites
+
+- The target microcontroller board must have the MicroPython package already loaded *before* starting the "mpremote" procedure outlined below.  [How to install MicroPython on an ESP32-C3 board](https://micropython.org/download/ESP32_GENERIC_C3/)
+
+- You may also need to install the `esptool` package in order to load the micropython package from you host computer to the target microcontroller.
+- Your host computer needs the `micropython-mpremote` package installed in order to communicate with the target microcontroller.
+
+Now you can continue with the installation of upyOS:-
+
+
 ```
 git clone https://github.com/rbenrax/upyOS.git
 
