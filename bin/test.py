@@ -4,7 +4,7 @@ import sdata
 def __main__(args):
 
     if len(args) == 0 or "--h" in args:
-        print("Check if file/directory/proc exists\nUsage: test --h -p <proccess name> -f/-d <path> [>[>] <var>/<file>]")
+        print("Check if file/directory/proc/gpio exists/value\nUsage: test --h -p <proccess name> -f/-d <path> -g <gpio> [>[>] <var>/<file>]")
     else:
 
         ret = False
@@ -21,4 +21,10 @@ def __main__(args):
                     ret=True
                     break
 
+        if "-g" in args:
+            from machine import Pin            
+            v = Pin(int(args[1]), Pin.IN).value()
+            ret = True if v == 1 else False 
+
         utls.outs(args, ret)
+
