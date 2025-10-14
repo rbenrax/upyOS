@@ -433,7 +433,7 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 	fusermount -u ~/dev_upyos
 ```
 
-  * **Android Alternative:** Squircle CE + Termux Apps
+  * **Android Alternative:** Squircle CE + Termux Apps (No extra installation is needed)
 ![Android development environment](media/Screenshot_20251012_092146_Termux.jpg)
 -----
 
