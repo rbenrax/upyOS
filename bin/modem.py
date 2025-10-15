@@ -11,28 +11,57 @@ def createUART(id, baud, tx, rx):
     except Exception as ex:
         print("modem error, " + str(ex))
         return False
-
     time.sleep(1)  # Esperar a que el puerto se estabilice
     return True
     
-def atcmd(command, timeout=0.2):
+def atcmd(command, timeout=2.0):
     if sdata.m0 is None:
         print("The modem uart is not initialized, see help")
         return False
     
-    #print(f"Enviando comando: {command}")
-    sdata.m0.write((command + "\r\n").encode('utf-8'))
-    time.sleep(timeout)
-    
-    resp = ""
+    # Limpiar buffer de entrada antes de enviar comando
     while sdata.m0.any() > 0:
-        line = sdata.m0.readline().decode('utf-8')
-        resp += str(line)
-
+        sdata.m0.read()
+    
+    # Enviar comando
+    sdata.m0.write((command + "\r\n").encode('utf-8'))
+    
+    time.sleep(1)
+    
+    # Esperar respuesta con timeout
+    start_time = time.time()
+    resp = ""
+    response_complete = False
+    
+    while (time.time() - start_time) < timeout:
+        if sdata.m0.any() > 0:
+            line = sdata.m0.readline()
+            if line:
+                line_str = line.decode('utf-8').strip()
+                resp += line_str + "\n"
+                
+                # Verificar si la respuesta está completa
+                # La mayoría de módems terminan con OK, ERROR, o prompt >
+                if "OK" in line_str or "ERROR" in line_str or ">" in line_str:
+                    response_complete = True
+                    break
+        else:
+            time.sleep(0.01)  # Pequeña pausa para no saturar el CPU
+    
+    # Si no hubo respuesta completa, dar un tiempo adicional
+    if not response_complete:
+        time.sleep(0.1)
+        while sdata.m0.any() > 0:
+            line = sdata.m0.readline()
+            if line:
+                resp += line.decode('utf-8').strip() + "\n"
+    
     print(f"{resp}")
     
     if "ERROR" in resp:
         return False
+    
+    return True
 
 def __main__(args):
     
@@ -40,7 +69,7 @@ def __main__(args):
         print("Modem management utility\nUsage:")
         print("\tEjecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
-        print("\tEjecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \@")
+        print("\tEjecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         return
         
     file=None
@@ -54,25 +83,25 @@ def __main__(args):
                 if lin.strip()=="": continue   # Empty lines skipped
                 if len(lin)>0 and lin[0]=="#": continue # Commanted lines skipped
                 cmdl=lin.split("#")[0] # Left part of commented line
-
                 # To be called from upyOS command line
                 cmdl = cmdl.replace("\\@", '"')
                 print(">>:" + cmdl)
                 
                 tmp = cmdl.split()
                 
-                #print(tmp)
-                
-                if tmp[0]== "uart":
+                if tmp[0].upper() == "UART":
                     id   = int(tmp[1])  # uC Uart ID
                     baud = int(tmp[2])  # Baudrate
                     tx   = int(tmp[3])  # TX gpio
                     rx   = int(tmp[4])  # RX gpio
                     if not createUART(id, baud, tx, rx):
                         utls.setenv("?", "-1")
+                        break
+                elif tmp[0].upper() == "SLEEP":
+                    time.sleep(float(tmp[1]))
                 else:
                     cmd = tmp[0]
-                    timeout=0.0
+                    timeout=2.0  # Timeout por defecto aumentado
                     if len(tmp) > 1:
                         timeout = float(tmp[1])
                     if atcmd(cmd, timeout) == False:
@@ -88,7 +117,7 @@ def __main__(args):
             utls.setenv("?", "-1")
         
     else:
-        timeout = 0.0
+        timeout = 2.0  # Timeout por defecto aumentado
         if len(args) > 1:
             timeout = float(args[1])
         if atcmd(args[0], timeout) == False:
