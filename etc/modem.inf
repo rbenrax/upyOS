@@ -1,4 +1,4 @@
-# Connect rp2040 (or other without wifi support) to a wifi network unsing external esp8266 as modem
+# Connect rp2040 (or other mcu without wifi support) to a wifi network using external esp8266 as modem
 # Require install modem AT Espressif firmware in the esp8266 previosly
 
 # 4 wires used
