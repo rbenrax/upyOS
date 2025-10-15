@@ -30,6 +30,7 @@
 /bin/lsmod.py
 /bin/mcu_t.sh
 /bin/mi.py
+/bin/modem.py
 /bin/mkdir.py
 /bin/mv.py
 /bin/ntpupdate.py
