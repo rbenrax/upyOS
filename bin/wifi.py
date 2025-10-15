@@ -48,8 +48,14 @@ NETMODE = {1: "11B", 2: "11G", 4: "11N", 8: "LR"}
 #network.STAT_NO_AP_FOUND 201
 #network.STAT_WRONG_PASSWORD 202
 
-NETSTAT = {203: "Association fail", 200: "Beacon timeout", 1001: "Connecting", 1010: "Got IP", \
-           204: "Handshake timeout", 1000: "Idle", 201: "No AP found",  202: "Wrong password", 8: "Unknown"}
+NETSTAT= {
+    network.STAT_IDLE : "no connection and no activity",
+    network.STAT_CONNECTING : "connecting in progress",
+    network.STAT_WRONG_PASSWORD : "failed due to incorrect password",
+    network.STAT_NO_AP_FOUND : "failed because no access point replied",
+    network.STAT_CONNECT_FAIL : "failed due to other problems",
+    network.STAT_GOT_IP : "connection successful"
+}
 
 #def netsts(sts):
 #    try:
