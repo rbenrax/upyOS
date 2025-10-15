@@ -1,0 +1,23 @@
+# Connect rp2040 (or other without wifi support) to a wifi network unsing external esp8266 as modem
+# Require install modem AT Espressif firmware in the esp8266 previosly
+
+# 4 wires used
+# rp2040     esp8266
+#  3.3v  --->  3.3v
+#  gnd   --->  gnd
+#  tx    --->  rx
+#  rx    --->  tx
+
+# Create serial comunication (see modem --h command)
+# uart <id> <baudrate> <tx gpio> <rxgpio>
+uart 1 115200 4 5
+
+# Standars AT commands, see https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf
+# <AT Command> <timeout>
+AT
+AT+GMR
+AT+CWLAP 5
+AT+CWMODE=1
+AT+CWJAP="ESSID","PASSW" 10
+AT+CIFSR
+AT+CWQAP

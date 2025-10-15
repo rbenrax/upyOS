@@ -17,5 +17,6 @@ sysconfig={}	# System configuration
 _pid=0
 procs=[]		# Running proccesses
 
-#Display0
-d0=None			# Global ref to display 0 (if exist)
+# Drivers
+d0 = None		# Global ref to display 0
+m0 = None		# Global ref to modem 0
