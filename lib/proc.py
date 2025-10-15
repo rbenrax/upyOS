@@ -71,10 +71,12 @@ class Proc:
         except KeyboardInterrupt:
             print(f"{self.cmd}: ended")
         except ImportError as ie:
-            self.rmmod=False
-            print(f"{self.cmd}: not found")
+            self.rmmod=True
+            print(f"{self.cmd}: not found or command import problem")
+            if sdata.debug:
+                sys.print_exception(ie)
         except Exception as e:
-            self.rmmod=False
+            self.rmmod=True
             print(f"Error executing {self.cmd}")
             if sdata.debug:
                 sys.print_exception(e)
