@@ -67,9 +67,9 @@ def __main__(args):
     
     if len(args) == 0 or "--h" in args:
         print("Modem management utility\nUsage:")
-        print("\tEjecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
+        print("\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
-        print("\tEjecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
+        print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         return
         
     file=None
