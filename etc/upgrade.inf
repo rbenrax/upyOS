@@ -84,6 +84,7 @@
 /etc/end.sh
 /etc/help.txt
 /etc/init.sh
+/etc/modem.inf
 /etc/upgrade.inf
 /etc/upyOS-esp32-wroom-32.board
 /etc/upyOS-esp32.board
