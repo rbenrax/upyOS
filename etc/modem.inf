@@ -12,7 +12,9 @@
 # uart <id> <baudrate> <tx gpio> <rxgpio>
 uart 1 115200 4 5
 
-# Standars AT commands, see https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf
+# AT commands documentation:
+# https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf
+# https://docs.espressif.com/projects/esp-at/en/release-v2.1.0.0_esp32s2/AT_Command_Set/HTTP_AT_Commands.html
 # <AT Command> <timeout>
 AT
 AT+GMR 
