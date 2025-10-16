@@ -68,7 +68,7 @@ def __main__(args):
         print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
         return
 
-    print("upyOS OTA Upgrade, \nDownloading upgrade list...", end="")
+    print("upyOS OTA Upgrade 2.0, \nDownloading upgrade list...", end="")
     uf="/etc/upgrade2.inf"
     pull(uf, url_raw + uf[1:])
     print(", OK")
