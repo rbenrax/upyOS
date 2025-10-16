@@ -1,4 +1,6 @@
 import uos
+import time
+import sdata
 
 def __main__(args):
 
@@ -6,13 +8,22 @@ def __main__(args):
         print("Create new release index file for upyOS upgrade\nUsage: release")
         return
     else:
-        fd="/etc/upgrade.inf"
+        fd="/etc/upgrade2.inf" # Realease file
         fr=["/boot.py","/main.py"] # Files to include       
-        fi=["system.conf"] # Files to avoid
+        fi=["system.conf", "upgrade.inf", "upgrade2.inf"] # Files to avoid
         dr=["/bin","/lib","/libx","/etc"] # Direcrories to include
+        
+        cont=0
         with open(fd, "w") as fu:
+            t = time.localtime()
+            ver = f"#upyOS,{sdata.version},{t[0]}-{t[1]:02d}-{t[2]:02d}"
+            fu.write(ver + "\n")
+            print(ver)
+                
             for f in fr:
                 fu.write(f+"\n")
+                print(f)
+                cont+=1
                 
             for d in dr:
                 tmp=uos.listdir(d)
@@ -20,9 +31,14 @@ def __main__(args):
                     if f in fi: continue
                     print(d + "/" + f)
                     fu.write(d + "/" + f + "\n")
+                    cont+=1
                     
-        print(f"\nFile {fd} successful created, shoud to be uploaded to git repository")
+            ls = f"#files,{cont}"
+            print(ls)
+            fu.write(ls + "\n")
+            
+        print(f"\nRelease file {fd} successful created with {cont} files, shoud to be uploaded to github repository")
 
-
-
-        
+if __name__ == "__main__":
+    __main__([""])
+    

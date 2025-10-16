@@ -7,6 +7,7 @@ import ssl
 
 import utls
 import sdata
+import sys
 
 url_raw = f'https://raw.githubusercontent.com/rbenrax/upyOS/main/'
 
@@ -68,39 +69,71 @@ def __main__(args):
         return
 
     print("upyOS OTA Upgrade, \nDownloading upgrade list...", end="")
-    uf="/etc/upgrade.inf"
+    uf="/etc/upgrade2.inf"
     pull(uf, url_raw + uf[1:])
     print(", OK")
     
     if not utls.file_exists(uf):
         print("No upgrade file available, system can not be upgraded")
         return
-        
+
+    ini=None
+    end=None
+    with open(uf, 'r') as f:
+        for l in f:
+            if l.startswith('#upyOS'):
+                ini = l.strip().split(',')
+            elif l.startswith('#files'):
+                end = l.strip().split(',')
+
+    print()
+    #print(ini)
+    #print(end)
+    
+    ftu=int(end[1]) # files to upgrade
+
     if not "f" in mod:
-        r = input("Confirm upyOS upgrade (y/N)? ")
+        print(f"upyOS current version: {sdata.version}")
+        print(f"upyOS new version: {ini[1]} ({ini[2]})" )
+        r = input("Confirm upgrade (y/N)? ")
         if r!="y":
-            print("Upgrade canceled")
+            print("Upgrade canceled.")
             return
-          
+         
     print("Upgrading from upyOS github repository, wait...")
     print("[", end="")
+    
+    cont=0
     with open(uf, 'r') as f:
         while True:
-            fp=f.readline()
+            fp = f.readline()
+            
             if not fp: break
-            fp=fp[:-1] # remove ending CR
+            if fp.strip()=="": continue   # Empty lines skipped
+            if fp.strip().startswith("#"): continue # Commanted lines skipped
+            
+            fp = fp[:-1] # remove ending CR
             if "v" in mod:
                 print(fp, end=", ")
             else:
                 print(".", end="")
             pull(fp, url_raw + fp[1:])
+            cont+=1
             
     os.remove(uf)
-    print("]OK\n100% Upgrade complete")
+    
+    #print(str(ftu))
+    #print(str(cont))
+    
+    if ftu == cont:
+        print("]OK\n100% Upgrade complete.")
+    else:
+        print("]Error in upgrade,\nUpgrade not complete.")
+        
     utime.sleep(2)
     
     if "r" in mod:
         print("Rebooting...")
         utime.sleep(2)
         machine.soft_reset()
-
+            
