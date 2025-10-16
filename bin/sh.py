@@ -115,7 +115,7 @@ def run(ssf, lbl_ln):
                             return float(value)
                         except ValueError:
                             # Si no es numérico, devolver como cadena (sin comillas adicionales)
-                            return value
+                            return value.replace('"', "")
 
                 # Convertir operandos a sus tipos apropiados
                 try:
@@ -135,6 +135,8 @@ def run(ssf, lbl_ln):
                         res = arg1_c <= arg2_c
                     elif op == ">=":
                         res = arg1_c >= arg2_c
+                    elif op == "in": 
+                        res = arg1_c in arg2_c
                     else:
                         print(f"sh - Operador no válido: {op} in {ssf} - {line} - {cmdl}")
                         return 0
@@ -199,4 +201,5 @@ def __main__(args):
         
 
         
+
 
