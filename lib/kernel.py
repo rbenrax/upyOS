@@ -27,8 +27,10 @@ class upyOS:
         sdata.initime = utime.time()
         sdata.upyos   = self
         
+        # Stop system
+        self.stop = False
+        
         # Initialization
-
         board = uos.uname()[4]
 
         # Create directories
@@ -95,7 +97,7 @@ class upyOS:
         self.print_msg("Type 'help' for a upyOS manual.")
 
         # Main command processing loop
-        while True:
+        while not self.stop:
             try:
                 user_input = input(uos.getcwd() + " $: ")
                 self.run_cmd(user_input)
@@ -246,7 +248,8 @@ class upyOS:
                 reboot()
             else:
                 #raise SystemExit
-                sys.exit()
+                #sys.exit()
+                self.stop=True
                 
         except KeyboardInterrupt:
             pass
