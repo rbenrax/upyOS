@@ -5,7 +5,9 @@
 # > (Execute Python code)
 # < (Print the Python code execuion)
 
-# > sdata.debug=False    # Debug mode
+> sdata.debug = False   # Debug mode
+> sdata.cache_enabled = False  # Enable filesystem cache (+ memmory needed)
+> sdata.log   = False	# No implemented yet
 
 #cpufreq 133  # set mcu clock speed
 

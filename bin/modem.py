@@ -1,12 +1,19 @@
+
+# AT modem script file (see /etc/modem.inf)
+# Allows you to launch a script file or enter commands directly via the console.
+
 from machine import UART, Pin
 import time
 import sdata
 import utls
 
+prn=True
+
 def createUART(id, baud, tx, rx):
     try:
         sdata.m0 = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
-        print("UART created\r\n\r\nOK")
+        if prn:
+            print("UART created\r\n\r\nOK")
         
     except Exception as ex:
         print("modem error, " + str(ex))
@@ -56,7 +63,8 @@ def atcmd(command, timeout=2.0):
             if line:
                 resp += line.decode('utf-8').strip() + "\n"
     
-    print(f"{resp}")
+    if prn:
+        print(f"{resp}")
     
     if "ERROR" in resp:
         return False
@@ -71,7 +79,10 @@ def __main__(args):
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
         print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         return
-        
+    
+    if "-n" in args:
+        prn = False
+    
     file=None
     if args[0]=="-f":
         file=args[1]
@@ -85,7 +96,8 @@ def __main__(args):
                 cmdl=lin.split("#")[0] # Left part of commented line
                 # To be called from upyOS command line
                 cmdl = cmdl.replace("\\@", '"')
-                print(">>:" + cmdl)
+                if prn:
+                    print(">>:" + cmdl)
                 
                 tmp = cmdl.split()
                 

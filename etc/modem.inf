@@ -1,5 +1,10 @@
+# AT modem script file for /bin/modem command (usage: modem -f modem.inf)
 # Connect rp2040 (or other mcu without wifi support) to a wifi network using external esp8266 as modem
-# Require install modem AT Espressif firmware in the esp8266 previosly
+# You need to install the Espressif AT firmware on the ESP8266 first.
+# The script can include the creation of the serial connection and the commands necessary to create the Wi-Fi connection.
+# After execution, you will have a global reference device (sdata.m0) available for use in your programs.
+# After execution, you will have a global reference device (sdata.m0) available for use in your programs.
+# Other scripts can be created, as well as one specific for disconnection.
 
 # 4 wires used
 # rp2040     esp8266
@@ -15,13 +20,16 @@ uart 1 115200 4 5
 # AT commands documentation:
 # https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf
 # https://docs.espressif.com/projects/esp-at/en/release-v2.1.0.0_esp32s2/AT_Command_Set/HTTP_AT_Commands.html
+
 # <AT Command> <timeout>
+
 AT
 AT+GMR 
 AT+CWMODE=1
 
 AT+CWJAP="ESSID","PASSW" 5
 
+# Delay between commands
 sleep 3
 
 AT+CIFSR
