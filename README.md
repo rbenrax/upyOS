@@ -345,10 +345,11 @@ Basic **conditional execution** in shell scripts is supported, as well as **labe
 
 	# Upgrade in reboot (touch /upgrade and reset)
 	test -f /upgrade > up
-	if $up == True echo "Upgrading......"
-	if $up == True upgrade -f
-	if $up == True rm /upgrade
-	if $up == True reset
+	if $up == False skip 4
+    echo "Upgrading......"
+	upgrade -f
+	rm /upgrade
+	reset
 
     wifi sta ifconfig
 
