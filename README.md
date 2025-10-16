@@ -343,12 +343,12 @@ Basic **conditional execution** in shell scripts is supported, as well as **labe
     > d0.text("Ready", 0, 56, 1)
     > d0.show()
 
-	# Upgrade in reboot (touch /upgrade and reboot)
+	# Upgrade in reboot
 	test -f /upgrade > up
 	if $up == True echo "Upgrading......"
-	if $up == True upgrade -f -r 
+	if $up == True upgrade -f
 	if $up == True rm /upgrade
-	unset up
+	if $up == True reset
 
     wifi sta ifconfig
 
