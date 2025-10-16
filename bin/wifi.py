@@ -57,6 +57,10 @@ NETSTAT= {
     network.STAT_GOT_IP : "connection successful"
 }
 
+# Old
+#NETSTAT = {203: "Association fail", 200: "Beacon timeout", 1001: "Connecting", 1010: "Got IP", \
+#           204: "Handshake timeout", 1000: "Idle", 201: "No AP found",  202: "Wrong password", 8: "Unknown"}
+
 #def netsts(sts):
 #    try:
 #        return str(sts) + "-" + NETSTAT[sts]
