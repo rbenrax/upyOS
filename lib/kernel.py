@@ -245,8 +245,8 @@ class upyOS:
             if mod=="-r":
                 reboot()
             else:
-                raise SystemExit
-                #sys.exit()
+                #raise SystemExit
+                sys.exit()
                 
         except KeyboardInterrupt:
             pass
