@@ -72,14 +72,14 @@ class Proc:
             print(f"{self.cmd}: ended")
         except ImportError as ie:
             self.rmmod=True
-            print(f"{self.cmd}: Command not found\nor command import problem, try enable debug.")
+            print(f"{self.cmd}: Command not found\nor command import problem, try to enable debug.")
             if sdata.debug:
                 sys.print_exception(ie)
         except Exception as e:
             self.rmmod=True
             print(f"Error executing {self.cmd}")
-            if sdata.debug:
-                sys.print_exception(e)
+            #if sdata.debug:
+            #    sys.print_exception(e)
         finally:
 
             # Check if multiple instances of a module are running
