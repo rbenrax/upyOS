@@ -142,8 +142,8 @@ def __main__(args):
         return
     
     if args[0] == "phy_mode":
-
-        if "Raspberry Pi Pico" in uos.uname():
+        
+        if "Raspberry Pi Pico" in uos.uname()[4]:
             print("Function not implemented in driver")
             return
         
