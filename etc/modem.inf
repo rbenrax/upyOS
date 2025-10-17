@@ -3,7 +3,6 @@
 # You need to install the Espressif AT firmware on the ESP8266 first.
 # The script can include the creation of the serial connection and the commands necessary to create the Wi-Fi connection.
 # After execution, you will have a global reference device (sdata.m0) available for use in your programs.
-# After execution, you will have a global reference device (sdata.m0) available for use in your programs.
 # Other scripts can be created, as well as one specific for disconnection.
 
 # 4 wires used
