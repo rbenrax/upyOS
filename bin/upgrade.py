@@ -9,7 +9,9 @@ import utls
 import sdata
 import sys
 
-url_raw = f'https://raw.githubusercontent.com/rbenrax/upyOS/main/'
+# Source branches
+mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/main/'
+testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/'
 
 def pull(f_path, url):    
     s = None
@@ -65,10 +67,18 @@ def __main__(args):
             return
 
     if "h" in mod:
-        print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
+        print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list, -t test branch")
         return
 
-    print("upyOS OTA Upgrade 2.0, \nDownloading upgrade list...", end="")
+    print("upyOS OTA Upgrade 2.0, \nDownloading upgrade list ", end="")
+    
+    if "t" in mod:
+        url_raw = testb # test
+        print("from test branch", end="")
+    else:
+        url_raw = mainb # Default main
+        print("from main branch", end="")
+        
     uf="/etc/upgrade2.inf"
     pull(uf, url_raw + uf[1:])
     print(", OK")
@@ -136,4 +146,3 @@ def __main__(args):
         print("Rebooting...")
         utime.sleep(2)
         machine.soft_reset()
-            
