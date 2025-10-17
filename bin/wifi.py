@@ -142,15 +142,13 @@ def __main__(args):
         return
     
     if args[0] == "phy_mode":
-
-        if "Raspberry Pi Pico" in uos.uname().machine:
-            print("Function not implemented in driver")
-            return
-        
-        if len(args) == 2:
-            network.phy_mode(args[1])
+        if hasattr(network, "phy_mode"):
+            if len(args) == 2:
+                network.phy_mode(args[1])
+            else:
+                print(network.phy_mode())
         else:
-            print(network.phy_mode())
+            print("Function not implemented in driver")
         return
     
 #- - - - -
