@@ -78,7 +78,14 @@ class Proc:
                 sys.print_exception(ie)
                 
             #if sdata.debug:
-            #    sys.print_exception(ie)                
+            #    sys.print_exception(ie)
+
+        except NameError as ne:
+            self.rmmod=True
+            print(f"Name error executing {self.cmd}")
+            print(f"Try enabling debug")
+            if sdata.debug:
+                sys.print_exception(ne)
 
         except Exception as e:
             self.rmmod=True

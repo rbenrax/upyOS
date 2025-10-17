@@ -1,4 +1,12 @@
-import network
+# Wifi management utility
+
+info = "Verify that your board has Wi-Fi, that it is loading the appropriate .board \nconfiguration file in /etc/init.sh, and that Wi-Fi support is enabled in it."
+try:
+    import network
+except ImportError as ie:
+    print("Networking is not implemented on this platform")
+    print(info)
+    
 from utime import sleep
 from utls import tspaces
 from utls import setenv
@@ -92,6 +100,7 @@ def __main__(args):
     
     if not sdata.board or not sdata.board["wifi"]:
         print("wifi not available in this board")
+        print(info)
         return
 
     # Command: wifi sta config essid=RedQ password=xxx 
