@@ -72,10 +72,13 @@ class Proc:
             print(f"{self.cmd}: ended")
         except ImportError as ie:
             self.rmmod=True
-            if str(ie).startswith("no module named"):
+            if str(ie).startswith(f"no module named '{self.cmd}"):
                 print(f"{self.cmd}: not found")
             else:
                 sys.print_exception(ie)
+                
+            #if sdata.debug:
+            #    sys.print_exception(ie)                
 
         except Exception as e:
             self.rmmod=True

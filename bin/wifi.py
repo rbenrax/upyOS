@@ -3,6 +3,7 @@ from utime import sleep
 from utls import tspaces
 from utls import setenv
 import sys
+import uos
 
 import sdata
 
@@ -132,6 +133,11 @@ def __main__(args):
         return
     
     if args[0] == "phy_mode":
+
+        if "Raspberry Pi Pico" in uos.uname():
+            print("Function not implemented in driver")
+            return
+        
         if len(args) == 2:
             network.phy_mode(args[1])
         else:
