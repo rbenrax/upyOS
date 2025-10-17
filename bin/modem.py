@@ -1,4 +1,3 @@
-
 # AT modem script file (see /etc/modem.inf)
 # Allows you to launch a script file or enter commands directly via the console.
 
@@ -7,96 +6,88 @@ import time
 import sdata
 import utls
 
-prn=True
-
-def createUART(id, baud, tx, rx):
-    try:
-        sdata.m0 = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
-        if prn:
+class ModemManager:
+    def __init__(self, scmds=True, sresp=True):
+        self.scmds = scmds
+        self.sresp = sresp
+    
+    def createUART(self, id, baud, tx, rx):
+        try:
+            sdata.m0 = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
             print("UART created\r\n\r\nOK")
+            
+        except Exception as ex:
+            print("modem error, " + str(ex))
+            return False
+        time.sleep(1)  # Esperar a que el puerto se estabilice
+        return True
         
-    except Exception as ex:
-        print("modem error, " + str(ex))
-        return False
-    time.sleep(1)  # Esperar a que el puerto se estabilice
-    return True
-    
-def atcmd(command, timeout=2.0):
-    if sdata.m0 is None:
-        print("The modem uart is not initialized, see help")
-        return False
-    
-    # Limpiar buffer de entrada antes de enviar comando
-    while sdata.m0.any() > 0:
-        sdata.m0.read()
-    
-    # Enviar comando
-    sdata.m0.write((command + "\r\n").encode('utf-8'))
-    
-    time.sleep(1)
-    
-    # Esperar respuesta con timeout
-    start_time = time.time()
-    resp = ""
-    response_complete = False
-    
-    while (time.time() - start_time) < timeout:
-        if sdata.m0.any() > 0:
-            line = sdata.m0.readline()
-            if line:
-                line_str = line.decode('utf-8').strip()
-                resp += line_str + "\n"
-                
-                # Verificar si la respuesta está completa
-                # La mayoría de módems terminan con OK, ERROR, o prompt >
-                if "OK" in line_str or "ERROR" in line_str or ">" in line_str:
-                    response_complete = True
-                    break
-        else:
-            time.sleep(0.01)  # Pequeña pausa para no saturar el CPU
-    
-    # Si no hubo respuesta completa, dar un tiempo adicional
-    if not response_complete:
-        time.sleep(0.1)
+    def atCMD(self, command, timeout=2.0):
+        if sdata.m0 is None:
+            print("The modem uart is not initialized, see help")
+            return False
+        
+        # Limpiar buffer de entrada antes de enviar comando
         while sdata.m0.any() > 0:
-            line = sdata.m0.readline()
-            if line:
-                resp += line.decode('utf-8').strip() + "\n"
-    
-    if prn:
-        print(f"{resp}")
-    
-    if "ERROR" in resp:
-        return False
-    
-    return True
+            sdata.m0.read()
+        
+        # Enviar comando
+        sdata.m0.write((command + "\r\n").encode('utf-8'))
+        
+        time.sleep(1)
+        
+        # Esperar respuesta con timeout
+        start_time = time.time()
+        resp = ""
+        response_complete = False
+        
+        while (time.time() - start_time) < timeout:
+            if sdata.m0.any() > 0:
+                line = sdata.m0.readline()
+                if line:
+                    line_str = line.decode('utf-8').strip()
+                    resp += line_str + "\n"
+                    
+                    # Verificar si la respuesta está completa
+                    # La mayoría de módems terminan con OK, ERROR, o prompt >
+                    if "OK" in line_str or "ERROR" in line_str or ">" in line_str:
+                        response_complete = True
+                        break
+            else:
+                time.sleep(0.01)  # Pequeña pausa para no saturar el CPU
+        
+        # Si no hubo respuesta completa, dar un tiempo adicional
+        if not response_complete:
+            time.sleep(0.1)
+            while sdata.m0.any() > 0:
+                line = sdata.m0.readline()
+                if line:
+                    resp += line.decode('utf-8').strip() + "\n"
+        
+        if self.sresp:
+            print(f"{resp}")
+        
+        if "ERROR" in resp:
+            return False
+        
+        return True
 
-def __main__(args):
-    
-    if len(args) == 0 or "--h" in args:
-        print("Modem management utility\nUsage:")
-        print("\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
-        print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
-        print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
-        return
-    
-    if "-n" in args:
-        prn = False
-    
-    file=None
-    if args[0]=="-f":
-        file=args[1]
+    def executeScript(self, file):
         with open(file, 'r') as archivo:
             while True:
                 lin = archivo.readline()
                 if not lin:  # Si no hay más líneas, salir del bucle
                     break
-                if lin.strip()=="": continue   # Empty lines skipped
-                if len(lin)>0 and lin[0]=="#": continue # Commanted lines skipped
-                cmdl=lin.split("#")[0] # Left part of commented line
+                if lin.strip() == "": 
+                    continue   # Empty lines skipped
+                if len(lin) > 0 and lin[0] == "#": 
+                    continue # Commented lines skipped
+                
+                cmdl = lin.split("#")[0] # Left part of commented line
                 # To be called from upyOS command line
                 cmdl = cmdl.replace("\\@", '"')
-                if prn:
+                
+                if self.scmds:
                     print(">>:" + cmdl)
                 
                 tmp = cmdl.split()
@@ -106,33 +97,55 @@ def __main__(args):
                     baud = int(tmp[2])  # Baudrate
                     tx   = int(tmp[3])  # TX gpio
                     rx   = int(tmp[4])  # RX gpio
-                    if not createUART(id, baud, tx, rx):
+                    if not self.createUART(id, baud, tx, rx):
                         utls.setenv("?", "-1")
                         break
                 elif tmp[0].upper() == "SLEEP":
                     time.sleep(float(tmp[1]))
                 else:
                     cmd = tmp[0]
-                    timeout=2.0  # Timeout por defecto aumentado
+                    timeout = 2.0  # Timeout por defecto aumentado
                     if len(tmp) > 1:
                         timeout = float(tmp[1])
-                    if atcmd(cmd, timeout) == False:
+                    if self.atCMD(cmd, timeout) == False:
                         utls.setenv("?", "-1")
                         break
+
+def __main__(args):
+    # Crear instancia del gestor de módem
+    modem = ModemManager(scmds=True, sresp=True)
+    
+    if len(args) == 0 or "--h" in args:
+        print("Modem management utility\nUsage:")
+        print("\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
+        print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
+        print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
+        return
+    
+    # Verificar si se desactiva la impresión
+    if "-n" in args:
+        self.scmds = False
+        self.sresp = False
+        # Remover el flag -n de los argumentos
+        args = [arg for arg in args if arg != "-n"]
+   
+    if args[0] == "-f":
+        file = args[1]
+        modem.executeScript(file)
         
-    elif args[0]=="-c":
+    elif args[0] == "-c":
         id   = int(args[1])  # uC Uart ID
-        baud = int(args[2]) # Baudrate
-        tx   = int(args[3])   # TX gpio
-        rx   = int(args[4])   # RX gpio
-        if not createUART(id, baud, tx, rx):
+        baud = int(args[2])  # Baudrate
+        tx   = int(args[3])  # TX gpio
+        rx   = int(args[4])  # RX gpio
+        if not modem.createUART(id, baud, tx, rx):
             utls.setenv("?", "-1")
         
     else:
         timeout = 2.0  # Timeout por defecto aumentado
         if len(args) > 1:
             timeout = float(args[1])
-        if atcmd(args[0], timeout) == False:
+        if modem.atCMD(args[0], timeout) == False:
             utls.setenv("?", "-1")
 
 # To call out upyos
