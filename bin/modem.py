@@ -124,8 +124,8 @@ def __main__(args):
     
     # Verificar si se desactiva la impresión
     if "-n" in args:
-        self.scmds = False
-        self.sresp = False
+        modem.scmds = False
+        modem.sresp = False
         # Remover el flag -n de los argumentos
         args = [arg for arg in args if arg != "-n"]
    
