@@ -72,11 +72,11 @@ class Proc:
             print(f"{self.cmd}: ended")
         except ImportError as ie:
             self.rmmod=True
-            print(f"{self.cmd}: Command not found\nor command import problem.")
-            if sdata.debug:
-                sys.print_exception(ie)
+            if str(ie).startswith("no module named"):
+                print(f"{self.cmd}: not found")
             else:
-                print("try to enable debug.")
+                sys.print_exception(ie)
+
         except Exception as e:
             self.rmmod=True
             print(f"Error executing {self.cmd}")
