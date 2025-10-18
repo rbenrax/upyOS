@@ -7,14 +7,35 @@ import sdata
 import utls
 
 class ModemManager:
-    def __init__(self, scmds=True, sresp=True):
-        self.scmds = scmds
-        self.sresp = sresp
+    def __init__(self, sctrl=True, scmds=True, sresp=True):
+        self.sctrl = sctrl # Print ctrl messages
+        self.scmds = scmds # Print cmds
+        self.sresp = sresp # Print resp
+        
+        self._callback = None
     
+    def setCB(self, callback): # add Callback
+        self._callback = callback
+
+    def reset(self, pin, wait=5):
+        resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
+
+        if self.sctrl:
+            print("Resenting Modem...")
+    
+        resetP.value(0)
+        time.sleep_ms(100) # 100ms pulse
+        resetP.value(1)
+
+        time.sleep(wait) # wait to ready
+        if self.sctrl:
+            print("Modem Ready")
+            
     def createUART(self, id, baud, tx, rx):
         try:
             sdata.m0 = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
-            print("UART created\r\n\r\nOK")
+            if self.sctrl:
+                print("UART created\r\n\r\nOK")
             
         except Exception as ex:
             print("modem error, " + str(ex))
@@ -34,7 +55,7 @@ class ModemManager:
         # Enviar comando
         sdata.m0.write((command + "\r\n").encode('utf-8'))
         
-        time.sleep(1)
+        time.sleep(.5)
         
         # Esperar respuesta con timeout
         start_time = time.time()
@@ -66,6 +87,10 @@ class ModemManager:
         
         if self.sresp:
             print(f"{resp}")
+            
+        # Llamar al callback con argumentos
+        if self._callback:
+            self._callback(command, resp)
         
         if "ERROR" in resp:
             return False
@@ -88,11 +113,15 @@ class ModemManager:
                 cmdl = cmdl.replace("\\@", '"')
                 
                 if self.scmds:
-                    print(">>:" + cmdl)
+                    print(">> " + cmdl)
                 
                 tmp = cmdl.split()
                 
-                if tmp[0].upper() == "UART":
+                if tmp[0].lower() == "reset":
+                    gpio  = int(tmp[1])  # Gpio reset pin in mcu
+                    wait  = int(tmp[2])  # Modem wait to ready
+                    self.reset(gpio, wait)
+                elif tmp[0].lower() == "uart":
                     id   = int(tmp[1])  # uC Uart ID
                     baud = int(tmp[2])  # Baudrate
                     tx   = int(tmp[3])  # TX gpio
@@ -100,7 +129,9 @@ class ModemManager:
                     if not self.createUART(id, baud, tx, rx):
                         utls.setenv("?", "-1")
                         break
-                elif tmp[0].upper() == "SLEEP":
+                elif tmp[0].lower() == "sleep":
+                    if self.sctrl:
+                        print(f"Waiting {tmp[1]}sec")
                     time.sleep(float(tmp[1]))
                 else:
                     cmd = tmp[0]
@@ -114,16 +145,25 @@ class ModemManager:
 def __main__(args):
     # Crear instancia del gestor de módem
     modem = ModemManager(scmds=True, sresp=True)
+
+    #modem.reset(22, 3) # gpio 22 3 sec
     
+    # Callback example
+    #def cb(cmd, resp):
+    #    print("Cmd from callback: " + cmd + "\n Response from callback:" + resp )
+    #modem.setCB(cb)
+
     if len(args) == 0 or "--h" in args:
         print("Modem management utility\nUsage:")
         print("\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
+        print("\tReset modem: modem -r <mcu gpio> <wait yo ready>")
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
         print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         return
     
     # Verificar si se desactiva la impresión
     if "-n" in args:
+        modem.sctrl = False
         modem.scmds = False
         modem.sresp = False
         # Remover el flag -n de los argumentos
@@ -132,6 +172,11 @@ def __main__(args):
     if args[0] == "-f":
         file = args[1]
         modem.executeScript(file)
+        
+    elif args[0] == "-r":
+        gpio  = int(args[1])  # Gpio reset pin in mcu
+        wait  = int(args[2])  # Modem wait to ready
+        modem.reset(gpio, wait)
         
     elif args[0] == "-c":
         id   = int(args[1])  # uC Uart ID
