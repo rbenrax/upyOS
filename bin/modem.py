@@ -14,14 +14,14 @@ class ModemManager:
         
         self._callback = None
     
-    def setCB(self, callback): # add Callback
+    def setCallBack(self, callback): # add Callback
         self._callback = callback
 
     def reset(self, pin, wait=5):
         resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
 
         if self.sctrl:
-            print("Resenting Modem...")
+            print("Reseting Modem...")
     
         resetP.value(0)
         time.sleep_ms(100) # 100ms pulse
@@ -43,7 +43,7 @@ class ModemManager:
         time.sleep(1)  # Esperar a que el puerto se estabilice
         return True
         
-    def atCMD(self, command, timeout=2.0):
+    def atCMD(self, command, timeout=1.0):
         if sdata.m0 is None:
             print("The modem uart is not initialized, see help")
             return False
@@ -52,10 +52,12 @@ class ModemManager:
         while sdata.m0.any() > 0:
             sdata.m0.read()
         
+        command = command.replace("\\@", '"')
+        
         # Enviar comando
         sdata.m0.write((command + "\r\n").encode('utf-8'))
         
-        time.sleep(.5)
+        time.sleep(.2)
         
         # Esperar respuesta con timeout
         start_time = time.time()
@@ -110,7 +112,6 @@ class ModemManager:
                 
                 cmdl = lin.split("#")[0] # Left part of commented line
                 # To be called from upyOS command line
-                cmdl = cmdl.replace("\\@", '"')
                 
                 if self.scmds:
                     print(">> " + cmdl)
@@ -144,25 +145,26 @@ class ModemManager:
 
 def __main__(args):
     # Crear instancia del gestor de módem
-    modem = ModemManager(scmds=True, sresp=True)
+    modem = ModemManager(sctrl=True, scmds=True, sresp=True)
 
+    # Modem rest test
     #modem.reset(22, 3) # gpio 22 3 sec
     
     # Callback example
-    #def cb(cmd, resp):
+    #def callback(cmd, resp):
     #    print("Cmd from callback: " + cmd + "\n Response from callback:" + resp )
-    #modem.setCB(cb)
+    #modem.setCallBack(callback)
 
     if len(args) == 0 or "--h" in args:
-        print("Modem management utility\nUsage:")
+        print("Modem management utility\n")
+        print("Usage:")
         print("\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
         print("\tReset modem: modem -r <mcu gpio> <wait yo ready>")
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
         print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         return
     
-    # Verificar si se desactiva la impresión
-    if "-n" in args:
+    if "-n" in args: # Print control
         modem.sctrl = False
         modem.scmds = False
         modem.sresp = False
@@ -173,12 +175,12 @@ def __main__(args):
         file = args[1]
         modem.executeScript(file)
         
-    elif args[0] == "-r":
+    elif args[0] == "-r": # Reset modem
         gpio  = int(args[1])  # Gpio reset pin in mcu
         wait  = int(args[2])  # Modem wait to ready
         modem.reset(gpio, wait)
         
-    elif args[0] == "-c":
+    elif args[0] == "-c": # Create uart (see --h)
         id   = int(args[1])  # uC Uart ID
         baud = int(args[2])  # Baudrate
         tx   = int(args[3])  # TX gpio
@@ -186,7 +188,7 @@ def __main__(args):
         if not modem.createUART(id, baud, tx, rx):
             utls.setenv("?", "-1")
         
-    else:
+    else: # Executa AT command <cmd> <timeout>
         timeout = 2.0  # Timeout por defecto aumentado
         if len(args) > 1:
             timeout = float(args[1])

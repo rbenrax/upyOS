@@ -124,6 +124,12 @@ class upyOS:
 
         fcmd=fcmd.strip()
         
+        ##### Test for quotation magement
+        if fcmd[:5]=="modem": 
+             fcmd = fcmd.replace('"', "\\@")
+             print(fcmd)
+        ##### ATENTION: for analisys only
+
         # Translate env variables $*
         tmp = fcmd.split()
  
@@ -144,7 +150,7 @@ class upyOS:
                 fcmd = "/" + fcmd[2:]
             else:
                 fcmd = cwd + "/" + fcmd[2:]
-
+                
         # Separate full command elements
         #parts = fcmd.split()
         parts = utls.shlex(fcmd)
