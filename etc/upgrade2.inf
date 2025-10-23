@@ -1,6 +1,8 @@
 #upyOS,0.9.1,2025-10-16
 /boot.py
 /main.py
+/bin/ATmodem.py
+/bin/ATmqtt.py
 /bin/cat.py
 /bin/cd.py
 /bin/clear.py
