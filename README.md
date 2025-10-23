@@ -447,7 +447,7 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 
 ### Added basic support for Espressif ESP-AT UART modems, especially for MCUs without integrated Wi-Fi, such as RP2040, etc.
 
-ATmodem and ATmqtt objects in /bin direcory.
+ATmodem and ATmqtt objects in /bin directory.
 
 ## TODO List
 
