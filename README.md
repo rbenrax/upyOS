@@ -445,10 +445,14 @@ Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) a
 ![Android development environment](media/Screenshot_20251012_092146_Termux.jpg)
 -----
 
+### Added basic support for Espressif ESP-AT UART modems, especially for MCUs without integrated Wi-Fi, such as RP2040, etc.
+
+ATmodem and ATmqtt objects in /bin directory.
+
 ## TODO List
 
   * Add other useful commands.
-  * Add Syslog.
+  * add AThttp object for use with ESP-AT modems
 
 The Wishlist is open\! 😉
 

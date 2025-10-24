@@ -18,11 +18,11 @@ class ModemManager:
     def setCallBack(self, callback): # add Callback
         self._callback = callback
 
-    def resetHW(self, pin, wait=5):
+    def resetHW(self, pin, wait=2):
         resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
 
         if self.sctrl:
-            print("ctrl_log: Reseting Modem...")
+            print("Reseting Modem...")
     
         resetP.value(0)
         time.sleep_ms(100) # 100ms pulse
@@ -30,13 +30,13 @@ class ModemManager:
 
         time.sleep(wait) # wait to ready
         if self.sctrl:
-            print("ctrl_log: Modem Ready")
+            print("Modem Ready")
             
     def createUART(self, id, baud, tx, rx):
         try:
             sdata.m0 = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
             if self.sctrl:
-                print("UART created\r\n\r\nOK")
+                print("UART created")
             
         except Exception as ex:
             print("Modem error, " + str(ex))
@@ -70,54 +70,66 @@ class ModemManager:
         time.sleep(0.100)
        
         # Esperar respuesta
-        resp = ""
+        resp = b""
         start_time = time.ticks_ms()
         
         #print("*****: " + str(timeout))
         
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if sdata.m0.any():
-                data = sdata.m0.read().decode('utf-8')
+                data = sdata.m0.read()
                 resp += data
 
                 # TODO: Test: ERROR, FAIL, add: SEND OK, SEND FAIL, busy p...
                 if exp == "OK" and "\r\nOK\r\n" in resp:
                     #print("*****: Brk 0")
                     break
-                elif "\r\nERROR\r\n" in resp or "\r\nFAIL\r\n" in resp:
+                elif (exp == "ERROR" and "\r\nERROR\r\n" in resp) or "\r\nERROR\r\n" in resp:
                     cmdsts=False
                     #print("*****: Brk 1")
                     break
-                elif exp in resp:
+                elif (exp == "FAIL" and "\r\nFAIL\r\n" in resp) or "\r\nFAIL\r\n" in resp:
+                    cmdsts=False
                     #print("*****: Brk 2")
+                    break
+                elif exp in resp:
+                    #print("*****: Brk 3")
                     break
 
             time.sleep(0.02)
         
         time.sleep(0.05)
         
-        if self.sresp:
-            print(f"<< {resp}")
+        decResp = resp.decode('utf-8')
 
         if self._callback:
-           self._callback(command, resp)
-        
-        return cmdsts, resp
+           cbresp = self._callback(command, decResp)
+           if cbresp != None:
+               decResp = cbresp
+
+        if self.sresp:
+            print(f"<< {decResp}")
+            
+        return cmdsts, decResp
     
-    def rcvDATA(self, timeout=5.0):
+    def rcvDATA(self, size=2048, encoded=True, timeout=5.0):
         timeout = timeout  * 1000
 
         # Esperar respuesta
-        resp = ""
+        resp = b""
         start_time = time.ticks_ms()
         
         #print("*rcv****: " + str(timeout))
         
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if sdata.m0.any():
-                data = sdata.m0.read().decode('utf-8')
+                data = sdata.m0.read()
                 resp += data
                 start_time = time.ticks_ms() # restart if new data
+                
+                if len(resp) >= size:
+                    resp += "\r\nCLOSED\r\n(more ...)"
+                    #break
                 
                 if"\r\nCLOSED\r\n" in resp:
                     #print("*****: Brk rcv 1")
@@ -125,19 +137,45 @@ class ModemManager:
 
             time.sleep(0.02)
         
+        if encoded:
+            retResp = resp.decode('utf-8')
+        else:
+            retResp = resp
+            
         if self.sresp:
-            print(f"<< data: {resp}")
+            print(f"<< data: {retResp}")
 
-        return True, resp
+        return True, retResp
  
 # ------ Command Implementations
 
-    def test(self):
+    def test_modem(self):
         sts, ret = self.atCMD("AT")
         if sts:
             lines = ret.split('\n')
             return(lines[2])
         return "Error test"
+    
+    def get_version(self):
+        sts, ret = self.atCMD("AT+GMR")
+        if sts:
+            return ret.replace("\r\nOK\r\n", "").replace("AT+GMR\r\n", "")
+        
+    def wifi_connect(self, ssid, password):
+        # Configurar modo station
+        sts, resp = self.atCMD("AT+CWMODE=1")
+        if not sts:
+            return False, resp
+        
+        time.sleep(1)
+        
+        # Conectar a WiFi
+        cmd = f'AT+CWJAP="{ssid}","{password}"'
+        sts, resp = self.atCMD(cmd, timeout=15000)
+        return sts, resp
+
+    def wifi_disconnect(self):
+        return self.atCMD("AT+CWQAP")
 
     def get_ip_mac(self, ip_mac):
         sts, ret = self.atCMD("AT+CIFSR")
@@ -154,8 +192,8 @@ class ModemManager:
     
     # Tcp CMDs
     
-    def tcp_conn(self, host, port, keepalive=60):
-        command = f'AT+CIPSTART="TCP","{host}",{port},{keepalive}'
+    def create_conn(self, host, port, prot="TCP", keepalive=60):
+        command = f'AT+CIPSTART="{prot}","{host}",{port},{keepalive}'
         sts, _ = self.atCMD(command, "CONNECT", 10000)
         return sts
     
@@ -177,7 +215,7 @@ class ModemManager:
         if sts:
             # Enviar datos
             sdata.m0.write(data)
-            sts, ret = self.atCMD("", "SEND OK") is not None
+            sts, ret = self.atCMD("", "SEND OK")
             return ret is not sts
         return False
     
@@ -191,101 +229,15 @@ class ModemManager:
         # Todo: Astk mode 1?
         mode = 1 if enable else 0
         return self.atCMD(f"AT+CIPMUX={mode}", "OK")
-    
-    # MQTT CMDs
-    
-    def mqtt_set_config(self, broker, port=1883):
-        """Configurar broker MQTT (AT+MQTTCFG)"""
-        command = f'AT+MQTTCFG="{broker}",{port},120,0,0,"",""'
-        return self.atCMD(command, "OK") is not None
-    
-    def mqtt_connect(self, client_id, username="", password=""):
-        """Conectar al broker MQTT (AT+MQTTCONN)"""
-        command = f'AT+MQTTCONN=0,"{client_id}",120,0,"{username}","{password}"'
-        result = self.atCMD(command, "+MQTTCONN:0,0", 15000)
-        
-        if result and "+MQTTCONN:0,0" in result:
-            self.mqtt_connected = True
-            return True
-        return False
-    
-    def mqtt_disconnect(self):
-        """Desconectar de MQTT (AT+MQTTDISC)"""
-        result = self.atCMD("AT+MQTTDISC=0,120", "OK")
-        if result:
-            self.mqtt_connected = False
-            return True
-        return False
-    
-    def mqtt_publish(self, topic, message, qos=0, retain=0):
-        """Publicar mensaje MQTT (AT+MQTTPUB)"""
-        # Primero establecer el topic
-        topic_cmd = f'AT+MQTTPUB=0,"{topic}","{message}",{qos},{retain},120'
-        return self.atCMD(topic_cmd, "OK") is not None
-    
-    def mqtt_subscribe(self, topic, qos=0):
-        """Suscribirse a topic MQTT (AT+MQTTSUB)"""
-        command = f'AT+MQTTSUB=0,"{topic}",{qos},120'
-        return self.atCMD(command, "OK") is not None
-    
-    def mqtt_unsubscribe(self, topic):
-        """Cancelar suscripción MQTT (AT+MQTTUNSUB)"""
-        command = f'AT+MQTTUNSUB=0,"{topic}",120'
-        return self.atCMD(command, "OK") is not None
-    
-    def check_messages(self):
-        """Verificar mensajes MQTT recibidos"""
-        messages = []
-        
-        # Leer todos los datos disponibles
-        if sdata.m0.any():
-            data = sdata.m0.read(sdata.m0.any()).decode('utf-8')
-            print(f"Datos recibidos: {data}")
-            
-            # Procesar mensajes MQTT
-            lines = data.split('\n')
-            for line in lines:
-                line = line.strip()
-                if line.startswith('+MQTTSUBRECV:'):
-                    # Formato: +MQTTSUBRECV:0,topic,len,message
-                    parts = line.split(',')
-                    if len(parts) >= 4:
-                        topic = parts[1].strip('"')
-                        message_len = int(parts[2])
-                        message = parts[3].strip('"')
-                        messages.append((topic, message))
-                        
-        return messages
-    
-    def mqtt_get_status(self):
-        """Obtener estado MQTT (AT+MQTTSTATUS)"""
-        return self.atCMD("AT+MQTTSTATUS=0", "OK")
-    
-    def mqtt_set_clean_session(self, clean_session=1):
-        """Configurar clean session (AT+MQTTCLEAN)"""
-        return self.atCMD(f"AT+MQTTCLEAN=0,{clean_session}", "OK") is not None
-    
-    def mqtt_set_will(self, topic, message, qos=0, retain=0):
-        """Configurar mensaje Will (AT+MQTTWILL)"""
-        command = f'AT+MQTTWILL=0,"{topic}","{message}",{qos},{retain}'
-        return self.atCMD(command, "OK") is not None
-    
-    def mqtt_ping(self):
-        """Enviar ping MQTT (AT+MQTTPING)"""
-        return self.atCMD("AT+MQTTPING=0", "OK") is not None
-    
-    def enable_transparent_mode(self, enable=True):
-        """Habilitar/deshabilitar modo transparente"""
-        mode = 1 if enable else 0
-        return self.atCMD(f"AT+CIPMODE={mode}", "OK")
-    
 
-    
-
-
-# -------
+# ------ File script
 
     def executeScript(self, file):
+        
+        if not utls.file_exists(file):
+            print(f"File {file} not foun")
+            return
+        
         with open(file, 'r') as archivo:
             while True:
                 lin = archivo.readline()
