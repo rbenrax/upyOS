@@ -86,7 +86,7 @@ class ModemManager:
                     break
                 elif (exp == "ERROR" and "\r\nERROR\r\n" in resp) or "\r\nERROR\r\n" in resp:
                     cmdsts=False
-                    print("*****: Brk 1")
+                    #print("*****: Brk 1")
                     break
                 elif (exp == "FAIL" and "\r\nFAIL\r\n" in resp) or "\r\nFAIL\r\n" in resp:
                     cmdsts=False
@@ -233,6 +233,11 @@ class ModemManager:
 # ------ File script
 
     def executeScript(self, file):
+        
+        if not utls.file_exists(file):
+            print(f"File {file} not foun")
+            return
+        
         with open(file, 'r') as archivo:
             while True:
                 lin = archivo.readline()

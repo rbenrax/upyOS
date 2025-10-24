@@ -5,6 +5,7 @@ from ATmodem import ModemManager
 import time
 import sdata
 import utls
+import sys
 
 proc=None
 
@@ -133,7 +134,7 @@ class MqttManager(ModemManager):
         
         return messages
     
-    def monitor_loop(self, callback=None):
+    def msgs_loop(self, callback=None):
         """
         Bucle continuo de monitoreo de mensajes MQTT
         
@@ -141,8 +142,8 @@ class MqttManager(ModemManager):
             callback: Función a llamar cuando se recibe un mensaje
                      Debe aceptar un dict con el mensaje parseado
         """
-        print("Iniciando monitoreo de mensajes MQTT...")
-        print("Presiona Ctrl+C para detener")
+        print("Starting callback MQTT message monitoring ...")
+        print("Ctrl+C to stop")
         
         try:
             while True:
@@ -167,14 +168,13 @@ class MqttManager(ModemManager):
 
 
 
-
-
+# ---------
 # Callback ejemplo de uso
 def on_message_received(msg):
     """Callback personalizado para procesar mensajes"""
-    #print(f"\n>>> Callback ejecutado <<<")
-    #print(f"Tópico: {msg['topic']}")
-    #print(f"Mensaje: {msg['data']}")
+    print(f"\n>>> Callback <<<")
+    print(f"Topic: {msg['topic']}")
+    print(f"Message: {msg['data']}")
     
     # Aquí puedes añadir tu lógica personalizada
     if msg['topic'] == 'casa/sotano/temp':
@@ -190,52 +190,151 @@ def on_message_received(msg):
             print(f"Humedad: {hum}°C")
         except:
             pass
-
     
 # ---------
 
 def __main__(args):
 
+    #TODO: add qos, reconnect and others parms
+
+    if len(args) == 0 or "--h" in args:
+        print("MQTT Library and command line utility")
+        print("Usage:")
+        print("\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
+        print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
+        print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
+        print("\t ATmqtt <listsub>")
+        print("\t ATmqtt <unsub>")
+        print("\t ATmqtt <close>")
+        print("\t -l[l] listen")
+        return
+
+    def parse(mod):
+        try:
+            if mod in args:
+                i = args.index(mod)
+                return args[i + 1] if i > 0 else ""
+            else:
+                return ""
+        except Exception as ex:
+            print("ATmqtt modifier error, " + mod)
+            if sdata.debug:
+                sys.print_exception(ex)
+            return ""
+
+    cmd = args[0]
+
+    host  = parse("-h")
+    port  = parse("-p")
+    port  = int(port) if port != "" else 1883
+    user  = parse("-u")
+    passw = parse("-P")
+    recon = parse("-R")
+    recon = 1 if recon == "1" else 0
+    
+    topic = parse("-t")
+    messg = parse("-m")
+    
+    qos   = parse("-q")
+    qos   = int(qos) if qos in ["1", "2"] else 0
+    retain = parse("-r")
+    retain = 1 if retain == "1" else 0
+
     mm = MqttManager(sctrl=False, scmds=False, sresp=False)
     
     # If modem not connected
     if not sdata.m0:
-        print("Connecting ...")
+        print("Connecting WIFI...")
         mm.executeScript("/local/dial.inf") # Connection script
     
-    # Else Wifi Connection by program
+    # Wifi Connection by program
     #mm.resetHW(22, 2)
     #if not mm.createUART(1, 115200, 4, 5):
     #    return
     
     #mm.wifi_connect("DIGIFIBRA-cGPRi","")
     
-    print("Test: "    + str(mm.test_modem()))
-    print("Version: " + mm.get_version())
-    print("IP: "      + mm.get_ip_mac("ip"))
-    print("MAC: "     + mm.get_ip_mac("mac"))
+    #print("Test: "    + str(mm.test_modem()))
+    #print("Version: " + mm.get_version())
+    #print("Local IP: " + mm.get_ip_mac("ip"))
+    #print("MAC: "     + mm.get_ip_mac("mac"))
 
-    print(f"Conectando MQTT")
-    mm.mqtt_user(1, "rp2040", "", "")
-    if mm.mqtt_connect("192.168.1.5"):
+    connected = utls.getenv("mqtt")
+    
+    if connected != "c":
+        
+        if not "-h" in args:
+            print("-h required")
+            return
+        if not "-u" in args:
+            print("-u required")
+            return
+        if not "-P" in args:
+            print("-P required")
+            return
 
-        mm.mqtt_pub("casa/buhardilla", "hola=rp2040")
+        print(f"Connecting MQTT...")
+        mm.mqtt_user(1, "ATmqtt", user, passw)
+        if mm.mqtt_connect(host, port, recon):
+            utls.setenv("mqtt", "c")
+            print("Connected")
+        else:
+            utls.setenv("mqtt", "")
+            print("No connected")
+            return
 
-        mm.mqtt_sub("casa/sotano/temp")
-        mm.mqtt_sub("casa/sotano/hum")
+    if cmd == "pub":
+        if not "-t" in args or topic == "":
+            print("-t required")
+            return
+        if not "-m" in args or messg == "":
+            print("-m required")
+            return
+        mm.mqtt_pub(topic, messg, qos, retain)
+        
+    elif cmd == "sub":
+        if not "-t" in args or topic == "":
+            print("-t required")
+            return
+        mm.mqtt_sub(topic, qos)
+        
+    elif cmd == "listsub":
+        # TODO: parse
         print(mm.mqtt_list_subs())
         
-    #    mm.mqtt_unsub("casa/sotano")
-    #    print(mm.mqtt_list_subs())
+    elif cmd == "unsub":
+        if not "-t" in args or topic == "":
+            print("-t required")
+            return
+        mm.mqtt_sub(topic)
 
-        mm.monitor_loop(callback=on_message_received)
-        
-        # Manual 
-        #print("Comprobando mensajes MQTT...")
-        #while True:
-        #    messages = mm.check_messages()
-        #    if messages:
-        #        for msg in messages:
-        #            print(f"Nuevo mensaje en '{msg['topic']}': {msg['data']}")
-        #    time.sleep(0.1)
-       
+    elif cmd == "close":
+        mm.mqtt_clean()
+        utls.setenv("mqtt", "d")
+        print("MQTT closed")
+#    else:
+#       print("MQTT not valid subcommand")
+
+    if "-l" in args:
+        # Option:
+        print("Listening MQTT messages...")
+        while True:
+            
+            # Thread control
+            if proc.sts=="S":break
+
+            if proc.sts=="H":
+                utime.sleep(1)
+                continue
+            
+            messages = mm.check_messages()
+            if messages:
+                for msg in messages:
+                    print(f"'{msg['topic']}': {msg['data']}")
+            time.sleep(0.1)
+
+    if "-ll" in args:
+        print("Listening MQTT messages...")
+        # For callbach use
+        mm.msgs_loop(callback=on_message_received)
+

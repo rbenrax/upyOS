@@ -1,6 +1,8 @@
-#upyOS,0.9.1,2025-10-16
+#upyOS,0.9.1,2025-10-23
 /boot.py
 /main.py
+/bin/ATmodem.py
+/bin/ATmqtt.py
 /bin/cat.py
 /bin/cd.py
 /bin/clear.py
@@ -32,7 +34,6 @@
 /bin/mcu_t.sh
 /bin/mi.py
 /bin/mkdir.py
-/bin/modem.py
 /bin/mv.py
 /bin/ntpupdate.py
 /bin/ping.py
@@ -92,4 +93,4 @@
 /etc/upyOS-rp2.board
 /etc/welcome.txt
 /etc/wellcome.txt
-#files,93
+#files,94

@@ -125,9 +125,9 @@ class upyOS:
         fcmd=fcmd.strip()
         
         ##### Test for quotation magement
-        #if fcmd[:5]=="modem":
+        #if fcmd[:5]=="ATmodem":
         if fcmd[:3]=="AT+":
-             fcmd = "modem " + fcmd.replace('"', "\\@")
+             fcmd = "ATmodem " + fcmd.replace('"', "\\@")
              #print(fcmd)
         ##### ATENTION: for analisys only
 
