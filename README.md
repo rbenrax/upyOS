@@ -10,19 +10,91 @@ The goal is to provide a common, modular base for using microcontrollers in a **
 
 ---
 
-## upyOS Installation
+## 🌟 Key Features at a Glance
 
-#### Prerequisites
+### 🎯 Design Philosophy
+- **Modular architecture** promoting code reuse and flexibility
+- **Alternative to monolithic programs** for easier maintenance
+- **Standalone microcontroller operation** without external dependencies
+- **POSIX-like environment** for familiar Unix/Linux-style interaction
 
-- The target microcontroller board must have the MicroPython package already loaded *before* starting the "mpremote" procedure outlined below.  [How to install MicroPython on an ESP32-C3 board](https://micropython.org/download/ESP32_GENERIC_C3/)
+### 📁 Unix-like System Structure
+- Hierarchical directory structure: `/bin`, `/etc`, `/lib`, `/libx`, `/opt`, `/tmp`, `/www`
+- Startup (`/etc/init.sh`) and shutdown (`/etc/end.sh`) scripts
+- **60+ built-in commands** (ls, cd, cp, mv, grep, ps, kill, wifi, gpio, etc.)
+- Board-specific configuration files (`.board`)
 
-- You may also need to install the `esptool` package in order to load the micropython package from you host computer to the target microcontroller.
+### ⚙️ Process Management
+- **Multi-threading support** with background execution (`&`)
+- **Asyncio support** for asynchronous programming
+- Process control: `ps`, `kill`, `killall`, `hold`, `resume`, `wait`
+- Thread management with status control in program loops
+
+### 🔧 Shell and Scripting
+- **Conditional execution** with `if` statements
+- **Loop support** with labels and `goto` instructions
+- **Output redirection** to files (`>`, `>>`) or environment variables
+- **Environment variables** with `export`, `echo`, `unset`
+- **Direct Python code execution** from shell (`>` for code, `<` for expressions)
+
+### 🌐 Network Connectivity
+- **Complete WiFi management** (scan, connect, status, disconnect)
+- **Built-in servers:** Telnet (`utelnetd`), FTP (`uftpd`), HTTP (`uhttpd`)
+- **NTP time synchronization** (`ntpupdate`)
+- **OTA updates** from GitHub repository (`upgrade` command)
+- **User authentication** for network services
+- **ESP-AT UART modem support** for MCUs without integrated WiFi (RP2040, etc.)
+
+### 💾 Advanced Features
+- **File system call caching** (configurable based on available memory)
+- **Recovery mode** for boot failures
+- **Remote development** via FTP + Telnet (compatible with VS Code, Geany, Thonny)
+- **Android development support** (Serial WiFi Terminal, Squircle CE, Termux)
+- **System data module** (`sdata`) for shared configuration and parameters
+
+### 🖥️ Hardware Support
+- **ESP32** family (ESP32, ESP32-C3, ESP32-S3)
+- **RP2040** boards
+- **ESP8266** (optimized for low memory)
+- **NodeMCU** and various development boards
+
+### 🚀 Performance Characteristics
+upyOS prioritizes **flexibility and ease of use** over raw performance, making it ideal for:
+- Developers new to microcontrollers
+- Projects requiring modular, maintainable code
+- Rapid prototyping and experimentation
+- Educational and learning purposes
+- IoT applications and home automation
+
+---
+
+## 📋 Table of Contents
+- [Installation](#-upyos-installation)
+- [Screenshots](#-screenshots)
+- [Explanation](#-upyos-explanation)
+- [Directory Structure](#-directory-structure)
+- [Commands](#-commands)
+- [Shell Scripting](#-shell-scripting)
+- [Remote Development](#%EF%B8%8F-upyos-remote-development)
+- [OTA Upgrade](#-upgrade-command-ota)
+- [ESP-AT Modem Support](#-esp-at-modem-support)
+- [Tested Boards](#-tested-boards)
+- [TODO List](#-todo-list)
+
+---
+
+## 🚀 upyOS Installation
+
+### Prerequisites
+
+- The target microcontroller board must have the MicroPython package already loaded *before* starting the "mpremote" procedure outlined below. [How to install MicroPython on an ESP32-C3 board](https://micropython.org/download/ESP32_GENERIC_C3/)
+
+- You may also need to install the `esptool` package in order to load the micropython package from your host computer to the target microcontroller.
 - Your host computer needs the `micropython-mpremote` package installed in order to communicate with the target microcontroller.
 
-Now you can continue with the installation of upyOS:-
+Now you can continue with the installation of upyOS:
 
-
-```
+```bash
 git clone https://github.com/rbenrax/upyOS.git
 
 cd upyOS
@@ -31,26 +103,26 @@ mpremote fs -r -v cp bin etc lib libx opt tmp www :
 
 mpremote
 Ctrl+D
-
 ```
+
 ---
 
-## Screenshots
+## 📸 Screenshots
 
 ### RP2040 Module Running upyOS
 
-![upyos01](media/upyos_01.png )
-![upyos02](media/upyos_02.png )
+![upyos01](media/upyos_01.png)
+![upyos02](media/upyos_02.png)
 
 ### ESP32-C3 Module Running upyOS
 
-![upyos03](media/upyos_03.png )
-![upyos04](media/upyos_04.png )
-![upyos05](media/upyos_05.png )
+![upyos03](media/upyos_03.png)
+![upyos04](media/upyos_04.png)
+![upyos05](media/upyos_05.png)
 
 ---
 
-## upyOS Explanation
+## 💡 upyOS Explanation
 
 The aim of **upyOS** is to provide an additional layer to MicroPython, allowing us to manage a microcontroller similarly to how we use a common computer every day. This approach facilitates the use of simpler, more flexible programs that can complement each other. Naturally, this comes at the cost of lower performance and efficiency, but it offers greater ease of use and flexibility, especially for those new to microcontrollers.
 
@@ -68,24 +140,24 @@ The system can be extended with external commands and programs, aiming to keep t
 ```python
 import xxxx
 
-proc=None			# Reference to the current process
+proc=None               # Reference to the current process
 
-def __main__(args):		# Entry point and command line arguments
+def __main__(args):     # Entry point and command line arguments
 
    # Your code ...
     
-   while True:			# Main loop (for, while, etc)
+   while True:          # Main loop (for, while, etc)
    
-        if proc.sts=="S":break	# Mechanism to stop the process if it is launched in batch (&)
+        if proc.sts=="S":break  # Mechanism to stop the process if it is launched in batch (&)
         
-        if proc.sts=="H":	# Mechanism to hold and resume the process if it is launched in batch (&) and held
+        if proc.sts=="H":       # Mechanism to hold and resume the process if it is launched in batch (&) and held
             utime.sleep(1)
             continue
         
         # Your code ...
         
    # Your code ...
-````
+```
 
 ### System Data
 
@@ -103,20 +175,21 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 
 ---
 
-## Directory Structure
+## 📁 Directory Structure
 
 * `boot.py`: MicroPython startup file.
 * `main.py`: MicroPython startup file (boots the system).
-* /bin        Commands and shell scripts
-* /etc        Configuration files
-* /libx       External libraries
-* /lib        System implementations libraries
-* /opt        Specific solution or add-on programs (not in path)
-* /tmp        Temporary directory (for files you don't know where else to put :-)
-* /www        Web server directory
+* `/bin` - Commands and shell scripts
+* `/etc` - Configuration files
+* `/libx` - External libraries
+* `/lib` - System implementations libraries
+* `/opt` - Specific solution or add-on programs (not in path)
+* `/tmp` - Temporary directory (for files you don't know where else to put :-)
+* `/www` - Web server directory
+
 ---
 
-## Commands
+## ⌨️ Commands
 
 ### Internal Commands
 
@@ -125,28 +198,26 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 * `loadconfig`: Loads the system configuration file.
 * `loadboard`: Loads the board interfaces configuration file.
 
-### Actual External Commands
+### External Commands (60+)
 
-`cat`, `cd`, `clear`, `cp`, `cpufreq`, `date`, `decr`, `df`, `echo`, `env`, `export`, `fileup`, `find`, `free`, `gpio`, `grep`, `help`, `hold`, `i2cscan`, `ifconfig`, `incr`, `iperf3`, `kill`, `killall`, `led`, `ls`, `lshw`, `lsmod`, `mi`, `mkdir`, `mv`, `ntpupdate`, `ping`, `ps`, `pwd`, `read`, `reboot`, `release`,`reset`, `resume`, `rm`, `rmdir`, `rmmod`, `sensors`, `setauth`, `sh`, `si`, `sleep`, `test`, `touch`, `uftpd`, `uhttpd`, `unset`, `upgrade`, `uptime`, `utelnetd`, `vi`, `wait`, `watch`, `wget`, `wifi`
+`cat`, `cd`, `clear`, `cp`, `cpufreq`, `date`, `decr`, `df`, `echo`, `env`, `export`, `fileup`, `find`, `free`, `gpio`, `grep`, `help`, `hold`, `i2cscan`, `ifconfig`, `incr`, `iperf3`, `kill`, `killall`, `led`, `ls`, `lshw`, `lsmod`, `mi`, `mkdir`, `mv`, `ntpupdate`, `ping`, `ps`, `pwd`, `read`, `reboot`, `release`, `reset`, `resume`, `rm`, `rmdir`, `rmmod`, `sensors`, `setauth`, `sh`, `si`, `sleep`, `test`, `touch`, `uftpd`, `uhttpd`, `unset`, `upgrade`, `uptime`, `utelnetd`, `vi`, `wait`, `watch`, `wget`, `wifi`
 
----
+### Command Output Redirection
 
-### Command output redirection
-
-Some commands allow you to redirect output (>, >>), if the variable name contains / or . characters, the output will be to a file; if it doesn't contain any of those characters, the output will be redirected to an environment variable, If you want to send the output to a file without extension, you must indicate the complete path.. 
+Some commands allow you to redirect output (`>`, `>>`):
+- If the variable name contains `/` or `.` characters, the output will be to a **file**
+- If it doesn't contain any of those characters, the output will be redirected to an **environment variable**
+- If you want to send the output to a file without extension, you must indicate the complete path
 
 Environment variables can have any specific type since they are also used with interprocess communication.
 
----
+### Board Definition Files
 
-### Board definition files (.board files in etc directory)
-
-Each board must have a .board file, which defines its specifications and capabilities, also defines the assignment of GPIOS to the pins and the GPIOS of the different buses and resources, it must be loaded in the script /etc/init.sh and can be consulted with the command lshw -f, in programming you can use different functions to access the resources, for example: utls.getgpio(5) and utls.getgpios("i2c",0)
-
+Each board must have a `.board` file, which defines its specifications and capabilities, also defines the assignment of GPIOs to the pins and the GPIOs of the different buses and resources. It must be loaded in the script `/etc/init.sh` and can be consulted with the command `lshw -f`. In programming you can use different functions to access the resources, for example: `utls.getgpio(5)` and `utls.getgpios("i2c",0)`
 
 ---
 
-## Current Development
+## 🔧 Current Development Features
 
 * **/lib/kernel.py** is the first module loaded; it's the OS core of the system. The first time it runs, it creates the `.board` file in the `/etc` directory if it doesn't exist. External commands are located in the `/bin` directory.
 * The current implementation can also call simple shell scripts, including **/etc/init.sh** and **/etc/end.sh** (the startup and system shutdown scripts).
@@ -156,224 +227,245 @@ Each board must have a .board file, which defines its specifications and capabil
 * Added support for **environment variables** in scripts and Python programs: `export`, `echo`, `unset`, `utls.getenv(var)`, and `utls.setenv(var, val)`.
 * The **ls** command is now fully functional, or so I hope 😉.
 * Commands now translate environment variables.
-* From the command line prompt and shell scripts, it's possible to input Python code directly:
-    * The `>` command allows inputting Python code:
-        ```
-        / $: > import ftptiny
-        / $: > ftp = ftptiny.FtpTiny()
-        / $: > ftp.start()
-        ```
-    * The `<` command allows printing any Python expression:
-        ```
-        / $: < sys.modules
-        {'kernel': <module 'kernel' from '/lib/kernel.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
 
-        / $: < 2+2
-        4
-        
-        / $: > import esp32
-        / $: < esp32.mcu_temperature()
-        31
-        ```
-* Management support for **multiple threads and asyncio** (tests available: `&`, `ps`, `kill`, `killall`, `wait`, `hold`, and `resume`):
-    ```
-      / $: /opt/thr_test &            # thread test
-      / $: /opt/asy_test &            # asyncio test in new thread
-    ```
+### Direct Python Code Execution
 
-### Shell Scripting
+From the command line prompt and shell scripts, it's possible to input Python code directly:
+
+* The `>` command allows inputting Python code:
+```bash
+/ $: > import ftptiny
+/ $: > ftp = ftptiny.FtpTiny()
+/ $: > ftp.start()
+```
+
+* The `<` command allows printing any Python expression:
+```bash
+/ $: < sys.modules
+{'kernel': <module 'kernel' from '/lib/kernel.py'>, 'flashbdev': <module 'flashbdev' from 'flashbdev.py'>, 'network': <module 'network'>, 'sdata': <module 'sdata' from '/lib/sdata.py'>, 'utls': <module 'utls' from '/lib/utls.py'>}
+
+/ $: < 2+2
+4
+
+/ $: > import esp32
+/ $: < esp32.mcu_temperature()
+31
+```
+
+### Multiple Threads and Asyncio
+
+Management support for **multiple threads and asyncio** (tests available: `&`, `ps`, `kill`, `killall`, `wait`, `hold`, and `resume`):
+```bash
+/ $: /opt/thr_test &            # thread test
+/ $: /opt/asy_test &            # asyncio test in new thread
+```
+
+---
+
+## 📜 Shell Scripting
 
 Basic **conditional execution** in shell scripts is supported, as well as **labels** and the **goto** instruction.
 
-  * **`example.sh`**:
+### Example Scripts
 
-    ```bash
-    export var1 5   # Set variable var1 to "5" (variables can also be accessed from Python programs and embedded Python)
-    if $var1 != 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
-    < 1
-    < 2
-    < skip 2
-    < 4
-    < 5
-    if $var1 == 3 return        # Ends shell script
-    if $var1 == 5 run watch ps -t 5 # Launch command "watch ps" every 5 seconds
-    if $var1 == 6 run asy_test &    # Submit asy_test process
-    ```
+#### Basic Conditional Execution (`example.sh`)
 
-  * **`menu.sh`**, an example of loop usage:
+```bash
+export var1 5   # Set variable var1 to "5" (variables can also be accessed from Python programs and embedded Python)
+if $var1 != 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
+< 1
+< 2
+< skip 2
+< 4
+< 5
+if $var1 == 3 return        # Ends shell script
+if $var1 == 5 run watch ps -t 5 # Launch command "watch ps" every 5 seconds
+if $var1 == 6 run asy_test &    # Submit asy_test process
+```
 
-    ```bash
-    :loop
-    clear
-    < "Options Menu"
-    < ""
-    < "Option 1 160MHz"
-    < "Option 2 240Mhz"
-    < "Option 3 return"
-    < "Option 0 exit"
-    < ""
-    echo "Last option: " $v1
-    read v1 "Enter option: "
-    if $v1 == 1 cpufreq 160
-    if $v1 == 2 cpufreq 240
-    if $v1 == 3 return
-    if $v1 != 0 goto loop
-    exit
-    ```
+#### Menu Loop Example (`menu.sh`)
 
-  * **`wifi startup sh script`** example (can be called from `init.sh`):
+```bash
+:loop
+clear
+< "Options Menu"
+< ""
+< "Option 1 160MHz"
+< "Option 2 240Mhz"
+< "Option 3 return"
+< "Option 0 exit"
+< ""
+echo "Last option: " $v1
+read v1 "Enter option: "
+if $v1 == 1 cpufreq 160
+if $v1 == 2 cpufreq 240
+if $v1 == 3 return
+if $v1 != 0 goto loop
+exit
+```
 
-    ```bash
-    #
-    # WiFi connection and services startup
-    #
+#### WiFi Startup Script
 
-    wifi sta on                      # Turn on wifi in client mode
+Example (can be called from `init.sh`):
 
-    wifi sta status 
+```bash
+#
+# WiFi connection and services startup
+#
 
-    #wifi sta scan                   # scan wifi APs
+wifi sta on                      # Turn on wifi in client mode
 
-    wifi sta connect <SSID> <password> 10 # SSID PASS Timeout
+wifi sta status 
 
-    wifi sta status -n
-    if $wa == False goto exit # wifi active
-    if $wc == False goto exit # wifi connected
+#wifi sta scan                   # scan wifi APs
 
-    ntpupdate es.pool.ntp.org
+wifi sta connect <SSID> <password> 10 # SSID PASS Timeout
 
-    date
+wifi sta status -n
+if $wa == False goto exit # wifi active
+if $wc == False goto exit # wifi connected
 
-    wifi sta ifconfig
+ntpupdate es.pool.ntp.org
 
-    utelnetd start
-    uftpd start
-    uhttpd start &
+date
 
-    :exit
-    ```
+wifi sta ifconfig
 
-  * Script triggered on system exit to stop running services:
+utelnetd start
+uftpd start
+uhttpd start &
 
-    ```bash
-    test -p uhttpd > 0
-    if $0 == True uhttpd stop
-    unset 0
+:exit
+```
 
-    uftpd stop
-    utelnetd stop
+#### System Exit Script
 
-    wifi sta status -n
-    if $wc == True wifi sta disconnect -n
-    if $wa == True wifi sta off
-    ```
+Script triggered on system exit to stop running services:
 
-  * Script execution on boot:
-  ![upyos06](media/upyos_06.png )
+```bash
+test -p uhttpd > 0
+if $0 == True uhttpd stop
+unset 0
 
-  * Loops in shell scripts:
+uftpd stop
+utelnetd stop
 
-    ```bash
-    :cont
-    incr a
-    if $a <= 5 goto cont
-    echo $a
+wifi sta status -n
+if $wc == True wifi sta disconnect -n
+if $wa == True wifi sta off
+```
 
-    :cont2
-    decr a
-    if $a > 4 goto cont2
-    echo $a
-    ```
+#### Script Execution on Boot
 
-  * `init.sh` example with SSD1306 Oled display and process start:
+![upyos06](media/upyos_06.png)
 
-    ```bash
-    # Init shell script 
-    loadboard /etc/upyOS-esp32c3_vcc_gnd.board
+#### Loop Examples
 
-    #ESP32-C3  ->  Display SSD1306
-    #-----------------------------
-    #GND       ->  GND
-    #3.3V      ->  VCC
-    #GPIO6     ->  SCK  D0
-    #GPIO7     ->  MOSI D1
-    #GPIO2     ->  MISO (unused)
-    #GPIO11    ->  RES (Reset)
-    #GPIO3     ->  DC (Data/Command)
-    #GPIO10    ->  CS (Chip Select)
+```bash
+:cont
+incr a
+if $a <= 5 goto cont
+echo $a
 
-    # Display0 driver load
-    > from machine import Pin, SPI
-    > import ssd1306
-    > sdata.d0 = ssd1306.SSD1306_SPI(128, 64, SPI(1), Pin(3), Pin(11), Pin(10)) # GPIOs assignment
-    > d0 = sdata.d0 	# Global reference for use in other programs
+:cont2
+decr a
+if $a > 4 goto cont2
+echo $a
+```
 
-    > d0.fill(0)
-    > d0.text(sdata.name + " " + sdata.version, 0, 0, 1)
-    > d0.line(0, 15, 127, 15, 1)
-    > d0.text("Iniciando...", 0, 16, 1)
-    > d0.show()
+#### Advanced init.sh with SSD1306 Display
 
-    # Wifi sta
-    wifi sta on                      	# Turn on wifi in client mode
+Example with SSD1306 OLED display and process start:
 
-    #wifi sta status
-    #wifi sta scan                   	# scan wifi APs
+```bash
+# Init shell script 
+loadboard /etc/upyOS-esp32c3_vcc_gnd.board
 
-    # Crear variable de entorno
-    export essid <essid>
-    export passw <password>
+#ESP32-C3  ->  Display SSD1306
+#-----------------------------
+#GND       ->  GND
+#3.3V      ->  VCC
+#GPIO6     ->  SCK  D0
+#GPIO7     ->  MOSI D1
+#GPIO2     ->  MISO (unused)
+#GPIO11    ->  RES (Reset)
+#GPIO3     ->  DC (Data/Command)
+#GPIO10    ->  CS (Chip Select)
 
-    > d0.text("Try.. " + utls.getenv("essid"), 0, 26, 1)  # Get environment variable to show on display
-    > d0.show()
+# Display0 driver load
+> from machine import Pin, SPI
+> import ssd1306
+> sdata.d0 = ssd1306.SSD1306_SPI(128, 64, SPI(1), Pin(3), Pin(11), Pin(10)) # GPIOs assignment
+> d0 = sdata.d0     # Global reference for use in other programs
 
-    wifi sta connect $essid $passw 10 	# Connect to wifi router
+> d0.fill(0)
+> d0.text(sdata.name + " " + sdata.version, 0, 0, 1)
+> d0.line(0, 15, 127, 15, 1)
+> d0.text("Iniciando...", 0, 16, 1)
+> d0.show()
 
-    wifi sta status -n
-    if $wa == False goto exit 		# wifi active
-    if $wc == False goto exit 		# wifi connected
+# Wifi sta
+wifi sta on                         # Turn on wifi in client mode
 
-    > d0.text("Connected", 0, 36, 1)
-    > d0.show()
+#wifi sta status
+#wifi sta scan                      # scan wifi APs
 
-    ntpupdate es.pool.ntp.org		# Time sync
-    date
+# Crear variable de entorno
+export essid <essid>
+export passw <password>
 
-    > d0.text("ntpupdate", 0, 46, 1)
-    > d0.text("Ready", 0, 56, 1)
-    > d0.show()
+> d0.text("Try.. " + utls.getenv("essid"), 0, 26, 1)  # Get environment variable to show on display
+> d0.show()
 
-	# Upgrade in reboot (touch /upgrade and reset)
-	test -f /upgrade > up
-	if $up == False skip 4
-    echo "Upgrading......"
-	upgrade -f
-	rm /upgrade
-	reset
+wifi sta connect $essid $passw 10   # Connect to wifi router
 
-    wifi sta ifconfig
+wifi sta status -n
+if $wa == False goto exit           # wifi active
+if $wc == False goto exit           # wifi connected
 
-    utelnetd start				# Start telnet server
-    uftpd start				# Start ftp server
-    uhttpd start &				# Start web server
+> d0.text("Connected", 0, 36, 1)
+> d0.show()
 
-    #/local/dsp.py &			# Start utility program as a thread
+ntpupdate es.pool.ntp.org           # Time sync
+date
 
-    :exit
-    unset essid				# Remove environment variables
-    unset passw
-    ```
+> d0.text("ntpupdate", 0, 46, 1)
+> d0.text("Ready", 0, 56, 1)
+> d0.show()
 
------
+# Upgrade in reboot (touch /upgrade and reset)
+test -f /upgrade > up
+if $up == False skip 4
+echo "Upgrading......"
+upgrade -f
+rm /upgrade
+reset
 
-## upyOS Remote Development 🛠️
+wifi sta ifconfig
 
-  * Start the telnet service (`utelnet start`) on the remote MCU.
-  * Start the ftp server service (`uftpd start`) on the remote MCU.
-  * Install the **`ftpfs`** package (available in my repositories) on your local machine instead of `curlftpfs` (which is considered unmaintained and removed from Linux distributions).
-  * On your local machine, mount the remote directory using **`ftpfs`** instructions, e.g., `ftpfs user@<mcu_ip> <local path>`.
-  * You can develop in the mounted `<local path>` directory using **Thonny** or your favorite IDE.
-  * Access the MCU console via its IP address using a telnet client to run commands and programs.
+utelnetd start                      # Start telnet server
+uftpd start                         # Start ftp server
+uhttpd start &                      # Start web server
+
+#/local/dsp.py &                    # Start utility program as a thread
+
+:exit
+unset essid                         # Remove environment variables
+unset passw
+```
+
+---
+
+## 🛠️ upyOS Remote Development
+
+### Development Setup
+
+1. Start the telnet service (`utelnetd start`) on the remote MCU.
+2. Start the ftp server service (`uftpd start`) on the remote MCU.
+3. Install the **`ftpfs`** package (available in my repositories) on your local machine instead of `curlftpfs` (which is considered unmaintained and removed from Linux distributions).
+4. On your local machine, mount the remote directory using **`ftpfs`** instructions, e.g., `ftpfs user@<mcu_ip> <local path>`.
+5. You can develop in the mounted `<local path>` directory using **Thonny** or your favorite IDE.
+6. Access the MCU console via its IP address using a telnet client to run commands and programs.
 
 ### Authentication
 
@@ -381,96 +473,124 @@ Added user and password authentication for accessing the telnet and ftp servers.
 
 ### Android Development
 
-By starting `utelnet` and `uftpd` on boot, you can develop remotely from **Android** using apps like **"Serial wifi terminal"** and **"Squircle CE"** from Google Play. **Termux** is also an excellent option as a telnet client.
+By starting `utelnetd` and `uftpd` on boot, you can develop remotely from **Android** using apps like **"Serial wifi terminal"** and **"Squircle CE"** from Google Play. **Termux** is also an excellent option as a telnet client.
 
------
+![Android development environment](media/Screenshot_20251012_092146_Termux.jpg)
 
-## Upgrade Command (OTA)
+### Remote Development Environment Example (Visual Studio Code)
+
+![Geany, VS code or others IDEs](media/upyos_07.png)
+
+Screenshot of developing on an ESP32 MCU with upyOS + [ftpfs](media/ftpfs.py) and telnet in Geany, VS Code, or other IDEs, both locally and remotely.
+
+### ftpfs Remote Development Environment - Linux Installation
+
+[Download ftpfs](media/ftpfs.py)
+
+```bash
+# ftpfs used to access mcu filesystem:
+
+# Install Linux dependencies:
+sudo apt-get install libfuse2t64 fuse3 libfuse3-dev python3-pip  # (Caution!)
+pip3 install fusepy # add --break-system-packages parm or create a virtual environment
+
+# Create a local directory and mount:
+mkdir ~/dev_upyos
+python3 ftpfs.py <mcu_IP> ~/dev_upyos -u admin -P <password> 
+# Default user is admin and no password. Use 'setauth' upyOS command to set a password.
+
+# Check directory use:
+ls ~/dev_upyos
+
+# Open favorite IDE:
+# VS Code, Geany, Gedit, etc.
+# Open mounted directory (~/dev_upyos) and use telnet from the IDE terminal to connect to the MCU.
+
+# To unmount:
+fusermount -u ~/dev_upyos
+```
+
+**Android Alternative:** Squircle CE + Termux Apps (No extra installation is needed)
+
+---
+
+## 📡 Upgrade Command (OTA)
 
 Added the **`upgrade`** command for **Over-The-Air (OTA)** upgrade from the GitHub repository.
 
-```
-	/ $: upgrade
-	upyOS OTA Upgrade,
-	Downloading upgrade list..., OK
-	Confirm upyOS upgrade (y/N)? y
-	Upgrading from upyOS github repository, wait...
-	[.......................................................................................]OK
-	100% Upgrade complete
-	/ $:
-	
-	Note: On systems with low memory (e.g., ESP32-C3), the MCU must boot only with the Telnet service, without any other services, due to the memory requirements of the encryption system for performing the update.
+```bash
+/ $: upgrade
+upyOS OTA Upgrade,
+Downloading upgrade list..., OK
+Confirm upyOS upgrade (y/N)? y
+Upgrading from upyOS github repository, wait...
+[.......................................................................................]OK
+100% Upgrade complete
+/ $:
 ```
 
------
+**Note:** On systems with low memory (e.g., ESP32-C3), the MCU must boot only with the Telnet service, without any other services, due to the memory requirements of the encryption system for performing the update.
 
-## File System Cache
+---
+
+## 💾 File System Cache
 
 Added call caching to the File System (FS). On systems with low memory, this should be disabled in `sdata.py`. On systems with more memory (e.g., ESP32S3 with 8MB of PSRAM), enabling it speeds up file system access.
 
------
+---
 
-## Remote Development Environment Example Visual Studio Code
+## 📶 ESP-AT Modem Support
 
-![Geany, VS code or others IDEs](media/upyos_07.png )
-Screenshot of developing on an ESP32 MCU with upyOS + ![ftpfs](media/ftpfs.py) and telnet in Geany, VS Code, or other IDEs, both locally and remotely:
+Added basic support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated Wi-Fi, such as RP2040, etc.
 
-### ftpfs Remote Development Environment, Linux Installation
-
-![Download ftpfs](media/ftpfs.py)
-```bash
-	# ftpfs used to access mcu filesystem:
-	
-	# Install Linux dependencies:
-    sudo apt-get install libfuse2t64 fuse3 libfuse3-dev python3-pip  # (Caution!)
-	pip3 install fusepy # add --break-system-packages parm or create a virtual environment
-
-	# Create a local directory and mount:
-	mkdir ~/dev_upyos
-	python3 ftpfs.py <mcu_IP> ~/dev_upyos -u admin -P <password> 
-    # Default user is admin and no password. Use 'setauth' upyOS command to set a password.
-
-	# Check directory use:
-	ls ~/dev_upyos
-	
-	# Open favorite IDE:
-	# VS Code, Geany, Gedit, etc.
-	# Open mounted directory (~/dev_upyos) and use telnet from the IDE terminal to connect to the MCU.
-
-	# To unmount:
-	fusermount -u ~/dev_upyos
-```
-
-  * **Android Alternative:** Squircle CE + Termux Apps (No extra installation is needed)
-![Android development environment](media/Screenshot_20251012_092146_Termux.jpg)
------
-
-### Added basic support for Espressif ESP-AT UART modems, especially for MCUs without integrated Wi-Fi, such as RP2040, etc.
-
-ATmodem and ATmqtt objects in /bin directory.
-
-## TODO List
-
-  * Add other useful commands.
-  * add AThttp object for use with ESP-AT modems
-
-The Wishlist is open\! 😉
-
-```
-```
-## Tested Boards
-
-* **ESP32-C3**
-    ![luatos](media/luatos_CORE-ESP32_pinout.webp)
-* **VCC-GND Studio YD-2040**
-    ![VCC-GND Studio](media/YD-2040-PIN.png)
-* **GOOUUU ESP32 WROOM-32**
-    ![ESP32](media/ESP32-38-Pin-Pinout.jpg)
-* **NodeMCU**
-    ![NodeMCU esp8266](media/Node-MCU-Pinout.png)
-* **YD-ESP32-C3**
-    ![YD-ESP32-C3](media/YD-ESP32-C3-Pinout.jpg)
-* **YD-ESP32-S3 with 8Mb PSRAM**
-    ![YD-ESP32-S3](media/YD-ESP32-S3-Pinout.jpg)
+**ATmodem** and **ATmqtt** objects available in `/bin` directory.
 
 ---
+
+## 🔧 TODO List
+
+* Add AThttp object for use with ESP-AT modems
+* Add ATws object for use with ESP-AT modems
+* Add ATwsrpc object for use with ESP-AT modems
+* Add mqtt utility for ESP family
+* Add other useful commands.
+
+The Wishlist is open! 😉
+
+---
+
+## 🎯 Tested Boards
+
+### ESP32-C3
+![luatos](media/luatos_CORE-ESP32_pinout.webp)
+
+### VCC-GND Studio YD-2040
+![VCC-GND Studio](media/YD-2040-PIN.png)
+
+### GOOUUU ESP32 WROOM-32
+![ESP32](media/ESP32-38-Pin-Pinout.jpg)
+
+### NodeMCU
+![NodeMCU esp8266](media/Node-MCU-Pinout.png)
+
+### YD-ESP32-C3
+![YD-ESP32-C3](media/YD-ESP32-C3-Pinout.jpg)
+
+### YD-ESP32-S3 with 8Mb PSRAM
+![YD-ESP32-S3](media/YD-ESP32-S3-Pinout.jpg)
+
+---
+
+## 📄 License
+
+MIT License
+
+## 👏 Credits
+
+Original idea by **Krzysztof Krystian Jankowski** ([smolOS](https://github.com/w84death/smolOS/tree/main)), Developed and maintained by **rbenrax**.
+
+Editor component from [octopusengine/micropython-shell](https://github.com/octopusengine/micropython-shell/tree/master).
+
+---
+
+**Made with ❤️ for the MicroPython community**

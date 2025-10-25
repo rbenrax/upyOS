@@ -11,7 +11,7 @@ proc=None
 
 class MqttManager(ModemManager):
     
-    def __init__(self, sctrl=False, scmds=True, sresp=True):
+    def __init__(self, sctrl=False, scmds=False, sresp=False):
         super().__init__(sctrl, scmds, sresp)
 
         self.debug = False # Debug?
@@ -20,17 +20,13 @@ class MqttManager(ModemManager):
     # MQTT CMDs
 
     def mqtt_user(self, schem=1, client="", user="", passw="", cert_key_ID=0, CA_ID=0, path=""):
-        """Configurar  al broker MQTT (AT+MQTTCONN)"""
-                   #AT+MQTTUSERCFG=0,1,"ESP32-C2","","",0,0,""
         command = f'AT+MQTTUSERCFG=0,{schem},"{client}","{user}","{passw}",{cert_key_ID},{CA_ID},"{path}"'
         sts, _ = self.atCMD(command, 1)
         return sts
 
     def mqtt_connect(self, host="", port=1883, reconnect=0):
-        """Conectar al broker MQTT (AT+MQTTCONN)"""
-                    #AT+MQTTCONN=0,"192.168.1.5",1883,0
         command = f'AT+MQTTCONN=0,"{host}",{port},{reconnect}'
-        sts, _ = self.atCMD(command, "+MQTTCONNECTED:0", 3)
+        sts, _ = self.atCMD(command, "+MQTTCONNECTED:0", 3.0)
         return sts
     
     def mqtt_pub(self, topic="", data="", qos=0, retain=0):
@@ -152,7 +148,7 @@ class MqttManager(ModemManager):
                 if proc.sts=="S":break
         
                 if proc.sts=="H":
-                    utime.sleep(1)
+                    time.sleep(1)
                     continue
                 
                 messages = self.check_messages()
@@ -199,8 +195,7 @@ def __main__(args):
 
     if len(args) == 0 or "--h" in args:
         print("MQTT Library and command line utility")
-        print("Usage:")
-        print("\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
+        print("Usage:\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
         print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
         print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
         print("\t ATmqtt <listsub>")
@@ -306,7 +301,7 @@ def __main__(args):
         if not "-t" in args or topic == "":
             print("-t required")
             return
-        mm.mqtt_sub(topic)
+        mm.mqtt_unsub(topic)
 
     elif cmd == "close":
         mm.mqtt_clean()
@@ -324,7 +319,7 @@ def __main__(args):
             if proc.sts=="S":break
 
             if proc.sts=="H":
-                utime.sleep(1)
+                time.sleep(1)
                 continue
             
             messages = mm.check_messages()

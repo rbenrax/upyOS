@@ -19,18 +19,23 @@ class ModemManager:
         self._callback = callback
 
     def resetHW(self, pin, wait=2):
-        resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
+        try:
+            resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
 
-        if self.sctrl:
-            print("Reseting Modem...")
-    
-        resetP.value(0)
-        time.sleep_ms(100) # 100ms pulse
-        resetP.value(1)
+            if self.sctrl:
+                print("Reseting Modem...")
+        
+            resetP.value(0)
+            time.sleep_ms(100) # 100ms pulse
+            resetP.value(1)
 
-        time.sleep(wait) # wait to ready
-        if self.sctrl:
-            print("Modem Ready")
+            time.sleep(wait) # wait to ready
+            if self.sctrl:
+                print("Modem Ready")
+        except Exception as ex:
+            print("Modem reset error, " + str(ex))
+            return False
+        return True
             
     def createUART(self, id, baud, tx, rx):
         try:
@@ -171,7 +176,7 @@ class ModemManager:
         
         # Conectar a WiFi
         cmd = f'AT+CWJAP="{ssid}","{password}"'
-        sts, resp = self.atCMD(cmd, timeout=15000)
+        sts, resp = self.atCMD(cmd, timeout=15.0)
         return sts, resp
 
     def wifi_disconnect(self):
@@ -194,7 +199,7 @@ class ModemManager:
     
     def create_conn(self, host, port, prot="TCP", keepalive=60):
         command = f'AT+CIPSTART="{prot}","{host}",{port},{keepalive}'
-        sts, _ = self.atCMD(command, "CONNECT", 10000)
+        sts, _ = self.atCMD(command, "CONNECT", 10.0)
         return sts
     
     def send_data(self, data):
@@ -204,7 +209,7 @@ class ModemManager:
         if sts:
             # Enviar datos reales
             sts, ret = self.atCMD(data, "SEND OK")
-            return ret is not sts
+            return sts
         return False
     
     def send_data_transparent(self, data):
@@ -216,7 +221,7 @@ class ModemManager:
             # Enviar datos
             sdata.m0.write(data)
             sts, ret = self.atCMD("", "SEND OK")
-            return ret is not sts
+            return sts
         return False
     
     def close_conn(self):
@@ -235,7 +240,7 @@ class ModemManager:
     def executeScript(self, file):
         
         if not utls.file_exists(file):
-            print(f"File {file} not foun")
+            print(f"File {file} not found")
             return
         
         with open(file, 'r') as archivo:
@@ -282,7 +287,7 @@ class ModemManager:
 # Command line tool
 def __main__(args):
     # Crear instancia del gestor de módem
-    modem = ModemManager(sctrl=False, scmds=False, sresp=True)
+    modem = ModemManager(sctrl=False, scmds=False, sresp=False)
 
     # Modem rest test
     #modem.reset(22, 3) # gpio 22 3 sec
@@ -293,9 +298,8 @@ def __main__(args):
     #modem.setCallBack(callback)
 
     if len(args) == 0 or "--h" in args:
-        print("Modem management utility\n")
-        print("Usage:")
-        print("\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
+        print("Modem management utility")
+        print("Usage:\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
         print("\tReset modem: modem -r <mcu gpio> <wait yo ready>")
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
         print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
@@ -331,8 +335,8 @@ def __main__(args):
         if len(args) > 1:
             timeout = float(args[1])
         if len(args) > 2:
-            exp = float(args[1])
-           
+            exp = args[2]
+            
         sts, resp = modem.atCMD(args[0], exp, timeout)
         if not sts:
             utls.setenv("?", "-1")
