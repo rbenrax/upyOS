@@ -10,6 +10,64 @@ The goal is to provide a common, modular base for using microcontrollers in a **
 
 ---
 
+## 🌟 Key Features at a Glance
+
+### 🎯 Design Philosophy
+- **Modular architecture** promoting code reuse and flexibility
+- **Alternative to monolithic programs** for easier maintenance
+- **Standalone microcontroller operation** without external dependencies
+- **POSIX-like environment** for familiar Unix/Linux-style interaction
+
+### 📁 Unix-like System Structure
+- Hierarchical directory structure: `/bin`, `/etc`, `/lib`, `/libx`, `/opt`, `/tmp`, `/www`
+- Startup (`/etc/init.sh`) and shutdown (`/etc/end.sh`) scripts
+- **60+ built-in commands** (ls, cd, cp, mv, grep, ps, kill, wifi, gpio, etc.)
+- Board-specific configuration files (`.board`)
+
+### ⚙️ Process Management
+- **Multi-threading support** with background execution (`&`)
+- **Asyncio support** for asynchronous programming
+- Process control: `ps`, `kill`, `killall`, `hold`, `resume`, `wait`
+- Thread management with status control in program loops
+
+### 🔧 Shell and Scripting
+- **Conditional execution** with `if` statements
+- **Loop support** with labels and `goto` instructions
+- **Output redirection** to files (`>`, `>>`) or environment variables
+- **Environment variables** with `export`, `echo`, `unset`
+- **Direct Python code execution** from shell (`>` for code, `<` for expressions)
+
+### 🌐 Network Connectivity
+- **Complete WiFi management** (scan, connect, status, disconnect)
+- **Built-in servers:** Telnet (`utelnetd`), FTP (`uftpd`), HTTP (`uhttpd`)
+- **NTP time synchronization** (`ntpupdate`)
+- **OTA updates** from GitHub repository (`upgrade` command)
+- **User authentication** for network services
+- **ESP-AT UART modem support** for MCUs without integrated WiFi (RP2040, etc.)
+
+### 💾 Advanced Features
+- **File system call caching** (configurable based on available memory)
+- **Recovery mode** for boot failures
+- **Remote development** via FTP + Telnet (compatible with VS Code, Geany, Thonny)
+- **Android development support** (Serial WiFi Terminal, Squircle CE, Termux)
+- **System data module** (`sdata`) for shared configuration and parameters
+
+### 🖥️ Hardware Support
+- **ESP32** family (ESP32, ESP32-C3, ESP32-S3)
+- **RP2040** boards
+- **ESP8266** (optimized for low memory)
+- **NodeMCU** and various development boards
+
+### 🚀 Performance Characteristics
+upyOS prioritizes **flexibility and ease of use** over raw performance, making it ideal for:
+- Developers new to microcontrollers
+- Projects requiring modular, maintainable code
+- Rapid prototyping and experimentation
+- Educational and learning purposes
+- IoT applications and home automation
+
+---
+
 ## 📋 Table of Contents
 - [Installation](#-upyos-installation)
 - [Screenshots](#-screenshots)
@@ -491,8 +549,11 @@ Added basic support for **Espressif ESP-AT UART modems**, especially for MCUs wi
 
 ## 🔧 TODO List
 
-* Add other useful commands.
 * Add AThttp object for use with ESP-AT modems
+* Add ATws object for use with ESP-AT modems
+* Add ATwsrpc object for use with ESP-AT modems
+* Add mqtt utility for ESP family
+* Add other useful commands.
 
 The Wishlist is open! 😉
 
@@ -522,11 +583,11 @@ The Wishlist is open! 😉
 
 ## 📄 License
 
-[Add your license information here]
+MIT License
 
 ## 👏 Credits
 
-Original idea by **Krzysztof Krystian Jankowski** ([smolOS](https://github.com/w84death/smolOS/tree/main)), adapted and maintained by **rbenrax**.
+Original idea by **Krzysztof Krystian Jankowski** ([smolOS](https://github.com/w84death/smolOS/tree/main)), Developed and maintained by **rbenrax**.
 
 Editor component from [octopusengine/micropython-shell](https://github.com/octopusengine/micropython-shell/tree/master).
 
