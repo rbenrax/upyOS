@@ -51,16 +51,12 @@ class MqttManager:
                 self.client.set_callback(self._internal_callback)
             
             # Conectar
-            if self.client.connect(clean_session=True) == 0:
-                self.is_connected = True
-                if self.debug:
-                    print(f"[MQTT] Connected to {self.server}:{self.port}")
-            else:
-                self.is_connected = False
-                if self.debug:
-                    print(f"[MQTT] Not Connected to {self.server}:{self.port}")
+            self.client.connect(True) # Atencion: se limpian las conexiones!!!
             
-            return self.is_connected
+            # CRÍTICO: Marcar como conectado
+            self.is_connected = True
+                            
+            return True
             
         except Exception as e:
             if self.debug:
@@ -237,13 +233,9 @@ class MqttManager:
             print(f"\nError en bucle: {e}")
 
 # ---------
-# Callback ejemplo de uso (mantenido igual)
+# Callback ejemplo de uso
 def on_message_received(msg):
     """Callback personalizado para procesar mensajes"""
-    #print(f"\n>>> Callback <<<")
-    #print(f"Topic: {msg['topic']}")
-    #print(f"Message: {msg['data']}")
-
     print(f"'{msg['topic']}': {msg['data']}")
     
     # Aquí puedes añadir tu lógica personalizada
@@ -265,18 +257,18 @@ def on_message_received(msg):
 
 def __main__(args):
     """
-    Función principal - Mantenida casi idéntica para compatibilidad
+    Función principal - Delegando persistencia a sdata
     """
 
     if len(args) == 0 or "--h" in args:
         print("MQTT Library and command line utility - MicroPython Simple MQTT")
-        print("Usage:\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
+        print("Usage:\t Connect with -h <host> [-p <port> -R <reconnect>]")
         print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
         print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
-        print("\t ATmqtt <listsub> not implemented")
+ #       print("\t ATmqtt <listsub> not implemented")
         print("\t ATmqtt <unsub>")
-        print("\t ATmqtt <close>")
-        print("\t -l[l] listen")
+ #       print("\t ATmqtt <close>")
+ #       print("\t -l[l] listen")
         return
 
     def parse(mod):
@@ -291,6 +283,21 @@ def __main__(args):
             if sdata.debug:
                 sys.print_exception(ex)
             return ""
+
+    def listen():
+        print("Listening MQTT messages...")
+        #mm.set_callback(on_message_received)
+        while True:
+            # Thread control
+            if proc and proc.sts == "S": 
+                break
+
+            if proc and proc.sts == "H":
+                time.sleep(1)
+                continue
+            
+            mm.check_messages()
+            time.sleep(0.1)
 
     cmd = args[0]
 
@@ -311,22 +318,23 @@ def __main__(args):
     retain = parse("-r")
     retain = 1 if retain == "1" else 0
 
-    # Crear instancia MQTT
-    mm = MqttManager(client_id="mqtt-esp32", server=host, port=port, user=user, password=passw)
+    mm = None
     
-    if not "-h" in args:
-        print("-h required")
-        return
+    # Conectar si se especifica -h
+    if "-h" in args:
+        # Crear nueva instancia solo si no existe
+        
+        mm = MqttManager(client_id="mqtt-esp32", server=host, port=port, user=user, password=passw)
+            
+        print(f"Connecting MQTT... ", end="")
+        
+        if mm.mqtt_connect(host, port, recon):
+            print("Connected")
+        else:
+            print("No connected")
+            return
 
-    print(f"Connecting MQTT...")
-    
-    # Conectar
-    if mm.mqtt_connect(host, port, recon):
-        print("Connected")
-    else:
-        print("No connected")
-        return
-
+    # Comandos
     if cmd == "pub":
         if not "-t" in args or topic == "":
             print("-t required")
@@ -347,6 +355,7 @@ def __main__(args):
         success = mm.mqtt_sub(topic, qos)
         if success:
             print(f"Subscribed to {topic}")
+            listen()
         else:
             print("Subscribe failed")
         
@@ -363,22 +372,15 @@ def __main__(args):
         else:
             print("Unsubscribe failed")
 
-    elif cmd == "close":
-        mm.mqtt_clean()
-        print("MQTT closed")
+    #elif cmd == "close":
+    #    mm.mqtt_clean()
+    #    print("MQTT closed")
 
     # Opciones de escucha
-    if "-l" in args:
-        print("Listening MQTT messages...")
-        #mm.set_callback(on_message_received)
-        while True:
-            # Thread control
-            if proc and proc.sts == "S": 
-                break
-
-            if proc and proc.sts == "H":
-                time.sleep(1)
-                continue
+    #if "-l" in args:
+    #    liste()
             
-            messages = mm.check_messages()
-            time.sleep(0.1)
+    #mm.mqtt_clean()
+    #print("MQTT closed")
+    
+    
