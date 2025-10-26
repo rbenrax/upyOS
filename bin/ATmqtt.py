@@ -208,7 +208,13 @@ def __main__(args):
         try:
             if mod in args:
                 i = args.index(mod)
-                return args[i + 1] if i > 0 else ""
+                if i+1 < len(args):
+                    #print("i:" + str(i))
+                    #print("len:" + str(len(args)))
+                    return args[i + 1] if i > 0 else ""
+                else:
+                    print(mod + " value, not found")
+                    return ""
             else:
                 return ""
         except Exception as ex:
@@ -325,7 +331,7 @@ def __main__(args):
             messages = mm.check_messages()
             if messages:
                 for msg in messages:
-                    print(f"'{msg['topic']}': {msg['data']}")
+                    print(f"{msg['topic']}: {msg['data']}")
             time.sleep(0.1)
 
     if "-ll" in args:
