@@ -43,8 +43,10 @@ def run(ssf, lbl_ln):
                 continue
             
             if lin.strip()=="": continue   # Empty lines skipped
-            if len(lin)>0 and lin[0]=="#": continue # Commanted lines skipped
-            cmdl=lin.split("#")[0] # Left part of commented line
+            if len(lin)>0 and lin.strip()[0]=="#": continue # Commanted lines skipped
+            cmdl=lin.split(" #")[0] # First part of commented line
+            
+            #print(cmdl)
             
             global labels
             #print(cmdl)
