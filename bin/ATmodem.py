@@ -14,7 +14,10 @@ class ModemManager:
         self.sresp = sresp # Print resp
         
         self._callback = None
-    
+
+        self.timming = False
+        self.tini=0
+        
     def setCallBack(self, callback): # add Callback
         self._callback = callback
 
@@ -50,6 +53,9 @@ class ModemManager:
         return True
         
     def atCMD(self, command, exp="OK", timeout=2.0):
+
+        if self.timming: 
+            self.tini = time.ticks_ms()
 
         if sdata.m0 is None:
             print("The modem uart is not initialized, see help")
@@ -115,9 +121,17 @@ class ModemManager:
         if self.sresp:
             print(f"<< {decResp}")
             
+        if self.timming:            
+            tfin = time.ticks_diff(time.ticks_ms(), self.tini)
+            print(f"** Tiempo cmd: {command}: {tfin}ms" )
+        
         return cmdsts, decResp
     
     def rcvDATA(self, size=2048, encoded=True, timeout=5.0):
+        
+        if self.timming:
+            ptini = time.ticks_ms()
+        
         timeout = timeout  * 1000
 
         # Esperar respuesta
@@ -149,6 +163,10 @@ class ModemManager:
             
         if self.sresp:
             print(f"<< data: {retResp}")
+
+        if self.timming:            
+            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            print(f"## Tiempo rcv: {ptfin}ms" )
 
         return True, retResp
  
@@ -248,13 +266,12 @@ class ModemManager:
                 lin = archivo.readline()
                 if not lin:  # Si no hay más líneas, salir del bucle
                     break
-                if lin.strip() == "": 
-                    continue   # Empty lines skipped
-                if len(lin) > 0 and lin[0] == "#": 
-                    continue # Commented lines skipped
                 
-                cmdl = lin.split("#")[0] # Left part of commented line
-                # To be called from upyOS command line
+                if lin.strip() == "": continue   # Empty lines skipped
+                
+                if lin.lstrip().startswith("#"): continue # Commanted lines skipped
+
+                cmdl = lin.split(" #")[0] # Left part of commented line
                 
                 tmp = cmdl.split()
                 

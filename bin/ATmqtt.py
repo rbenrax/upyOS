@@ -39,9 +39,12 @@ class MqttManager(ModemManager):
     
     def mqtt_list_subs(self):
         sts, res = self.atCMD(f'AT+MQTTSUB?', 1)
+        sl=""
         if sts:
-            return res
-        return ""
+            for l in res.split():
+                if l.startswith("+MQTTSUB:0"):           
+                    sl += l.split(",")[2] + "\n"
+        return sl
 
     def mqtt_unsub(self, topic=""):
         sts, _ = self.atCMD(f'AT+MQTTUNSUB=0,"{topic}"', 1)
@@ -209,8 +212,6 @@ def __main__(args):
             if mod in args:
                 i = args.index(mod)
                 if i+1 < len(args):
-                    #print("i:" + str(i))
-                    #print("len:" + str(len(args)))
                     return args[i + 1] if i > 0 else ""
                 else:
                     print(mod + " value, not found")
