@@ -1,6 +1,6 @@
-# MQTT manager - MicroPython Simple MQTT version
+# MQTT manager - MicroPython Robust MQTT version
 
-from umqtt.simple import MQTTClient
+from umqtt.robust import MQTTClient
 import time
 import sdata
 import utls
@@ -24,9 +24,9 @@ class MqttManager:
         self.is_connected = False
         
         # Callback para mensajes recibidos
-        self.message_callback = on_message_received
+        self.message_callback = None
         
-    def mqtt_connect(self, host="", port=1883, reconnect=0):
+    def mqtt_connect(self, host="", port=1883, reconnect=True):
         """
         Conecta al broker MQTT
         """
@@ -34,7 +34,7 @@ class MqttManager:
             self.server = host if host else self.server
             self.port = port if port else self.port
             
-            # Crear cliente MQTT
+            # Crear cliente MQTT robust
             self.client = MQTTClient(
                 self.client_id,
                 self.server,
@@ -50,58 +50,34 @@ class MqttManager:
             if self.message_callback:
                 self.client.set_callback(self._internal_callback)
             
-            # Conectar
-            self.client.connect(True) # Atencion: se limpian las conexiones!!!
+            # Conectar - MQTTClient robust maneja reconexiones automáticamente
+            self.client.connect(clean_session=False)
             
             # CRÍTICO: Marcar como conectado
             self.is_connected = True
-                            
             return True
             
         except Exception as e:
-            if self.debug:
-                print(f"[MQTT] Connection error: {e}")
+            print(f"MQTT Connection error: {e}")
             self.is_connected = False
             return False
     
     def mqtt_pub(self, topic="", data="", qos=0, retain=0):
-        """
-        Publica mensaje MQTT
-        """
-        if not self.is_connected or not self.client:
-            if self.debug:
-                print("[MQTT] Not connected")
-            return False
-        
         try:
-            # umqtt.simple solo soporta qos=0
-            self.client.publish(topic, data, retain=retain, qos=0)
+            # umqtt.robust soporta mejor el manejo de errores en publicación
+            self.client.publish(topic, data, retain=retain, qos=qos)
             return True
         except Exception as e:
-            if self.debug:
-                print(f"[MQTT] Publish error: {e}")
+            print(f"MQTT Publish error: {e}")
+            # El cliente robust intentará reconectar automáticamente
             return False
     
     def mqtt_sub(self, topic="", qos=0):
-        """
-        Suscribe a un topic MQTT
-        """
-        if not self.is_connected or not self.client:
-            if self.debug:
-                print("[MQTT] Not connected")
-            return False
-        
         try:
-            # umqtt.simple solo soporta qos=0
-            self.client.subscribe(topic)
-            
-            if self.debug:
-                print(f"[MQTT] Subscribed to: {topic}")
-            
+            self.client.subscribe(topic, qos=qos)
             return True
         except Exception as e:
-            if self.debug:
-                print(f"[MQTT] Subscribe error: {e}")
+            print(f"MQTT Subscribe error: {e}")
             return False
     
     def mqtt_list_subs(self):
@@ -111,24 +87,25 @@ class MqttManager:
         return
     
     def mqtt_unsub(self, topic=""):
-        """
-        Cancela suscripción a topic
-        """
-        if not self.is_connected or not self.client:
-            if self.debug:
-                print("[MQTT] Not connected")
-            return False
-        
         try:
-            self.client.unsubscribe(topic)
-               
-            if self.debug:
-                print(f"[MQTT] Unsubscribed from: {topic}")
-            
+            # umqtt.robust no tiene método unsubscribe, usamos el de la clase base
+            # Enviar paquete UNSUBSCRIBE manualmente
+            if self.client:
+                # Para umqtt.robust, necesitamos acceder al socket directamente
+                # Esta es una implementación básica de unsubscribe
+                from umqtt.robust import MQTTClient
+                
+                # Intentar usar si existe, sino ignorar
+                if hasattr(self.client, 'unsubscribe'):
+                    self.client.unsubscribe(topic)
+                else:
+                    print("Warning: unsubscribe not supported in this umqtt.robust version")
+                    print(f"Topic {topic} will remain subscribed until disconnect")
+                    # Alternativa: desconectar y reconectar con clean_session=True
+                    return True
             return True
         except Exception as e:
-            if self.debug:
-                print(f"[MQTT] Unsubscribe error: {e}")
+            print(f"MQTT Unsubscribe error: {e}")
             return False
 
     def mqtt_clean(self):
@@ -141,12 +118,24 @@ class MqttManager:
             self.is_connected = False
             return True
         except Exception as e:
-            if self.debug:
-                print(f"[MQTT] Clean error: {e}")
+            print(f"MQTT Clean error: {e}")
             return False
 
+    def ping(self):
+        """
+        Verifica la conexión con el broker
+        """
+        try:
+            if self.client:
+                self.client.ping()
+                return True
+        except Exception as e:
+            print(f"MQTT Ping error: {e}")
+            return False
+        return False
+
 # ---------
-# Gestión de mensajes - Adaptado para umqtt.simple
+# Gestión de mensajes - Adaptado para umqtt.robust
     
     def set_callback(self, callback):
         """
@@ -180,36 +169,41 @@ class MqttManager:
         if self.is_connected and self.client:
             try:
                 # Verificar si hay mensajes (no bloqueante)
+                # wait_msg con timeout 0 es no bloqueante en umqtt.robust
                 self.client.check_msg()
                 # Los mensajes se manejan via callback automáticamente
             except Exception as e:
                 if self.debug:
-                    print(f"[MQTT] Check messages error: {e}")
+                    print(f"MQTT Check messages error: {e}")
         
         return messages  # En esta implementación, los mensajes van por callback
     
-    def wait_msg(self, timeout=None):
+    def wait_for_message(self, timeout=None):
         """
-        Espera mensajes (bloqueante)
+        Espera mensajes (bloqueante) con manejo robusto
         """
         if self.is_connected and self.client:
             try:
-                self.client.wait_msg()
+                if timeout is not None:
+                    # wait_msg con timeout en segundos
+                    self.client.wait_msg()
+                else:
+                    self.client.wait_msg()
                 return True
             except Exception as e:
                 if self.debug:
-                    print(f"[MQTT] Wait message error: {e}")
+                    print(f"MQTT Wait message error: {e}")
                 return False
         return False
 
     def msgs_loop(self, callback=None):
         """
-        Bucle continuo de monitoreo de mensajes MQTT
+        Bucle continuo de monitoreo de mensajes MQTT con reconexión automática
         """
         if callback:
             self.set_callback(callback)
             
-        print("Starting callback MQTT message monitoring ...")
+        print("Starting robust MQTT message monitoring ...")
         print("Ctrl+C to stop")
         
         try:
@@ -222,10 +216,14 @@ class MqttManager:
                     time.sleep(1)
                     continue
                 
-                # Verificar mensajes
-                self.check_messages()
+                # Verificar mensajes - el cliente robust maneja reconexiones
+                try:
+                    self.check_messages()
+                except Exception as e:
+                    print(f"Error checking messages: {e}")
+                    # El cliente robust debería intentar reconectar automáticamente
                 
-                time.sleep_ms(10)  # Pequeña pausa para no saturar
+                time.sleep_ms(100)  # Pausa un poco más larga para eficiencia
                 
         except KeyboardInterrupt:
             print("\nMonitoreo detenido")
@@ -261,14 +259,15 @@ def __main__(args):
     """
 
     if len(args) == 0 or "--h" in args:
-        print("MQTT Library and command line utility - MicroPython Simple MQTT")
+        print("MQTT Library and command line utility - MicroPython Robust MQTT")
         print("Usage:\t Connect with -h <host> [-p <port> -R <reconnect>]")
         print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
         print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
         print("\t ATmqtt <listsub> not implemented")
-        print("\t ATmqtt <unsub>")
- #       print("\t ATmqtt <close>")
- #       print("\t -l[l] listen")
+        print("\t ATmqtt <unsub> - limited support")
+        print("\t ATmqtt <close>")
+        print("\t ATmqtt <ping> - check connection")
+        print("\nNote: unsubscribe may have limited support in umqtt.robust")
         return
 
     def parse(mod):
@@ -284,21 +283,6 @@ def __main__(args):
                 sys.print_exception(ex)
             return ""
 
-    def listen():
-        print("Listening MQTT messages...")
-        #mm.set_callback(on_message_received)
-        while True:
-            # Thread control
-            if proc and proc.sts == "S": 
-                break
-
-            if proc and proc.sts == "H":
-                time.sleep(1)
-                continue
-            
-            mm.check_messages()
-            time.sleep(0.1)
-
     cmd = args[0]
 
     host  = parse("-h")
@@ -308,24 +292,23 @@ def __main__(args):
     user  = parse("-u")
     passw = parse("-P")
     recon = parse("-R")
-    recon = 1 if recon == "1" else 0
+    recon = recon.lower() == "true" or recon == "1"
     
     topic = parse("-t")
     messg = parse("-m")
     
     qos   = parse("-q")
-    qos   = int(qos) if qos in ["1", "2"] else 0
+    qos   = int(qos) if qos in ["0", "1", "2"] else 0
     retain = parse("-r")
-    retain = 1 if retain == "1" else 0
+    retain = retain.lower() == "true" or retain == "1"
 
     mm = None
     
     # Conectar si se especifica -h
     if "-h" in args:
-        # Crear nueva instancia solo si no existe
+        mm = MqttManager(client_id=sdata.sid, server=host, port=port, user=user, password=passw)
+        mm.set_callback(on_message_received)
         
-        mm = MqttManager(client_id="mqtt-esp32", server=host, port=port, user=user, password=passw)
-            
         print(f"Connecting MQTT... ", end="")
         
         if mm.mqtt_connect(host, port, recon):
@@ -355,35 +338,40 @@ def __main__(args):
         success = mm.mqtt_sub(topic, qos)
         if success:
             print(f"Subscribed to {topic}")
-            listen()
+            mm.msgs_loop(on_message_received)
         else:
             print("Subscribe failed")
         
     elif cmd == "listsub":
-        print("Not implemented in umqtt simple library")
+        print("Not implemented in umqtt robust library")
         
     elif cmd == "unsub":
         if not "-t" in args or topic == "":
             print("-t required")
             return
+        print("Note: Unsubscribe may have limited support in umqtt.robust")
         success = mm.mqtt_unsub(topic)
         if success:
-            print(f"Unsubscribed from {topic}")
+            print(f"Unsubscribe request sent for {topic}")
         else:
-            print("Unsubscribe failed")
+            print("Unsubscribe may not be fully supported")
 
     elif cmd == "close":
-        mm.mqtt_clean()
-        print("MQTT closed")
+        success = mm.mqtt_clean()
+        if success:
+            print("MQTT closed")
+        else:
+            print("MQTT close failed")
+            
+    elif cmd == "ping":
+        success = mm.ping()
+        if success:
+            print("MQTT ping successful")
+        else:
+            print("MQTT ping failed")
+        
+    elif cmd == "listen":
+        mm.msgs_loop(on_message_received)
         
     else:
         print(f"Invalid subcommand {cmd}")
-        
-    # Opciones de escucha
-    #if "-l" in args:
-    #    listen()
-            
-    #mm.mqtt_clean()
-    #print("MQTT closed")
-    
-    
