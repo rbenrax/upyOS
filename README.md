@@ -433,7 +433,7 @@ date
 > d0.text("Ready", 0, 56, 1)
 > d0.show()
 
-# Upgrade in reboot (touch /upgrade and reset)
+# Upgrade on reboot (touch /upgrade and reset)
 test -f /upgrade > up
 if $up == False skip 4
 echo "Upgrading......"
