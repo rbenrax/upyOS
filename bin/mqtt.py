@@ -236,7 +236,7 @@ class MqttManager:
 # Callback ejemplo de uso
 def on_message_received(msg):
     """Callback personalizado para procesar mensajes"""
-    print(f"'{msg['topic']}': {msg['data']}")
+    print(f"{msg['topic']}: {msg['data']}")
     
     # Aquí puedes añadir tu lógica personalizada
     if msg['topic'] == 'casa/sotano/temp':
@@ -265,7 +265,7 @@ def __main__(args):
         print("Usage:\t Connect with -h <host> [-p <port> -R <reconnect>]")
         print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
         print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
- #       print("\t ATmqtt <listsub> not implemented")
+        print("\t ATmqtt <listsub> not implemented")
         print("\t ATmqtt <unsub>")
  #       print("\t ATmqtt <close>")
  #       print("\t -l[l] listen")
@@ -372,13 +372,16 @@ def __main__(args):
         else:
             print("Unsubscribe failed")
 
-    #elif cmd == "close":
-    #    mm.mqtt_clean()
-    #    print("MQTT closed")
-
+    elif cmd == "close":
+        mm.mqtt_clean()
+        print("MQTT closed")
+        
+    else:
+        print(f"Invalid subcommand {cmd}")
+        
     # Opciones de escucha
     #if "-l" in args:
-    #    liste()
+    #    listen()
             
     #mm.mqtt_clean()
     #print("MQTT closed")

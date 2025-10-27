@@ -43,7 +43,9 @@ def run(ssf, lbl_ln):
                 continue
             
             if lin.strip()=="": continue   # Empty lines skipped
-            if len(lin)>0 and lin.strip()[0]=="#": continue # Commanted lines skipped
+
+            if lin.lstrip().startswith("#"): continue # Commanted lines skipped
+            
             cmdl=lin.split(" #")[0] # First part of commented line
             
             #print(cmdl)
