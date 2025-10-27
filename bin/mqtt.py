@@ -271,8 +271,8 @@ def __main__(args):
         print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
         print("\t ATmqtt <listsub>")
         print("\t ATmqtt <unsub> -t <topic>")
-        print("\t ATmqtt <close>")
         print("\t ATmqtt <ping> - check connection")
+        print("\t ATmqtt <close>")
         return
 
     def parse(mod):
@@ -284,7 +284,7 @@ def __main__(args):
                 return ""
         except Exception as ex:
             print("ATmqtt modifier error, " + mod)
-            if sdata.debug:
+            if mm.debug:
                 sys.print_exception(ex)
             return ""
 
@@ -314,11 +314,12 @@ def __main__(args):
         mm = MqttManager(client_id=sdata.sid, server=host, port=port, user=user, password=passw)
         mm.set_callback(on_message_received)
         
-        print(f"Connecting MQTT... ", end="")
+        if mm.debug:
+            print(f"Connecting MQTT {host}:{port}... ")
         
-        if mm.mqtt_connect(host, port, recon):
-            print("Connected")
-        else:
+        mm.mqtt_connect(host, port, recon)
+        
+        if not mm.ping():
             print("No connected")
             return
     else:
