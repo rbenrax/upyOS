@@ -254,7 +254,7 @@ def __main__(args):
     #if not mm.createUART(1, 115200, 4, 5):
     #    return
     
-    #mm.wifi_connect("DIGIFIBRA-cGPRi","")
+    #mm.wifi_connect("SSID","PASSW")
     
     #print("Test: "    + str(mm.test_modem()))
     #print("Version: " + mm.get_version())
@@ -275,14 +275,14 @@ def __main__(args):
             print("-P required")
             return
 
-        print(f"Connecting MQTT...")
-        mm.mqtt_user(1, "ATmqtt", user, passw)
+        print(f"Connecting MQTT {host} ...", end="")
+        mm.mqtt_user(1, sdata.sid, user, passw)
         if mm.mqtt_connect(host, port, recon):
             utls.setenv("mqtt", "c")
-            print("Connected")
+            print(", Connected")
         else:
-            utls.setenv("mqtt", "")
-            print("No connected")
+            utls.setenv("mqtt", "d")
+            print(", No connected")
             return
 
     if cmd == "pub":
@@ -292,14 +292,20 @@ def __main__(args):
         if not "-m" in args or messg == "":
             print("-m required")
             return
-        mm.mqtt_pub(topic, messg, qos, retain)
+        if mm.mqtt_pub(topic, messg, qos, retain):
+            print(f"Message '{topic}': '{messg}' published")
+        else:
+            print(f"Publish '{topic}': '{messg}' failed")
         
     elif cmd == "sub":
         if not "-t" in args or topic == "":
             print("-t required")
             return
-        mm.mqtt_sub(topic, qos)
-        
+        if mm.mqtt_sub(topic, qos):
+            print(f"Subscription '{topic}' Ok")
+        else:
+            print(f"Subscription '{topic}' failed")
+
     elif cmd == "listsub":
         # TODO: parse
         print(mm.mqtt_list_subs())
@@ -308,14 +314,17 @@ def __main__(args):
         if not "-t" in args or topic == "":
             print("-t required")
             return
-        mm.mqtt_unsub(topic)
+        if mm.mqtt_unsub(topic):
+            print(f"Unsubscription '{topic}' Ok")
+        else:
+            print(f"Unsubscription '{topic}' failed")
 
     elif cmd == "close":
         mm.mqtt_clean()
         utls.setenv("mqtt", "d")
         print("MQTT closed")
-#    else:
-#       print("MQTT not valid subcommand")
+    else:
+       print(f"MQTT not valid subcommand {smd}")
 
     if "-l" in args:
         # Option:
