@@ -315,7 +315,7 @@ def __main__(args):
     #modem.setCallBack(callback)
 
     if len(args) == 0 or "--h" in args:
-        print("Modem management utility")
+        print("Modem management utility for AT-ESP serial modem")
         print("Usage:\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
         print("\tReset modem: modem -r <mcu gpio> <wait yo ready>")
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")

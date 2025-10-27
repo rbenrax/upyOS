@@ -197,7 +197,7 @@ def __main__(args):
     #TODO: add qos, reconnect and others parms
 
     if len(args) == 0 or "--h" in args:
-        print("MQTT Library and command line utility")
+        print("MQTT Library and command line utility for AT-ESP serial modem")
         print("Usage:\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
         print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
         print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
