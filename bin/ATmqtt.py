@@ -104,8 +104,8 @@ class MqttManager(ModemManager):
         messages = []
         
         # Leer datos disponibles
-        if sdata.m0.any():
-            data = sdata.m0.read()
+        if self.modem.any():
+            data = self.modem.read()
             if data:
                 self.buffer += data.decode('utf-8', 'ignore')
                 
@@ -245,7 +245,8 @@ def __main__(args):
     mm = MqttManager() # default dev= sdata.modem0
     
     # If modem not connected
-    if not sdata.m0:
+    #mm.modem = globals().get(mm.device)
+    if not mm.modem:
         print("Connecting WIFI...")
         mm.executeScript("/local/dial.inf") # Connection script
     

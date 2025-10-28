@@ -12,6 +12,10 @@ class ModemManager:
         
         self.device = device
         
+        if not hasattr(sdata, device):
+            setattr(sdata, device, None)
+        self.modem = getattr(sdata, device)
+        
         self.sctrl = False # Print ctrl messages
         self.scmds = False # Print cmds
         self.sresp = False # Print resp
@@ -45,14 +49,17 @@ class ModemManager:
             
     def createUART(self, id, baud, tx, rx):
         try:
-            sdata.m0 = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
+            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
             if self.sctrl:
                 print("UART created")
+                
+            setattr(sdata, self.device, self.modem)
             
         except Exception as ex:
             print("Modem error, " + str(ex))
             return False
         time.sleep(1)  # Esperar a que el puerto se estabilice
+            
         return True
         
     def atCMD(self, command, exp="OK", timeout=2.0):
@@ -60,14 +67,14 @@ class ModemManager:
         if self.timming: 
             self.tini = time.ticks_ms()
 
-        if sdata.m0 is None:
+        if self.modem is None:
             print("The modem uart is not initialized, see help")
             return False, ""
 
         timeout = timeout  * 1000
 
-        while sdata.m0.any():
-            sdata.m0.read()
+        while self.modem.any():
+            self.modem.read()
 
         # Command execution Status
         cmdsts=True
@@ -76,7 +83,7 @@ class ModemManager:
         command = command.replace("\\@", '"')
 
         # Enviar comando
-        sdata.m0.write(command + '\r\n')
+        self.modem.write(command + '\r\n')
        
         if self.scmds:
             print(">> " + command)
@@ -90,8 +97,8 @@ class ModemManager:
         #print("*****: " + str(timeout))
         
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
-            if sdata.m0.any():
-                data = sdata.m0.read()
+            if self.modem.any():
+                data = self.modem.read()
                 resp += data
 
                 # TODO: Test: ERROR, FAIL, add: SEND OK, SEND FAIL, busy p...
@@ -144,8 +151,8 @@ class ModemManager:
         #print("*rcv****: " + str(timeout))
         
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
-            if sdata.m0.any():
-                data = sdata.m0.read()
+            if self.modem.any():
+                data = self.modem.read()
                 resp += data
                 start_time = time.ticks_ms() # restart if new data
                 
@@ -240,7 +247,7 @@ class ModemManager:
         sts, _ = self.atCMD(length_cmd, ">")
         if sts:
             # Enviar datos
-            sdata.m0.write(data)
+            self.modem.write(data)
             sts, ret = self.atCMD("", "SEND OK")
             return sts
         return False
@@ -321,7 +328,7 @@ def __main__(args):
         print("Modem management utility for AT-ESP serial modem")
         print("Usage:\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
         print("\tReset modem: modem -r <mcu gpio> <wait yo ready>")
-        print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
+        print("\tCreate serial uart (self.modem): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
         print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         print("\t-v Verbose, -tm Timmings")
         return
