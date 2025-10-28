@@ -19,4 +19,3 @@ procs=[] # Running proccesses
 
 # Drivers
 d0 = None # Global ref to display 0
-m0 = None # Global ref to modem 0

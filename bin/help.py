@@ -3,7 +3,7 @@ import uos
 
 def __main__(args):
     
-    print(sdata.name + " version: " + sdata.version + "\n")
+    print(sdata.name + " version: " + sdata.version)
 
     with open("/etc/help.txt", 'r') as f:
         while True:
@@ -12,7 +12,7 @@ def __main__(args):
             print(lin, end="")
         print("")
 
-    print("External commands:\n")
+    print("Commands:")
     
     tmp=uos.listdir("/bin")
     tmp.sort()
