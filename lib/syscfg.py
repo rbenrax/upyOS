@@ -22,7 +22,7 @@ class SysCfg():
                     "ints"  : [{"int1": 0, "int2": 0}],
                     "i2c"   : [{"scl": 27, "sda": 28}],
                     "spi"   : [{"mosi1": 20, "miso1": 21, "cs1": 23, "ck1": 19}],
-                    "usart" : [{"tx0": 2, "rx0": 3}, {"tx1": 9, "rx1": 8}],
+                    "uart" : [{"tx0": 2, "rx0": 3}, {"tx1": 9, "rx1": 8}],
                     "i2s"   : [{"clk1": 0, "io1": 0}],
                     "can"   : [{"tx1": 0, "rx1": 0}],
                     "usb"   : [{"D+1": 0, "D-1": 0}],
@@ -68,4 +68,5 @@ class SysCfg():
     
 #    def setSysConf(self, obj):
 #        self.sysconf=obj
+
 
