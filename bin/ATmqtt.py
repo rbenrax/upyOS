@@ -19,6 +19,11 @@ class MqttManager(ModemManager):
         
     # MQTT CMDs
 
+    def mqtt_conncfg(self, keepalive=0, clean_sess=1, topic="", msg="", qos=0, retain=0):
+        command = f'AT+MQTTCONNCFG=0,{keepalive},{clean_sess},"{topic}","{msg}",{qos},{retain}'
+        sts, _ = self.atCMD(command, 1)
+        return sts
+
     def mqtt_user(self, schem=1, client="", user="", passw="", cert_key_ID=0, CA_ID=0, path=""):
         command = f'AT+MQTTUSERCFG=0,{schem},"{client}","{user}","{passw}",{cert_key_ID},{CA_ID},"{path}"'
         sts, _ = self.atCMD(command, 1)
@@ -29,8 +34,8 @@ class MqttManager(ModemManager):
         sts, _ = self.atCMD(command, "+MQTTCONNECTED:0", 3.0)
         return sts
     
-    def mqtt_pub(self, topic="", data="", qos=0, retain=0):
-        sts, _ = self.atCMD(f'AT+MQTTPUB=0,"{topic}","{data}",{qos},{retain}', 1)
+    def mqtt_pub(self, topic="", msg="", qos=0, retain=0):
+        sts, _ = self.atCMD(f'AT+MQTTPUB=0,"{topic}","{msg}",{qos},{retain}', 1)
         return sts
     
     def mqtt_sub(self, topic="", qos=0):
@@ -245,10 +250,10 @@ def __main__(args):
     mm = MqttManager() # default dev= sdata.modem0
     
     # If modem not connected
-    #mm.modem = globals().get(mm.device)
     if not mm.modem:
         print("Connecting WIFI...")
-        mm.executeScript("/local/dial.inf") # Connection script
+        mm.executeScript("/etc/modem.inf") # Connection script
+        #mm.executeScript("/local/dial.inf")
     
     if "-v" in args:
         mm.sctrl = True

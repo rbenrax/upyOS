@@ -10,7 +10,7 @@
         }
     ],
     "ver": 1.0,
-    "usart": [
+    "uart": [
         {
             "tx": 1,
             "rx": 2
@@ -71,7 +71,7 @@
         36
     ],
     "5v0": [],
-    "text": "VCC-GND YD2040, dual core, dual threaded, no comms, 2 usart and 2 i2c can used in others pins",
+    "text": "VCC-GND YD2040, dual core, dual threaded, no comms, 2 uart and 2 i2c can used in others pins",
     "resv": [],
     "gpio": [
         {
