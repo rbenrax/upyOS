@@ -34,6 +34,7 @@
 /bin/mcu_t.sh
 /bin/mi.py
 /bin/mkdir.py
+/bin/mqttc.py
 /bin/mv.py
 /bin/ntpupdate.py
 /bin/ping.py
