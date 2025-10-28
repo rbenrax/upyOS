@@ -11,10 +11,10 @@ proc=None
 
 class MqttManager(ModemManager):
     
-    def __init__(self, sctrl=False, scmds=False, sresp=False):
-        super().__init__(sctrl, scmds, sresp)
+    def __init__(self, device="modem0"):
+        super().__init__(device)
 
-        self.debug = False # Debug?
+        self.debug = False
         self.buffer = "" # Message buffer
         
     # MQTT CMDs
@@ -204,7 +204,7 @@ def __main__(args):
         print("\t ATmqtt <listsub>")
         print("\t ATmqtt <unsub>")
         print("\t ATmqtt <close>")
-        print("\t -l[l] listen")
+        print("\t -l [l] listen, -v Verbose, -tm Timmings")
         return
 
     def parse(mod):
@@ -242,12 +242,22 @@ def __main__(args):
     retain = parse("-r")
     retain = 1 if retain == "1" else 0
 
-    mm = MqttManager(sctrl=False, scmds=False, sresp=False)
+    mm = MqttManager() # default dev= sdata.modem0
     
     # If modem not connected
     if not sdata.m0:
         print("Connecting WIFI...")
         mm.executeScript("/local/dial.inf") # Connection script
+    
+    if "-v" in args:
+        mm.sctrl = True
+        mm.scmds = True
+        mm.sresp = True
+        args = [arg for arg in args if arg != "-v"]
+        
+    if "-tm" in args:
+        mm.timming = True
+        args = [arg for arg in args if arg != "-tm"]
     
     # Wifi Connection by program
     #mm.resetHW(22, 2)
@@ -324,7 +334,7 @@ def __main__(args):
         utls.setenv("mqtt", "d")
         print("MQTT closed")
     else:
-       print(f"MQTT not valid subcommand {smd}")
+       print(f"MQTT not valid subcommand {cmd}")
 
     if "-l" in args:
         # Option:

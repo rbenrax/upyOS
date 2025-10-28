@@ -8,10 +8,13 @@ import sdata
 import utls
 
 class ModemManager:
-    def __init__(self, sctrl=False, scmds=False, sresp=False):
-        self.sctrl = sctrl # Print ctrl messages
-        self.scmds = scmds # Print cmds
-        self.sresp = sresp # Print resp
+    def __init__(self, device="modem0"):
+        
+        self.device = device
+        
+        self.sctrl = False # Print ctrl messages
+        self.scmds = False # Print cmds
+        self.sresp = False # Print resp
         
         self._callback = None
 
@@ -123,7 +126,7 @@ class ModemManager:
             
         if self.timming:            
             tfin = time.ticks_diff(time.ticks_ms(), self.tini)
-            print(f"** Tiempo cmd: {command}: {tfin}ms" )
+            print(f"** Cmd: {command}: Time: {tfin}ms\n" )
         
         return cmdsts, decResp
     
@@ -304,7 +307,7 @@ class ModemManager:
 # Command line tool
 def __main__(args):
     # Crear instancia del gestor de módem
-    modem = ModemManager(sctrl=False, scmds=False, sresp=False)
+    modem = ModemManager() # Device def: sdata.modem0
 
     # Modem rest test
     #modem.reset(22, 3) # gpio 22 3 sec
@@ -320,14 +323,20 @@ def __main__(args):
         print("\tReset modem: modem -r <mcu gpio> <wait yo ready>")
         print("\tCreate serial uart (sdata.m0): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
         print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
+        print("\t-v Verbose, -tm Timmings")
         return
     
-    if "-n" in args: # Print control
-        modem.sctrl = False
-        modem.scmds = False
-        modem.sresp = False
+    if "-v" in args:
+        modem.sctrl = True
+        modem.scmds = True
+        modem.sresp = True
         # Remover el flag -n de los argumentos
-        args = [arg for arg in args if arg != "-n"]
+        args = [arg for arg in args if arg != "-v"]
+        
+    if "-tm" in args:
+        modem.timming = True
+        # Remover el flag -n de los argumentos
+        args = [arg for arg in args if arg != "-tm"]
    
     if args[0] == "-f":
         file = args[1]
