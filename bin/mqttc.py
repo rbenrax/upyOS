@@ -66,16 +66,24 @@ class MqttManager:
             self.is_connected = False
             return False
     
-    def mqtt_pub(self, topic="", data="", qos=0, retain=0):
+    def mqtt_pub(self, topic="", msg="", retain=False, qos=0):
         try:
             # umqtt.robust soporta mejor el manejo de errores en publicación
-            self.client.publish(topic, data, retain=retain, qos=qos)
+            self.client.publish(topic, msg, retain, qos)
             return True
         except Exception as e:
             print(f"MQTT Publish error: {e}")
             # El cliente robust intentará reconectar automáticamente
             return False
     
+    def mqtt_last_will(self, topic="", msg="", retain=False, qos=0):
+        try:
+            self.client.set_last_will(topic, msg, retain, qos)
+            return True
+        except Exception as e:
+            print(f"MQTT last will error: {e}")
+            return False
+        
     def mqtt_sub(self, topic="", qos=0):
         try:
             self.client.subscribe(topic, qos=qos)
@@ -260,14 +268,12 @@ def on_message_received(msg):
 # ---------
 
 def __main__(args):
-    """
-    Función principal - Delegando persistencia a sdata
-    """
 
     if len(args) == 0 or "--h" in args:
         print("MQTT Library and command line utility - MicroPython Robust MQTT")
         print("Usage:\t Connect with -h <host> [-p <port> -R <reconnect>]")
-        print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
+        print("\t ATmqtt <pub> -t <topic> -m <message> [-r <retain> -q <qos> ]")
+        print("\t ATmqtt <lastwill> -t <topic> -m <message> [-r <retain> -q <qos> ]")
         print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
         print("\t ATmqtt <listsub>")
         print("\t ATmqtt <unsub> -t <topic>")
@@ -334,12 +340,25 @@ def __main__(args):
         if not "-m" in args or messg == "":
             print("-m required")
             return
-        success = mm.mqtt_pub(topic, messg, qos, retain)
+        success = mm.mqtt_pub(topic, messg, retain, qos)
         if success:
             print("Message published")
         else:
             print("Publish failed")
-        
+
+    if cmd == "lastwill":
+        if not "-t" in args or topic == "":
+            print("-t required")
+            return
+        if not "-m" in args or messg == "":
+            print("-m required")
+            return        
+        success = mm.mqtt_last_will(topic, messg, retain, qos)
+        if success:
+            print("Last will message published")
+        else:
+            print("Publish failed")
+
     elif cmd == "sub":
         if not "-t" in args or topic == "":
             print("-t required")

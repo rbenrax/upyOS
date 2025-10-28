@@ -69,4 +69,3 @@ class SysCfg():
 #    def setSysConf(self, obj):
 #        self.sysconf=obj
 
-
