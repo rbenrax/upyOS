@@ -77,7 +77,7 @@ def getenv(var):
 
 def setenv(var, val):
     """Set a value to a environment variable"""
-    if var=="" or val == "": return        
+    if var=="": return        
     sdata.sysconfig["env"][var]=val
     
 def unset(var):
