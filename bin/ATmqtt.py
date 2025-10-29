@@ -251,9 +251,8 @@ def __main__(args):
     
     # If modem not connected
     if not mm.modem:
-        print("Connecting WIFI...")
-        mm.executeScript("/etc/modem.inf") # Connection script
-        #mm.executeScript("/local/dial.inf")
+        print("No connected")
+        return
     
     if "-v" in args:
         mm.sctrl = True

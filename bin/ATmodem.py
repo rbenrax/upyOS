@@ -2,7 +2,7 @@
 # AT Modem utility and library (see /etc/modem.inf)
 # Allows you to launch a script file or enter commands directly via the console, and function library.
 
-from machine import UART, Pin
+from machine import UART, Pin, RTC
 import time
 import sdata
 import utls
@@ -209,6 +209,53 @@ class ModemManager:
 
     def wifi_disconnect(self):
         return self.atCMD("AT+CWQAP")
+
+    def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org"):
+                              #AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
+        sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"')
+        return sts
+
+    def set_datetime(self):
+        # Req. set_ntp_server
+        sts, ret = self.atCMD("AT+CIPSNTPTIME?")
+        if sts:
+            fecha_str = ""
+            for linea in ret.split('\n'):       
+                if '+CIPSNTPTIME:' in linea:
+                    fecha_str = linea.split(':', 1)[1]
+                    break
+
+            # Diccionarios para traducir abreviaciones
+            dias_semana = {"Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6, "Sun": 7}
+            meses = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+                     "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
+
+            # Separar la cadena por espacios y limpiar huecos dobles
+            partes = fecha_str.split()
+            # Resultado típico: ['Thu', 'Jan', '1', '00:00:07', '1970']
+
+            dia_semana_str, mes_str, dia_str, hora_str, anio_str = partes
+
+            # Descomponer la hora
+            hora, minuto, segundo = [int(x) for x in hora_str.split(":")]
+
+            # Crear la tupla que espera el RTC
+            fecha_rtc = (
+                int(anio_str),          # Año
+                meses[mes_str],         # Mes
+                int(dia_str),           # Día
+                dias_semana[dia_semana_str],  # Día de la semana (1=Lunes ... 7=Domingo)
+                hora,                   # Hora
+                minuto,                 # Minuto
+                segundo,                # Segundo
+                0                       # Subsegundos
+            )
+
+            # Configurar el RTC
+            rtc = RTC()
+            rtc.datetime(fecha_rtc)
+            #return rtc.datetime()
+            return sts
 
     def get_ip_mac(self, ip_mac):
         sts, ret = self.atCMD("AT+CIFSR")
