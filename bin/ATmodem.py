@@ -1,6 +1,6 @@
 
 # AT Modem utility and library (see /etc/modem.inf)
-# Allows you to launch a script file or enter commands directly via the console, and function library.
+# Allows you to launch a script file or enter commands directly
 
 from machine import UART, Pin, RTC
 import time
