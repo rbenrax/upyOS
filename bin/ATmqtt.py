@@ -269,6 +269,7 @@ def __main__(args):
     #if not mm.createUART(1, 115200, 4, 5):
     #    return
     
+    #mm.set_mode(1)
     #mm.wifi_connect("SSID","PASSW")
     
     #print("Test: "     + str(mm.test_modem()))

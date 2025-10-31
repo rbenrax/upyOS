@@ -33,7 +33,7 @@ class ModemManager:
             resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
 
             if self.sctrl:
-                print("Reseting Modem...")
+                print("** Reseting Modem...")
         
             resetP.value(0)
             time.sleep_ms(100) # 100ms pulse
@@ -41,7 +41,7 @@ class ModemManager:
 
             time.sleep(wait) # wait to ready
             if self.sctrl:
-                print("Modem Ready")
+                print("** Modem Ready")
         except Exception as ex:
             print("Modem reset error, " + str(ex))
             return False
@@ -51,7 +51,7 @@ class ModemManager:
         try:
             self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
             if self.sctrl:
-                print("UART created")
+                print("** UART created")
                 
             setattr(sdata, self.device, self.modem)
             
@@ -194,21 +194,20 @@ class ModemManager:
         if sts:
             return ret.replace("\r\nOK\r\n", "").replace("AT+GMR\r\n", "")
         
-    def wifi_connect(self, ssid, password):
-        # Configurar modo station
-        sts, resp = self.atCMD("AT+CWMODE=1")
-        if not sts:
-            return False, resp
+    def set_mode(self, mode=1):
+        """Establecer modo WiFi (1=station, 2=AP, 3=both)"""
+        sts, _ = self.atCMD(f"AT+CWMODE={mode}")
+        return sts
         
-        time.sleep(1)
-        
+    def wifi_connect(self, ssid, password):        
         # Conectar a WiFi
         cmd = f'AT+CWJAP="{ssid}","{password}"'
         sts, resp = self.atCMD(cmd, timeout=15.0)
         return sts, resp
 
     def wifi_disconnect(self):
-        return self.atCMD("AT+CWQAP")
+        sts, _ = self.atCMD("AT+CWQAP")
+        return sts
 
     def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org"):
                               #AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
@@ -346,7 +345,7 @@ class ModemManager:
                         break
                 elif tmp[0].lower() == "sleep":
                     if self.sctrl:
-                        print(f"ctrl_log: Waiting {tmp[1]}sec")
+                        print(f"** Waiting {tmp[1]}sec\n")
                     time.sleep(float(tmp[1]))
                 else:
                     cmd = tmp[0]
