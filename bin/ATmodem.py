@@ -1,6 +1,6 @@
 
 # AT Modem utility and library (see /etc/modem.inf)
-# Allows you to launch a script file or enter commands directly via the console, and function library.
+# Allows you to launch a script file or enter commands directly
 
 from machine import UART, Pin, RTC
 import time
@@ -372,11 +372,11 @@ def __main__(args):
 
     if len(args) == 0 or "--h" in args:
         print("Modem management utility for AT-ESP serial modem")
-        print("Usage:\tExecute modem script: modem -f <file.inf>, See modem.inf in /etc directory")
-        print("\tReset modem: modem -r <mcu gpio> <wait yo ready>")
-        print("\tCreate serial uart (self.modem): modem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
-        print("\tExecute AT command: modem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
-        print("\t-v Verbose, -tm Timmings")
+        print("Usage:\tExecute modem script: <ATmodem -f <file.inf>, See modem.inf in /etc directory")
+        print("\tReset modem: ATmodem -r <mcu gpio> <wait to ready>")
+        print("\tCreate serial uart: ATmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
+        print("\tExecute AT command: ATmodem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
+        print("\t-v verbose, -tm timmings")
         return
     
     if "-v" in args:
@@ -410,7 +410,7 @@ def __main__(args):
         
     else: # Executa AT command <cmd> <timeout>
         timeout = 2.0  # Timeout por defecto aumentado
-        exp="OK"
+        exp="OK"¡¡
         if len(args) > 1:
             timeout = float(args[1])
         if len(args) > 2:
