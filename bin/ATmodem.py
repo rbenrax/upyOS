@@ -373,7 +373,7 @@ def __main__(args):
 
     if len(args) == 0 or "--h" in args:
         print("Modem management utility for AT-ESP serial modem")
-        print("Usage:\tExecute Atmodem script: modem -f <file.inf>, See modem.inf in /etc directory")
+        print("Usage:\tExecute modem script: <ATmodem -f <file.inf>, See modem.inf in /etc directory")
         print("\tReset modem: ATmodem -r <mcu gpio> <wait to ready>")
         print("\tCreate serial uart: ATmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
         print("\tExecute AT command: ATmodem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
