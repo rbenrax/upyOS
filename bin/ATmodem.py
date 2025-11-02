@@ -209,6 +209,15 @@ class ModemManager:
         sts, _ = self.atCMD("AT+CWQAP")
         return sts
 
+    def wifi_status(self):
+        sts, ret = self.atCMD("AT+CWSTATE?")
+        if sts:
+            for linea in ret.split('\n'):       
+                if '+CWSTATE:' in linea:
+                    return linea.split(':', 1)[1]
+        else:
+            return ""
+
     def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org"):
                               #AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
         sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"')
@@ -253,8 +262,8 @@ class ModemManager:
             # Configurar el RTC
             rtc = RTC()
             rtc.datetime(fecha_rtc)
-            #return rtc.datetime()
-            return sts
+            return rtc.datetime()
+            #return sts
 
     def get_ip_mac(self, ip_mac):
         sts, ret = self.atCMD("AT+CIFSR")
