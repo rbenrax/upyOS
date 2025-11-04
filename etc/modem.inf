@@ -18,8 +18,8 @@
 reset 22 3
 
 # Create serial comunication (see modem --h command)
-# uart <id> <baudrate> <tx gpio> <rxgpio>
-uart 1 115200 4 5
+# uart <id> <baudrate> <txgpio> <rxgpio> [<modemname (modem0)]>
+uart 1 115200 4 5 modem0
 
 # AT commands documentation:
 # https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf

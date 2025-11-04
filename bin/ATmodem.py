@@ -11,10 +11,11 @@ class ModemManager:
     def __init__(self, device="modem0"):
         
         self.device = device
+        self.modem  = None
         
-        if not hasattr(sdata, device):
-            setattr(sdata, device, None)
-        self.modem = getattr(sdata, device)
+        if hasattr(sdata, device):
+            #setattr(sdata, device, None)
+            self.modem = getattr(sdata, device)
         
         self.sctrl = False # Print ctrl messages
         self.scmds = False # Print cmds
@@ -47,17 +48,22 @@ class ModemManager:
             return False
         return True
             
-    def createUART(self, id, baud, tx, rx):
+    def createUART(self, id, baud, tx, rx, device="modem0"):
         try:
+            
+            self.device = device
+            
             self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
-            if self.sctrl:
-                print("** UART created")
-                
+            
             setattr(sdata, self.device, self.modem)
+
+            if self.sctrl:
+                print(f"** UART {id} created as {device}")
             
         except Exception as ex:
             print("Modem error, " + str(ex))
             return False
+        
         time.sleep(1)  # Esperar a que el puerto se estabilice
             
         return True
@@ -349,7 +355,9 @@ class ModemManager:
                     baud = int(tmp[2])  # Baudrate
                     tx   = int(tmp[3])  # TX gpio
                     rx   = int(tmp[4])  # RX gpio
-                    if not self.createUART(id, baud, tx, rx):
+                    if len(tmp) == 6:
+                       self.device = tmp[5] # Modem name (modem0)
+                    if not self.createUART(id, baud, tx, rx, self.device):
                         utls.setenv("?", "-1")
                         break
                 elif tmp[0].lower() == "sleep":
@@ -383,7 +391,7 @@ def __main__(args):
         print("Modem management utility for AT-ESP serial modem")
         print("Usage:\tExecute modem script: ATmodem -f <file.inf>, See modem.inf in /etc directory")
         print("\tReset modem: ATmodem -r <mcu gpio> <wait to ready>")
-        print("\tCreate serial uart: ATmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
+        print("\tCreate serial uart: ATmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio> [<modemname (modem0)>]")
         print("\tExecute AT command: ATmodem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         print("\t-v verbose, -tm timmings")
         return
@@ -414,7 +422,9 @@ def __main__(args):
         baud = int(args[2])  # Baudrate
         tx   = int(args[3])  # TX gpio
         rx   = int(args[4])  # RX gpio
-        if not modem.createUART(id, baud, tx, rx):
+        if len(args) == 6:
+           modem.device=args[5] # Modem name (modem0)
+        if not modem.createUART(id, baud, tx, rx, modem.device):
             utls.setenv("?", "-1")
         
     else: # Executa AT command <cmd> <timeout>
