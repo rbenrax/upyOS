@@ -83,7 +83,7 @@ class ModemManager:
             self.modem.read()
 
         # Command execution Status
-        cmdsts=True
+        cmdsts=False
 
         # Passthrow quotation marks
         command = command.replace("\\@", '"')
@@ -101,26 +101,23 @@ class ModemManager:
         start_time = time.ticks_ms()
         
         #print("*****: " + str(timeout))
-        
+
+        expected_responses = {"OK", "SEND OK", "ERROR", "SEND FAIL", "SET OK"}
+
+        #print(f"**** Exp {exp}")
+
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if self.modem.any():
                 data = self.modem.read()
                 resp += data
 
-                # TODO: Test: ERROR, FAIL, add: SEND OK, SEND FAIL, busy p...
-                if exp == "OK" and "\r\nOK\r\n" in resp:
-                    #print("*****: Brk 0")
-                    break
-                elif (exp == "ERROR" and "\r\nERROR\r\n" in resp) or "\r\nERROR\r\n" in resp:
-                    cmdsts=False
-                    #print("*****: Brk 1")
-                    break
-                elif (exp == "FAIL" and "\r\nFAIL\r\n" in resp) or "\r\nFAIL\r\n" in resp:
-                    cmdsts=False
-                    #print("*****: Brk 2")
-                    break
+                if exp in expected_responses:
+                    if f"\r\n{exp}\r\n" in resp:
+                        if exp in {"OK", "SEND OK", "SET OK"}:
+                            cmdsts = True
+                        break
                 elif exp in resp:
-                    #print("*****: Brk 3")
+                    cmdsts = True
                     break
 
             time.sleep(0.02)
@@ -208,7 +205,7 @@ class ModemManager:
     def wifi_connect(self, ssid, password):        
         # Conectar a WiFi
         cmd = f'AT+CWJAP="{ssid}","{password}"'
-        sts, resp = self.atCMD(cmd, timeout=15.0)
+        sts, resp = self.atCMD(cmd, "WIFI GOT IP", 15)
         return sts, resp
 
     def wifi_disconnect(self):
@@ -315,14 +312,14 @@ class ModemManager:
     
     def close_conn(self):
         """Cerrar conexión"""
-        sts, _ = self.atCMD("AT+CIPCLOSE", "OK")
+        sts, _ = self.atCMD("AT+CIPCLOSE")
         return sts
     
     def enable_multiple_connections(self, enable=True):
         """Habilitar múltiples conexiones"""
         # Todo: Astk mode 1?
         mode = 1 if enable else 0
-        return self.atCMD(f"AT+CIPMUX={mode}", "OK")
+        return self.atCMD(f"AT+CIPMUX={mode}")
 
 # ------ File script
 
