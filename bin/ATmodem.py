@@ -11,10 +11,11 @@ class ModemManager:
     def __init__(self, device="modem0"):
         
         self.device = device
+        self.modem  = None
         
-        if not hasattr(sdata, device):
-            setattr(sdata, device, None)
-        self.modem = getattr(sdata, device)
+        if hasattr(sdata, device):
+            #setattr(sdata, device, None)
+            self.modem = getattr(sdata, device)
         
         self.sctrl = False # Print ctrl messages
         self.scmds = False # Print cmds
@@ -47,17 +48,22 @@ class ModemManager:
             return False
         return True
             
-    def createUART(self, id, baud, tx, rx):
+    def createUART(self, id, baud, tx, rx, device="modem0"):
         try:
+            
+            self.device = device
+            
             self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
-            if self.sctrl:
-                print("** UART created")
-                
+            
             setattr(sdata, self.device, self.modem)
+
+            if self.sctrl:
+                print(f"** UART {id} created as {device}")
             
         except Exception as ex:
             print("Modem error, " + str(ex))
             return False
+        
         time.sleep(1)  # Esperar a que el puerto se estabilice
             
         return True
@@ -77,7 +83,7 @@ class ModemManager:
             self.modem.read()
 
         # Command execution Status
-        cmdsts=True
+        cmdsts=False
 
         # Passthrow quotation marks
         command = command.replace("\\@", '"')
@@ -95,26 +101,23 @@ class ModemManager:
         start_time = time.ticks_ms()
         
         #print("*****: " + str(timeout))
-        
+
+        expected_responses = {"OK", "SEND OK", "ERROR", "SEND FAIL", "SET OK"}
+
+        #print(f"**** Exp {exp}")
+
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if self.modem.any():
                 data = self.modem.read()
                 resp += data
 
-                # TODO: Test: ERROR, FAIL, add: SEND OK, SEND FAIL, busy p...
-                if exp == "OK" and "\r\nOK\r\n" in resp:
-                    #print("*****: Brk 0")
-                    break
-                elif (exp == "ERROR" and "\r\nERROR\r\n" in resp) or "\r\nERROR\r\n" in resp:
-                    cmdsts=False
-                    #print("*****: Brk 1")
-                    break
-                elif (exp == "FAIL" and "\r\nFAIL\r\n" in resp) or "\r\nFAIL\r\n" in resp:
-                    cmdsts=False
-                    #print("*****: Brk 2")
-                    break
+                if exp in expected_responses:
+                    if f"\r\n{exp}\r\n" in resp:
+                        if exp in {"OK", "SEND OK", "SET OK"}:
+                            cmdsts = True
+                        break
                 elif exp in resp:
-                    #print("*****: Brk 3")
+                    cmdsts = True
                     break
 
             time.sleep(0.02)
@@ -202,7 +205,7 @@ class ModemManager:
     def wifi_connect(self, ssid, password):        
         # Conectar a WiFi
         cmd = f'AT+CWJAP="{ssid}","{password}"'
-        sts, resp = self.atCMD(cmd, timeout=15.0)
+        sts, resp = self.atCMD(cmd, "WIFI GOT IP", 15)
         return sts, resp
 
     def wifi_disconnect(self):
@@ -309,14 +312,14 @@ class ModemManager:
     
     def close_conn(self):
         """Cerrar conexión"""
-        sts, _ = self.atCMD("AT+CIPCLOSE", "OK")
+        sts, _ = self.atCMD("AT+CIPCLOSE")
         return sts
     
     def enable_multiple_connections(self, enable=True):
         """Habilitar múltiples conexiones"""
         # Todo: Astk mode 1?
         mode = 1 if enable else 0
-        return self.atCMD(f"AT+CIPMUX={mode}", "OK")
+        return self.atCMD(f"AT+CIPMUX={mode}")
 
 # ------ File script
 
@@ -349,7 +352,9 @@ class ModemManager:
                     baud = int(tmp[2])  # Baudrate
                     tx   = int(tmp[3])  # TX gpio
                     rx   = int(tmp[4])  # RX gpio
-                    if not self.createUART(id, baud, tx, rx):
+                    if len(tmp) == 6:
+                       self.device = tmp[5] # Modem name (modem0)
+                    if not self.createUART(id, baud, tx, rx, self.device):
                         utls.setenv("?", "-1")
                         break
                 elif tmp[0].lower() == "sleep":
@@ -383,7 +388,7 @@ def __main__(args):
         print("Modem management utility for AT-ESP serial modem")
         print("Usage:\tExecute modem script: ATmodem -f <file.inf>, See modem.inf in /etc directory")
         print("\tReset modem: ATmodem -r <mcu gpio> <wait to ready>")
-        print("\tCreate serial uart: ATmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio>")
+        print("\tCreate serial uart: ATmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio> [<modemname (modem0)>]")
         print("\tExecute AT command: ATmodem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
         print("\t-v verbose, -tm timmings")
         return
@@ -414,7 +419,9 @@ def __main__(args):
         baud = int(args[2])  # Baudrate
         tx   = int(args[3])  # TX gpio
         rx   = int(args[4])  # RX gpio
-        if not modem.createUART(id, baud, tx, rx):
+        if len(args) == 6:
+           modem.device=args[5] # Modem name (modem0)
+        if not modem.createUART(id, baud, tx, rx, modem.device):
             utls.setenv("?", "-1")
         
     else: # Executa AT command <cmd> <timeout>
