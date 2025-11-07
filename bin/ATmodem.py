@@ -34,7 +34,7 @@ class ModemManager:
             resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
 
             if self.sctrl:
-                print("** Reseting Modem...")
+                print("** Reseting Modem...", end="")
         
             resetP.value(0)
             time.sleep_ms(100) # 100ms pulse
@@ -42,9 +42,9 @@ class ModemManager:
 
             time.sleep(wait) # wait to ready
             if self.sctrl:
-                print("** Modem Ready")
+                print(", Ready")
         except Exception as ex:
-            print("Modem reset error, " + str(ex))
+            print(", Error\nModem reset error, " + str(ex))
             return False
         return True
             
@@ -52,23 +52,21 @@ class ModemManager:
         try:
             
             self.device = device
-            
             self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
-            
             setattr(sdata, self.device, self.modem)
 
             if self.sctrl:
                 print(f"** UART {id} created as {device}")
             
         except Exception as ex:
-            print("Modem error, " + str(ex))
+            print("Crerate uart error, " + str(ex))
             return False
         
         time.sleep(1)  # Esperar a que el puerto se estabilice
             
         return True
         
-    def atCMD(self, command, exp="OK", timeout=2.0):
+    def atCMD(self, command, timeout=2.0, exp="OK"):
 
         if self.timming: 
             self.tini = time.ticks_ms()
@@ -205,7 +203,7 @@ class ModemManager:
     def wifi_connect(self, ssid, password):        
         # Conectar a WiFi
         cmd = f'AT+CWJAP="{ssid}","{password}"'
-        sts, resp = self.atCMD(cmd, "WIFI GOT IP", 15)
+        sts, resp = self.atCMD(cmd, 15)
         return sts, resp
 
     def wifi_disconnect(self):
@@ -223,7 +221,7 @@ class ModemManager:
 
     def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org"):
                               #AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
-        sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"')
+        sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"', 10, "+TIME_UPDATED")
         return sts
 
     def set_datetime(self):
@@ -285,16 +283,16 @@ class ModemManager:
     
     def create_conn(self, host, port, prot="TCP", keepalive=60):
         command = f'AT+CIPSTART="{prot}","{host}",{port},{keepalive}'
-        sts, _ = self.atCMD(command, "CONNECT", 10.0)
+        sts, _ = self.atCMD(command, 10.0, "CONNECT")
         return sts
     
     def send_data(self, data):
         # Primero establecer longitud de datos
-        length_cmd = f"AT+CIPSEND={len(data)}"
-        sts, _ = self.atCMD(length_cmd, ">")
+        lcmd = f"AT+CIPSEND={len(data)}"
+        sts, r = self.atCMD(lcmd, 5, ">")
         if sts:
             # Enviar datos reales
-            sts, ret = self.atCMD(data, "SEND OK")
+            sts, ret = self.atCMD(data, 5, "SEND OK")
             return sts
         return False
     
@@ -302,11 +300,11 @@ class ModemManager:
         """Enviar datos en modo transparente"""
         # Primero establecer longitud
         length_cmd = f"AT+CIPSEND={len(data)}"
-        sts, _ = self.atCMD(length_cmd, ">")
+        sts, _ = self.atCMD(length_cmd, 3, ">")
         if sts:
             # Enviar datos
             self.modem.write(data)
-            sts, ret = self.atCMD("", "SEND OK")
+            sts, ret = self.atCMD("", 3, "SEND OK")
             return sts
         return False
     
@@ -369,7 +367,7 @@ class ModemManager:
                         timeout = float(tmp[1])
                     if len(tmp) > 2:
                         exp = tmp[2]
-                    self.atCMD(cmd, exp, timeout)
+                    self.atCMD(cmd, timeout, exp)
 
 # Command line tool
 def __main__(args):
@@ -432,7 +430,7 @@ def __main__(args):
         if len(args) > 2:
             exp = args[2]
             
-        sts, resp = modem.atCMD(args[0], exp, timeout)
+        sts, resp = modem.atCMD(args[0], timeout, exp)
         if not sts:
             utls.setenv("?", "-1")
 

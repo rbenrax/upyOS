@@ -21,29 +21,29 @@ class MqttManager(ModemManager):
 
     def mqtt_conncfg(self, keepalive=0, clean_sess=1, topic="", msg="", qos=0, retain=0):
         command = f'AT+MQTTCONNCFG=0,{keepalive},{clean_sess},"{topic}","{msg}",{qos},{retain}'
-        sts, _ = self.atCMD(command, "OK", 1)
+        sts, _ = self.atCMD(command)
         return sts
 
     def mqtt_user(self, schem=1, client="", user="", passw="", cert_key_ID=0, CA_ID=0, path=""):
         command = f'AT+MQTTUSERCFG=0,{schem},"{client}","{user}","{passw}",{cert_key_ID},{CA_ID},"{path}"'
-        sts, _ = self.atCMD(command, "OK", 1)
+        sts, _ = self.atCMD(command)
         return sts
 
     def mqtt_connect(self, host="", port=1883, reconnect=0):
         command = f'AT+MQTTCONN=0,"{host}",{port},{reconnect}'
-        sts, _ = self.atCMD(command, "+MQTTCONNECTED:0", 3.0)
+        sts, _ = self.atCMD(command, 3.0, "+MQTTCONNECTED:0")
         return sts
     
     def mqtt_pub(self, topic="", msg="", qos=0, retain=0):
-        sts, _ = self.atCMD(f'AT+MQTTPUB=0,"{topic}","{msg}",{qos},{retain}', "OK", 2)
+        sts, _ = self.atCMD(f'AT+MQTTPUB=0,"{topic}","{msg}",{qos},{retain}')
         return sts
     
     def mqtt_sub(self, topic="", qos=0):
-        sts, _ = self.atCMD(f'AT+MQTTSUB=0,"{topic}",{qos}', "OK", 2)
+        sts, _ = self.atCMD(f'AT+MQTTSUB=0,"{topic}",{qos}')
         return sts
     
     def mqtt_list_subs(self):
-        sts, res = self.atCMD(f'AT+MQTTSUB?', "OK", 2)
+        sts, res = self.atCMD(f'AT+MQTTSUB?')
         sl=""
         if sts:
             for l in res.split():
@@ -52,11 +52,11 @@ class MqttManager(ModemManager):
         return sl
 
     def mqtt_unsub(self, topic=""):
-        sts, _ = self.atCMD(f'AT+MQTTUNSUB=0,"{topic}"', "OK", 1)
+        sts, _ = self.atCMD(f'AT+MQTTUNSUB=0,"{topic}"')
         return sts
 
     def mqtt_clean(self):
-        sts, _ = self.atCMD(f'AT+MQTTCLEAN=0', "OK", 1)
+        sts, _ = self.atCMD(f'AT+MQTTCLEAN=0')
         return sts
 
 # ---------

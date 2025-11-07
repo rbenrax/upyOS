@@ -261,7 +261,8 @@ def __main__(args):
                     if "=" in e:
                         tmp=e.split("=")
                         # TODO: check type
-                        if tmp[0]in ["mac", "channel", "authmode", "key", "security"]: tmp[1]=int(tmp[1])
+                        if tmp[0] in ["channel", "authmode", "security", "hidden", "reconects", "pm"]: tmp[1] = int(tmp[1])
+                        if tmp[0] in ["txpower"]: tmp[1] = float(tmp[1])
                         p[tmp[0]]=tmp[1]
 
                     else:
@@ -272,7 +273,7 @@ def __main__(args):
                             print(_if.config(e))
                 
                 if len(p)>0:
-                    #print(p)
+#                     print(p)
                     _if.config(**p)
                     
         except Exception as ex:
