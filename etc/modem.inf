@@ -9,8 +9,8 @@
 # rp2040     esp8266
 #  3.3v  --->  3.3v
 #  gnd   --->  gnd
-#  tx    --->  rx
-#  rx    --->  tx
+#  tx    --->  rx (In new ESP-AT versions, Espressif has changed the pins, see docs)
+#  rx    --->  tx (In new ESP-AT versions, Espressif has changed the pins, see docs)
 #  gpio  --->  reset # Optional
 
 # Reset Modem
@@ -25,14 +25,13 @@ uart 1 115200 4 5 modem0
 # https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf
 # https://docs.espressif.com/projects/esp-at/en/release-v2.1.0.0_esp32s2/AT_Command_Set/HTTP_AT_Commands.html
 
-# <AT Command> <response timeout> <msg expected>
+# <AT Command> <timeout> <msg expected>
 
 AT
 AT+GMR 
-AT+CMD
+AT+CMD?
 
 AT+CWMODE=1
-
 AT+CWJAP="ESSID","PASSW" 5
 
 # Delay between commands
