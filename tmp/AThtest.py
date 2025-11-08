@@ -1,9 +1,8 @@
 
-# Sample HTTP manager
+# Sample HTTP manager, to use with an ESP-AT mcu capable with AT+http funcions, ej, esp32c3 (see /etc/modem.inf) 
 
 from ATmodem import ModemManager
 import time
-
 
 class HttpManager(ModemManager):
     
@@ -11,10 +10,7 @@ class HttpManager(ModemManager):
         super().__init__(device)
         
         self.debug = False
-# ---------
-
-# ---------
-
+        
 def __main__(args):
  
     hm = HttpManager()
@@ -23,6 +19,8 @@ def __main__(args):
         
         print("- Connecting ...")
         hm.executeScript("/local/dial.inf") # Script connection
+        
+        # Alternative by program WIFI connection
         #hm.resetHW(22, 2)
         #if not hm.createUART(1, 115200, 4, 5, "modem0"):
         #    return

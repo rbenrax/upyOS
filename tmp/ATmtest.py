@@ -1,5 +1,5 @@
 
-# ATmodem test program
+# ATmodem test program, use with an ESP-AT mcu capable (see /etc/modem.inf)
 
 from ATmodem import ModemManager
 import time
@@ -14,10 +14,12 @@ class ModemTest(ModemManager):
         print("**CB: " + cmd + " -> " + resp)
         
 def __main__(args):
-    # Crear instancia mt
+
+    # Create instancia mt
     mt = ModemTest("modem0")
-    #mt.setCallBack(mt.callBack)
+    #mt.setCallBack(mt.callBack) # for trace AT commands
     
+    # An other trace option
     #mt.scmds = True
     #mt.sctrl = True
     #mt.sresp = True
@@ -26,14 +28,14 @@ def __main__(args):
     print("- Connecting ...")
     mt.executeScript("/local/dial.inf") # Script connection
     
+    # ... Or direct by program WIFI connection
     #mt.resetHW(22, 1)
     #if not mt.createUART(1, 115200, 4, 5, "modem0"):
     #    return
     
     #mt.set_mode(1)
     
-    #mt.wifi_connect("DIGIFIBRA-cGPRi","")
-    #mt.wifi_connect("DIGIFIBRA-dDsK-E","")
+    #mt.wifi_connect("SSID","PASSW")
 
     print("- Test: "    + str(mt.test_modem()))
     print("- Version: " + mt.get_version())
@@ -70,9 +72,9 @@ def __main__(args):
     else:
         print("- No Data")
     
-    mt.close_conn()    # La cierra el servidor al enviar
+    mt.close_conn() # if not closed by server
      
     print("- Disconnecting ...")
     mt.wifi_disconnect()
-    #mt.executeScript("/local/disc.inf") # Script Disconnection
+    #mt.executeScript("/local/disc.inf") # Disconnection Script 
    
