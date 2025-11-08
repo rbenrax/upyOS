@@ -11,7 +11,7 @@ def __main__(args):
         return
 
     if not sdata.board:
-        print("Unknown board, this board has not a .board files loaded, see /etc/init.sh")
+        print("Unknown board, this board has not a .board file loaded, see /etc/init.sh")
         return 
 
     cmd=args[0]
