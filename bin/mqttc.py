@@ -346,7 +346,7 @@ def __main__(args):
         else:
             print("Publish failed")
 
-    if cmd == "lastwill":
+    elif cmd == "lastwill":
         if not "-t" in args or topic == "":
             print("-t required")
             return
