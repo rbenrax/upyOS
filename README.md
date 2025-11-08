@@ -579,6 +579,9 @@ The Wishlist is open! 😉
 ### YD-ESP32-S3 with 8Mb PSRAM
 ![YD-ESP32-S3](media/YD-ESP32-S3-Pinout.jpg)
 
+### ESP32-C6
+![ESP32-C6](media/ESP32-C6-Pinout.jpg)
+
 ---
 
 ## 📄 License
