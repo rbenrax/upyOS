@@ -1,6 +1,6 @@
 
 # AT Modem utility and library (see /etc/modem.inf)
-# Allows you to launch a script file or enter commands directly via the console, and function library.
+# Allows you to launch a script file or enter commands directly via terminal, and and also function library.
 
 from machine import UART, Pin, RTC
 import time
@@ -14,7 +14,6 @@ class ModemManager:
         self.modem  = None
         
         if hasattr(sdata, device):
-            #setattr(sdata, device, None)
             self.modem = getattr(sdata, device)
         
         self.sctrl = False # Print ctrl messages
@@ -359,6 +358,9 @@ class ModemManager:
                     if self.sctrl:
                         print(f"** Waiting {tmp[1]}sec\n")
                     time.sleep(float(tmp[1]))
+                elif tmp[0].lower() == "echo":
+                    if len(cmdl)>5:
+                        print(cmdl[5:], end="") # TODO: Translate env vars
                 else:
                     cmd = tmp[0]
                     timeout = 2.0  # Timeout por defecto aumentado

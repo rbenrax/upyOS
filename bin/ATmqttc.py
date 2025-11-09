@@ -204,12 +204,12 @@ def __main__(args):
     if len(args) == 0 or "--h" in args:
         print("MQTT Library and command line utility for AT-ESP serial modem")
         print("Usage:\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
-        print("\t ATmqtt <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
-        print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
-        print("\t ATmqtt <listsub>")
-        print("\t ATmqtt <unsub>")
-        print("\t ATmqtt <close>")
-        print("\t ATmqtt <listen> or [-l] , [-v] verbose, [-tm] timmings")
+        print("\t ATmqttc <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
+        print("\t ATmqttc <sub> -t <topic> [-q <qos>]")
+        print("\t ATmqttc <listsub>")
+        print("\t ATmqttc <unsub>")
+        print("\t ATmqttc <close>")
+        print("\t ATmqttc <listen> or [-l] , [-v] verbose, [-tm] timmings")
         return
 
     def parse(mod):
@@ -224,7 +224,7 @@ def __main__(args):
             else:
                 return ""
         except Exception as ex:
-            print("ATmqtt modifier error, " + mod)
+            print("ATmqttc modifier error, " + mod)
             if sdata.debug:
                 sys.print_exception(ex)
             return ""
@@ -250,7 +250,7 @@ def __main__(args):
     mm = MqttManager() # default dev= sdata.modem0
     
     # If modem not connected
-    if not mm.modem:
+    if not mm.modem or mm.wifi_status() == 2:
         print("No connected")
         return
     
@@ -266,7 +266,7 @@ def __main__(args):
     
     # WIFI Connection by ESP-AT
     #mm.resetHW(22, 2)
-    #if not mm.createUART(1, 115200, 4, 5):
+    #if not mm.createUART(1, 115200, 4, 5, "modem0"):
     #    return
     
     #mm.set_mode(1)
@@ -278,7 +278,6 @@ def __main__(args):
     #print("MAC: "      + mm.get_ip_mac("mac"))
 
     #print(mm.set_ntp_server())
-    #time.sleep(5)
     #print(mm.set_datetime())
 
     connected = utls.getenv("mqtt")
@@ -335,10 +334,8 @@ def __main__(args):
         mm.mqtt_clean()
         utls.setenv("mqtt", "")
         print("MQTT closed")
-    else:
-       print(f"MQTT not valid subcommand {cmd}")
 
-    if cmd == "listen" or "-l" in args:
+    elif cmd == "listen" or "-l" in args:
         print("Listening MQTT messages...")
         while True:
             
@@ -354,6 +351,8 @@ def __main__(args):
                 for msg in messages:
                     print(f"{msg['topic']}: {msg['data']}")
             time.sleep(0.1)
+    else:
+       print(f"MQTT not valid subcommand {cmd}")            
 
     # Callback example
     #if "-ll" in args:
