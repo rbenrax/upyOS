@@ -1,7 +1,7 @@
 
 # ATmodem test program, use with an ESP-AT mcu capable (see /etc/modem.inf)
 
-from ATmodem import ModemManager
+from esp_at import ModemManager
 import time
 import sdata
 
@@ -24,9 +24,6 @@ def __main__(args):
     #mt.sctrl = True
     #mt.sresp = True
     #mt.timming = True
-    
-    print("- Connecting ...")
-    mt.executeScript("/local/dial.inf") # Script connection
     
     # ... Or direct by program WIFI connection
     #mt.resetHW(22, 1)
@@ -72,9 +69,9 @@ def __main__(args):
     else:
         print("- No Data")
     
-    mt.close_conn() # if not closed by server
+    #mt.close_conn() # if not closed by server
      
-    print("- Disconnecting ...")
-    mt.wifi_disconnect()
-    #mt.executeScript("/local/disc.inf") # Disconnection Script 
+    #print("- Disconnecting ...")
+    #mt.wifi_disconnect()
+
    

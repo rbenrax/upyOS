@@ -1,4 +1,4 @@
-# AT modem script file for /bin/ATmodem command (usage: ATmodem -f modem.inf)
+# AT modem script file for /bin/atmodem command (usage: atmodem -f modem.inf)
 # Connect rp2040 (or other mcu without wifi support) to a wifi network using external esp8266 as modem
 # You need to install the Espressif AT firmware on the ESP8266 first.
 # The script can include the creation of the serial connection and the commands necessary to create the Wi-Fi connection.

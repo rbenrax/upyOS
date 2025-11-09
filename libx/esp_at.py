@@ -1,6 +1,4 @@
-
-# AT Modem utility and library (see /etc/modem.inf)
-# Allows you to launch a script file or enter commands directly via terminal, and and also function library.
+# ESP-AT Modem library
 
 from machine import UART, Pin, RTC
 import time
@@ -276,8 +274,6 @@ class ModemManager:
             
         return "Error get iP/mac"
     
-    # ------ Command Implementations
-    
     # Tcp CMDs
     
     def create_conn(self, host, port, prot="TCP", keepalive=60):
@@ -318,124 +314,166 @@ class ModemManager:
         mode = 1 if enable else 0
         return self.atCMD(f"AT+CIPMUX={mode}")
 
-# ------ File script
+# MQTT Implementation
 
-    def executeScript(self, file):
-        
-        if not utls.file_exists(file):
-            print(f"File {file} not found")
-            return
-        
-        with open(file, 'r') as archivo:
-            while True:
-                lin = archivo.readline()
-                if not lin:  # Si no hay más líneas, salir del bucle
-                    break
-                
-                if lin.strip() == "": continue   # Empty lines skipped
-                
-                if lin.lstrip().startswith("#"): continue # Commanted lines skipped
+class MqttManager(ModemManager):
+    
+    def __init__(self, device="modem0"):
+        super().__init__(device)
 
-                cmdl = lin.split(" #")[0] # Left part of commented line
+        self.debug = False
+        self.buffer = "" # Message buffer
+        
+    # MQTT CMDs
+
+    def mqtt_conncfg(self, keepalive=0, clean_sess=1, topic="", msg="", qos=0, retain=0):
+        command = f'AT+MQTTCONNCFG=0,{keepalive},{clean_sess},"{topic}","{msg}",{qos},{retain}'
+        sts, _ = self.atCMD(command)
+        return sts
+
+    def mqtt_user(self, schem=1, client="", user="", passw="", cert_key_ID=0, CA_ID=0, path=""):
+        command = f'AT+MQTTUSERCFG=0,{schem},"{client}","{user}","{passw}",{cert_key_ID},{CA_ID},"{path}"'
+        sts, _ = self.atCMD(command)
+        return sts
+
+    def mqtt_connect(self, host="", port=1883, reconnect=0):
+        command = f'AT+MQTTCONN=0,"{host}",{port},{reconnect}'
+        sts, _ = self.atCMD(command, 3.0, "+MQTTCONNECTED:0")
+        return sts
+    
+    def mqtt_pub(self, topic="", msg="", qos=0, retain=0):
+        sts, _ = self.atCMD(f'AT+MQTTPUB=0,"{topic}","{msg}",{qos},{retain}')
+        return sts
+    
+    def mqtt_sub(self, topic="", qos=0):
+        sts, _ = self.atCMD(f'AT+MQTTSUB=0,"{topic}",{qos}')
+        return sts
+    
+    def mqtt_list_subs(self):
+        sts, res = self.atCMD(f'AT+MQTTSUB?')
+        sl=""
+        if sts:
+            for l in res.split():
+                if l.startswith("+MQTTSUB:0"):           
+                    sl += l.split(",")[2] + "\n"
+        return sl
+
+    def mqtt_unsub(self, topic=""):
+        sts, _ = self.atCMD(f'AT+MQTTUNSUB=0,"{topic}"')
+        return sts
+
+    def mqtt_clean(self):
+        sts, _ = self.atCMD(f'AT+MQTTCLEAN=0')
+        return sts
+
+# ---------
+    
+    def parse_mqttsubrecv(self, data):
+        """
+        Parsea los mensajes +MQTTSUBRECV del formato:
+        +MQTTSUBRECV:<LinkID>,<topic>,<data_length>,<data>
+        
+        Returns:
+            dict con link_id, topic, data_length, data o None si no es válido
+        """
+        if '+MQTTSUBRECV:' not in data:
+            return None
+        
+        try:
+            # Extraer la línea que contiene +MQTTSUBRECV
+            lines = data.split('\n')
+            for line in lines:
+                if '+MQTTSUBRECV:' in line:
+                    # Formato: +MQTTSUBRECV:<LinkID>,"<topic>",<length>,<data>
+                    line = line.strip()
+                    parts = line.replace('+MQTTSUBRECV:', '').split(',', 3)
+                    
+                    if len(parts) >= 4:
+                        link_id = int(parts[0])
+                        topic = parts[1].strip('"')
+                        data_length = int(parts[2])
+                        message_data = parts[3]
+                        
+                        return {
+                            'link_id': link_id,
+                            'topic': topic,
+                            'data_length': data_length,
+                            'data': message_data,
+                            'raw': line
+                        }
+        except Exception as e:
+            print(f"Error parseando mensaje: {e}")
+        
+        return None
+    
+    def check_messages(self, timeout_ms=100):
+        """
+        Comprueba si hay mensajes MQTT recibidos
+        
+        Returns:
+            Lista de mensajes parseados o lista vacía
+        """
+        messages = []
+        
+        # Leer datos disponibles
+        if self.modem.any():
+            data = self.modem.read()
+            if data:
+                self.buffer += data.decode('utf-8', 'ignore')
                 
-                tmp = cmdl.split()
-                
-                if tmp[0].lower() == "reset":
-                    gpio  = int(tmp[1])  # Gpio reset pin in mcu
-                    wait  = int(tmp[2])  # Modem wait to ready
-                    self.resetHW(gpio, wait)
-                elif tmp[0].lower() == "uart":
-                    id   = int(tmp[1])  # uC Uart ID
-                    baud = int(tmp[2])  # Baudrate
-                    tx   = int(tmp[3])  # TX gpio
-                    rx   = int(tmp[4])  # RX gpio
-                    if len(tmp) == 6:
-                       self.device = tmp[5] # Modem name (modem0)
-                    if not self.createUART(id, baud, tx, rx, self.device):
-                        utls.setenv("?", "-1")
+                # Buscar mensajes completos en el buffer
+                while '+MQTTSUBRECV:' in self.buffer:
+                    # Buscar el final del mensaje (normalmente \n o OK)
+                    end_idx = self.buffer.find('\n', self.buffer.find('+MQTTSUBRECV:'))
+                    
+                    if end_idx != -1:
+                        msg_section = self.buffer[:end_idx + 1]
+                        parsed = self.parse_mqttsubrecv(msg_section)
+                        
+                        if parsed:
+                            messages.append(parsed)
+                            if self.debug:
+                                print(f"[MQTT] Mensaje recibido:")
+                                print(f"  Topic: {parsed['topic']}")
+                                print(f"  Data: {parsed['data']}")
+                                print(f"  Length: {parsed['data_length']}")
+                        
+                        # Eliminar el mensaje procesado del buffer
+                        self.buffer = self.buffer[end_idx + 1:]
+                    else:
                         break
-                elif tmp[0].lower() == "sleep":
-                    if self.sctrl:
-                        print(f"** Waiting {tmp[1]}sec\n")
-                    time.sleep(float(tmp[1]))
-                elif tmp[0].lower() == "echo":
-                    if len(cmdl)>5:
-                        print(cmdl[5:], end="") # TODO: Translate env vars
-                else:
-                    cmd = tmp[0]
-                    timeout = 2.0  # Timeout por defecto aumentado
-                    exp = "OK"
-                    if len(tmp) > 1:
-                        timeout = float(tmp[1])
-                    if len(tmp) > 2:
-                        exp = tmp[2]
-                    self.atCMD(cmd, timeout, exp)
-
-# Command line tool
-def __main__(args):
-    # Crear instancia del gestor de módem
-    modem = ModemManager() # Device def: sdata.modem0
-
-    # Modem rest test
-    #modem.reset(22, 3) # gpio 22 3 sec
+        
+        return messages
     
-    # Callback example
-    #def callback(cmd, resp):
-    #    print("Cmd from callback: " + cmd + "\n Response from callback:" + resp )
-    #modem.setCallBack(callback)
+    def msgs_loop(self, callback=None):
+        """
+        Bucle continuo de monitoreo de mensajes MQTT
+        
+        Args:
+            callback: Función a llamar cuando se recibe un mensaje
+                     Debe aceptar un dict con el mensaje parseado
+        """
+        print("Starting callback MQTT message monitoring ...")
+        print("Ctrl+C to stop")
+        
+        try:
+            while True:
+ 
+                # Thread control
+                if proc.sts=="S":break
+        
+                if proc.sts=="H":
+                    time.sleep(1)
+                    continue
+                
+                messages = self.check_messages()
+                
+                for msg in messages:
+                    if callback:
+                        callback(msg)
+                
+                time.sleep_ms(10)  # Pequeña pausa para no saturar
+                
+        except KeyboardInterrupt:
+            print("\nMonitoreo detenido")
 
-    if len(args) == 0 or "--h" in args:
-        print("Modem management utility for AT-ESP serial modem")
-        print("Usage:\tExecute modem script: ATmodem -f <file.inf>, See modem.inf in /etc directory")
-        print("\tReset modem: ATmodem -r <mcu gpio> <wait to ready>")
-        print("\tCreate serial uart: ATmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio> [<modemname (modem0)>]")
-        print("\tExecute AT command: ATmodem <AT Command> <timeout>, Note: quotation marks must be sent as \\@")
-        print("\t-v verbose, -tm timmings")
-        return
-    
-    if "-v" in args:
-        modem.sctrl = True
-        modem.scmds = True
-        modem.sresp = True
-        # Remover el flag -n de los argumentos
-        args = [arg for arg in args if arg != "-v"]
-        
-    if "-tm" in args:
-        modem.timming = True
-        # Remover el flag -n de los argumentos
-        args = [arg for arg in args if arg != "-tm"]
-   
-    if args[0] == "-f":
-        file = args[1]
-        modem.executeScript(file)
-        
-    elif args[0] == "-r": # Reset modem
-        gpio  = int(args[1])  # Gpio reset pin in mcu
-        wait  = int(args[2])  # Modem wait to ready
-        modem.resetHW(gpio, wait)
-        
-    elif args[0] == "-c": # Create uart (see --h)
-        id   = int(args[1])  # uC Uart ID
-        baud = int(args[2])  # Baudrate
-        tx   = int(args[3])  # TX gpio
-        rx   = int(args[4])  # RX gpio
-        if len(args) == 6:
-           modem.device=args[5] # Modem name (modem0)
-        if not modem.createUART(id, baud, tx, rx, modem.device):
-            utls.setenv("?", "-1")
-        
-    else: # Executa AT command <cmd> <timeout>
-        timeout = 2.0  # Timeout por defecto aumentado
-        exp="OK"
-        if len(args) > 1:
-            timeout = float(args[1])
-        if len(args) > 2:
-            exp = args[2]
-            
-        sts, resp = modem.atCMD(args[0], timeout, exp)
-        if not sts:
-            utls.setenv("?", "-1")
-
-# To call out upyos
-if __name__ == "__main__":
-    __main__(["-f", "/local/dial.inf"])
