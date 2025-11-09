@@ -1,4 +1,4 @@
-# ESP-AT Modem library
+# ESP-AT Modem library for Espressif devices with ESP-AT firmware
 
 from machine import UART, Pin, RTC
 import time
