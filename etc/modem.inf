@@ -13,7 +13,7 @@
 #  rx    --->  tx (In new ESP-AT versions, Espressif has changed the pins, see docs)
 #  gpio  --->  reset # Optional
 
-# Reset Modem
+echo Reset Modem
 # reset <gpio pin> <wait to ready>
 reset 22 3
 
@@ -31,6 +31,7 @@ AT
 AT+GMR 
 AT+CMD?
 
+echo Connecting WIFI ...
 AT+CWMODE=1
 AT+CWJAP="ESSID","PASSW" 5
 
