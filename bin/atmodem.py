@@ -1,13 +1,11 @@
 
 # AT Modem utility (see /etc/modem.inf)
-# Allows you to launch a script file or enter commands directly via terminal.
+# Allows you to launch a script file on /etc/init.sh or enter commands directly by terminal.
 
 from esp_at import ModemManager
 import time
 import sdata
 import utls
-
-# ------ File script
 
 def executeScript(mm, file):
     
@@ -75,7 +73,7 @@ def __main__(args):
         return
     
     # Create a modem manager instance
-    modem = ModemManager() # Def device modem0
+    modem = ModemManager() # Def device sdata.modem0
     
     if "-v" in args:
         modem.sctrl = True
