@@ -140,30 +140,40 @@ class ModemManager:
         if self.timming:
             ptini = time.ticks_ms()
         
-        timeout = timeout  * 1000
-
-        # Esperar respuesta
+        timeout_ms = timeout * 1000
         resp = b""
         start_time = time.ticks_ms()
+        no_data_timeout = 500  # timeout sin datos nuevos (ms)
+        last_data_time = start_time
         
-        #print("*rcv****: " + str(timeout))
-        
-        while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
+        while True:
+            current_time = time.ticks_ms()
+            
+            # Timeout global
+            if time.ticks_diff(current_time, start_time) >= timeout_ms:
+                break
+                
             if self.modem.any():
                 data = self.modem.read()
                 resp += data
-                start_time = time.ticks_ms() # restart if new data
+                last_data_time = current_time  # actualizar tiempo de último dato
                 
-                if len(resp) >= size:
-                    resp += "\r\nCLOSED\r\n(more ...)"
-                    #break
-                
-                if"\r\nCLOSED\r\n" in resp:
-                    #print("*****: Brk rcv 1")
+                # Verificar si llegó el marcador de cierre
+                if b"\r\nCLOSED\r\n" in resp:
                     break
-
-            time.sleep(0.02)
-        
+                    
+                # Limitar tamaño si es necesario
+                if len(resp) >= size:
+                    resp += b"\r\nCLOSED\r\n(more ...)"
+                    break
+            else:
+                # Si no hay datos disponibles, timeout corto sin datos nuevos
+                if time.ticks_diff(current_time, last_data_time) >= no_data_timeout:
+                    break
+                
+                # Sleep muy corto solo cuando no hay datos
+                time.sleep_ms(10)  # 10ms en lugar de 200ms
+                
         if encoded:
             retResp = resp.decode('utf-8')
         else:
@@ -171,13 +181,13 @@ class ModemManager:
             
         if self.sresp:
             print(f"<< data: {retResp}")
-
+            
         if self.timming:            
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms" )
 
         return True, retResp
- 
+     
 # ------ Command Implementations
 
     def test_modem(self):
@@ -219,6 +229,7 @@ class ModemManager:
     def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org"):
                               #AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
         sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"', 10, "+TIME_UPDATED")
+        #sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"', 10, "OK")
         return sts
 
     def set_datetime(self):

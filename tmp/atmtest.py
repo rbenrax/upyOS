@@ -20,8 +20,8 @@ def __main__(args):
     #mt.setCallBack(mt.callBack) # for trace AT commands
     
     # An other trace option
-    #mt.scmds = True
     #mt.sctrl = True
+    #mt.scmds = True
     #mt.sresp = True
     #mt.timming = True
     
