@@ -1,5 +1,5 @@
 
-# MQTT manager
+# MQTT utility client for ESP-AT modem
 
 from esp_at import MqttManager
 import time
@@ -39,14 +39,14 @@ def __main__(args):
     #TODO: add qos, reconnect and others parms
 
     if len(args) == 0 or "--h" in args:
-        print("MQTT Library and command line utility for AT-ESP serial modem")
+        print("MQTT Command line utility for AT-ESP serial modem")
         print("Usage:\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
         print("\t atmqttc <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
         print("\t atmqttc <sub> -t <topic> [-q <qos>]")
         print("\t atmqttc <listsub>")
         print("\t atmqttc <unsub>")
         print("\t atmqttc <close>")
-        print("\t atmqttc <listen> or [-l] , [-v] verbose, [-tm] timmings")
+        print("\t atmqttc <listen> or [-l], [-v] verbose, [-tm] timmings")
         return
 
     def parse(mod):
@@ -101,7 +101,7 @@ def __main__(args):
         mm.timming = True
         args = [arg for arg in args if arg != "-tm"]
     
-    # WIFI Connection by ESP-AT
+    # WIFI Connection or alternative by atmodem -f modem.inf in /etc/init.sh
     #mm.resetHW(22, 2)
     #if not mm.createUART(1, 115200, 4, 5, "modem0"):
     #    return
@@ -117,7 +117,7 @@ def __main__(args):
     #print(mm.set_ntp_server())
     #print(mm.set_datetime())
 
-    connected = utls.getenv("mqtt")
+    connected = utls.getenv("atmqttc")
     
     if connected != "c":
         
@@ -127,9 +127,9 @@ def __main__(args):
 
         mm.mqtt_user(1, sdata.sid, user, passw)
         if mm.mqtt_connect(host, port, recon):
-            utls.setenv("mqtt", "c")
+            utls.setenv("atmqttc", "c")
         else:
-            utls.setenv("mqtt", "")
+            utls.setenv("atmqttc", "")
             print("No connected")
             return
 
@@ -169,7 +169,7 @@ def __main__(args):
 
     elif cmd == "close":
         mm.mqtt_clean()
-        utls.setenv("mqtt", "")
+        utls.setenv("atmqttc", "")
         print("MQTT closed")
 
     elif cmd == "listen" or "-l" in args:
