@@ -124,12 +124,12 @@ class upyOS:
 
         fcmd=fcmd.strip()
         
-        ##### Test for quotation magement
-        #if fcmd[:5]=="ATmodem":
+        ##### Test for quotation marks passthrow
+        #if fcmd[:5]=="atmodem":
         if fcmd[:3]=="AT+":
-             fcmd = "ATmodem " + fcmd.replace('"', "\\@")
+             fcmd = "atmodem " + fcmd.replace('"', "\\@")
              #print(fcmd)
-        ##### ATENTION: for analisys only
+        ##### ATENTION: for testing only
 
         # Translate env variables $*
         tmp = fcmd.split()
