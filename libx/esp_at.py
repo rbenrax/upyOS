@@ -97,7 +97,7 @@ class ModemManager:
         
         #print("*****: " + str(timeout))
 
-        expected_responses = {"OK", "SEND OK", "ERROR", "SEND FAIL", "SET OK"}
+        exp_resp = {"OK", "SEND OK", "ERROR", "SEND FAIL", "SET OK"}
 
         #print(f"**** Exp {exp}")
 
@@ -106,7 +106,7 @@ class ModemManager:
                 data = self.modem.read()
                 resp += data
 
-                if exp in expected_responses:
+                if exp in exp_resp:
                     if f"\r\n{exp}\r\n" in resp:
                         if exp in {"OK", "SEND OK", "SET OK"}:
                             cmdsts = True
@@ -157,6 +157,7 @@ class ModemManager:
                 
                 data = self.modem.read()
                 
+                #TODO: remove +IPD
                 if fhnd: # If file handle
                     fhnd.write(data)
                 else:
@@ -168,8 +169,8 @@ class ModemManager:
                 if b"\r\nCLOSED\r\n" in resp:
                     break
                     
-                # Limitar tamaño si es necesario
-                if len(resp) >= size:
+                # Limitar tamaño si es necesario, 0 unlimited
+                if size > 0 and len(resp) >= size:
                     resp += b"\r\nCLOSED\r\n(more ...)"
                     break
             else:
