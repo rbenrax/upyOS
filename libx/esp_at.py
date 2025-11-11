@@ -135,7 +135,7 @@ class ModemManager:
         
         return cmdsts, decResp
     
-    def rcvDATA(self, size=2048, encoded=True, timeout=5.0):
+    def rcvDATA(self, size=2048, encoded=True, timeout=5.0, fhnd=None):
         
         if self.timming:
             ptini = time.ticks_ms()
@@ -154,8 +154,14 @@ class ModemManager:
                 break
                 
             if self.modem.any():
+                
                 data = self.modem.read()
-                resp += data
+                
+                if fhnd: # If file handle
+                    fhnd.write(data)
+                else:
+                    resp += data
+
                 last_data_time = current_time  # actualizar tiempo de último dato
                 
                 # Verificar si llegó el marcador de cierre
@@ -225,6 +231,10 @@ class ModemManager:
                     return linea.split(':', 1)[1]
         else:
             return ""
+
+    def ping(self, host=""):
+        sts, ret = self.atCMD(f'AT+PING="{host}"')
+        return ret.split()[1]
 
     def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org"):
                               #AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
