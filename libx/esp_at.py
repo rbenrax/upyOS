@@ -62,7 +62,13 @@ class ModemManager:
         time.sleep(1)  # Esperar a que el puerto se estabilice
             
         return True
-        
+    
+    def _drain(self):
+        # vacía el buffer UART
+        t0 = time.time()
+        while self.modem.any() and (time.time() - t0) < 0.1:
+            self.modem.read()
+            
     def atCMD(self, command, timeout=2.0, exp="OK"):
 
         if self.timming: 
@@ -74,8 +80,7 @@ class ModemManager:
 
         timeout = timeout  * 1000
 
-        while self.modem.any():
-            self.modem.read()
+        self._drain()
 
         # Command execution Status
         cmdsts=False
@@ -89,7 +94,7 @@ class ModemManager:
         if self.scmds:
             print(">> " + command)
        
-        time.sleep(0.100)
+        time.sleep(0.050)
        
         # Esperar respuesta
         resp = b""
@@ -99,19 +104,22 @@ class ModemManager:
 
         exp_resp = {"OK", "SEND OK", "ERROR", "SEND FAIL", "SET OK"}
 
-        #print(f"**** Exp {exp}")
+        #print(f"*** Exp {exp}")
 
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if self.modem.any():
                 data = self.modem.read()
+                #print(f"**atCMD*** << {data}")
                 resp += data
 
                 if exp in exp_resp:
                     if f"\r\n{exp}\r\n" in resp:
                         if exp in {"OK", "SEND OK", "SET OK"}:
+                            #print("*** P1 OK***")
                             cmdsts = True
-                        break
+                            break
                 elif exp in resp:
+                    #print("*** P1 Other***")
                     cmdsts = True
                     break
 
@@ -134,66 +142,98 @@ class ModemManager:
             print(f"** Cmd: {command}: Time: {tfin}ms\n" )
         
         return cmdsts, decResp
-    
-    def rcvDATA(self, size=2048, encoded=True, timeout=5.0, fhnd=None):
+
+    def clear_ipd(self, data):
+        ipd_pattern = b'\r\n\r\n+IPD,' if isinstance(data, bytes) else '\r\n\r\n+IPD,'
+        colon = b':' if isinstance(data, bytes) else ':'
+        
+        result = data
+        while True:
+            p_ipd = result.find(ipd_pattern)
+            if p_ipd == -1:
+                break
+                
+            p_dp = result.find(colon, p_ipd)
+            if p_dp == -1:
+                print("Error clear_ipd-01")
+                break
+                
+            result = result[:p_ipd] + result[p_dp + 1:]
+        
+        return result
+
+    def rcvDATA(self, size=1024, encoded=True, timeout=8.0):
         
         if self.timming:
             ptini = time.ticks_ms()
         
-        timeout_ms = timeout * 1000
+        timeout = timeout  * 1000
+
+        # Esperar respuesta
         resp = b""
         start_time = time.ticks_ms()
-        no_data_timeout = 500  # timeout sin datos nuevos (ms)
-        last_data_time = start_time
         
-        while True:
-            current_time = time.ticks_ms()
-            
-            # Timeout global
-            if time.ticks_diff(current_time, start_time) >= timeout_ms:
-                break
-                
+        ndc=0 # No data count
+        
+        #print("*rcv****: " + str(timeout))
+        while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if self.modem.any():
-                
+                ndc = -1
                 data = self.modem.read()
+                #print(f"*rcvDATA*** <<  {data}")
                 
-                #TODO: remove +IPD
-                if fhnd: # If file handle
-                    fhnd.write(data)
+                if b"\r\nCLOSED\r\n" in data:
+                    cidx = data.find(b"\r\nCLOSED\r\n")
+                    if cidx > 0:
+                        resp += data[:cidx]
+                    #print("*****: Brk rcv 1 closed")
+                    break
                 else:
                     resp += data
-
-                last_data_time = current_time  # actualizar tiempo de último dato
                 
-                # Verificar si llegó el marcador de cierre
-                if b"\r\nCLOSED\r\n" in resp:
-                    break
-                    
-                # Limitar tamaño si es necesario, 0 unlimited
+                start_time = time.ticks_ms() # restart if new data
+                
                 if size > 0 and len(resp) >= size:
-                    resp += b"\r\nCLOSED\r\n(more ...)"
+                    print(f"Warning: Size truncated")
+                    #print("*****: Brk rcv 0 more...")
                     break
+                
             else:
-                # Si no hay datos disponibles, timeout corto sin datos nuevos
-                if time.ticks_diff(current_time, last_data_time) >= no_data_timeout:
-                    break
+                ndc += 1
+                #print("No data")
+                time.sleep(0.050)
                 
-                # Sleep muy corto solo cuando no hay datos
-                time.sleep_ms(10)  # 10ms en lugar de 200ms
-                
+            time.sleep(0.010)
+            if ndc > 25:
+                #print("*****: Brk rcv 2")
+                break
+        
+        #print("breaking...")
+        
         if encoded:
             retResp = resp.decode('utf-8')
         else:
             retResp = resp
-            
+
+        retResp = self.clear_ipd(retResp)
+
+        headers = ""
+        body_ini = retResp.index("\r\n\r\n")
+        if body_ini > 0:
+            headers = retResp[:body_ini]
+            retResp = retResp[body_ini + 4:] 
+
         if self.sresp:
-            print(f"<< data: {retResp}")
-            
+            print(f"<< Headers: {headers}")
+            print(f"<< Body: {retResp}")
+
+        
+
         if self.timming:            
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms" )
 
-        return True, retResp
+        return True, retResp, headers
      
 # ------ Command Implementations
 
@@ -303,27 +343,27 @@ class ModemManager:
         sts, _ = self.atCMD(command, 10.0, "CONNECT")
         return sts
     
-    def send_data(self, data):
-        # Primero establecer longitud de datos
+    def send_data(self, data, tout=5):
         lcmd = f"AT+CIPSEND={len(data)}"
-        sts, r = self.atCMD(lcmd, 5, ">")
-        if sts:
-            # Enviar datos reales
-            sts, ret = self.atCMD(data, 5, "SEND OK")
-            return sts
-        return False
-    
-    def send_data_transparent(self, data):
-        """Enviar datos en modo transparente"""
-        # Primero establecer longitud
-        length_cmd = f"AT+CIPSEND={len(data)}"
-        sts, _ = self.atCMD(length_cmd, 3, ">")
+        sts, ret = self.atCMD(lcmd, 3, ">")
         if sts:
             # Enviar datos
+            sts, ret = self.atCMD(data, tout, "SEND OK")
+            ret = self.clear_ipd(ret)
+            return sts, ret
+        return False, ""
+    
+    def send_data_transp(self, data, tout=5):
+        """Send transparent mode data"""
+        length_cmd = f"AT+CIPSEND={len(data)}"
+        sts, _ = self.atCMD(length_cmd, tout, ">")
+        if sts:
+            # Send data
             self.modem.write(data)
-            sts, ret = self.atCMD("", 3, "SEND OK")
-            return sts
-        return False
+            sts, ret = self.atCMD("", tout, "SEND OK")
+            ret = self.clear_ipd(ret)
+            return sts, ret
+        return False, ""
     
     def close_conn(self):
         """Cerrar conexión"""

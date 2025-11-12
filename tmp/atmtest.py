@@ -34,42 +34,59 @@ def __main__(args):
     
     #mt.wifi_connect("SSID","PASSW")
 
-    print("- Test: "    + str(mt.test_modem()))
-    print("- Version: " + mt.get_version())
+    #print("- Test: "    + str(mt.test_modem()))
+    #print("- Version: " + mt.get_version())
         
-    print("- Status: "  + mt.wifi_status())
-    print("- IP: "      + mt.get_ip_mac("ip"))
-    print("- MAC: "     + mt.get_ip_mac("mac"))
+    #print("- Status: "  + mt.wifi_status())
+    #print("- IP: "      + mt.get_ip_mac("ip"))
+    #print("- MAC: "     + mt.get_ip_mac("mac"))
         
-    mt.set_ntp_server()
-    #time.sleep(5)
-    print("- NTP time: " + str(mt.set_datetime()))
+    #mt.set_ntp_server()
+    #print("- NTP time: " + str(mt.set_datetime()))
     
     # TCP test
 
-    srv="httpcan.org"
+    #srv="httpcan.org"
     #srv="httpbin.org"
-    get="/get"
+    srv="192.168.2.132"
+    #srv="fmstream.org"
+    get="/"
+
+    srv= "raw.githubusercontent.com"
+    get= "/rbenrax/upyOS/refs/heads/main/etc/upgrade2.inf"
 
     #sts, _ = mt.atCMD("AT+CIPSSLCCONF=0")
     #sts, _ = mt.atCMD("AT+CIPSNIREQ=0")
     
+    print("Ping: " + mt.ping(srv))
+    
     print("- Create TCP Connection")
-    mt.create_conn(srv, 80, "TCP", keepalive=60)
-    #mt.create_conn(srv, 443, "SSL", keepalive=60)
+    #mt.create_conn(srv, 8200, "TCP", keepalive=60)
+    mt.create_conn(srv, 443, "SSL", keepalive=60)
 
     print("- Send request")
-    mt.send_data(f"GET {get} HTTP/1.1\r\nHost: {srv}\r\n\r\n")
-    #mt.send_data_transparent(f"GET / HTTP/1.1\r\nHost: {srv}\r\n\r\n")
+    req = f"GET {get} HTTP/1.1\r\nHost: {srv}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
     
-    print("- Receive data")
-    sts, data = mt.rcvDATA(2048, True, 10)
+    #sts, ret = mt.send_data(req)
+    sts, ret = mt.send_data_transp(req, 5)
+    #print(f"- sts: {sts} / ret: {ret}")
+    
+    f = open('datos.txt', 'w')
+    
+    print("- Data receiving")
+    #sts, data = mt.rcvDATA(0, True, 10, f)
+    sts, body, headers = mt.rcvDATA(0, True, 15)
     if sts:
-        print(data)
+        print(body)
+        f.write(body)
     else:
         print("- No Data")
     
-    #mt.close_conn() # if not closed by server
+    f.close()
+    
+    time.sleep(2)
+    
+    mt.close_conn() # if not closed by server
      
     #print("- Disconnecting ...")
     #mt.wifi_disconnect()
