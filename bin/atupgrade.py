@@ -24,14 +24,18 @@ def pull(f_path, url):
         mm.create_conn(host, 443, "SSL", keepalive=60) 
         sts, ret = mm.send_data_transp(solicitud, 5)
         
-        sts, body, headers = mm.rcvDATA(0, True, 15)
-        if sts:
-            #print(body)
-            f = open(f_path, 'w')
-            f.write(body)
-            f.close()
-        else:
-            print(f"- Error downloading {f_path}")
+        f = open(f_path, 'w')
+        mm.rcvDATA_tofile(f, timeout=8.0)
+        f.close()
+        
+        #sts, body, headers = mm.rcvDATA(0, True, 15)
+        #if sts:
+        #    #print(body)
+        #    f = open(f_path, 'w')
+        #    f.write(body)
+        #    f.close()
+        #else:
+        #    print(f"- Error downloading {f_path}")
             
         #mm.close_conn() # if not closed by server
  

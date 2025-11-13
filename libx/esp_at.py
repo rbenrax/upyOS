@@ -234,7 +234,146 @@ class ModemManager:
             print(f"## Tiempo rcv: {ptfin}ms" )
 
         return True, retResp, headers
-     
+    
+    def rcvDATA_tofile(self, fh, timeout=8.0):
+
+        """
+        Recibe datos del módem ESP-AT y guarda el payload en el fichero `fh`.
+        - Detecta y guarda las cabeceras HTTP (antes del primer \r\n\r\n).
+        - Procesa y elimina las cabeceras +IPD,<len>: incluso si llegan fragmentadas.
+        - Escribe al fichero solo los datos reales del payload.
+        - Usa un buffer temporal muy pequeño para ahorrar memoria.
+        Devuelve (success: bool, result: dict)
+        result contiene:
+            'written' -> bytes escritos en total
+            'headers' -> cadena con las cabeceras (si las hay)
+            'errors'  -> lista de errores
+        """
+        import time
+
+        start_ms = time.ticks_ms()
+        timeout_ms = int(timeout * 1000)
+
+        buf = bytearray()
+        total_written = 0
+        errors = []
+        ndc = 0
+        headers = ""
+        headers_found = False
+
+        ipd_tag = b'+IPD,'
+        closed_marker = b'\r\nCLOSED\r\n'
+
+        while time.ticks_diff(time.ticks_ms(), start_ms) < timeout_ms:
+            if self.modem.any():
+                ndc = -1
+                chunk = self.modem.read()
+                if not chunk:
+                    time.sleep(0.01)
+                    continue
+
+                buf.extend(chunk)
+
+                # Detectar cabeceras HTTP si no se han detectado todavía
+                if not headers_found:
+                    sep = buf.find(b'\r\n\r\n')
+                    if sep != -1:
+                        try:
+                            headers = buf[:sep].decode('utf-8', 'ignore')
+                        except Exception:
+                            headers = "<decode_error>"
+                        buf = buf[sep + 4:]  # eliminar cabeceras del buffer
+                        headers_found = True
+
+                # Detectar fin de conexión
+                ci = buf.find(closed_marker)
+                if ci != -1:
+                    buf = buf[:ci]
+
+                # Procesar posibles bloques +IPD
+                while True:
+                    p = buf.find(ipd_tag)
+                    if p == -1:
+                        # mantener pequeño el buffer
+                        if len(buf) > 64:
+                            buf = buf[-16:]
+                        break
+
+                    colon = buf.find(b':', p + len(ipd_tag))
+                    if colon == -1:
+                        if p > 0:
+                            buf = buf[p:]
+                        break
+
+                    # Extraer tamaño del payload
+                    num_field = buf[p + len(ipd_tag):colon]
+                    try:
+                        n = int(num_field)
+                    except Exception:
+                        errors.append("bad length field: %r" % num_field)
+                        buf = buf[colon + 1:]
+                        continue
+
+                    payload_start = colon + 1
+                    available = len(buf) - payload_start
+
+                    if available >= n:
+                        # Tenemos el bloque completo
+                        payload = buf[payload_start:payload_start + n]
+                        try:
+                            fh.write(payload)
+                            try:
+                                fh.flush()
+                            except:
+                                pass
+                            total_written += n
+                        except Exception as e:
+                            errors.append("file write error: %s" % str(e))
+                            return False, {
+                                'written': total_written,
+                                'headers': headers,
+                                'errors': errors
+                            }
+
+                        buf = buf[payload_start + n:]  # eliminar bloque procesado
+                        continue
+                    else:
+                        # payload incompleto, esperar más datos
+                        if p > 0:
+                            buf = buf[p:]
+                        break
+
+                # reiniciar timeout si hay datos
+                start_ms = time.ticks_ms()
+
+                # si detectamos CLOSED y buffer vacío, salir
+                if ci != -1 and len(buf) == 0:
+                    break
+
+            else:
+                ndc += 1
+                time.sleep(0.05)
+
+            if ndc > 25:
+                break
+
+            time.sleep(0.005)
+
+        # Si quedan restos en buffer
+        if len(buf) > 0:
+            if buf.find(ipd_tag) != -1:
+                errors.append("incomplete IPD frame left in buffer (%d bytes)" % len(buf))
+            elif any(b not in (0x0d, 0x0a, 0x00) for b in buf):
+                errors.append("trailing non-IPD data (%d bytes) discarded" % len(buf))
+
+        success = (len(errors) == 0)
+        return success, {
+            'written': total_written,
+            'headers': headers,
+            'errors': errors
+        }
+
+
 # ------ Command Implementations
 
     def test_modem(self):
