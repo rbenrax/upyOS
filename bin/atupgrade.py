@@ -15,6 +15,7 @@ def pull(f_path, url):
     try:
         _, _, host, path = url.split('/', 3)
         solicitud = f"GET /{path} HTTP/1.0\r\nHost: {host}\r\nUser-Agent: upyOS\r\n\r\n"
+        
         mm = ModemManager("modem0")
         #mt.sctrl = True
         #mt.scmds = True
@@ -25,9 +26,15 @@ def pull(f_path, url):
         sts, ret = mm.send_data_transp(solicitud, 5)
         
         f = open(f_path, 'w')
-        mm.rcvDATA_tofile(f, timeout=8.0)
+        sts, ret = mm.rcvDATA_tofile(f, timeout=8.0)
         f.close()
+
+        if not sts:
+            print(f"Error downloading {f_path}")
+            uos.remove(f_path)
         
+        return sts
+
         #sts, body, headers = mm.rcvDATA(0, True, 15)
         #if sts:
         #    #print(body)
@@ -41,6 +48,7 @@ def pull(f_path, url):
  
     except Exception as e:
         print(f"\natupgrade/pull: {f_path} - {str(e)}")
+        return False
 
 def __main__(args):
 
@@ -67,8 +75,8 @@ def __main__(args):
         print("from main branch", end="")
         
     uf="/etc/upgrade2.inf"
-    pull(uf, url_raw + uf[1:])
-    print(", OK")
+    if pull(uf, url_raw + uf[1:]):
+        print(", OK")
     
     if not utls.file_exists(uf):
         print("No upgrade file available, system can not be upgraded")
