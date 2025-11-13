@@ -227,23 +227,17 @@ class ModemManager:
             print(f"<< Headers: {headers}")
             print(f"<< Body: {retResp}")
 
-        
-
         if self.timming:            
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms" )
 
         return True, retResp, headers
-    
-    def rcvDATA_tofile(self, fh, timeout=8.0):
+        
+    def rcvDATA_tofile(self, fh, timeout=10.0):
         """
         Recibe datos del módem ESP-AT y guarda el payload en el fichero `fh`.
-        - Detecta y guarda las cabeceras (antes del primer \r\n\r\n).
-        - Procesa +IPD,<len>: incluso si llegan fragmentadas.
-        - Escribe al fichero conforme llegan los datos (modo streaming).
-        - No mantiene grandes buffers en RAM.
-        Devuelve (success: bool, result: dict)
-          result = {'written': N, 'headers': str, 'errors': [..]}
+        Maneja correctamente fragmentos parciales de +IPD y evita errores
+        'trailing non-IPD data' e 'incomplete IPD frame left in buffer'.
         """
         import time
 
@@ -262,7 +256,7 @@ class ModemManager:
 
         while time.ticks_diff(time.ticks_ms(), start_ms) < timeout_ms:
             if self.modem.any():
-                ndc = 0
+                ndc = -2
                 chunk = self.modem.read()
                 if not chunk:
                     time.sleep(0.01)
@@ -278,102 +272,97 @@ class ModemManager:
                             headers = buf[:sep].decode('utf-8', 'ignore')
                         except Exception:
                             headers = "<decode_error>"
-                        buf = buf[sep + 4:]  # eliminar cabeceras
+                        buf = buf[sep + 4:]
                         headers_found = True
 
-                # Detectar cierre de conexión
+                # Detectar fin de conexión
                 ci = buf.find(closed_marker)
                 if ci != -1:
                     buf = buf[:ci]
 
-                # Procesar bloques +IPD
+                # Procesar posibles bloques +IPD
                 while True:
                     p = buf.find(ipd_tag)
                     if p == -1:
-                        # Mantener buffer corto
-                        if len(buf) > 64:
-                            buf = buf[-16:]
+                        # no hay cabecera +IPD completa
+                        if len(buf) > 2048:
+                            # evitar buffer excesivo
+                            buf = buf[-512:]
                         break
 
                     colon = buf.find(b':', p + len(ipd_tag))
                     if colon == -1:
+                        # encabezado +IPD incompleto, esperar más datos
                         if p > 0:
                             buf = buf[p:]
                         break
 
-                    # Extraer longitud
                     num_field = buf[p + len(ipd_tag):colon]
                     try:
                         n = int(num_field)
                     except Exception:
-                        errors.append("bad length field: %r" % num_field)
+                        errors.append(f"bad length field: {num_field!r}")
                         buf = buf[colon + 1:]
                         continue
 
                     payload_start = colon + 1
-                    buf = buf[payload_start:]  # eliminar cabecera +IPD
+                    available = len(buf) - payload_start
 
-                    # === Escritura por partes (streaming) ===
-                    remaining = n
-                    while remaining > 0 and time.ticks_diff(time.ticks_ms(), start_ms) < timeout_ms:
-                        if len(buf) == 0:
-                            # Esperar más datos del módem
-                            wait_start = time.ticks_ms()
-                            while not self.modem.any() and time.ticks_diff(time.ticks_ms(), wait_start) < 200:
-                                time.sleep(0.01)
-                            if not self.modem.any():
-                                # sin datos, salir del bucle de lectura parcial
-                                break
-                            buf.extend(self.modem.read())
+                    if available < n:
+                        # aún no tenemos todo el payload
+                        if p > 0:
+                            buf = buf[p:]
+                        break
 
-                        to_write = min(len(buf), remaining)
-                        if to_write > 0:
-                            fh.write(buf[:to_write])
-                            total_written += to_write
-                            try:
-                                fh.flush()
-                            except:
-                                pass
-                            buf = buf[to_write:]
-                            remaining -= to_write
-                            start_ms = time.ticks_ms()  # reiniciar timeout si llegan datos
-                        else:
-                            time.sleep(0.01)
+                    # tenemos bloque completo
+                    payload = buf[payload_start:payload_start + n]
+                    try:
+                        fh.write(payload)
+                        try:
+                            fh.flush()
+                        except Exception:
+                            pass
+                        total_written += n
+                    except Exception as e:
+                        errors.append(f"file write error: {e}")
+                        return False, {'written': total_written, 'headers': headers, 'errors': errors}
 
-                    # Si no completamos el bloque, marcar pero sin abortar
-                    if remaining > 0:
-                        errors.append("partial frame (%d bytes missing)" % remaining)
-                    # Continuar buscando siguiente +IPD
-                    continue
+                    # eliminar bloque procesado (+IPD + payload)
+                    buf = buf[payload_start + n:]
 
-                # Reiniciar timeout si llegan datos
+                # reiniciar timeout si hay datos
                 start_ms = time.ticks_ms()
 
-                # Si se cerró la conexión y no quedan datos, salir
+                # si detectamos CLOSED y buffer vacío, salir
                 if ci != -1 and len(buf) == 0:
                     break
-
             else:
                 ndc += 1
-                time.sleep(0.07)
+                time.sleep(0.100)
 
             if ndc > 25:
                 break
 
             time.sleep(0.005)
 
-        # Limpieza final
-        if len(buf) > 0:
-            # Si hay restos no-IPD (ruido)
-            if buf.find(ipd_tag) == -1 and any(b not in (0x0d, 0x0a, 0x00) for b in buf):
-                errors.append("trailing data discarded (%d bytes)" % len(buf))
+        # --- Post-procesamiento del buffer ---
+        # Limpiar restos de un posible frame parcial o datos basura
+        if buf:
+            # 1. Si hay +IPD, pero incompleto -> truncar
+            if buf.startswith(ipd_tag) or (ipd_tag in buf):
+                errors.append(f"incomplete IPD frame left in buffer ({len(buf)} bytes)")
+            else:
+                # 2. Ignorar solo si no son saltos de línea / nulos
+                if any(b not in (0x0d, 0x0a, 0x00) for b in buf):
+                    errors.append(f"trailing non-IPD data ({len(buf)} bytes) discarded")
 
-        success = (len(errors) == 0)
+        success = not errors
         return success, {
             'written': total_written,
             'headers': headers,
             'errors': errors
         }
+
 
 # ------ Command Implementations
 

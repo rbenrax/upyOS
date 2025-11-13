@@ -27,11 +27,14 @@ def pull(f_path, url):
         
         f = open(f_path, 'w')
         sts, ret = mm.rcvDATA_tofile(f, timeout=8.0)
+        if not sts:
+            print(ret)
+
         f.close()
 
         if not sts:
             print(f"Error downloading {f_path}")
-            uos.remove(f_path)
+            os.remove(f_path)
         
         return sts
 
@@ -123,9 +126,11 @@ def __main__(args):
             else:
                 print(".", end="")
             pull(fp, url_raw + fp[1:])
+
             cont+=1
             
     os.remove(uf)
+    
     
     #print(str(ftu))
     #print(str(cont))
