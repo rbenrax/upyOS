@@ -230,78 +230,76 @@ class ModemManager:
         if self.timming:            
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms" )
-
+            
         return True, retResp, headers
-        
+
     def rcvDATA_tofile(self, fh, timeout=10.0):
         """
-        Recibe datos del módem ESP-AT y guarda el payload en el fichero `fh`.
-        Maneja correctamente fragmentos parciales de +IPD y evita errores
-        'trailing non-IPD data' e 'incomplete IPD frame left in buffer'.
+        Lee del ESP-AT, procesa tramas +IPD (soporta +IPD,<len>: y +IPD,<id>,<len>:),
+        detecta cabeceras HTTP aunque estén fragmentadas dentro de varios +IPD,
+        y escribe solo el payload real al fichero `fh`.
+        Devuelve (success, {written, headers, errors})
         """
         import time
 
         start_ms = time.ticks_ms()
         timeout_ms = int(timeout * 1000)
 
-        buf = bytearray()
+        buf = bytearray()            # buffer general de bytes recibidos del módem
+        header_acc = bytearray()     # acumulador para detectar cabeceras dentro del payloads
+        headers = ""
+        headers_done = False
+
         total_written = 0
         errors = []
-        ndc = 0
-        headers = ""
-        headers_found = False
 
-        ipd_tag = b'+IPD,'
-        closed_marker = b'\r\nCLOSED\r\n'
+        IPD = b"+IPD,"
+        CLOSED = b"\r\nCLOSED\r\n"
 
         while time.ticks_diff(time.ticks_ms(), start_ms) < timeout_ms:
             if self.modem.any():
-                ndc = -2
                 chunk = self.modem.read()
                 if not chunk:
                     time.sleep(0.01)
                     continue
-
                 buf.extend(chunk)
+                start_ms = time.ticks_ms()  # reiniciar timeout al recibir datos
 
-                # Detectar cabeceras HTTP si no se han detectado todavía
-                if not headers_found:
-                    sep = buf.find(b'\r\n\r\n')
-                    if sep != -1:
-                        try:
-                            headers = buf[:sep].decode('utf-8', 'ignore')
-                        except Exception:
-                            headers = "<decode_error>"
-                        buf = buf[sep + 4:]
-                        headers_found = True
-
-                # Detectar fin de conexión
-                ci = buf.find(closed_marker)
+                # si aparece CLOSED, quitarlo y marcar fin de datos extra
+                ci = buf.find(CLOSED)
                 if ci != -1:
+                    # recortamos todo desde CLOSED en adelante
                     buf = buf[:ci]
 
-                # Procesar posibles bloques +IPD
+                # procesar todas las tramas +IPD completas que haya en buf
                 while True:
-                    p = buf.find(ipd_tag)
+                    p = buf.find(IPD)
                     if p == -1:
-                        # no hay cabecera +IPD completa
-                        if len(buf) > 2048:
-                            # evitar buffer excesivo
-                            buf = buf[-512:]
+                        # no hay +IPD; mantener buffer pequeño
+                        if len(buf) > 256:
+                            buf = buf[-128:]
                         break
 
-                    colon = buf.find(b':', p + len(ipd_tag))
+                    # localizar ':' que termina el encabezado de IPD
+                    colon = buf.find(b':', p + len(IPD))
                     if colon == -1:
-                        # encabezado +IPD incompleto, esperar más datos
-                        if p > 0:
-                            buf = buf[p:]
+                        # encabezado +IPD incompleto, conservar desde p y esperar más
+                        buf = buf[p:]
                         break
 
-                    num_field = buf[p + len(ipd_tag):colon]
+                    # el campo entre +IPD, y ':' puede ser "N" o "id,N" (variante con id)
+                    num_field = buf[p + len(IPD):colon]         # bytes entre +IPD, y ':'
+                    parts = num_field.split(b',')
+                    if not parts:
+                        errors.append("empty IPD length field")
+                        buf = buf[colon + 1:]
+                        continue
+
                     try:
-                        n = int(num_field)
+                        # tomar el último campo como longitud
+                        n = int(parts[-1])
                     except Exception:
-                        errors.append(f"bad length field: {num_field!r}")
+                        errors.append("bad IPD length: %r" % (num_field,))
                         buf = buf[colon + 1:]
                         continue
 
@@ -309,59 +307,89 @@ class ModemManager:
                     available = len(buf) - payload_start
 
                     if available < n:
-                        # aún no tenemos todo el payload
-                        if p > 0:
-                            buf = buf[p:]
+                        # payload incompleto: conservar desde p (inicio de +IPD) y esperar
+                        buf = buf[p:]
                         break
 
-                    # tenemos bloque completo
-                    payload = buf[payload_start:payload_start + n]
-                    try:
-                        fh.write(payload)
-                        try:
-                            fh.flush()
-                        except Exception:
+                    # payload completo disponible
+                    payload = bytes(buf[payload_start:payload_start + n])  # convertir para manipular
+                    # si aún no hemos extraído cabeceras, acumulamos y buscamos \r\n\r\n
+                    if not headers_done:
+                        header_acc.extend(payload)
+                        sep = header_acc.find(b"\r\n\r\n")
+                        if sep != -1:
+                            # encontramos cabeceras
+                            try:
+                                headers = header_acc[:sep].decode("utf-8", "ignore")
+                            except Exception:
+                                headers = "<decode_error>"
+                            # lo que quede después del separador es parte del body
+                            body_part = header_acc[sep + 4:]
+                            # escribir la parte de body acumulada (si hay)
+                            if body_part:
+                                try:
+                                    fh.write(body_part)
+                                    try:
+                                        fh.flush()
+                                    except:
+                                        pass
+                                    total_written += len(body_part)
+                                except Exception as e:
+                                    errors.append("file write error: %s" % str(e))
+                                    return False, {"written": total_written, "headers": headers, "errors": errors}
+                            headers_done = True
+                            # NOTA: el resto del payload (si quedó después de payload slice) ya se
+                            # aplicará más abajo si hay bytes restantes en este payload.
+                        else:
+                            # aún no hemos visto el final de cabeceras; no escribir nada todavía
+                            # (puede que los headers sean grandes y sigan en siguientes +IPD)
                             pass
-                        total_written += n
-                    except Exception as e:
-                        errors.append(f"file write error: {e}")
-                        return False, {'written': total_written, 'headers': headers, 'errors': errors}
+                    else:
+                        # cabeceras ya detectadas previamente -> escribir payload entero
+                        try:
+                            fh.write(payload)
+                            try:
+                                fh.flush()
+                            except:
+                                pass
+                            total_written += n
+                        except Exception as e:
+                            errors.append("file write error: %s" % str(e))
+                            return False, {"written": total_written, "headers": headers, "errors": errors}
 
-                    # eliminar bloque procesado (+IPD + payload)
+                    # Si acabamos de detectar headers dentro de este payload, puede que
+                    # body_part (la porción que quedó tras \r\n\r\n) no haya sido escrita:
+                    if headers_done and header_acc:
+                        # ya procesamos header_acc (su body_part) arriba; limpiar header_acc
+                        header_acc = bytearray()
+
+                    # eliminar de buf la trama procesada (desde inicio '+IPD' hasta final del payload)
                     buf = buf[payload_start + n:]
+                    # seguir buscando más +IPD en buf
 
-                # reiniciar timeout si hay datos
-                start_ms = time.ticks_ms()
-
-                # si detectamos CLOSED y buffer vacío, salir
+                # si habíamos encontrado CLOSED y ya no queda nada por procesar → salir
                 if ci != -1 and len(buf) == 0:
                     break
+
             else:
-                ndc += 1
-                time.sleep(0.100)
+                # no hay datos disponibles
+                time.sleep(0.05)
 
-            if ndc > 25:
-                break
+        # tras salir del bucle, revisar si quedó algo problemático en buffers
+        if header_acc:
+            # si hemos acumulado datos en header_acc pero no encontramos '\r\n\r\n'
+            # puede que falten bytes para completar las cabeceras
+            errors.append("incomplete HTTP headers left (%d bytes)" % len(header_acc))
 
-            time.sleep(0.005)
-
-        # --- Post-procesamiento del buffer ---
-        # Limpiar restos de un posible frame parcial o datos basura
         if buf:
-            # 1. Si hay +IPD, pero incompleto -> truncar
-            if buf.startswith(ipd_tag) or (ipd_tag in buf):
-                errors.append(f"incomplete IPD frame left in buffer ({len(buf)} bytes)")
-            else:
-                # 2. Ignorar solo si no son saltos de línea / nulos
-                if any(b not in (0x0d, 0x0a, 0x00) for b in buf):
-                    errors.append(f"trailing non-IPD data ({len(buf)} bytes) discarded")
+            # si quedó data residual que no parecía IPD
+            if IPD in buf:
+                errors.append("incomplete IPD frame left in buffer (%d bytes)" % len(buf))
+            elif any(b not in (0x00, 0x0d, 0x0a) for b in buf):
+                errors.append("trailing non-IPD data discarded (%d bytes)" % len(buf))
 
-        success = not errors
-        return success, {
-            'written': total_written,
-            'headers': headers,
-            'errors': errors
-        }
+        success = (len(errors) == 0)
+        return success, {"written": total_written, "headers": headers, "errors": errors}
 
 
 # ------ Command Implementations

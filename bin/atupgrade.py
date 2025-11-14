@@ -36,6 +36,7 @@ def pull(f_path, url):
             print(f"Error downloading {f_path}")
             os.remove(f_path)
         
+        mm.close_conn()
         return sts
 
         #sts, body, headers = mm.rcvDATA(0, True, 15)
