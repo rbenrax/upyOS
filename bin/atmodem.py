@@ -28,37 +28,37 @@ def executeScript(mm, file):
             
 def executeLine(mm, tmp):
 
-        if tmp[0].lower() == "reset" or tmp[0].lower() == "-r":
-            gpio  = int(tmp[1])  # Gpio reset pin in mcu
-            wait  = int(tmp[2])  # Modem wait to ready
-            mm.resetHW(gpio, wait)
+    if tmp[0].lower() == "reset" or tmp[0].lower() == "-r":
+        gpio  = int(tmp[1])  # Gpio reset pin in mcu
+        wait  = int(tmp[2])  # Modem wait to ready
+        mm.resetHW(gpio, wait)
 
-        elif tmp[0].lower() == "uart" or tmp[0].lower() == "-c":
-            id   = int(tmp[1])  # uC Uart ID
-            baud = int(tmp[2])  # Baudrate
-            tx   = int(tmp[3])  # TX gpio
-            rx   = int(tmp[4])  # RX gpio
-            if len(tmp) == 6:
-               mm.device = tmp[5] # Modem name (modem0)
-            mm.createUART(id, baud, tx, rx, mm.device)
+    elif tmp[0].lower() == "uart" or tmp[0].lower() == "-c":
+        id   = int(tmp[1])  # uC Uart ID
+        baud = int(tmp[2])  # Baudrate
+        tx   = int(tmp[3])  # TX gpio
+        rx   = int(tmp[4])  # RX gpio
+        if len(tmp) == 6:
+           mm.device = tmp[5] # Modem name (modem0)
+        mm.createUART(id, baud, tx, rx, mm.device)
 
-        elif tmp[0].lower() == "sleep":
-            if mm.sctrl:
-                print(f"** Waiting {tmp[1]}sec\n")
-            time.sleep(float(tmp[1]))
-            
-        elif tmp[0].lower() == "echo":
-            print(" ".join(tmp[1:])) # TODO: Translate env vars
-            
-        else:
-            cmd = tmp[0]
-            timeout = 2.0  # Timeout por defecto aumentado
-            exp = "OK"
-            if len(tmp) > 1:
-                timeout = float(tmp[1])
-            if len(tmp) > 2:
-                exp = tmp[2]
-            mm.atCMD(cmd, timeout, exp)
+    elif tmp[0].lower() == "sleep":
+        if mm.sctrl:
+            print(f"** Waiting {tmp[1]}sec\n")
+        time.sleep(float(tmp[1]))
+        
+    elif tmp[0].lower() == "echo":
+        print(" ".join(tmp[1:])) # TODO: Translate env vars
+        
+    else:
+        cmd = tmp[0]
+        timeout = 2.0  # Timeout por defecto aumentado
+        exp = "OK"
+        if len(tmp) > 1:
+            timeout = float(tmp[1])
+        if len(tmp) > 2:
+            exp = tmp[2]
+        mm.atCMD(cmd, timeout, exp)
 
 # Command line tool
 def __main__(args):
