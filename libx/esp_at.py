@@ -49,8 +49,9 @@ class ModemManager:
         try:
 
             self.device = device
-            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=1024)
-                        
+            #self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=1024)
+            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rts=Pin(7), cts=Pin(6), rxbuf=1024)
+            
             #self.modem = UART(id,
             #            baudrate=baud,
             #            bits=8,
@@ -277,7 +278,7 @@ class ModemManager:
                 data = self.modem.read()
                 #nb += 1
                 
-                print(f"*rcvDATA*** <<  data")
+                #print(f"*rcvDATA*** <<  data")
                                 
                 if not hf:
                     body_ini = data.find(b"\r\n\r\n")
@@ -289,9 +290,10 @@ class ModemManager:
        
                 #print(f"*** NB: {nb}")
                         
-                if data.find(b"HTTP/1.1 200 OK") > -1:
-                    print(f"Body Error !!!: {data}")
-                    return False, headers
+                #if data.find(b"HTTP/1.1 200 OK") > -1:
+                #    print(f"Body Error !!!: {data}")
+                #    return False, headers
+                
                 try:
                     fh.write(data)
                     fh.flush()
@@ -305,7 +307,7 @@ class ModemManager:
                 
             else:
                 ndc += 1
-                print(f"No data {ndc}")
+                #print(f"No data {ndc}")
                 time.sleep_ms(50)
                 
             time.sleep_ms(5)
