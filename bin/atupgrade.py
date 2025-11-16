@@ -54,8 +54,8 @@ def __main__(args):
         print("from main branch", end="")
         
     uf="/etc/upgrade2.inf"
-    if pull(uf, url_raw + uf[1:]):
-        print(", OK")
+    pull(uf, url_raw + uf[1:])
+    print(", OK")
     
     if not utls.file_exists(uf):
         print("No upgrade file available, system can not be upgraded")
@@ -83,9 +83,28 @@ def __main__(args):
         if r!="y":
             print("Upgrade canceled.")
             return
-       , end="")
-            
+         
+    print("Upgrading from upyOS github repository, wait...")
+    print("[", end="")
     
+    cont=0
+    with open(uf, 'r') as f:
+        while True:
+            fp = f.readline()
+            
+            if not fp: break
+            if fp.strip()=="": continue   # Empty lines skipped
+            if fp.strip().startswith("#"): continue # Commanted lines skipped
+            
+            fp = fp[:-1] # remove ending CR
+            if "v" in mod:
+                print(fp, end=", ")
+            else:
+                print(".", end="")
+            pull(fp, url_raw + fp[1:])
+            cont+=1
+            
+    os.remove(uf)
     
     #print(str(ftu))
     #print(str(cont))
