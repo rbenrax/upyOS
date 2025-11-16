@@ -21,57 +21,114 @@ def __main__(args):
     
     # An other trace option
     #mt.sctrl = True
-    #mt.scmds = True
-    #mt.sresp = True
-    #mt.timming = True
-    
-    # ... Or direct by program WIFI connection
-    #mt.resetHW(22, 1)
-    #if not mt.createUART(1, 115200, 4, 5, "modem0"):
-    #    return
-    
-    #mt.set_mode(1)
-    
-    #mt.wifi_connect("SSID","PASSW")
+    mt.scmds = True
+    mt.sresp = True
+    mt.timming = True
 
-    print("- Test: "    + str(mt.test_modem()))
-    print("- Version: " + mt.get_version())
+    testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/microWebSrv.py'
+    #testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/uftpdserver.py'
+    #testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/esp_at.py'
+    mt.http_to_file(testb, filename="/prueba.py")
+
+    if 1 == 2:
+
+        #print("- Test: "    + str(mt.test_modem()))
+        #print("- Version: " + mt.get_version())
+            
+        #print("- Status: "  + mt.wifi_status())
+        #print("- IP: "      + mt.get_ip_mac("ip"))
+        #print("- MAC: "     + mt.get_ip_mac("mac"))
+            
+        #mt.set_ntp_server()
+        #print("- NTP time: " + str(mt.set_datetime()))
         
-    print("- Status: "  + mt.wifi_status())
-    print("- IP: "      + mt.get_ip_mac("ip"))
-    print("- MAC: "     + mt.get_ip_mac("mac"))
+        # TCP test
+
+        #srv="httpcan.org"
+        #srv="httpbin.org"
+        #srv="192.168.2.132"
+        #srv="fmstream.org"
+        #get="/"
+
+        srv= "raw.githubusercontent.com"
+        #get= "/rbenrax/upyOS/refs/heads/main/etc/upgrade2.inf"
+        get= "/rbenrax/upyOS/refs/heads/main/libx/microWebSrv.py"    
+    
+
+        #print("Ping: " + mt.ping(srv))
         
-    mt.set_ntp_server()
-    #time.sleep(5)
-    print("- NTP time: " + str(mt.set_datetime()))
-    
-    # TCP test
+        print("- Create TCP Connection")
+        #mt.create_conn(srv, 8200, "TCP", keepalive=60)
+        mt.create_conn(srv, 443, "SSL", keepalive=60)
+        
+        mt.atCMD("ATE0")
+        mt.atCMD("AT+CIPMODE=1")
+        
+        print("- Send request")
+        #req = f"GET {get} HTTP/1.1\r\nHost: {srv}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
+        req = f"GET {get} HTTP/1.1\r\nHost: {srv}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
 
-    srv="httpcan.org"
-    #srv="httpbin.org"
-    get="/get"
+        # Entrar en modo transparente
+        #mt.modem.write("AT+CIPSEND\r\n")
+        mt.send_passthrow()
+        
+        time.sleep(.5)
+        print(f"Sending: {req}")
+        mt.modem.write(req)
+        while mt.modem.any():
+            mt.modem.read()
+        time.sleep(.3)
 
-    #sts, _ = mt.atCMD("AT+CIPSSLCCONF=0")
-    #sts, _ = mt.atCMD("AT+CIPSNIREQ=0")
-    
-    print("- Create TCP Connection")
-    mt.create_conn(srv, 80, "TCP", keepalive=60)
-    #mt.create_conn(srv, 443, "SSL", keepalive=60)
+        #sts, ret = mt.send_data(req)
+        #sts, ret = mt.send_data_transp(req, 5)
+        #print(f"- sts: {sts} / ret: {ret}")
+        
+        f = open('datos.txt', 'w')
+        
+        print("- Data receiving")
+        #sts, data = mt.rcv_data(0, True, 10, f)
+        
+        #sts, body, headers = mt.rcv_data(0, True, 15)
+        #if sts:
+        #    print(body)
+        #    f.write(body)
+        #else:
+        #    print("- No Data")
+        
+        sts, headers = mt.rcv_to_file_t(f, 10)
+        if sts:
+            print(headers)
+        else:
+            print("- No Data")
 
-    print("- Send request")
-    mt.send_data(f"GET {get} HTTP/1.1\r\nHost: {srv}\r\n\r\n")
-    #mt.send_data_transparent(f"GET / HTTP/1.1\r\nHost: {srv}\r\n\r\n")
-    
-    print("- Receive data")
-    sts, data = mt.rcvDATA(2048, True, 10)
-    if sts:
-        print(data)
-    else:
-        print("- No Data")
-    
-    #mt.close_conn() # if not closed by server
-     
-    #print("- Disconnecting ...")
-    #mt.wifi_disconnect()
+        f.close()
+        
+        mt.modem.write("+++")
+        mt.atCMD("AT+CIPMODE=0")
+        mt.close_conn() # if not closed by server
+        mt.atCMD("ATE1")
+        
+        #print("- Disconnecting ...")
+        #mt.wifi_disconnect()
 
-   
+       
+       
+         
+        """  
+        ATE0
+        AT+RST
+
+        AT+CWJAP="MiSSID","MiPassword"
+        AT+CIPSTA?
+
+        AT+CIPSTART="SSL","example.com",443
+        AT+CIPMODE=1
+        AT+CIPSEND
+        GET / HTTP/1.1
+        Host: example.com
+        Connection: close
+
+        +++
+        AT+CIPMODE=0
+        AT+CIPCLOSE
+        """   

@@ -1,8 +1,9 @@
-#upyOS,0.9.1,2025-10-29
+#upyOS,0.9.1,2025-11-16
 /boot.py
 /main.py
-/bin/ATmodem.py
-/bin/ATmqtt.py
+/bin/atmodem.py
+/bin/atmqttc.py
+/bin/atupgrade.py
 /bin/cat.py
 /bin/cd.py
 /bin/clear.py
@@ -35,6 +36,7 @@
 /bin/mcu_t.sh
 /bin/mi.py
 /bin/mkdir.py
+/bin/mqtt.py
 /bin/mqttc.py
 /bin/mv.py
 /bin/ntpupdate.py
@@ -49,6 +51,7 @@
 /bin/rm.py
 /bin/rmdir.py
 /bin/rmmod.py
+/bin/screen.py
 /bin/sensors.py
 /bin/setauth.py
 /bin/sh.py
@@ -76,6 +79,7 @@
 /lib/utls.py
 /libx/editor.py
 /libx/editstr.py
+/libx/esp_at.py
 /libx/microWebSocket.py
 /libx/microWebSrv.py
 /libx/microWebTemplate.py
@@ -94,9 +98,10 @@
 /etc/upyOS-esp32.board
 /etc/upyOS-esp32c3_luatos.board
 /etc/upyOS-esp32c3_vcc_gnd.board
+/etc/upyOS-esp32c6_muse_labs.board
 /etc/upyOS-esp32s3_vcc_gnd.board
 /etc/upyOS-esp8266.board
 /etc/upyOS-rp2.board
 /etc/welcome.txt
 /etc/wellcome.txt
-#files,100
+#files,105
