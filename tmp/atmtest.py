@@ -26,9 +26,14 @@ def __main__(args):
     mt.timming = True
 
     testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/microWebSrv.py'
-    #testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/uftpdserver.py'
-    #testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/esp_at.py'
-    mt.http_to_file(testb, filename="/prueba.py")
+    mt.http_to_file(testb, filename="/x1.py")
+
+    testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/uftpdserver.py'
+    mt.http_to_file(testb, filename="/x2.py")
+
+    testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/libx/editor.py'
+    mt.http_to_file(testb, filename="/x3.py")
+ 
 
     if 1 == 2:
 

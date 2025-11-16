@@ -49,7 +49,22 @@ class ModemManager:
         try:
 
             self.device = device
-            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=2048)
+            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=1024)
+                        
+            #self.modem = UART(id,
+            #            baudrate=baud,
+            #            bits=8,
+            #            parity=None,
+            #            stop=1,
+            #            tx=Pin(tx),    # TX pin
+            #            rx=Pin(rx),    # RX pin  
+            #            rts=Pin(7),    # RTS pin (Request to Send)
+            #            cts=Pin(6),    # CTS pin (Clear to Send)
+            #            timeout=0,
+            #            timeout_char=0,
+            #            rxbuf=1024,
+            #            txbuf=512)
+
             setattr(sdata, self.device, self.modem)
 
             if self.sctrl:
@@ -66,7 +81,7 @@ class ModemManager:
     def _drain(self):
         # vacía el buffer UART
         t0 = time.time()
-        while self.modem.any() and (time.time() - t0) < 0.1:
+        while self.modem.any() and (time.time() - t0) < 0.01:
             self.modem.read()
             
     def atCMD(self, command, timeout=2.0, exp="OK"):
@@ -170,7 +185,7 @@ class ModemManager:
         timeout = timeout  * 1000
 
         # Important, to wait !!
-        time.sleep(0.100)
+        #time.sleep(0.100)
 
         resp = b""
         start_time = time.ticks_ms()
@@ -235,7 +250,7 @@ class ModemManager:
             
         return True, retResp, headers
     
-    def rcv_to_file_t(self, fh, timeout=10.0):
+    def rcv_to_file_t(self, fh, timeout=8.0):
         
         if self.timming:
             ptini = time.ticks_ms()
@@ -243,7 +258,7 @@ class ModemManager:
         timeout = timeout  * 1000
 
         # Important, to wait !!
-        time.sleep(0.050)
+        #time.sleep_ms(5)
 
         # Esperar respuesta
         resp = b""
@@ -262,7 +277,7 @@ class ModemManager:
                 data = self.modem.read()
                 #nb += 1
                 
-                #print(f"*rcvDATA*** <<  {data}")
+                print(f"*rcvDATA*** <<  data")
                                 
                 if not hf:
                     body_ini = data.find(b"\r\n\r\n")
@@ -290,11 +305,11 @@ class ModemManager:
                 
             else:
                 ndc += 1
-                #print(f"No data {ndc}")
-                time.sleep(0.100)
+                print(f"No data {ndc}")
+                time.sleep_ms(50)
                 
-            time.sleep(0.010)
-            if ndc > 5:
+            time.sleep_ms(5)
+            if ndc > 6:
                 #print("*****: Brk rcv 2")
                 break
  
@@ -330,22 +345,21 @@ class ModemManager:
         # Entrar en modo transparente
         self.send_passthrow()
         
-        time.sleep(0.020)
+        time.sleep(0.050)
         self._drain()
-        time.sleep(0.020)
+        time.sleep(0.050)
         self.modem.write(req.encode('utf-8'))
-        self._drain()
-        
+        time.sleep(0.050)
         sts = False
         with open(filename, 'wb') as f:
-            sts, headers = self.rcv_to_file_t(f, 10)
+            sts, headers = self.rcv_to_file_t(f, 8)
         
-        time.sleep(0.5)
+        time.sleep(1)
         self.modem.write("+++")
-        time.sleep(0.1)
-        self.atCMD("AT+CIPMODE=0")
+        time.sleep(1)
+        self.atCMD("AT+CIPMODE=0", 3)
         self.close_conn()
-        self.atCMD("ATE1")
+        self.atCMD("ATE1", 2)
         
         return sts
 
