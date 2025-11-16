@@ -15,8 +15,8 @@ def pull(f_path, url):
     try:
         
         mm = ModemManager("modem0")
-        #mt.sctrl = True
-        #mt.scmds = True
+        #mm.sctrl = True
+        #mm.scmds = True
         #mm.sresp = True
         #mm.timming = True
  
