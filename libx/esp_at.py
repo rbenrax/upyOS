@@ -47,9 +47,9 @@ class ModemManager:
             
     def createUART(self, id, baud, tx, rx, device="modem0"):
         try:
-            
+
             self.device = device
-            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx))
+            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=2048)
             setattr(sdata, self.device, self.modem)
 
             if self.sctrl:
@@ -162,14 +162,16 @@ class ModemManager:
         
         return result
 
-    def rcvDATA(self, size=1024, encoded=True, timeout=8.0):
+    def rcv_data(self, size=1024, encoded=True, timeout=8.0):
         
         if self.timming:
             ptini = time.ticks_ms()
         
         timeout = timeout  * 1000
 
-        # Esperar respuesta
+        # Important, to wait !!
+        time.sleep(0.100)
+
         resp = b""
         start_time = time.ticks_ms()
         
@@ -184,7 +186,7 @@ class ModemManager:
                 
                 if b"\r\nCLOSED\r\n" in data:
                     cidx = data.find(b"\r\nCLOSED\r\n")
-                    if cidx > 0:
+                    if cidx > -1:
                         resp += data[:cidx]
                     #print("*****: Brk rcv 1 closed")
                     break
@@ -218,8 +220,8 @@ class ModemManager:
         retResp = self.clear_ipd(retResp)
 
         headers = ""
-        body_ini = retResp.index("\r\n\r\n")
-        if body_ini > 0:
+        body_ini = retResp.find("\r\n\r\n")
+        if body_ini > -1:
             headers = retResp[:body_ini]
             retResp = retResp[body_ini + 4:] 
 
@@ -232,169 +234,124 @@ class ModemManager:
             print(f"## Tiempo rcv: {ptfin}ms" )
             
         return True, retResp, headers
+    
+    def rcv_to_file_t(self, fh, timeout=10.0):
+        
+        if self.timming:
+            ptini = time.ticks_ms()
+        
+        timeout = timeout  * 1000
 
-    def rcvDATA_tofile(self, fh, timeout=10.0):
-        """
-        Lee del ESP-AT, procesa tramas +IPD (soporta +IPD,<len>: y +IPD,<id>,<len>:),
-        detecta cabeceras HTTP aunque estén fragmentadas dentro de varios +IPD,
-        y escribe solo el payload real al fichero `fh`.
-        Devuelve (success, {written, headers, errors})
-        """
-        import time
+        # Important, to wait !!
+        time.sleep(0.010)
 
-        start_ms = time.ticks_ms()
-        timeout_ms = int(timeout * 1000)
-
-        buf = bytearray()            # buffer general de bytes recibidos del módem
-        header_acc = bytearray()     # acumulador para detectar cabeceras dentro del payloads
+        # Esperar respuesta
+        resp = b""
+        start_time = time.ticks_ms()
+        ndc=0 # No data count
+        #nb=0
+        
+        #print("*rcv****: " + str(timeout))
+        hf = False
         headers = ""
-        headers_done = False
-
-        total_written = 0
-        errors = []
-
-        IPD = b"+IPD,"
-        CLOSED = b"\r\nCLOSED\r\n"
-
-        while time.ticks_diff(time.ticks_ms(), start_ms) < timeout_ms:
+        
+        while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
+            
             if self.modem.any():
-                chunk = self.modem.read()
-                if not chunk:
-                    time.sleep(0.01)
-                    continue
-                buf.extend(chunk)
-                start_ms = time.ticks_ms()  # reiniciar timeout al recibir datos
-
-                # si aparece CLOSED, quitarlo y marcar fin de datos extra
-                ci = buf.find(CLOSED)
-                if ci != -1:
-                    # recortamos todo desde CLOSED en adelante
-                    buf = buf[:ci]
-
-                # procesar todas las tramas +IPD completas que haya en buf
-                while True:
-                    p = buf.find(IPD)
-                    if p == -1:
-                        # no hay +IPD; mantener buffer pequeño
-                        if len(buf) > 256:
-                            buf = buf[-128:]
-                        break
-
-                    # localizar ':' que termina el encabezado de IPD
-                    colon = buf.find(b':', p + len(IPD))
-                    if colon == -1:
-                        # encabezado +IPD incompleto, conservar desde p y esperar más
-                        buf = buf[p:]
-                        break
-
-                    # el campo entre +IPD, y ':' puede ser "N" o "id,N" (variante con id)
-                    num_field = buf[p + len(IPD):colon]         # bytes entre +IPD, y ':'
-                    parts = num_field.split(b',')
-                    if not parts:
-                        errors.append("empty IPD length field")
-                        buf = buf[colon + 1:]
-                        continue
-
-                    try:
-                        # tomar el último campo como longitud
-                        n = int(parts[-1])
-                    except Exception:
-                        errors.append("bad IPD length: %r" % (num_field,))
-                        buf = buf[colon + 1:]
-                        continue
-
-                    payload_start = colon + 1
-                    available = len(buf) - payload_start
-
-                    if available < n:
-                        # payload incompleto: conservar desde p (inicio de +IPD) y esperar
-                        buf = buf[p:]
-                        break
-
-                    # payload completo disponible
-                    payload = bytes(buf[payload_start:payload_start + n])  # convertir para manipular
-                    # si aún no hemos extraído cabeceras, acumulamos y buscamos \r\n\r\n
-                    if not headers_done:
-                        header_acc.extend(payload)
-                        sep = header_acc.find(b"\r\n\r\n")
-                        if sep != -1:
-                            # encontramos cabeceras
-                            try:
-                                headers = header_acc[:sep].decode("utf-8", "ignore")
-                            except Exception:
-                                headers = "<decode_error>"
-                            # lo que quede después del separador es parte del body
-                            body_part = header_acc[sep + 4:]
-                            # escribir la parte de body acumulada (si hay)
-                            if body_part:
-                                try:
-                                    fh.write(body_part)
-                                    try:
-                                        fh.flush()
-                                    except:
-                                        pass
-                                    total_written += len(body_part)
-                                except Exception as e:
-                                    errors.append("file write error: %s" % str(e))
-                                    return False, {"written": total_written, "headers": headers, "errors": errors}
-                            headers_done = True
-                            # NOTA: el resto del payload (si quedó después de payload slice) ya se
-                            # aplicará más abajo si hay bytes restantes en este payload.
-                        else:
-                            # aún no hemos visto el final de cabeceras; no escribir nada todavía
-                            # (puede que los headers sean grandes y sigan en siguientes +IPD)
-                            pass
-                    else:
-                        # cabeceras ya detectadas previamente -> escribir payload entero
-                        try:
-                            fh.write(payload)
-                            try:
-                                fh.flush()
-                            except:
-                                pass
-                            total_written += n
-                        except Exception as e:
-                            errors.append("file write error: %s" % str(e))
-                            return False, {"written": total_written, "headers": headers, "errors": errors}
-
-                    # Si acabamos de detectar headers dentro de este payload, puede que
-                    # body_part (la porción que quedó tras \r\n\r\n) no haya sido escrita:
-                    if headers_done and header_acc:
-                        # ya procesamos header_acc (su body_part) arriba; limpiar header_acc
-                        header_acc = bytearray()
-
-                    # eliminar de buf la trama procesada (desde inicio '+IPD' hasta final del payload)
-                    buf = buf[payload_start + n:]
-                    # seguir buscando más +IPD en buf
-
-                # si habíamos encontrado CLOSED y ya no queda nada por procesar → salir
-                if ci != -1 and len(buf) == 0:
-                    break
-
+                ndc = 0
+                data = self.modem.read()
+                #nb += 1
+                
+                #print(f"*rcvDATA*** <<  {data}")
+                                
+                if not hf:
+                    body_ini = data.find(b"\r\n\r\n")
+                    if body_ini > -1:
+                        headers = data[:body_ini + 4]
+                        data    = data[body_ini + 4:]
+                        hf = True
+                        #print(f"*** Headers found!")
+       
+                #print(f"*** NB: {nb}")
+                        
+                if data.find(b"HTTP/1.1 200 OK") > -1:
+                    print(f"Body Error !!!: {data}")
+                    return False, headers
+                try:
+                    fh.write(data)
+                    fh.flush()
+                    #print(f"*** h: {headers}")
+                    #print(f"*** b: {data}")
+                except Exception as e:
+                    print(f"Error writing file - {str(e)}")
+                    return False, headers
+                
+                start_time = time.ticks_ms() # restart if new data
+                
             else:
-                # no hay datos disponibles
-                time.sleep(0.05)
+                ndc += 1
+                #print("No data")
+                time.sleep(0.200)
+                
+            #time.sleep(0.030)
+            if ndc > 4:
+                #print("*****: Brk rcv 2")
+                break
+ 
+        if self.timming:            
+            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            print(f"## Tiempo rcv: {ptfin}ms" )
+            
+        return True, headers
 
-        # tras salir del bucle, revisar si quedó algo problemático en buffers
-        if header_acc:
-            # si hemos acumulado datos en header_acc pero no encontramos '\r\n\r\n'
-            # puede que falten bytes para completar las cabeceras
-            errors.append("incomplete HTTP headers left (%d bytes)" % len(header_acc))
+    def http_to_file(self, url, filename=""):
+        
+        prot, _, hostport, path = url.split('/', 3)
+        port = 443 if prot.lower() == "https:" else 80
+        con = "SSL" if prot.lower() == "https:" else "TCP"
 
-        if buf:
-            # si quedó data residual que no parecía IPD
-            if IPD in buf:
-                errors.append("incomplete IPD frame left in buffer (%d bytes)" % len(buf))
-            elif any(b not in (0x00, 0x0d, 0x0a) for b in buf):
-                errors.append("trailing non-IPD data discarded (%d bytes)" % len(buf))
+        tmp = hostport.split(':')
+        if len(tmp) == 1:
+            host = tmp[0]
+        else:
+            host = tmp[0]
+            port = tmp[1]
 
-        success = (len(errors) == 0)
-        return success, {"written": total_written, "headers": headers, "errors": errors}
+        self.create_conn(host, port, con, keepalive=60)
+        
+        self.atCMD("ATE0")
+        self.atCMD("AT+CIPMODE=1")
+        
+        if not path.startswith("/"): path = "/" + path
+        
+        req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
+        #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
 
+        # Entrar en modo transparente
+        self.send_passthrow()
+        
+        time.sleep(0.020)
+        self._drain()
+        time.sleep(0.020)
+        self.modem.write(req.encode('utf-8'))
+        self._drain()
+        
+        sts = False
+        with open(filename, 'wb') as f:
+            sts, headers = self.rcv_to_file_t(f, 10)
+        
+        time.sleep(0.5)
+        self.modem.write("+++")
+        time.sleep(0.1)
+        self.atCMD("AT+CIPMODE=0")
+        self.close_conn()
+        self.atCMD("ATE1")
+        
+        return sts
 
 # ------ Command Implementations
 
-    def test_modem(self):
+    def test(self):
         sts, ret = self.atCMD("AT")
         if sts:
             lines = ret.split('\n')
@@ -406,7 +363,7 @@ class ModemManager:
         if sts:
             return ret.replace("\r\nOK\r\n", "").replace("AT+GMR\r\n", "")
         
-    def set_mode(self, mode=1):
+    def wifi_set_mode(self, mode=1):
         """Establecer modo WiFi (1=station, 2=AP, 3=both)"""
         sts, _ = self.atCMD(f"AT+CWMODE={mode}")
         return sts
@@ -500,6 +457,13 @@ class ModemManager:
         sts, _ = self.atCMD(command, 10.0, "CONNECT")
         return sts
     
+    def send_passthrow(self, tout=5):
+        lcmd = "AT+CIPSEND"
+        sts, ret = self.atCMD(lcmd, 3, ">")
+        if sts:
+            return sts, ret
+        return False, ""
+    
     def send_data(self, data, tout=5):
         lcmd = f"AT+CIPSEND={len(data)}"
         sts, ret = self.atCMD(lcmd, 3, ">")
@@ -512,8 +476,8 @@ class ModemManager:
     
     def send_data_transp(self, data, tout=5):
         """Send transparent mode data"""
-        length_cmd = f"AT+CIPSEND={len(data)}"
-        sts, _ = self.atCMD(length_cmd, tout, ">")
+        lcmd = f"AT+CIPSEND={len(data)}"
+        sts, _ = self.atCMD(lcmd, tout, ">")
         if sts:
             # Send data
             self.modem.write(data)
@@ -526,12 +490,7 @@ class ModemManager:
         """Cerrar conexión"""
         sts, _ = self.atCMD("AT+CIPCLOSE")
         return sts
-    
-    def enable_multiple_connections(self, enable=True):
-        """Habilitar múltiples conexiones"""
-        # Todo: Astk mode 1?
-        mode = 1 if enable else 0
-        return self.atCMD(f"AT+CIPMUX={mode}")
+
 
 # MQTT Implementation
 

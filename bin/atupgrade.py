@@ -108,29 +108,8 @@ def __main__(args):
         if r!="y":
             print("Upgrade canceled.")
             return
-         
-    print("Upgrading from upyOS github repository, wait...")
-    print("[", end="")
-    
-    cont=0
-    with open(uf, 'r') as f:
-        while True:
-            fp = f.readline()
+       , end="")
             
-            if not fp: break
-            if fp.strip()=="": continue   # Empty lines skipped
-            if fp.strip().startswith("#"): continue # Commanted lines skipped
-            
-            fp = fp[:-1] # remove ending CR
-            if "v" in mod:
-                print(fp, end=", ")
-            else:
-                print(".", end="")
-            pull(fp, url_raw + fp[1:])
-
-            cont+=1
-            
-    os.remove(uf)
     
     
     #print(str(ftu))
