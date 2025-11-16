@@ -243,7 +243,7 @@ class ModemManager:
         timeout = timeout  * 1000
 
         # Important, to wait !!
-        time.sleep(0.010)
+        time.sleep(0.050)
 
         # Esperar respuesta
         resp = b""
@@ -290,11 +290,11 @@ class ModemManager:
                 
             else:
                 ndc += 1
-                #print("No data")
-                time.sleep(0.200)
+                #print(f"No data {ndc}")
+                time.sleep(0.100)
                 
-            #time.sleep(0.030)
-            if ndc > 4:
+            time.sleep(0.010)
+            if ndc > 5:
                 #print("*****: Brk rcv 2")
                 break
  
