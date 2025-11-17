@@ -319,11 +319,11 @@ class ModemManager:
             else:
                 ndc += 1
                 #print(f"No data {ndc}")
-                time.sleep_ms(30)
-                
+                time.sleep_ms(20)
+        
             time.sleep_ms(5)
             
-            if ndc > 30:
+            if ndc > 100:
                 break
         
         fh.flush()
