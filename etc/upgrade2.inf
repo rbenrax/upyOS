@@ -81,7 +81,6 @@
 /libx/ssd1306.py
 /libx/terminal.py
 /libx/uftpdserver.py
-/libx/ugit.py
 /libx/uiperf3.py
 /libx/uping.py
 /libx/utelnetserver.py
@@ -98,5 +97,4 @@
 /etc/upyOS-esp8266.board
 /etc/upyOS-rp2.board
 /etc/welcome.txt
-/etc/wellcome.txt
-#files,100
+#files,98

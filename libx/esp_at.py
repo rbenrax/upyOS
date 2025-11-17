@@ -46,10 +46,11 @@ class ModemManager:
         return True
             
     def createUART(self, id, baud, tx, rx, device="modem0"):
+
         try:
 
             self.device = device
-            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=512)
+            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=768)
             #self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rts=Pin(7),
             #                                        cts=Pin(6), rxbuf=1024,
             #                                        timeout=0, timeout_char=0)
@@ -314,15 +315,15 @@ class ModemManager:
                         return False, headers
                 
                 start_time = time.ticks_ms()  # Reiniciar timeout si hay nuevos datos
-        
+
             else:
                 ndc += 1
                 #print(f"No data {ndc}")
-                time.sleep_ms(25)
+                time.sleep_ms(30)
                 
-            time.sleep_ms(2)
+            time.sleep_ms(5)
             
-            if ndc > 15:
+            if ndc > 30:
                 break
         
         fh.flush()
