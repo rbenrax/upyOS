@@ -49,8 +49,10 @@ class ModemManager:
         try:
 
             self.device = device
-            #self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=1024)
-            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rts=Pin(7), cts=Pin(6), rxbuf=1024)
+            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=512)
+            #self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rts=Pin(7),
+            #                                        cts=Pin(6), rxbuf=1024,
+            #                                        timeout=0, timeout_char=0)
             
             #self.modem = UART(id,
             #            baudrate=baud,
@@ -256,69 +258,79 @@ class ModemManager:
         if self.timming:
             ptini = time.ticks_ms()
         
-        timeout = timeout  * 1000
-
-        # Important, to wait !!
-        #time.sleep_ms(5)
+        timeout = timeout * 1000
 
         # Esperar respuesta
-        resp = b""
         start_time = time.ticks_ms()
-        ndc=0 # No data count
-        #nb=0
+        ndc = 0  # No data count
         
-        #print("*rcv****: " + str(timeout))
         hf = False
         headers = ""
+        buffer = b""  # Buffer para acumular datos antes de encontrar headers
         
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             
             if self.modem.any():
                 ndc = 0
                 data = self.modem.read()
-                #nb += 1
                 
                 #print(f"*rcvDATA*** <<  data")
-                                
+                
+                time.sleep_ms(10)
+                
                 if not hf:
-                    body_ini = data.find(b"\r\n\r\n")
+                    # Acumular datos mientras no se hayan encontrado los headers
+                    buffer += data
+                    
+                    # Buscar el separador de headers en los datos acumulados
+                    body_ini = buffer.find(b"\r\n\r\n")
+                    
                     if body_ini > -1:
-                        headers = data[:body_ini + 4]
-                        data    = data[body_ini + 4:]
+                        # Headers encontrados
+                        headers = buffer[:body_ini + 4]
+                        data = buffer[body_ini + 4:]  # El resto es body
                         hf = True
+                        buffer = b""  # Limpiar el buffer
                         #print(f"*** Headers found!")
-       
-                #print(f"*** NB: {nb}")
-                        
-                #if data.find(b"HTTP/1.1 200 OK") > -1:
-                #    print(f"Body Error !!!: {data}")
-                #    return False, headers
+
+                        # Verificar error HTTP en headers
+                        if headers.find(b"HTTP/1.1 200 OK") == -1 and headers.find(b"HTTP/") > -1:
+                            # Si hay respuesta HTTP pero no es 200 OK
+                            #print(f"HTTP Error in headers: {headers}")
+                            # Continuar para verificar si hay error en el body también
+                            return False, headers
+                    else:
+                        # Headers aún no completos, continuar acumulando
+                        start_time = time.ticks_ms()  # Reiniciar timeout
+                        continue
                 
-                try:
-                    fh.write(data)
-                    fh.flush()
-                    #print(f"*** h: {headers}")
-                    #print(f"*** b: {data}")
-                except Exception as e:
-                    print(f"Error writing file - {str(e)}")
-                    return False, headers
+                # Procesar body solo si ya se encontraron los headers
+                if hf:
+                    # Escribir datos al archivo
+                    try:
+                        fh.write(data)
+                    except Exception as e:
+                        print(f"Error writing file - {str(e)}")
+                        return False, headers
                 
-                start_time = time.ticks_ms() # restart if new data
-                
+                start_time = time.ticks_ms()  # Reiniciar timeout si hay nuevos datos
+        
             else:
                 ndc += 1
                 #print(f"No data {ndc}")
-                time.sleep_ms(50)
+                time.sleep_ms(25)
                 
-            time.sleep_ms(5)
-            if ndc > 6:
-                #print("*****: Brk rcv 2")
-                break
- 
-        if self.timming:            
-            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
-            print(f"## Tiempo rcv: {ptfin}ms" )
+            time.sleep_ms(2)
             
+            if ndc > 15:
+                break
+        
+        fh.flush()
+        
+        if self.timming:
+            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            print(f"## Tiempo rcv: {ptfin}ms")
+        
         return True, headers
 
     def http_to_file(self, url, filename=""):
