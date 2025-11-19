@@ -8,6 +8,8 @@ import utls
 class ModemManager:
     def __init__(self, device="modem0"):
         
+        self.phost = ""
+        
         self.device = device
         self.modem  = None
         
@@ -44,12 +46,21 @@ class ModemManager:
             print(", Error\nModem reset error, " + str(ex))
             return False
         return True
-            
-    def createUART(self, id, baud, tx, rx, device="modem0"):
+        
+    def createUART(self, id, baud, tx, rx, device="modem0", rts=7, cts=6, flow=UART.RTS|UART.CTS):
+
         try:
 
             self.device = device
-            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=2048)
+            
+            # With flow control for RPO4020, default
+            self.modem = UART(id, baud, bits=8, parity=None, stop=1,
+                                        tx=Pin(tx), rx=Pin(rx),
+                                        rts=Pin(rts), cts=Pin(cts),
+                                        txbuf=256, rxbuf=1024,
+                                        timeout=0, timeout_char=0,
+                                        flow=flow) # Important!!!
+
             setattr(sdata, self.device, self.modem)
 
             if self.sctrl:
@@ -66,7 +77,7 @@ class ModemManager:
     def _drain(self):
         # vacía el buffer UART
         t0 = time.time()
-        while self.modem.any() and (time.time() - t0) < 0.1:
+        while self.modem.any() and (time.time() - t0) < 0.01:
             self.modem.read()
             
     def atCMD(self, command, timeout=2.0, exp="OK"):
@@ -162,7 +173,7 @@ class ModemManager:
         
         return result
 
-    def rcv_data(self, size=1024, encoded=True, timeout=8.0):
+    def rcv_data(self, size=1024, encoded=True, timeout=10.0):
         
         if self.timming:
             ptini = time.ticks_ms()
@@ -170,7 +181,7 @@ class ModemManager:
         timeout = timeout  * 1000
 
         # Important, to wait !!
-        time.sleep(0.100)
+        #time.sleep(0.100)
 
         resp = b""
         start_time = time.ticks_ms()
@@ -235,73 +246,89 @@ class ModemManager:
             
         return True, retResp, headers
     
-    def rcv_to_file_t(self, fh, timeout=10.0):
+    def rcv_to_file_t(self, fh, timeout=10):
         
         if self.timming:
             ptini = time.ticks_ms()
         
-        timeout = timeout  * 1000
-
-        # Important, to wait !!
-        time.sleep(0.050)
+        timeout = timeout * 1000
 
         # Esperar respuesta
-        resp = b""
         start_time = time.ticks_ms()
-        ndc=0 # No data count
-        #nb=0
+        ndc = 0  # No data count
         
-        #print("*rcv****: " + str(timeout))
         hf = False
         headers = ""
+        buffer = b""  # Buffer para acumular datos antes de encontrar headers
         
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             
             if self.modem.any():
-                ndc = 0
+                
                 data = self.modem.read()
-                #nb += 1
+                ndc = 1
                 
                 #print(f"*rcvDATA*** <<  {data}")
-                                
+                #time.sleep_ms(10)
+                
                 if not hf:
-                    body_ini = data.find(b"\r\n\r\n")
+                    # Acumular datos mientras no se hayan encontrado los headers
+                    buffer += data
+                    
+                    # Buscar el separador de headers en los datos acumulados
+                    body_ini = buffer.find(b"\r\n\r\n")
+                    
                     if body_ini > -1:
-                        headers = data[:body_ini + 4]
-                        data    = data[body_ini + 4:]
+                        # Headers encontrados
+                        headers = buffer[:body_ini + 4]
+                        data = buffer[body_ini + 4:]  # El resto es body
                         hf = True
+                        buffer = b""  # Limpiar el buffer
                         #print(f"*** Headers found!")
-       
-                #print(f"*** NB: {nb}")
-                        
-                if data.find(b"HTTP/1.1 200 OK") > -1:
-                    print(f"Body Error !!!: {data}")
-                    return False, headers
-                try:
-                    fh.write(data)
-                    fh.flush()
-                    #print(f"*** h: {headers}")
-                    #print(f"*** b: {data}")
-                except Exception as e:
-                    print(f"Error writing file - {str(e)}")
-                    return False, headers
+
+                        # Verificar error HTTP en headers
+                        if headers.find(b"HTTP/1.1 200 OK") == -1 and headers.find(b"HTTP/") > -1:
+                            # Si hay respuesta HTTP pero no es 200 OK
+                            #print(f"HTTP Error in headers: {headers}")
+                            # Continuar para verificar si hay error en el body también
+                            return False, headers
+                    else:
+                        # Headers aún no completos, continuar acumulando
+                        start_time = time.ticks_ms()  # Reiniciar timeout
+                        continue
                 
-                start_time = time.ticks_ms() # restart if new data
+                # Procesar body solo si ya se encontraron los headers
+                if hf:
+                    # Escribir datos al archivo
+                    try:
+                        fh.write(data)
+                        #print(f"Data {data}")
+                    except Exception as e:
+                        print(f"Error writing file - {str(e)}")
+                        return False, headers
                 
+                start_time = time.ticks_ms()  # Reiniciar timeout si hay nuevos datos
+
             else:
-                ndc += 1
+                if ndc > 0:
+                    ndc += 1
                 #print(f"No data {ndc}")
-                time.sleep(0.100)
+                if ndc > 25:
+                    break
                 
-            time.sleep(0.010)
-            if ndc > 5:
-                #print("*****: Brk rcv 2")
-                break
- 
-        if self.timming:            
+                time.sleep_ms(20)
+        
+            time.sleep_ms(5)
+        
+        fh.flush()
+        
+        if ndc==0:
+            print(f"Error: Timeout {timeout/1000}s reached with no data")
+        
+        if self.timming:
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
-            print(f"## Tiempo rcv: {ptfin}ms" )
-            
+            print(f"## Tiempo rcv: {ptfin}ms")
+        
         return True, headers
 
     def http_to_file(self, url, filename=""):
@@ -317,35 +344,39 @@ class ModemManager:
             host = tmp[0]
             port = tmp[1]
 
-        self.create_conn(host, port, con, keepalive=60)
-        
-        self.atCMD("ATE0")
-        self.atCMD("AT+CIPMODE=1")
-        
+        if self.phost != host:
+            self.create_conn(host, port, con, keepalive=120)
+            self.atCMD("ATE0")
+            self.atCMD("AT+CIPMODE=1")
+            # Entrar en modo transparente
+            self.send_passthrow()
+            
         if not path.startswith("/"): path = "/" + path
         
-        req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
-        #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
-
-        # Entrar en modo transparente
-        self.send_passthrow()
-        
-        time.sleep(0.020)
-        self._drain()
-        time.sleep(0.020)
+        #time.sleep(0.050)
+        #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
+        req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
+        #print(req.encode('utf-8'))
+        #time.sleep(0.070)
+        #self._drain()
+        #time.sleep(0.050)
         self.modem.write(req.encode('utf-8'))
-        self._drain()
-        
+        #time.sleep(0.050)
         sts = False
         with open(filename, 'wb') as f:
             sts, headers = self.rcv_to_file_t(f, 10)
+    
+        #time.sleep(1)
+        #self.modem.write("+++")
+        #time.sleep(1)
+        #self.atCMD("AT+CIPMODE=0", 3)
         
-        time.sleep(0.5)
-        self.modem.write("+++")
-        time.sleep(0.1)
-        self.atCMD("AT+CIPMODE=0")
-        self.close_conn()
-        self.atCMD("ATE1")
+        #if self.phost != host: 
+        #    self.close_conn()
+            
+        #self.atCMD("ATE1", 2)
+        
+        self.phost = host
         
         return sts
 

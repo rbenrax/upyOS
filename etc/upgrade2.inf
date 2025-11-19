@@ -1,4 +1,4 @@
-#upyOS,0.9.1,2025-11-16
+#upyOS,0.9.1,2021-01-01
 /boot.py
 /main.py
 /bin/atmodem.py
@@ -18,7 +18,6 @@
 /bin/fileup.py
 /bin/find.py
 /bin/free.py
-/bin/ftp.py
 /bin/gpio.py
 /bin/grep.py
 /bin/help.py
@@ -36,7 +35,6 @@
 /bin/mcu_t.sh
 /bin/mi.py
 /bin/mkdir.py
-/bin/mqtt.py
 /bin/mqttc.py
 /bin/mv.py
 /bin/ntpupdate.py
@@ -57,9 +55,7 @@
 /bin/sh.py
 /bin/si.py
 /bin/sleep.py
-/bin/telnet.py
 /bin/test.py
-/bin/top.py
 /bin/touch.py
 /bin/uftpd.py
 /bin/uhttpd.py
@@ -80,13 +76,11 @@
 /libx/editor.py
 /libx/editstr.py
 /libx/esp_at.py
-/libx/microWebSocket.py
 /libx/microWebSrv.py
 /libx/microWebTemplate.py
 /libx/ssd1306.py
 /libx/terminal.py
 /libx/uftpdserver.py
-/libx/ugit.py
 /libx/uiperf3.py
 /libx/uping.py
 /libx/utelnetserver.py
@@ -103,5 +97,4 @@
 /etc/upyOS-esp8266.board
 /etc/upyOS-rp2.board
 /etc/welcome.txt
-/etc/wellcome.txt
-#files,105
+#files,98
