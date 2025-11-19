@@ -105,12 +105,7 @@ def __main__(args):
                 print(fp, end=", ")
             else:
                 print(".", end="")
-    
-            #if fp == "/libx/esp_at.py":
-            #    print(f"Saltando {fp}")
-            #    cont+=1
-            #    continue
-    
+            
             ptini = time.ticks_ms()
     
             stat = utls.get_stat(fp)            
@@ -122,16 +117,30 @@ def __main__(args):
             stat = utls.get_stat(fp)            
             size2 = stat[6]
             
-            #ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            
             #print(f" <-> S2: {size2} {ptfin}ms")
 
             cont+=1
 
             if size1 != size2:
-                print(f"Error in file: {fp}")
+                print(f"Error size in file: {fp}")
                 break
             
     os.remove(uf)
+    
+    
+    # Salir del modo transparente
+    time.sleep(1)
+    mm.modem.write("+++")
+    time.sleep(1)
+    mm.atCMD("AT+CIPMODE=0", 3)
+    
+    #if self.conected: 
+    mm.close_conn()  
+    mm.atCMD("ATE1", 2)
+    # ------<
+    
     
     #print(str(ftu))
     #print(str(cont))
