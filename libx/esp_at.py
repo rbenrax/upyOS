@@ -8,6 +8,8 @@ import utls
 class ModemManager:
     def __init__(self, device="modem0"):
         
+        self.phost = ""
+        
         self.device = device
         self.modem  = None
         
@@ -44,30 +46,20 @@ class ModemManager:
             print(", Error\nModem reset error, " + str(ex))
             return False
         return True
-            
-    def createUART(self, id, baud, tx, rx, device="modem0"):
+        
+    def createUART(self, id, baud, tx, rx, device="modem0", rts=7, cts=6, flow=UART.RTS|UART.CTS):
 
         try:
 
             self.device = device
-            self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rxbuf=768)
-            #self.modem = UART(id, baud, tx=Pin(tx), rx=Pin(rx), rts=Pin(7),
-            #                                        cts=Pin(6), rxbuf=1024,
-            #                                        timeout=0, timeout_char=0)
             
-            #self.modem = UART(id,
-            #            baudrate=baud,
-            #            bits=8,
-            #            parity=None,
-            #            stop=1,
-            #            tx=Pin(tx),    # TX pin
-            #            rx=Pin(rx),    # RX pin  
-            #            rts=Pin(7),    # RTS pin (Request to Send)
-            #            cts=Pin(6),    # CTS pin (Clear to Send)
-            #            timeout=0,
-            #            timeout_char=0,
-            #            rxbuf=1024,
-            #            txbuf=512)
+            # With flow control for RPO4020, default
+            self.modem = UART(id, baud, bits=8, parity=None, stop=1,
+                                        tx=Pin(tx), rx=Pin(rx),
+                                        rts=Pin(rts), cts=Pin(cts),
+                                        txbuf=256, rxbuf=1024,
+                                        timeout=0, timeout_char=0,
+                                        flow=flow) # Important!!!
 
             setattr(sdata, self.device, self.modem)
 
@@ -272,10 +264,11 @@ class ModemManager:
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             
             if self.modem.any():
-                ndc = 0
-                data = self.modem.read()
                 
-                #print(f"*rcvDATA*** <<  data")
+                data = self.modem.read()
+                ndc = 1
+                
+                #print(f"*rcvDATA*** <<  {data}")
                 
                 time.sleep_ms(10)
                 
@@ -310,6 +303,7 @@ class ModemManager:
                     # Escribir datos al archivo
                     try:
                         fh.write(data)
+                        #print(f"Data {data}")
                     except Exception as e:
                         print(f"Error writing file - {str(e)}")
                         return False, headers
@@ -317,14 +311,15 @@ class ModemManager:
                 start_time = time.ticks_ms()  # Reiniciar timeout si hay nuevos datos
 
             else:
-                ndc += 1
+                if ndc > 0:
+                    ndc += 1
                 #print(f"No data {ndc}")
+                if ndc > 25:
+                    break
+                
                 time.sleep_ms(20)
         
             time.sleep_ms(5)
-            
-            if ndc > 100:
-                break
         
         fh.flush()
         
@@ -347,7 +342,8 @@ class ModemManager:
             host = tmp[0]
             port = tmp[1]
 
-        self.create_conn(host, port, con, keepalive=60)
+        if self.phost != host:
+            self.create_conn(host, port, con, keepalive=60)
         
         self.atCMD("ATE0")
         self.atCMD("AT+CIPMODE=1")
@@ -373,8 +369,13 @@ class ModemManager:
         self.modem.write("+++")
         time.sleep(1)
         self.atCMD("AT+CIPMODE=0", 3)
-        self.close_conn()
+        
+        #if self.phost != host: 
+        #    self.close_conn()
+            
         self.atCMD("ATE1", 2)
+        
+        self.phost = host
         
         return sts
 
