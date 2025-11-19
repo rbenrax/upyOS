@@ -246,7 +246,7 @@ class ModemManager:
             
         return True, retResp, headers
     
-    def rcv_to_file_t(self, fh, timeout=8.0):
+    def rcv_to_file_t(self, fh, timeout=10):
         
         if self.timming:
             ptini = time.ticks_ms()
@@ -270,7 +270,7 @@ class ModemManager:
                 
                 #print(f"*rcvDATA*** <<  {data}")
                 
-                time.sleep_ms(10)
+                #time.sleep_ms(10)
                 
                 if not hf:
                     # Acumular datos mientras no se hayan encontrado los headers
@@ -321,6 +321,9 @@ class ModemManager:
         
             time.sleep_ms(5)
         
+        if ndc==0:
+            print(f"Error: Timeout reached with no data")
+        
         fh.flush()
         
         if self.timming:
@@ -344,36 +347,33 @@ class ModemManager:
 
         if self.phost != host:
             self.create_conn(host, port, con, keepalive=60)
-        
-        self.atCMD("ATE0")
-        self.atCMD("AT+CIPMODE=1")
-        
+            self.atCMD("ATE0")
+            self.atCMD("AT+CIPMODE=1")
+            # Entrar en modo transparente
+            self.send_passthrow()
+            
         if not path.startswith("/"): path = "/" + path
         
         req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
         #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
-
-        # Entrar en modo transparente
-        self.send_passthrow()
-        
-        time.sleep(0.050)
+        #time.sleep(0.070)
         self._drain()
-        time.sleep(0.050)
+        #time.sleep(0.050)
         self.modem.write(req.encode('utf-8'))
-        time.sleep(0.050)
+        #time.sleep(0.070)
         sts = False
         with open(filename, 'wb') as f:
             sts, headers = self.rcv_to_file_t(f, 8)
         
-        time.sleep(1)
-        self.modem.write("+++")
-        time.sleep(1)
-        self.atCMD("AT+CIPMODE=0", 3)
+        #time.sleep(1)
+        #self.modem.write("+++")
+        #time.sleep(1)
+        #self.atCMD("AT+CIPMODE=0", 3)
         
         #if self.phost != host: 
         #    self.close_conn()
             
-        self.atCMD("ATE1", 2)
+        #self.atCMD("ATE1", 2)
         
         self.phost = host
         
