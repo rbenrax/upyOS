@@ -345,7 +345,7 @@ class ModemManager:
             port = tmp[1]
 
         if self.phost != host:
-            self.create_conn(host, port, con, keepalive=60)
+            self.create_conn(host, port, con, keepalive=120)
             self.atCMD("ATE0")
             self.atCMD("AT+CIPMODE=1")
             # Entrar en modo transparente
@@ -353,17 +353,19 @@ class ModemManager:
             
         if not path.startswith("/"): path = "/" + path
         
-        req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
-        #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
+        #time.sleep(0.050)
+        #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
+        req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
+        #print(req.encode('utf-8'))
         #time.sleep(0.070)
-        self._drain()
+        #self._drain()
         #time.sleep(0.050)
         self.modem.write(req.encode('utf-8'))
-        #time.sleep(0.070)
+        #time.sleep(0.050)
         sts = False
         with open(filename, 'wb') as f:
-            sts, headers = self.rcv_to_file_t(f, 16)
-        
+            sts, headers = self.rcv_to_file_t(f, 10)
+    
         #time.sleep(1)
         #self.modem.write("+++")
         #time.sleep(1)
