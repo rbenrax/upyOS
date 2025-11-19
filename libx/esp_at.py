@@ -173,7 +173,7 @@ class ModemManager:
         
         return result
 
-    def rcv_data(self, size=1024, encoded=True, timeout=8.0):
+    def rcv_data(self, size=1024, encoded=True, timeout=10.0):
         
         if self.timming:
             ptini = time.ticks_ms()
@@ -269,7 +269,6 @@ class ModemManager:
                 ndc = 1
                 
                 #print(f"*rcvDATA*** <<  {data}")
-                
                 #time.sleep_ms(10)
                 
                 if not hf:
@@ -321,10 +320,10 @@ class ModemManager:
         
             time.sleep_ms(5)
         
-        if ndc==0:
-            print(f"Error: Timeout reached with no data")
-        
         fh.flush()
+        
+        if ndc==0:
+            print(f"Error: Timeout {timeout/1000}s reached with no data")
         
         if self.timming:
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
