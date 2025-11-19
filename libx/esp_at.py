@@ -362,7 +362,7 @@ class ModemManager:
         #time.sleep(0.070)
         sts = False
         with open(filename, 'wb') as f:
-            sts, headers = self.rcv_to_file_t(f, 8)
+            sts, headers = self.rcv_to_file_t(f, 16)
         
         #time.sleep(1)
         #self.modem.write("+++")
