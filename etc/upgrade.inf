@@ -3,7 +3,7 @@
 /main.py,71
 /bin/atmodem.py,3109
 /bin/atmqttc.py,5527
-/bin/atupgrade.py,4993
+/bin/atupgrade.py,4828
 /bin/cat.py,1909
 /bin/cd.py,330
 /bin/clear.py,63
@@ -75,7 +75,7 @@
 /lib/utls.py,7301
 /libx/editor.py,12606
 /libx/editstr.py,6445
-/libx/esp_at.py,22739
+/libx/esp_at.py,22693
 /libx/microWebSrv.py,34548
 /libx/microWebTemplate.py,13597
 /libx/ssd1306.py,4584
