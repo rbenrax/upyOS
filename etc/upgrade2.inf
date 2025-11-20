@@ -3,7 +3,7 @@
 /main.py,71
 /bin/atmodem.py,3109
 /bin/atmqttc.py,5527
-/bin/atupgrade.py,4114
+/bin/atupgrade.py,4604
 /bin/cat.py,1909
 /bin/cd.py,330
 /bin/clear.py,63
@@ -60,7 +60,7 @@
 /bin/uftpd.py,585
 /bin/uhttpd.py,3825
 /bin/unset.py,177
-/bin/upgrade.py,4089
+/bin/upgrade.py,4191
 /bin/uptime.py,466
 /bin/utelnetd.py,453
 /bin/vi.py,288
