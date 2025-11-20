@@ -8,10 +8,10 @@ import sdata
 import time
 
 # Source branches
-mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main/'
-testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/'
+mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
+testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test'
 
-def pull(mm, f_path, url):
+def pull(mm, url, f_path):
 
     try:
  
@@ -53,10 +53,12 @@ def __main__(args):
     else:
         url_raw = mainb # Default main
         print("from main branch", end="")
-        
+    
     uf="/etc/upgrade2.inf"
-    pull(mm, uf, url_raw + uf[1:])
-    print(", OK")
+    if utls.file_exists(uf):
+        os.remove(uf)
+    pull(mm, url_raw + uf, uf)
+    print(", OK") 
     
     if not utls.file_exists(uf):
         print("No upgrade file available, system can not be upgraded")
@@ -94,42 +96,54 @@ def __main__(args):
     cont=0
     with open(uf, 'r') as f:
         while True:
-            fp = f.readline()
+            ln = f.readline()
             
-            if not fp: break
-            if fp.strip()=="": continue   # Empty lines skipped
-            if fp.strip().startswith("#"): continue # Commanted lines skipped
+            if not ln: break
+            if ln.strip()=="": continue   # Empty lines skipped
+            if ln.strip().startswith("#"): continue # Commanted lines skipped
             
-            fp = fp[:-1] # remove ending CR
+            tmp = ln.split(",")
+            
+            fp = tmp[0]
+            fs = int(tmp[1])
+            
+            #print(f"File: {fp} {fs}")
+            
+            #if fp != "/main.py": continue
+            
             if "v" in mod:
                 print(fp, end=", ")
             else:
                 print(".", end="")
             
             ptini = time.ticks_ms()
-    
-            stat = utls.get_stat(fp)            
-            size1 = stat[6]
-            #print(f"{fp} S1: {size1}", end="")
             
-            pull(mm, fp, url_raw + fp[1:])
+            tmpf = fp + "/tmp/ptf_file.tmp"
             
-            stat = utls.get_stat(fp)            
-            size2 = stat[6]
+            if utls.file_exists(tmpf):
+                os.remove(tmpf)
+            
+            pull(mm, url_raw + fp, tmpf)
+            
+            stat = utls.get_stat(tmpf)           
+            tmpfsz = stat[6]
+            
+            if tmpfsz == fs:
+                if utls.file_exists(fp):
+                    os.remove(fp)
+                os.rename(tmpf, fp)
+            else:
+                print(f"Error descarga: {fp} {fs} != {tmpfsz}")
+                break
             
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             
             #print(f" <-> S2: {size2} {ptfin}ms")
 
             cont+=1
-
-            if size1 != size2:
-                print(f"Error size in file: {fp}")
-                break
             
     os.remove(uf)
-    
-    
+
     # Salir del modo transparente
     time.sleep(1)
     mm.modem.write("+++")
