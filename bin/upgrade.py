@@ -1,10 +1,14 @@
-import os
-import urequests
+import os    
 import machine
 import utime
-import usocket
-import ssl
 
+try:
+    import urequests
+    import usocket
+    import ssl
+except:
+    print("Try atupgrade with esp-at modem instead")
+    
 import utls
 import sdata
 import sys

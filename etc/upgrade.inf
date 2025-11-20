@@ -3,7 +3,7 @@
 /main.py,71
 /bin/atmodem.py,3109
 /bin/atmqttc.py,5527
-/bin/atupgrade.py,4602
+/bin/atupgrade.py,4993
 /bin/cat.py,1909
 /bin/cd.py,330
 /bin/clear.py,63
@@ -60,7 +60,7 @@
 /bin/uftpd.py,585
 /bin/uhttpd.py,3825
 /bin/unset.py,177
-/bin/upgrade.py,5366
+/bin/upgrade.py,5457
 /bin/uptime.py,466
 /bin/utelnetd.py,453
 /bin/vi.py,288
@@ -75,7 +75,7 @@
 /lib/utls.py,7301
 /libx/editor.py,12606
 /libx/editstr.py,6445
-/libx/esp_at.py,22415
+/libx/esp_at.py,22739
 /libx/microWebSrv.py,34548
 /libx/microWebTemplate.py,13597
 /libx/ssd1306.py,4584
@@ -88,6 +88,7 @@
 /etc/help.txt,70
 /etc/init.sh,2033
 /etc/modem.inf,1527
+/etc/upgrade2.inf,1553
 /etc/upyOS-esp32-wroom-32.board,2342
 /etc/upyOS-esp32.board,3685
 /etc/upyOS-esp32c3_luatos.board,1804
@@ -97,4 +98,4 @@
 /etc/upyOS-esp8266.board,1760
 /etc/upyOS-rp2.board,2281
 /etc/welcome.txt,329
-#files,98
+#files,99
