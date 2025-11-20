@@ -60,7 +60,7 @@
 /bin/uftpd.py,585
 /bin/uhttpd.py,3825
 /bin/unset.py,177
-/bin/upgrade.py,5493
+/bin/upgrade.py,5457
 /bin/uptime.py,466
 /bin/utelnetd.py,453
 /bin/vi.py,288

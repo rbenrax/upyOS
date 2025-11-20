@@ -2,6 +2,13 @@ import os
 import machine
 import utime
 
+try:
+    import urequests
+    import usocket
+    import ssl
+except:
+    print("Try atupgrade with esp-at modem instead")
+    
 import utls
 import sdata
 import sys
@@ -54,14 +61,6 @@ def pull(url, f_path):
         if s: s.close()
     
 def __main__(args):
-
-    try:
-        import urequests
-        import usocket
-        import ssl
-    except:
-        print("Try atupgrade with esp-at modem instead")
-        return
 
     mod="" 
     for i in args:
