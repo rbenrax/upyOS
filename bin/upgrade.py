@@ -173,7 +173,7 @@ def __main__(args):
                 print(f"Error descarga: {fp} {fs} != {tmpfsz}")
                 break
             
-    os.remove(uf)
+#     os.remove(uf)
 
     #print(str(ftu))
     #print(str(cont))
