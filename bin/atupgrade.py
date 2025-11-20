@@ -51,7 +51,7 @@ def __main__(args):
     #mm.sctrl = True
     #mm.scmds = True
     #mm.sresp = True
-    #mm.timming = True
+    #mm.timing = True
 
     if not mm.modem:
         print("\nError: No modem")

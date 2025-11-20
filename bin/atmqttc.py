@@ -46,7 +46,7 @@ def __main__(args):
         print("\t atmqttc <listsub>")
         print("\t atmqttc <unsub>")
         print("\t atmqttc <close>")
-        print("\t atmqttc <listen> or [-l], [-v] verbose, [-tm] timmings")
+        print("\t atmqttc <listen> or [-l], [-v] verbose, [-tm] timings")
         return
 
     def parse(mod):
@@ -98,7 +98,7 @@ def __main__(args):
         args = [arg for arg in args if arg != "-v"]
         
     if "-tm" in args:
-        mm.timming = True
+        mm.timing = True
         args = [arg for arg in args if arg != "-tm"]
     
     # WIFI Connection or alternative by atmodem -f modem.inf in /etc/init.sh
