@@ -1,8 +1,13 @@
 import uos
 import time
 import sdata
+import utls
 
 def __main__(args):
+    
+    def fsize(fp):
+        stat = utls.get_stat(fp)            
+        return stat[6]
 
     if len(args) == 1 and args[0]=="--h":
         print("Create new release index file for upyOS upgrade\nUsage: release")
@@ -21,7 +26,7 @@ def __main__(args):
             print(ver)
                 
             for f in fr:
-                fu.write(f+"\n")
+                fu.write(f + "," + str(fsize(f)) + "\n")
                 print(f)
                 cont+=1
                 
@@ -29,8 +34,9 @@ def __main__(args):
                 tmp=uos.listdir(d)
                 for f in tmp:
                     if f in fi: continue
-                    print(d + "/" + f)
-                    fu.write(d + "/" + f + "\n")
+                    fp = d + "/" + f
+                    print(fp)
+                    fu.write(fp + "," + str(fsize(fp)) + "\n")
                     cont+=1
                     
             ls = f"#files,{cont}"
