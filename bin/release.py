@@ -13,9 +13,9 @@ def __main__(args):
         print("Create new release index file for upyOS upgrade\nUsage: release")
         return
     else:
-        fd="/etc/upgrade2.inf" # Realease file
+        fd="/etc/upgrade.inf" # Realease file
         fr=["/boot.py","/main.py"] # Files to include       
-        fi=["system.conf", "upgrade.inf", "upgrade2.inf"] # Files to avoid
+        fi=["system.conf", "upgrade.inf", "upgrade.inf"] # Files to avoid
         dr=["/bin","/lib","/libx","/etc"] # Direcrories to include
         
         cont=0

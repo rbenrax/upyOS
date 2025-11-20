@@ -8,12 +8,13 @@ import ssl
 import utls
 import sdata
 import sys
+import time
 
 # Source branches
-mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/main/'
-testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test/'
+mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
+testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test'
 
-def pull(f_path, url):    
+def pull(url, f_path):    
     s = None
     ssl_socket = None
     
@@ -79,8 +80,10 @@ def __main__(args):
         url_raw = mainb # Default main
         print("from main branch", end="")
         
-    uf="/etc/upgrade2.inf"
-    pull(uf, url_raw + uf[1:])
+    uf="/etc/upgrade.inf"
+    if utls.file_exists(uf):
+        os.remove(uf)
+    pull(url_raw + uf, uf)
     print(", OK")
     
     if not utls.file_exists(uf):
@@ -100,7 +103,10 @@ def __main__(args):
     #print(ini)
     #print(end)
     
-    ftu=int(end[1]) # files to upgrade
+    if len(end) > 1:
+        ftu=int(end[1]) # files to upgrade
+    else:
+        print("Error ungrade file, see /etc/upgrade.inf")
 
     if not "f" in mod:
         print(f"upyOS current version: {sdata.version}")
@@ -120,24 +126,55 @@ def __main__(args):
             
             if not ln: break
             if ln.strip()=="": continue   # Empty lines skipped
-            if ln.strip().startswith("#"): continue # Comment lines skipped
+            if ln.strip().startswith("#"): continue # Commanted lines skipped
             
             tmp = ln.split(",")
             
-            fp = fp[0]
-            fs = ln[1]            
+            fp = tmp[0]
+            fs = int(tmp[1])
+            
+            #print(f"File: {fp} {fs}")
             
             if "v" in mod:
                 print(fp, end=", ")
             else:
                 print(".", end="")
-                
-            pull(fp, url_raw + fp)
             
-            cont+=1
+            ptini = time.ticks_ms()
+            
+            upgr=False
+            tmpfsz=0
+            tmpf = "/tmp/ptf_file.tmp"
+            for r in range(3):
+                
+                #if utls.file_exists(tmpf):
+                #    print(f"{tmpf} {utls.file_exists(tmpf)}")
+                #    os.remove(tmpf)
+                
+                pull(url_raw + fp, tmpf)
+                
+                time.sleep(.3)
+                
+                stat = utls.get_stat(tmpf)
+                tmpfsz = stat[6]
+                
+                if tmpfsz == fs:
+                    if utls.file_exists(fp):
+                        os.remove(fp)
+                    os.rename(tmpf, fp)
+                    upgr=True
+                    cont+=1
+                    break
+
+            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            #print(f" <-> S2: {size2} {ptfin}ms")
+
+            if not upgr:
+                print(f"Error descarga: {fp} {fs} != {tmpfsz}")
+                break
             
     os.remove(uf)
-    
+
     #print(str(ftu))
     #print(str(cont))
     

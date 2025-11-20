@@ -54,7 +54,7 @@ def __main__(args):
         url_raw = mainb # Default main
         print("from main branch", end="")
     
-    uf="/etc/upgrade2.inf"
+    uf="/etc/upgrade.inf"
     if utls.file_exists(uf):
         os.remove(uf)
     pull(mm, url_raw + uf, uf)
@@ -80,7 +80,7 @@ def __main__(args):
     if len(end) > 1:
         ftu=int(end[1]) # files to upgrade
     else:
-        print("Error ungrade file, see /etc/upgrade2.inf")
+        print("Error ungrade file, see /etc/upgrade.inf")
 
     if not "f" in mod:
         print(f"upyOS current version: {sdata.version}")
