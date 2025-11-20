@@ -127,8 +127,6 @@ def __main__(args):
             else:
                 print(".", end="")
             
-            ptini = time.ticks_ms()
-            
             upgr=False
             tmpfsz=0
             for r in range(3):
@@ -150,12 +148,9 @@ def __main__(args):
                     cont+=1
                     break
 
-            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
-            #print(f" <-> S2: {size2} {ptfin}ms")
-
-            if not upgr and not "-i" in args: # ignore errors
-                print(f"Error descarga: {fp} {fs} != {tmpfsz}")
-                break
+            if not upgr:
+                print(f"\nError descarga: {fp} {fs} != {tmpfsz}")
+                if not "-i" in args: break # show errors
 
     #os.remove(uf)
 

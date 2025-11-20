@@ -357,7 +357,6 @@ class ModemManager:
                f"Host: {host}\r\n"
                f"User-Agent: upyOS\r\n"
                f"Accept: */*\r\n"
-               f"Connection: keep-alive\r\n"
                f"\r\n")
         
         self.modem.write(req.encode('utf-8'))
@@ -365,7 +364,6 @@ class ModemManager:
         with open(filename, 'wb') as f:
             sts, headers = self.rcv_to_file_t(f, tout)
         return sts
-
 
 # ------ Command Implementations
 
