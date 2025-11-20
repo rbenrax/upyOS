@@ -8,8 +8,6 @@ import utls
 class ModemManager:
     def __init__(self, device="modem0"):
         
-        self.phost = ""
-        
         self.device = device
         self.modem  = None
         
@@ -20,10 +18,12 @@ class ModemManager:
         self.scmds = False # Print cmds
         self.sresp = False # Print resp
         
-        self._callback = None
-
         self.timming = False
         self.tini=0
+        
+        self._callback = None
+        
+        self.tcp_conn = False # TCP Connected?
         
     def setCallBack(self, callback): # add Callback
         self._callback = callback
@@ -39,6 +39,8 @@ class ModemManager:
             time.sleep_ms(100) # 100ms pulse
             resetP.value(1)
 
+            self.tcp_conn = False
+
             time.sleep(wait) # wait to ready
             if self.sctrl:
                 print(", Ready")
@@ -53,7 +55,7 @@ class ModemManager:
 
             self.device = device
             
-            # With flow control for RPO4020, default
+            # Flow control enabled for RPO4020, default
             self.modem = UART(id, baud, bits=8, parity=None, stop=1,
                                         tx=Pin(tx), rx=Pin(rx),
                                         rts=Pin(rts), cts=Pin(cts),
@@ -70,12 +72,12 @@ class ModemManager:
             print("Crerate uart error, " + str(ex))
             return False
         
-        time.sleep(1)  # Esperar a que el puerto se estabilice
+        time.sleep(1)  # Wait for the port to stabilize
             
         return True
     
     def _drain(self):
-        # vacía el buffer UART
+        # empty UART buffer
         t0 = time.time()
         while self.modem.any() and (time.time() - t0) < 0.01:
             self.modem.read()
@@ -175,6 +177,10 @@ class ModemManager:
 
     def rcv_data(self, size=1024, encoded=True, timeout=10.0):
         
+        if not self.tcp_conn:
+            print("rcv_data: TCP Not connected")
+            return False, "", ""
+        
         if self.timming:
             ptini = time.ticks_ms()
         
@@ -247,6 +253,10 @@ class ModemManager:
         return True, retResp, headers
     
     def rcv_to_file_t(self, fh, timeout=10):
+        
+        if not self.tcp_conn:
+            print("rcv_to_file_t: TCP Not connected")
+            return False, ""
         
         if self.timming:
             ptini = time.ticks_ms()
@@ -331,54 +341,31 @@ class ModemManager:
         
         return True, headers
 
-    def http_to_file(self, url, filename=""):
+    def http_get_to_file_t(self, url, filename="", tout=10):
         
-        prot, _, hostport, path = url.split('/', 3)
-        port = 443 if prot.lower() == "https:" else 80
-        con = "SSL" if prot.lower() == "https:" else "TCP"
-
+        if not self.tcp_conn:
+            print("http_get_to_file_t: TCP Not connected")
+            return False
+        
+        _, _, hostport, path = url.split('/', 3)
         tmp = hostport.split(':')
-        if len(tmp) == 1:
-            host = tmp[0]
-        else:
-            host = tmp[0]
-            port = tmp[1]
-
-        if self.phost != host:
-            self.create_conn(host, port, con, keepalive=120)
-            self.atCMD("ATE0")
-            self.atCMD("AT+CIPMODE=1")
-            # Entrar en modo transparente
-            self.send_passthrow()
-            
+        host = tmp[0]
+        
         if not path.startswith("/"): path = "/" + path
         
-        #time.sleep(0.050)
-        #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
-        req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
-        #print(req.encode('utf-8'))
-        #time.sleep(0.070)
-        #self._drain()
-        #time.sleep(0.050)
+        req = (f"GET {path} HTTP/1.1\r\n"
+               f"Host: {host}\r\n"
+               f"User-Agent: upyOS\r\n"
+               f"Accept: */*\r\n"
+               f"Connection: keep-alive\r\n"
+               f"\r\n")
+        
         self.modem.write(req.encode('utf-8'))
-        #time.sleep(0.050)
         sts = False
         with open(filename, 'wb') as f:
-            sts, headers = self.rcv_to_file_t(f, 10)
-    
-        #time.sleep(1)
-        #self.modem.write("+++")
-        #time.sleep(1)
-        #self.atCMD("AT+CIPMODE=0", 3)
-        
-        #if self.phost != host: 
-        #    self.close_conn()
-            
-        #self.atCMD("ATE1", 2)
-        
-        self.phost = host
-        
+            sts, headers = self.rcv_to_file_t(f, tout)
         return sts
+
 
 # ------ Command Implementations
 
@@ -482,10 +469,29 @@ class ModemManager:
         return "Error get iP/mac"
     
     # Tcp CMDs
+    def create_url_conn(self, url, keepalive=60):
+        prot, _, hostport, path = url.split('/', 3)
+        port = 443 if prot.lower() == "https:" else 80
+        ct = "SSL" if prot.lower() == "https:" else "TCP"
+
+        tmp = hostport.split(':')
+        if len(tmp) == 1:
+            host = tmp[0]
+        else:
+            host = tmp[0]
+            port = tmp[1]
+        
+        return self.create_conn(host, port, ct, keepalive)
     
-    def create_conn(self, host, port, prot="TCP", keepalive=60):
-        command = f'AT+CIPSTART="{prot}","{host}",{port},{keepalive}'
+    def create_conn(self, host, port, ct="TCP", keepalive=60):
+        command = f'AT+CIPSTART="{ct}","{host}",{port},{keepalive}'
         sts, _ = self.atCMD(command, 10.0, "CONNECT")
+        
+        if sts:
+            self.tcp_conn = True
+        else:
+            self.tcp_conn = False
+            
         return sts
     
     def send_passthrow(self, tout=5):
@@ -496,6 +502,11 @@ class ModemManager:
         return False, ""
     
     def send_data(self, data, tout=5):
+        
+        if not self.tcp_conn:
+            print("send_data: TCP Not connected")
+            return False, ""
+        
         lcmd = f"AT+CIPSEND={len(data)}"
         sts, ret = self.atCMD(lcmd, 3, ">")
         if sts:
@@ -505,8 +516,12 @@ class ModemManager:
             return sts, ret
         return False, ""
     
-    def send_data_transp(self, data, tout=5):
-        """Send transparent mode data"""
+    def send_data_t(self, data, tout=5):
+ 
+        if not self.tcp_conn:
+            print("send_data_t: TCP Not connected")
+            return False, ""
+ 
         lcmd = f"AT+CIPSEND={len(data)}"
         sts, _ = self.atCMD(lcmd, tout, ">")
         if sts:
@@ -520,6 +535,7 @@ class ModemManager:
     def close_conn(self):
         """Cerrar conexión"""
         sts, _ = self.atCMD("AT+CIPCLOSE")
+        self.tcp_conn = False
         return sts
 
 

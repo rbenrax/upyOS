@@ -15,7 +15,7 @@ def pull(mm, url, f_path):
 
     try:
  
-        sts = mm.http_to_file(url, f_path)
+        sts = mm.http_get_to_file_t(url, f_path)
         if not sts:
             print(f"- Error downloading {f_path}")
         return sts
@@ -39,12 +39,6 @@ def __main__(args):
         print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list, -t test branch")
         return
 
-    mm = ModemManager("modem0")
-    #mm.sctrl = True
-    #mm.scmds = True
-    #mm.sresp = True
-    #mm.timming = True
-
     print("upyOS OTA Upgrade 2.0 (ESP-AT), \nDownloading upgrade list ", end="")
     
     if "t" in mod:
@@ -53,6 +47,21 @@ def __main__(args):
     else:
         url_raw = mainb # Default main
         print("from main branch", end="")
+    
+    mm = ModemManager("modem0")
+    #mm.sctrl = True
+    #mm.scmds = True
+    #mm.sresp = True
+    #mm.timming = True
+
+    # Connection
+    if not mm.create_url_conn(url_raw, keepalive=120):
+        print("Error: Cant connect")
+        return
+    
+    mm.atCMD("ATE0") # Echo off
+    mm.atCMD("AT+CIPMODE=1") # Transmissnon type 1
+    mm.send_passthrow() # Send for passthrow
     
     uf="/etc/upgrade.inf"
     if utls.file_exists(uf):
@@ -144,19 +153,17 @@ def __main__(args):
                 print(f"Error descarga: {fp} {fs} != {tmpfsz}")
                 break
 
-    os.remove(uf)
+    #os.remove(uf)
 
-    # Salir del modo transparente
-    time.sleep(1)
-    mm.modem.write("+++")
-    time.sleep(1)
-    mm.atCMD("AT+CIPMODE=0", 3)
-    
-    #if self.conected: 
-    mm.close_conn()  
-    mm.atCMD("ATE1", 2)
-    # ------<
-    
+    # Close connectiopn
+    if mm.tcp_conn: 
+        time.sleep(1)
+        mm.modem.write("+++")
+        time.sleep(1)
+        mm.atCMD("AT+CIPMODE=0", 3)
+        
+        mm.close_conn()  
+        mm.atCMD("ATE1", 2)    
     
     #print(str(ftu))
     #print(str(cont))
