@@ -94,7 +94,7 @@ def __main__(args):
     print("[", end="")
     
     cont=0
-    with open(uf, 'r') as f:
+    with open(uf,'r') as f:
         while True:
             ln = f.readline()
             
@@ -109,8 +109,6 @@ def __main__(args):
             
             #print(f"File: {fp} {fs}")
             
-            #if fp != "/main.py": continue
-            
             if "v" in mod:
                 print(fp, end=", ")
             else:
@@ -118,30 +116,34 @@ def __main__(args):
             
             ptini = time.ticks_ms()
             
-            tmpf = fp + "/tmp/ptf_file.tmp"
-            
-            if utls.file_exists(tmpf):
-                os.remove(tmpf)
-            
-            pull(mm, url_raw + fp, tmpf)
-            
-            stat = utls.get_stat(tmpf)           
-            tmpfsz = stat[6]
-            
-            if tmpfsz == fs:
-                if utls.file_exists(fp):
-                    os.remove(fp)
-                os.rename(tmpf, fp)
-            else:
-                print(f"Error descarga: {fp} {fs} != {tmpfsz}")
-                break
-            
+            upgr=False
+            tmpfsz=0
+            for r in range(3):
+                tmpf = "/tmp/ptf_file.tmp"
+                
+                if utls.file_exists(tmpf):
+                    os.remove(tmpf)
+                
+                pull(mm, url_raw + fp, tmpf)
+                
+                stat = utls.get_stat(tmpf)           
+                tmpfsz = stat[6]
+                
+                if tmpfsz == fs:
+                    if utls.file_exists(fp):
+                        os.remove(fp)
+                    os.rename(tmpf, fp)
+                    upgr=True
+                    cont+=1
+                    break
+
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
-            
             #print(f" <-> S2: {size2} {ptfin}ms")
 
-            cont+=1
-            
+            if not upgr:
+                print(f"Error descarga: {fp} {fs} != {tmpfsz}")
+                break
+
     os.remove(uf)
 
     # Salir del modo transparente

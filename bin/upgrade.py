@@ -116,18 +116,24 @@ def __main__(args):
     cont=0
     with open(uf, 'r') as f:
         while True:
-            fp = f.readline()
+            ln = f.readline()
             
-            if not fp: break
-            if fp.strip()=="": continue   # Empty lines skipped
-            if fp.strip().startswith("#"): continue # Commanted lines skipped
+            if not ln: break
+            if ln.strip()=="": continue   # Empty lines skipped
+            if ln.strip().startswith("#"): continue # Comment lines skipped
             
-            fp = fp[:-1] # remove ending CR
+            tmp = ln.split(",")
+            
+            fp = fp[0]
+            fs = ln[1]            
+            
             if "v" in mod:
                 print(fp, end=", ")
             else:
                 print(".", end="")
-            pull(fp, url_raw + fp[1:])
+                
+            pull(fp, url_raw + fp)
+            
             cont+=1
             
     os.remove(uf)
