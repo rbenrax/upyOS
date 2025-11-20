@@ -54,9 +54,13 @@ def __main__(args):
     #mm.sresp = True
     #mm.timming = True
 
+    if not mm.modem:
+        print("\nError: No modem")
+        return
+
     # Connection
     if not mm.create_url_conn(url_raw, keepalive=120):
-        print("Error: Cant connect")
+        print("\nError: Cant connect")
         return
     
     mm.atCMD("ATE0") # Echo off
@@ -149,7 +153,7 @@ def __main__(args):
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             #print(f" <-> S2: {size2} {ptfin}ms")
 
-            if not upgr:
+            if not upgr and not "-i" in args: # ignore errors
                 print(f"Error descarga: {fp} {fs} != {tmpfsz}")
                 break
 
