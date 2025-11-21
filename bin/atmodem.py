@@ -69,7 +69,7 @@ def __main__(args):
         print("\tReset modem: atmodem -r <mcu gpio> <wait to ready>")
         print("\tCreate serial uart: atmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio> [<modemname (modem0)>]")
         print("\tExecute AT command: atmodem <AT Command> <timeout> <expected resp>, Note: quotation marks must be sent as \\@")
-        print("\t-v verbose, -tm timmings")
+        print("\t-v verbose, -tm timings")
         return
     
     # Create a modem manager instance
@@ -83,7 +83,7 @@ def __main__(args):
         args = [arg for arg in args if arg != "-v"]
         
     if "-tm" in args:
-        modem.timming = True
+        modem.timing = True
         # Remover el flag -n de los argumentos
         args = [arg for arg in args if arg != "-tm"]
    

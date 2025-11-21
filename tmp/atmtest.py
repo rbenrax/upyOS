@@ -23,7 +23,7 @@ def __main__(args):
     #mt.sctrl = True
     mt.scmds = True
     mt.sresp = True
-    mt.timming = True
+    mt.timing = True
     
     def get(url, filename=""):
         prot, _, hostport, path = url.split('/', 3)

@@ -129,7 +129,7 @@ class upyOS:
         if fcmd[:3]=="AT+":
              fcmd = "atmodem " + fcmd.replace('"', "\\@")
              #print(fcmd)
-        ##### ATENTION: for testing only
+        ##### ATTENTION: for testing only
 
         # Translate env variables $*
         tmp = fcmd.split()
@@ -234,7 +234,7 @@ class upyOS:
         try:
             # Stop threads before exit
             if len(sdata.procs)>0:
-                print("\nStoping process...")
+                print("\nStopping process...")
 
                 # Launch shutdown services script
                 if utls.file_exists("/etc/end.sh"):

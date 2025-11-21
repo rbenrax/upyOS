@@ -1,9 +1,11 @@
 # ESP-AT Modem library for Espressif devices with ESP-AT firmware
 
 from machine import UART, Pin, RTC
-import time
+import utime
 import sdata
 import utls
+
+proc = None
 
 class ModemManager:
     def __init__(self, device="modem0"):
@@ -18,7 +20,7 @@ class ModemManager:
         self.scmds = False # Print cmds
         self.sresp = False # Print resp
         
-        self.timming = False
+        self.timing = False
         self.tini=0
         
         self._callback = None
@@ -33,15 +35,15 @@ class ModemManager:
             resetP = Pin(pin, Pin.OUT, value=1)  # HIGH default
 
             if self.sctrl:
-                print("** Reseting Modem...", end="")
+                print("** Resetting Modem...", end="")
         
             resetP.value(0)
-            time.sleep_ms(100) # 100ms pulse
+            utime.sleep_ms(100) # 100ms pulse
             resetP.value(1)
 
             self.tcp_conn = False
 
-            time.sleep(wait) # wait to ready
+            utime.sleep(wait) # wait to ready
             if self.sctrl:
                 print(", Ready")
         except Exception as ex:
@@ -69,23 +71,23 @@ class ModemManager:
                 print(f"** UART {id} created as {device}")
             
         except Exception as ex:
-            print("Crerate uart error, " + str(ex))
+            print("Create uart error, " + str(ex))
             return False
         
-        time.sleep(1)  # Wait for the port to stabilize
+        utime.sleep(1)  # Wait for the port to stabilize
             
         return True
     
     def _drain(self):
         # empty UART buffer
-        t0 = time.time()
-        while self.modem.any() and (time.time() - t0) < 0.01:
+        t0 = utime.time()
+        while self.modem.any() and (utime.time() - t0) < 0.01:
             self.modem.read()
             
     def atCMD(self, command, timeout=2.0, exp="OK"):
 
-        if self.timming: 
-            self.tini = time.ticks_ms()
+        if self.timing: 
+            self.tini = utime.ticks_ms()
 
         if self.modem is None:
             print("The modem uart is not initialized, see help")
@@ -107,11 +109,11 @@ class ModemManager:
         if self.scmds:
             print(">> " + command)
        
-        time.sleep(0.050)
+        utime.sleep(0.050)
        
         # Esperar respuesta
         resp = b""
-        start_time = time.ticks_ms()
+        start_time = utime.ticks_ms()
         
         #print("*****: " + str(timeout))
 
@@ -119,7 +121,7 @@ class ModemManager:
 
         #print(f"*** Exp {exp}")
 
-        while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
+        while utime.ticks_diff(utime.ticks_ms(), start_time) < timeout:
             if self.modem.any():
                 data = self.modem.read()
                 #print(f"**atCMD*** << {data}")
@@ -136,9 +138,9 @@ class ModemManager:
                     cmdsts = True
                     break
 
-            time.sleep(0.02)
+            utime.sleep(0.02)
         
-        time.sleep(0.05)
+        utime.sleep(0.05)
         
         decResp = resp.decode('utf-8')
 
@@ -150,8 +152,8 @@ class ModemManager:
         if self.sresp:
             print(f"<< {decResp}")
             
-        if self.timming:            
-            tfin = time.ticks_diff(time.ticks_ms(), self.tini)
+        if self.timing:            
+            tfin = utime.ticks_diff(utime.ticks_ms(), self.tini)
             print(f"** Cmd: {command}: Time: {tfin}ms\n" )
         
         return cmdsts, decResp
@@ -181,8 +183,8 @@ class ModemManager:
             print("rcv_data: TCP Not connected")
             return False, "", ""
         
-        if self.timming:
-            ptini = time.ticks_ms()
+        if self.timing:
+            ptini = utime.ticks_ms()
         
         timeout = timeout  * 1000
 
@@ -190,12 +192,12 @@ class ModemManager:
         #time.sleep(0.100)
 
         resp = b""
-        start_time = time.ticks_ms()
+        start_time = utime.ticks_ms()
         
         ndc=0 # No data count
         
         #print("*rcv****: " + str(timeout))
-        while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
+        while utime.ticks_diff(utime.ticks_ms(), start_time) < timeout:
             if self.modem.any():
                 ndc = -1
                 data = self.modem.read()
@@ -220,7 +222,7 @@ class ModemManager:
             else:
                 ndc += 1
                 #print("No data")
-                time.sleep(0.050)
+                utime.sleep(0.050)
                 
             time.sleep(0.010)
             if ndc > 25:
@@ -246,7 +248,7 @@ class ModemManager:
             print(f"<< Headers: {headers}")
             print(f"<< Body: {retResp}")
 
-        if self.timming:            
+        if self.timing:            
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms" )
             
@@ -258,20 +260,20 @@ class ModemManager:
             print("rcv_to_file_t: TCP Not connected")
             return False, ""
         
-        if self.timming:
-            ptini = time.ticks_ms()
+        if self.timing:
+            ptini = utime.ticks_ms()
         
         timeout = timeout * 1000
 
         # Esperar respuesta
-        start_time = time.ticks_ms()
+        start_time = utime.ticks_ms()
         ndc = 0  # No data count
         
         hf = False
         headers = ""
         buffer = b""  # Buffer para acumular datos antes de encontrar headers
         
-        while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
+        while utime.ticks_diff(utime.ticks_ms(), start_time) < timeout:
             
             if self.modem.any():
                 
@@ -335,7 +337,7 @@ class ModemManager:
         if ndc==0:
             print(f"Error: Timeout {timeout/1000}s reached with no data")
         
-        if self.timming:
+        if self.timing:
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms")
         
@@ -463,7 +465,7 @@ class ModemManager:
             else:
                 return(lines[2].split(",")[1])
             
-        return "Error get iP/mac"
+        return "Error get IP/mac"
     
     # Tcp CMDs
     def create_url_conn(self, url, keepalive=60, tout=10.0):
@@ -681,10 +683,10 @@ class MqttManager(ModemManager):
             while True:
  
                 # Thread control
-                if proc.sts=="S":break
+                if proc and proc.sts=="S":break
         
-                if proc.sts=="H":
-                    time.sleep(1)
+                if proc and proc.sts=="H":
+                    utime.sleep(1)
                     continue
                 
                 messages = self.check_messages()
@@ -693,7 +695,7 @@ class MqttManager(ModemManager):
                     if callback:
                         callback(msg)
                 
-                time.sleep_ms(10)  # Pequeña pausa para no saturar
+                utime.sleep_ms(10)  # Pequeña pausa para no saturar
                 
         except KeyboardInterrupt:
             print("\nMonitoreo detenido")

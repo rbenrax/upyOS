@@ -10,12 +10,12 @@ class Proc:
         sdata._pid += 1               # Increment process Id
         self.pid   = sdata._pid       # Process id
         self.tid   = 0                # Thread id
-        self.ext   = ""               # File extention / Call type
+        self.ext   = ""               # File extension / Call type
         self.cmd   = ""               # Command
         self.args  = ""               # Arguments
         self.stt   = utime.time()     # Start time
         self.sts   = "S"              # Process status
-        self.rmmod = True             # Remove module ant end?, default True
+        self.rmmod = True             # Remove module at end?, default True
         self.isthr = False
         
     def run(self, isthr, ext, cmd, args):

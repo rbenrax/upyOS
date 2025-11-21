@@ -5,7 +5,6 @@ import utime
 
 import utls
 import sdata
-import time
 
 # Source branches
 mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
@@ -28,7 +27,7 @@ def __main__(args):
 
     mod="" 
     for i in args:
-        if i[0]=="-": mod +=i [1:]
+        if i[0]=="-": mod += i[1:]
 
     for p in sdata.procs:
         if p.isthr:
@@ -54,7 +53,7 @@ def __main__(args):
     #mm.sctrl = True
     #mm.scmds = True
     #mm.sresp = True
-    #mm.timming = True
+    #mm.timing = True
 
     if not mm.modem:
         print("\nError: No modem")
@@ -66,7 +65,7 @@ def __main__(args):
         return
     
     mm.atCMD("ATE0") # Echo off
-    mm.atCMD("AT+CIPMODE=1") # Transmissnon type 1
+    mm.atCMD("AT+CIPMODE=1") # Transmission type 1
     mm.send_passthrow() # Send for passthrow
     
     uf="/etc/upgrade.inf"
@@ -95,7 +94,7 @@ def __main__(args):
     if len(end) > 1:
         ftu=int(end[1]) # files to upgrade
     else:
-        print("Error ungrade file, see /etc/upgrade.inf")
+        print("Error upgrade file, see /etc/upgrade.inf")
 
     if not "f" in mod:
         print(f"upyOS current version: {sdata.version}")
@@ -115,7 +114,7 @@ def __main__(args):
             
             if not ln: break
             if ln.strip()=="": continue   # Empty lines skipped
-            if ln.strip().startswith("#"): continue # Commanted lines skipped
+            if ln.strip().startswith("#"): continue # Commented lines skipped
             
             tmp = ln.split(",")
             
@@ -157,11 +156,11 @@ def __main__(args):
 
     #os.remove(uf) 
 
-    # Close connectiopn
+    # Close connection
     if mm.tcp_conn: 
-        time.sleep(1)
+        utime.sleep(1)
         mm.modem.write("+++")
-        time.sleep(1)
+        utime.sleep(1)
         mm.atCMD("AT+CIPMODE=0", 3)
         
         mm.close_conn()  
