@@ -5,7 +5,7 @@ import utime
 
 import utls
 import sdata
-import time
+
 
 # Source branches
 mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
@@ -159,9 +159,9 @@ def __main__(args):
 
     # Close connectiopn
     if mm.tcp_conn: 
-        time.sleep(1)
+        utime.sleep(1)
         mm.modem.write("+++")
-        time.sleep(1)
+        utime.sleep(1)
         mm.atCMD("AT+CIPMODE=0", 3)
         
         mm.close_conn()  
