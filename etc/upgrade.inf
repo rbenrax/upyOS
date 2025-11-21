@@ -43,7 +43,7 @@
 /bin/pwd.py,68
 /bin/read.py,243
 /bin/reboot.py,69
-/bin/release.py,1524
+/bin/release.py,1541
 /bin/reset.py,60
 /bin/resume.py,387
 /bin/rm.py,996
@@ -88,7 +88,6 @@
 /etc/help.txt,70
 /etc/init.sh,3490
 /etc/modem.inf,1788
-/etc/upgrade2.inf,1553
 /etc/upyOS-esp32-wroom-32.board,2342
 /etc/upyOS-esp32.board,3685
 /etc/upyOS-esp32c3_luatos.board,1804
@@ -98,4 +97,4 @@
 /etc/upyOS-esp8266.board,1760
 /etc/upyOS-rp2.board,2281
 /etc/welcome.txt,329
-#files,99
+#files,98
