@@ -539,7 +539,7 @@ Added call caching to the File System (FS). On systems with low memory, this sho
 
 ---
 
-## 📶 ESP-AT Modem Support
+## 📶 ESP-AT serial Modem Support
 
 Added support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated conectivity, such as RP2040, etc.
 ### RP2040 connected to an ESP8266 as wifi coprocessor
@@ -547,7 +547,7 @@ Added support for **Espressif ESP-AT UART modems**, especially for MCUs without 
 
 ```bash
 
-# /etc/init.sh connection example 
+# /etc/init.sh wifi connection example using ESP-AT serial modem 
 
 atmodem -r 22 1     # Reset modem
 sleep 3
@@ -608,13 +608,31 @@ AT+CIFSR
 
 ```
 
+```bash
+
+# OTA upgrade command for MCUs without integrated conectivity, using ESP-AT serial modem
+
+/ $: atupgrade
+upyOS OTA Upgrade 2.0 (ESP-AT), 
+Downloading upgrade list from main branch, OK
+
+upyOS current version: 0.9.2
+upyOS new version: 0.9.2 (2025-11-21)
+Confirm upgrade (y/N)? y
+Upgrading from upyOS github repository, wait...
+[..................................................................................................]OK
+100% Upgrade complete.
+/ $: 
+
+```
+
 ---
 # 📡 MQTT support
 
-Added **`MQTT clients`** commands for mcus with and without connectivity integrated.
+Added **`MQTT clients`** commands for MCUs with and without connectivity integrated.
 
 ```bash
-# MQTT examples for ESP and others mcus with integrated connectivity 
+# MQTT examples for ESP and others MCUs with integrated connectivity 
 
 export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
 
@@ -626,7 +644,7 @@ mqttc unsub -t "#"
 ```
 
 ```bash
-# MQTT examples for mcus without integrated connectivity using an ESP8266 or any from the ESP family with ESP-AT firmware installed.
+# MQTT examples for MCUs without integrated connectivity using an ESP8266 or any from the ESP family with ESP-AT firmware installed.
 
 export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
 
