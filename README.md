@@ -549,13 +549,12 @@ Added support for **Espressif ESP-AT UART modems**, especially for MCUs without 
 
 # /etc/init.sh wifi connection example using ESP-AT serial modem 
 
-atmodem -r 22 1     # Reset modem
-sleep 3
+atmodem -r 22 3     # Reset modem <reset_gpio> <time_toready_state>
 
 atmodem -c 1 115200 4 5 modem0 -v -tm  # Initialize UART and modem: -v verbose, -tm show timings
 atmodem AT+UART_CUR=115200,8,1,0,3     # Enable hardware flow control on ESP module
 
-# Optional: Execute an additional or complementary AT command script
+# Optional: You can execute an additional or complementary AT command script
 #echo "Executing modem script..."
 #atmodem -f /local/dial.inf
 
