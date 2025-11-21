@@ -86,7 +86,7 @@
 /libx/utelnetserver.py,5365
 /etc/end.sh,88
 /etc/help.txt,70
-/etc/init.sh,3486
+/etc/init.sh,3490
 /etc/modem.inf,1788
 /etc/upgrade2.inf,1553
 /etc/upyOS-esp32-wroom-32.board,2342

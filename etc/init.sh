@@ -70,11 +70,11 @@ led rgb 1             # Test the board's RGB LED (if available)
 
 # Using an ESP8266 with ESP-AT firmware (see /etc/modem.inf)
 
-atmodem -r 22 1     # Reset modem
-sleep 3
+#atmodem -r 22 1     # Reset modem
+#sleep 3
 
-atmodem -c 1 115200 4 5 modem0 -v -tm  # Initialize UART and modem: -v verbose, -tm show timings
-atmodem AT+UART_CUR=115200,8,1,0,3     # Enable hardware flow control on ESP module
+#atmodem -c 1 115200 4 5 modem0 -v -tm  # Initialize UART and modem: -v verbose, -tm show timings
+#atmodem AT+UART_CUR=115200,8,1,0,3     # Enable hardware flow control on ESP module
 
 # Optional: Execute an additional or complementary AT command script
 #echo "Executing modem script..."
