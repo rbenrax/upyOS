@@ -1,18 +1,18 @@
-# This script runs on boot. If it exists, the system is in normal mode.
-# If it doesn't exist, the system is in recovery mode.
+# This script runs at boot. If it exists, the system is in normal mode.
+# If it does not exist, the system enters recovery mode.
 
 # Both internal and external commands can be used:
-# > (Execute Python code)
-# < (Print Python code execution output)
+# >  (Execute Python code)
+# <  (Print Python code execution output)
 
-# Change configuration default values: 
-> sdata.cache_enabled = False  # Enable filesystem cache (+ memmory needed)
-> sdata.debug = False   # Debug mode
-> sdata.log   = False   # No implemented yet
+# Change default configuration values:
+> sdata.cache_enabled = False  # Enable filesystem cache (requires more memory)
+> sdata.debug = False          # Debug mode
+> sdata.log   = False          # Not implemented yet
 
-#cpufreq 160  # set mcu clock speed
+#cpufreq 160  # Set MCU clock speed
 
-# Welcome banner 
+# Welcome banner
 < "\033[1;33;44m", end=""
 cat /etc/welcome.txt
 < "\033[0m", end=""
@@ -37,43 +37,89 @@ free -h
 < "\033[1mStorage:"
 df -h
 
-# Test System Leds
-led on 0             # Turn on led 0
+# Test system LEDs
+led on 0              # Turn on LED 0
 sleep .05
-led off 0            # Turn off led 0
+led off 0             # Turn off LED 0
 
-led rgb 1            # Test rgb led in board (if board has one)
+led rgb 1             # Test the board's RGB LED (if available)
 
 < "\\n"
 
-# Wifi connection
-#wifi sta on                     # Turn on wifi in cliente mode
+# WiFi connection for mcus with integrated connectivity:
+
+#wifi sta on                     # Enable WiFi in station mode
 
 #wifi sta status   
-#wifi sta scan                   # Scan wifi APs
+#wifi sta scan                   # Scan for WiFi access points
 
-#wifi sta connect <SSID> <PASSWORD> 10 	# SSID PASS Timeout
+#wifi sta connect <SSID> <PASSWORD> 10   # SSID PASS Timeout
 
 #wifi sta status -n
-#if $wa == False goto exit    # wifi active
-#if $wc == False goto exit    # wifi connected
+#if $wa == False goto exit       # WiFi active?
+#if $wc == False goto exit       # WiFi connected?
 
-#ntpupdate es.pool.ntp.org    # Your ntp server
+#ntpupdate es.pool.ntp.org       # Your NTP server
 
-#date                         # Current date
+#date                            # Current date/time
 
-#wifi sta ifconfig            # IPs information
+#wifi sta ifconfig               # IP information
 
-#utelnetd start               # Start telnet server
-#uftpd start                  # Start ftp server
-#uhttpd start &               # Start http server
+
+# -- ATTENTION: Only for MCUs without integrated connectivity ---------------- #
+
+# Using an ESP8266 with ESP-AT firmware (see /etc/modem.inf)
+
+#atmodem -r 22 1     # Reset modem
+#sleep 3
+
+#atmodem -c 1 115200 4 5 modem0 -v -tm  # Initialize UART and modem: -v verbose, -tm show timings
+#atmodem AT+UART_CUR=115200,8,1,0,3     # Enable hardware flow control on ESP module
+
+# Optional: Execute an additional or complementary AT command script
+#echo "Executing modem script..."
+#atmodem -f /local/dial.inf
+
+# Connecting using external modem (if you wish, you can do a .py program)
+#> from esp_at import ModemManager
+#> mm = ModemManager()
+#< f"Modem: {mm.device}"
+#< mm.get_version()
+
+#< "Connecting WiFi..."
+#> mm.wifi_set_mode(1); mm.wifi_connect("SSID", "PASSWORD")
+
+#< f"WiFi status: {mm.wifi_status()}"
+#< "NTP update..."
+#> mm.set_ntp_server(); mm.set_datetime(); del mm
+#date
+
+# Example usage of MQTT command with AT modem:
+#export h = 192.168.2.132
+#atmqttc pub -h $h -t "home/bedroom/temp" -m "25"
+#atmqttc sub -t "#"
+#atmqttc listsub -t "#"
+#atmqttc listen
+
+# -- ATTENTION ---------------------------------------------------------------- #
+
+# Example usage of MQTT commands for MCUs with integrated connectivity:
+
+#export h = 192.168.2.132
+#mqttc pub -h $h -t "home/bedroom/temp" -m "25"
+#mqttc sub -t "#"
+#mqttc listsub -t "#"
+
+# Start integrated services
+
+#utelnetd start               # Start Telnet server
+#uftpd start                  # Start FTP server
+#uhttpd start &               # Start HTTP server
 
 :exit
 
-# Run an alternative local script if you don't want to modify 
-# this one that will be changed in the updates.
-test -f /local/init.sh > 0      # Check if script exists, save bool result in $0 env var
+# Run an alternative local script if you prefer not to modify
+# this one (it may be overwritten during updates).
+test -f /local/init.sh > 0       # Check if script exists and store result in $0
 if $0 == True /local/init.sh
 unset 0
-
-

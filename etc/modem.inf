@@ -5,12 +5,19 @@
 # After execution, you will have a global reference device (sdata.modem0, or other) available for use in your programs.
 # Other scripts can be created, as well as one specific for disconnection.
 
-# 4 wires used (+ reset)
+# 4 wires used
 # rp2040     esp8266
+
 #  3.3v  --->  3.3v
 #  gnd   --->  gnd
 #  tx    --->  rx (In new ESP-AT versions, Espressif has changed the pins, see docs)
 #  rx    --->  tx (In new ESP-AT versions, Espressif has changed the pins, see docs)
+
+# 2 wires+ RTS/CTS flow control, Very recommended specially for https (TLS) connections
+#  RTS   --->  CTS
+#  CTS   --->  RTS
+
+# Reset
 #  gpio  --->  reset # Optional
 
 echo Reset Modem
@@ -28,7 +35,10 @@ uart 1 115200 4 5 modem0   # From programs you can access as sdata.modem0
 # <AT Command> <timeout> <resp expected>
 
 AT
-AT+GMR 
+#AT+RST
+#AT+RESTORE
+AT+GMR
+#AT+CWLAP 10
 AT+CMD?
 
 echo Connecting WIFI ...
@@ -40,3 +50,11 @@ sleep 3
 
 AT+CIFSR
 #AT+CWQAP
+
+# NTP server cmd
+#AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
+#sleep 5
+#AT+CIPSNTPTIME?
+
+
+

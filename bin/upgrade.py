@@ -72,7 +72,9 @@ def __main__(args):
             return
 
     if "h" in mod:
-        print("Upgrade upyOS from git repository\nUsage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list, -t test branch")
+        print("Upgrade upyOS from git repository")
+        print("Usage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
+        print(", -t test branch, -i ignore errors, -o overwrite diffs")
         return
 
     print("upyOS OTA Upgrade 2.0, \nDownloading upgrade list ", end="")
@@ -162,7 +164,7 @@ def __main__(args):
                 stat = utls.get_stat(tmpf)
                 tmpfsz = stat[6]
                 
-                if tmpfsz == fs:
+                if tmpfsz == fs or "o" in mod: # Overwrite diffs
                     if utls.file_exists(fp):
                         os.remove(fp)
                     os.rename(tmpf, fp)
@@ -175,7 +177,8 @@ def __main__(args):
 
             if not upgr:
                 print(f"Error descarga: {fp} {fs} != {tmpfsz}")
-                break
+                print(f"upgrade.inf file may not be up to date")
+                if not "i" in mod: break # ignore and show errors
             
 #     os.remove(uf)
 

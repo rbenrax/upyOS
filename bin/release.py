@@ -15,7 +15,7 @@ def __main__(args):
     else:
         fd="/etc/upgrade.inf" # Realease file
         fr=["/boot.py","/main.py"] # Files to include       
-        fi=["system.conf", "upgrade.inf", "upgrade.inf"] # Files to avoid
+        fi=["system.conf", "upgrade.inf", "upgrade2.inf", "ptf_file.tmp"] # Files to avoid
         dr=["/bin","/lib","/libx","/etc"] # Direcrories to include
         
         cont=0
