@@ -541,18 +541,108 @@ Added call caching to the File System (FS). On systems with low memory, this sho
 
 ## 📶 ESP-AT Modem Support
 
-Added basic support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated Wi-Fi, such as RP2040, etc.
+Added support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated conectivity, such as RP2040, etc.
+### RP2040 connected to ESP8266 as wifi comprocessor
+![rp2040+esp8266](media/rp2040_esp8266.jpg)
 
-**ATmodem** and **ATmqtt** objects available in `/bin` directory.
+```bash
+
+# /etc/init.sh connection example 
+
+atmodem -r 22 1     # Reset modem
+sleep 3
+
+atmodem -c 1 115200 4 5 modem0 -v -tm  # Initialize UART and modem: -v verbose, -tm show timings
+atmodem AT+UART_CUR=115200,8,1,0,3     # Enable hardware flow control on ESP module
+
+# Optional: Execute an additional or complementary AT command script
+#echo "Executing modem script..."
+#atmodem -f /local/dial.inf
+
+# Connecting using external modem (if you wish, you can do a .py program)
+> from esp_at import ModemManager
+> mm = ModemManager()
+< f"Modem: {mm.device}"
+< mm.get_version()
+
+< "Connecting WiFi..."
+> mm.wifi_set_mode(1); mm.wifi_connect("SSID", "PASSWORD")
+
+< f"WiFi status: {mm.wifi_status()}"
+< "NTP update..."
+> mm.set_ntp_server(); mm.set_datetime(); del mm
+date
+
+```
+
+```bash
+# /etc/modem.inf connection example 
+
+echo Reseting Modem
+reset 22 3
+
+# Create serial comunication (see modem --h command)
+uart 1 115200 4 5 modem0   # From programs you can access as sdata.modem0
+
+AT
+#AT+RST
+#AT+RESTORE
+AT+GMR
+#AT+CWLAP 10
+AT+CMD?
+
+echo Connecting WIFI ...
+AT+CWMODE=1
+AT+CWJAP="ESSID","PASSW" 5
+
+# Delay between commands
+sleep 3
+
+AT+CIFSR
+#AT+CWQAP
+
+# NTP server cmd
+#AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
+#sleep 5
+#AT+CIPSNTPTIME?
+
+```
+
+---
+# 📡 MQTT support
+
+Added **`MQTT clients`** commands for mcus with and without connectivity integrated.
+
+```bash
+# MQTT examples for ESP and others mcus with integrated connectivity 
+
+#export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
+
+mqttc pub -h $h -t "home/bedroom/temp" -m "25"
+mqttc sub -t "#"
+mqttc listsub -t "#"
+mqttc unsub -t "#"
+
+```
+
+```bash
+# MQTT examples for mcus without integrated connectivity using an ESP8266 or any from the ESP family with ESP-AT firmware installed.
+
+#export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
+
+atmqttc pub -h $h -t "home/bedroom/temp" -m "25"
+atmqttc sub -t "#"
+atmqttc listen
+atmqttc listsub -t "#"
+atmqttc unsub -t "#"
+
+```
+
 
 ---
 
 ## 🔧 TODO List
 
-* Add AThttp object for use with ESP-AT modems
-* Add ATws object for use with ESP-AT modems
-* Add ATwsrpc object for use with ESP-AT modems
-* Add mqtt utility for ESP family
 * Add other useful commands.
 
 The Wishlist is open! 😉
