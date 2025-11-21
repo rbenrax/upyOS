@@ -542,7 +542,7 @@ Added call caching to the File System (FS). On systems with low memory, this sho
 ## 📶 ESP-AT Modem Support
 
 Added support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated conectivity, such as RP2040, etc.
-### RP2040 connected to ESP8266 as wifi comprocessor
+### RP2040 connected to an ESP8266 as wifi coprocessor
 ![rp2040+esp8266](media/rp2040_esp8266.jpg)
 
 ```bash
@@ -616,7 +616,7 @@ Added **`MQTT clients`** commands for mcus with and without connectivity integra
 ```bash
 # MQTT examples for ESP and others mcus with integrated connectivity 
 
-#export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
+export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
 
 mqttc pub -h $h -t "home/bedroom/temp" -m "25"
 mqttc sub -t "#"
@@ -628,7 +628,7 @@ mqttc unsub -t "#"
 ```bash
 # MQTT examples for mcus without integrated connectivity using an ESP8266 or any from the ESP family with ESP-AT firmware installed.
 
-#export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
+export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
 
 atmqttc pub -h $h -t "home/bedroom/temp" -m "25"
 atmqttc sub -t "#"
