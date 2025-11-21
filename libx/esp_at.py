@@ -175,7 +175,7 @@ class ModemManager:
         
         return result
 
-    def rcv_data(self, size=1024, encoded=True, timeout=10.0):
+    def rcv_data(self, size=1024, encoded=True, timeout=15.0):
         
         if not self.tcp_conn:
             print("rcv_data: TCP Not connected")
@@ -252,7 +252,7 @@ class ModemManager:
             
         return True, retResp, headers
     
-    def rcv_to_file_t(self, fh, timeout=10):
+    def rcv_to_file_t(self, fh, timeout=15):
         
         if not self.tcp_conn:
             print("rcv_to_file_t: TCP Not connected")
@@ -341,7 +341,7 @@ class ModemManager:
         
         return True, headers
 
-    def http_get_to_file_t(self, url, filename="", tout=10):
+    def http_get_to_file_t(self, url, filename="", tout=15):
         
         if not self.tcp_conn:
             print("http_get_to_file_t: TCP Not connected")
@@ -384,10 +384,9 @@ class ModemManager:
         sts, _ = self.atCMD(f"AT+CWMODE={mode}")
         return sts
         
-    def wifi_connect(self, ssid, password):        
-        # Conectar a WiFi
+    def wifi_connect(self, ssid, password, tout=10):
         cmd = f'AT+CWJAP="{ssid}","{password}"'
-        sts, resp = self.atCMD(cmd, 15)
+        sts, resp = self.atCMD(cmd, tout)
         return sts, resp
 
     def wifi_disconnect(self):
@@ -407,10 +406,10 @@ class ModemManager:
         sts, ret = self.atCMD(f'AT+PING="{host}"')
         return ret.split()[1]
 
-    def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org"):
+    def set_ntp_server(self, en=1, tz=1, ns1="es.pool.ntp.org", ns2="es.pool.ntp.org", tout=10):
                               #AT+CIPSNTPCFG=1,1,"es.pool.ntp.org","es.pool.ntp.org"
-        sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"', 10, "+TIME_UPDATED")
-        #sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"', 10, "OK")
+        sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"', tout, "+TIME_UPDATED")
+        #sts, ret = self.atCMD(f'AT+CIPSNTPCFG={en},{tz},"{ns1}","{ns2}"', tout, "OK")
         return sts
 
     def set_datetime(self):
@@ -467,7 +466,7 @@ class ModemManager:
         return "Error get iP/mac"
     
     # Tcp CMDs
-    def create_url_conn(self, url, keepalive=60):
+    def create_url_conn(self, url, keepalive=60, tout=10.0):
         prot, _, hostport, path = url.split('/', 3)
         port = 443 if prot.lower() == "https:" else 80
         ct = "SSL" if prot.lower() == "https:" else "TCP"
@@ -479,11 +478,11 @@ class ModemManager:
             host = tmp[0]
             port = tmp[1]
         
-        return self.create_conn(host, port, ct, keepalive)
+        return self.create_conn(host, port, ct, keepalive, tout)
     
-    def create_conn(self, host, port, ct="TCP", keepalive=60):
+    def create_conn(self, host, port, ct="TCP", keepalive=60, tout=10.0):
         command = f'AT+CIPSTART="{ct}","{host}",{port},{keepalive}'
-        sts, _ = self.atCMD(command, 10.0, "CONNECT")
+        sts, _ = self.atCMD(command, tout, "CONNECT")
         
         if sts:
             self.tcp_conn = True
@@ -492,21 +491,21 @@ class ModemManager:
             
         return sts
     
-    def send_passthrow(self, tout=5):
+    def send_passthrow(self, tout=3):
         lcmd = "AT+CIPSEND"
-        sts, ret = self.atCMD(lcmd, 3, ">")
+        sts, ret = self.atCMD(lcmd, tout, ">")
         if sts:
             return sts, ret
         return False, ""
     
-    def send_data(self, data, tout=5):
+    def send_data(self, data, tout=3):
         
         if not self.tcp_conn:
             print("send_data: TCP Not connected")
             return False, ""
         
         lcmd = f"AT+CIPSEND={len(data)}"
-        sts, ret = self.atCMD(lcmd, 3, ">")
+        sts, ret = self.atCMD(lcmd, tout, ">")
         if sts:
             # Enviar datos
             sts, ret = self.atCMD(data, tout, "SEND OK")
@@ -535,7 +534,6 @@ class ModemManager:
         sts, _ = self.atCMD("AT+CIPCLOSE")
         self.tcp_conn = False
         return sts
-
 
 # MQTT Implementation
 
