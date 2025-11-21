@@ -73,10 +73,9 @@
 /lib/sdata.py,464
 /lib/syscfg.py,3087
 /lib/utls.py,7301
-/libx/__pycache__,7301
 /libx/editor.py,12606
 /libx/editstr.py,6445
-/libx/esp_at.py,22766
+/libx/esp_at.py,22778
 /libx/microWebSrv.py,34548
 /libx/microWebTemplate.py,13597
 /libx/ssd1306.py,4584
@@ -99,4 +98,4 @@
 /etc/upyOS-esp8266.board,1760
 /etc/upyOS-rp2.board,2281
 /etc/welcome.txt,329
-#files,100
+#files,99

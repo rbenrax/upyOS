@@ -189,7 +189,7 @@ class ModemManager:
         timeout = timeout  * 1000
 
         # Important, to wait !!
-        #time.sleep(0.100)
+        #utime.sleep(0.100)
 
         resp = b""
         start_time = utime.ticks_ms()
@@ -212,7 +212,7 @@ class ModemManager:
                 else:
                     resp += data
                 
-                start_time = time.ticks_ms() # restart if new data
+                start_time = utime.ticks_ms() # restart if new data
                 
                 if size > 0 and len(resp) >= size:
                     print(f"Warning: Size truncated")
@@ -224,7 +224,7 @@ class ModemManager:
                 #print("No data")
                 utime.sleep(0.050)
                 
-            time.sleep(0.010)
+            utime.sleep(0.010)
             if ndc > 25:
                 #print("*****: Brk rcv 2")
                 break
@@ -249,7 +249,7 @@ class ModemManager:
             print(f"<< Body: {retResp}")
 
         if self.timing:            
-            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            ptfin = utime.ticks_diff(utime.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms" )
             
         return True, retResp, headers
@@ -281,7 +281,7 @@ class ModemManager:
                 ndc = 1
                 
                 #print(f"*rcvDATA*** <<  {data}")
-                #time.sleep_ms(10)
+                #utime.sleep_ms(10)
                 
                 if not hf:
                     # Acumular datos mientras no se hayan encontrado los headers
@@ -306,7 +306,7 @@ class ModemManager:
                             return False, headers
                     else:
                         # Headers aún no completos, continuar acumulando
-                        start_time = time.ticks_ms()  # Reiniciar timeout
+                        start_time = utime.ticks_ms()  # Reiniciar timeout
                         continue
                 
                 # Procesar body solo si ya se encontraron los headers
@@ -319,7 +319,7 @@ class ModemManager:
                         print(f"Error writing file - {str(e)}")
                         return False, headers
                 
-                start_time = time.ticks_ms()  # Reiniciar timeout si hay nuevos datos
+                start_time = utime.ticks_ms()  # Reiniciar timeout si hay nuevos datos
 
             else:
                 if ndc > 0:
@@ -328,9 +328,9 @@ class ModemManager:
                 if ndc > 25:
                     break
                 
-                time.sleep_ms(20)
+                utime.sleep_ms(20)
         
-            time.sleep_ms(5)
+            utime.sleep_ms(5)
         
         fh.flush()
         
@@ -338,7 +338,7 @@ class ModemManager:
             print(f"Error: Timeout {timeout/1000}s reached with no data")
         
         if self.timing:
-            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
+            ptfin = utime.ticks_diff(utime.ticks_ms(), ptini)
             print(f"## Tiempo rcv: {ptfin}ms")
         
         return True, headers
