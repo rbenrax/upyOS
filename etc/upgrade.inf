@@ -68,7 +68,7 @@
 /bin/watch.py,693
 /bin/wget.py,487
 /bin/wifi.py,10243
-/lib/kernel.py,9049
+/lib/kernel.py,9051
 /lib/proc.py,3916
 /lib/sdata.py,465
 /lib/syscfg.py,3087
