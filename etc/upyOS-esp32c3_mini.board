@@ -1,0 +1,51 @@
+{
+    "ir": true,
+    "rtc": true,
+    "ver": 1.0,
+    "uart": [
+        {
+            "tx": 10,
+            "rx": 9
+        }
+    ],
+    "temp": true,
+    "spi": [
+        {
+            "mosi": 7,
+            "miso": 2,
+            "cs": 3,
+            "ck": 6
+        }
+    ],
+    "ledio": [
+        {
+            "d4": 12,
+            "d5": 13
+        }
+    ],
+    "bt": true,
+    "wifi": true,
+    "text": "",
+    "rgbio": [
+        {
+            "l1": 8
+        }
+    ],
+    "eth": false,
+    "i2c": [
+        {
+            "scl": 9,
+            "sda": 8
+        }
+    ],
+    "mcu": [
+        {
+            "arch": "risc-v",
+            "type": "esp32-c3"
+        }
+    ],
+    "board": {
+        "name": "ESP32C3",
+        "vendor": "Espressif"
+    }
+}

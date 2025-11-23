@@ -1,4 +1,4 @@
-#upyOS,0.9.2,2025-11-21
+#upyOS,0.9.2,2025-11-23
 /boot.py,139
 /main.py,71
 /bin/atmodem.py,3107
@@ -86,15 +86,16 @@
 /libx/utelnetserver.py,5365
 /etc/end.sh,88
 /etc/help.txt,70
-/etc/init.sh,3490
+/etc/init.sh,3533
 /etc/modem.inf,1788
 /etc/upyOS-esp32-wroom-32.board,2342
 /etc/upyOS-esp32.board,3685
 /etc/upyOS-esp32c3_luatos.board,1804
+/etc/upyOS-esp32c3_mini.board,758
 /etc/upyOS-esp32c3_vcc_gnd.board,1866
 /etc/upyOS-esp32c6_muse_labs.board,1879
 /etc/upyOS-esp32s3_vcc_gnd.board,1891
-/etc/upyOS-esp8266.board,1760
+/etc/upyOS-esp8266.board,749
 /etc/upyOS-rp2.board,2281
 /etc/welcome.txt,329
-#files,98
+#files,99
