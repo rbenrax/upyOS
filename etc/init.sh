@@ -18,13 +18,16 @@ cat /etc/welcome.txt
 < "\033[0m", end=""
 
 # Choose your board model and layout
+
+loadboard /etc/upyOS-esp32c3_mini.board
+
 #loadboard /etc/upyOS-esp32c3_luatos.board
 #loadboard /etc/upyOS-esp32c3_vcc_gnd.board
 #loadboard /etc/upyOS-esp32s3_vcc_gnd.board
 #loadboard /etc/upyOS-esp8266.board
 #loadboard /etc/upyOS-esp32-wroom-32.board
 #loadboard /etc/upyOS-rp2.board
-loadboard /etc/upyOS-esp32c6_muse_labs.board
+#loadboard /etc/upyOS-esp32c6_muse_labs.board
 
 < "\\n"
 lshw -b
