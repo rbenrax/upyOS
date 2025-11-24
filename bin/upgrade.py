@@ -137,6 +137,7 @@ def __main__(args):
     print("[", end="")
     
     cont=0
+    cntup=0
     with open(uf, 'r') as f:
         while True:
             ln = f.readline()
@@ -200,6 +201,8 @@ def __main__(args):
                 print(f"Error descarga: {fp} {fs} != {tmpfsz}")
                 print(f"upgrade.inf file may not be up to date")
                 if not "i" in mod: break # ignore and show errors
+            else:
+                cntup+=1
             
 #     os.remove(uf)
 
@@ -208,6 +211,7 @@ def __main__(args):
     
     if ftu == cont:
         print("]OK\n100% Upgrade complete.")
+        print(f"{cntup} Upgraded files")
     else:
         print("]Error in upgrade,\nUpgrade not complete.")
         
