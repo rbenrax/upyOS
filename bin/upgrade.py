@@ -8,7 +8,8 @@ try:
     import ssl
 except:
     print("Try atupgrade with esp-at modem instead")
-    
+
+import hashlib
 import utls
 import sdata
 import sys

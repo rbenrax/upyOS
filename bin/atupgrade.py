@@ -24,15 +24,15 @@ def pull(mm, url, f_path):
         print(f"\natupgrade/pull: {f_path} - {str(e)}")
         return False
 
-    def hash_sha1(filename):
-        h = hashlib.sha1()
-        with open(filename, 'rb') as f:
-            while True:
-                chunk = f.read(512)
-                if not chunk:
-                    break
-                h.update(chunk)
-        return h.digest().hex()
+def hash_sha1(filename):
+    h = hashlib.sha1()
+    with open(filename, 'rb') as f:
+        while True:
+            chunk = f.read(512)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.digest().hex()
 
 def __main__(args):
 
