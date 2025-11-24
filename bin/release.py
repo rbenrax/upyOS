@@ -2,7 +2,18 @@ import uos
 import time
 import sdata
 import utls
+import hashlib
 
+def hash_sha1(filename):
+    h = hashlib.sha1()
+    with open(filename, 'rb') as f:
+        while True:
+            chunk = f.read(512)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.digest().hex()
+    
 def __main__(args):
     
     def fsize(fp):
@@ -26,7 +37,7 @@ def __main__(args):
             print(ver)
                 
             for f in fr:
-                fu.write(f + "," + str(fsize(f)) + "\n")
+                fu.write(f + "," + str(fsize(f)) + "," + hash_sha1(f) + "," + "\n")
                 print(f)
                 cont+=1
                 
@@ -36,7 +47,7 @@ def __main__(args):
                     if f in fi: continue
                     fp = d + "/" + f
                     print(fp)
-                    fu.write(fp + "," + str(fsize(fp)) + "\n")
+                    fu.write(fp + "," + str(fsize(fp)) + "," + hash_sha1(fp) + "," + "\n")
                     cont+=1
                     
             ls = f"#files,{cont}"

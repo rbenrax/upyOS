@@ -2,10 +2,9 @@ from esp_at import ModemManager
 import os
 import machine
 import utime
-
+import hashlib
 import utls
 import sdata
-
 
 # Source branches
 mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
@@ -23,6 +22,17 @@ def pull(mm, url, f_path):
     except Exception as e:
         print(f"\natupgrade/pull: {f_path} - {str(e)}")
         return False
+
+def hash_sha1(filename):
+    if not utls.file_exists(filename): return ""
+    h = hashlib.sha1()
+    with open(filename, 'rb') as f:
+        while True:
+            chunk = f.read(512)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.digest().hex()
 
 def __main__(args):
 
@@ -109,6 +119,7 @@ def __main__(args):
     print("[", end="")
     
     cont=0
+    cntup=0
     with open(uf,'r') as f:
         while True:
             ln = f.readline()
@@ -122,12 +133,22 @@ def __main__(args):
             fp = tmp[0]
             fs = int(tmp[1])
             
+            hsh=None
+            if len(tmp) > 2:
+                hsh = tmp[2]
+            
             #print(f"File: {fp} {fs}")
             
             if "v" in mod:
                 print(fp, end=", ")
             else:
                 print(".", end="")
+            
+            if hsh:
+                lhsh = hash_sha1(fp)
+                if hsh == lhsh:
+                    cont+=1
+                    continue
             
             upgr=False
             tmpfsz=0
@@ -136,7 +157,7 @@ def __main__(args):
                 
                 if utls.file_exists(tmpf):
                     os.remove(tmpf)
-                
+                    
                 pull(mm, url_raw + fp, tmpf)
                 
                 stat = utls.get_stat(tmpf)           
@@ -151,9 +172,11 @@ def __main__(args):
                     break
 
             if not upgr:
-                print(f"\nError descarga: {fp} src: {fs} != dest: {tmpfsz}")
+                print(f"\nDownload error: {fp} src: {fs} != dest: {tmpfsz}")
                 print(f"upgrade.inf file may not be up to date")
                 if not "i" in mod: break # ignore and show errors
+            else:
+                cntup+=1
 
     #os.remove(uf) 
 
@@ -172,6 +195,7 @@ def __main__(args):
     
     if ftu == cont:
         print("]OK\n100% Upgrade complete.")
+        print(f"{cntup} Upgraded files")
     else:
         print("]Error in upgrade,\nUpgrade not complete.")
         

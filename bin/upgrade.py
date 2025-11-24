@@ -8,7 +8,8 @@ try:
     import ssl
 except:
     print("Try atupgrade with esp-at modem instead")
-    
+
+import hashlib
 import utls
 import sdata
 import sys
@@ -59,6 +60,17 @@ def pull(url, f_path):
     finally:
         if ssl_socket: ssl_socket.close()
         if s: s.close()
+    
+def hash_sha1(filename):
+    if not utls.file_exists(filename): return ""
+    h = hashlib.sha1()
+    with open(filename, 'rb') as f:
+        while True:
+            chunk = f.read(512)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.digest().hex()
     
 def __main__(args):
 
@@ -126,6 +138,7 @@ def __main__(args):
     print("[", end="")
     
     cont=0
+    cntup=0
     with open(uf, 'r') as f:
         while True:
             ln = f.readline()
@@ -141,10 +154,20 @@ def __main__(args):
             
             #print(f"File: {fp} {fs}")
             
+            hsh=None
+            if len(tmp) > 2:
+                hsh = tmp[2]
+            
             if "v" in mod:
                 print(fp, end=", ")
             else:
                 print(".", end="")
+            
+            if hsh:
+                lhsh = hash_sha1(fp)
+                if hsh == lhsh:
+                    cont+=1
+                    continue
             
             ptini = time.ticks_ms()
             
@@ -176,9 +199,11 @@ def __main__(args):
             #print(f" <-> S2: {size2} {ptfin}ms")
 
             if not upgr:
-                print(f"Error descarga: {fp} {fs} != {tmpfsz}")
+                print(f"\nDownload error: {fp} {fs} != {tmpfsz}")
                 print(f"upgrade.inf file may not be up to date")
                 if not "i" in mod: break # ignore and show errors
+            else:
+                cntup+=1
             
 #     os.remove(uf)
 
@@ -187,6 +212,7 @@ def __main__(args):
     
     if ftu == cont:
         print("]OK\n100% Upgrade complete.")
+        print(f"{cntup} Upgraded files")
     else:
         print("]Error in upgrade,\nUpgrade not complete.")
         
