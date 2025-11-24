@@ -68,7 +68,7 @@ class ModemManager:
             setattr(sdata, self.device, self.modem)
 
             if self.sctrl:
-                print(f"** UART {id} created as {device}")
+                print(f"UART {id} created as {device}")
             
         except Exception as ex:
             print("Create uart error, " + str(ex))
@@ -199,7 +199,7 @@ class ModemManager:
         #print("*rcv****: " + str(timeout))
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if self.modem.any():
-                ndc = -1
+                ndc = 1
                 data = self.modem.read()
                 #print(f"*rcvDATA*** <<  {data}")
                 
@@ -220,14 +220,15 @@ class ModemManager:
                     break
                 
             else:
-                ndc += 1
-                #print("No data")
+                if ndc > 0:
+                    ndc += 1
+                    #print(f"No data {ndc}")
+                if ndc > 25:
+                    break
+                
                 time.sleep(0.050)
                 
             time.sleep(0.010)
-            if ndc > 25:
-                #print("*****: Brk rcv 2")
-                break
         
         #print("breaking...")
         
@@ -514,7 +515,7 @@ class ModemManager:
         if sts:
             # Enviar datos
             sts, ret = self.atCMD(data, tout, "SEND OK")
-            ret = self.clear_ipd(ret)
+            #ret = self.clear_ipd(ret)
             return sts, ret
         return False, ""
     
@@ -530,7 +531,7 @@ class ModemManager:
             # Send data
             self.modem.write(data)
             sts, ret = self.atCMD("", tout, "SEND OK")
-            ret = self.clear_ipd(ret)
+            #ret = self.clear_ipd(ret)
             return sts, ret
         return False, ""
     

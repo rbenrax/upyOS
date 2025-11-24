@@ -1,6 +1,7 @@
 #upyOS,0.9.2,2025-11-24
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
+/bin/atcurl.py,5130,12c3db0659d79101dc0689508219478f66a48b39,
 /bin/atmodem.py,3107,472fc33bc1dc0f49bbc7293427391465b86bedf4,
 /bin/atmqttc.py,5525,f1d4667f7ad388a9a619b96aad4cd8c0a2e2fa76,
 /bin/atupgrade.py,5583,6a0e273f20db5372e4a8b8a511068dc056887f27,
@@ -76,7 +77,7 @@
 /lib/utls.py,7301,43132c83827ddb1ef8ff692a3c01b9cc0d6ae4a5,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
 /libx/editstr.py,6445,6e4059fdf2df28be1e09164ca7ed8ecca618e9ee,
-/libx/esp_at.py,22795,e4565b81af91022378c7ad56c0b8e66bef088ffa,
+/libx/esp_at.py,22818,1c7d4b2c21da3e1d8de2ba0645689ea00ab2e400,
 /libx/microWebSrv.py,34548,42780574b59490eab8ad25958d663166a857d1d1,
 /libx/microWebTemplate.py,13597,9b74e227ef22f2be768f46e404d62a150eaa95a2,
 /libx/ssd1306.py,4584,ef7c8a250f6824020cb6072adaa1126b9f3f136b,
@@ -99,4 +100,4 @@
 /etc/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
 /etc/welcome.txt,329,11a86867eb5ce308624aa37300caf7a3f815325a,
-#files,100
+#files,101
