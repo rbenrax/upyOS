@@ -24,6 +24,16 @@ def pull(mm, url, f_path):
         print(f"\natupgrade/pull: {f_path} - {str(e)}")
         return False
 
+    def hash_sha1(filename):
+        h = hashlib.sha1()
+        with open(filename, 'rb') as f:
+            while True:
+                chunk = f.read(512)
+                if not chunk:
+                    break
+                h.update(chunk)
+        return h.digest().hex()
+
 def __main__(args):
 
     mod="" 
@@ -122,6 +132,10 @@ def __main__(args):
             fp = tmp[0]
             fs = int(tmp[1])
             
+            hsh=None
+            if len(tmp) == 3:
+                hsh = tmp[2]
+            
             #print(f"File: {fp} {fs}")
             
             if "v" in mod:
@@ -129,6 +143,14 @@ def __main__(args):
             else:
                 print(".", end="")
             
+            if hsh:
+                lhsh = hash_sha1(fp)
+                if hsh == lhsh:
+                    print("p1")
+                    cont+=1
+                    continue
+            
+            print("p2")
             upgr=False
             tmpfsz=0
             for r in range(3):
@@ -136,7 +158,7 @@ def __main__(args):
                 
                 if utls.file_exists(tmpf):
                     os.remove(tmpf)
-                
+                    
                 pull(mm, url_raw + fp, tmpf)
                 
                 stat = utls.get_stat(tmpf)           

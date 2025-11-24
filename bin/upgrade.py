@@ -141,10 +141,20 @@ def __main__(args):
             
             #print(f"File: {fp} {fs}")
             
+            hsh=None
+            if len(tmp) == 3:
+                hsh = tmp[2]
+            
             if "v" in mod:
                 print(fp, end=", ")
             else:
                 print(".", end="")
+            
+            if hsh:
+                lhsh = hash_sha1(fp)
+                if hsh == lhsh:
+                    cont+=1
+                    continue
             
             ptini = time.ticks_ms()
             
