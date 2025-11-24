@@ -24,6 +24,7 @@ def pull(mm, url, f_path):
         return False
 
 def hash_sha1(filename):
+    if not utls.file_exists(filename): return ""
     h = hashlib.sha1()
     with open(filename, 'rb') as f:
         while True:
