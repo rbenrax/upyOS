@@ -3,7 +3,7 @@
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16
 /bin/atmodem.py,3107,472fc33bc1dc0f49bbc7293427391465b86bedf4
 /bin/atmqttc.py,5525,f1d4667f7ad388a9a619b96aad4cd8c0a2e2fa76
-/bin/atupgrade.py,5587,5aadda6246f4668b17c572aa1c1a91c044f962de
+/bin/atupgrade.py,5599,bd7fd76a62142bef4fd16c8bc3a7ead8b15d299f
 /bin/cat.py,1909,61a960f81c53e649bdc5cd00c9087c4d2de3b0e3
 /bin/cd.py,330,0355baffd6599cf6fe152000d592571a64ef96ae
 /bin/clear.py,63,079be4ed19df5f15875a79633de80f38e6b7e19b

@@ -2,10 +2,9 @@ from esp_at import ModemManager
 import os
 import machine
 import utime
-
+import hashlib
 import utls
 import sdata
-
 
 # Source branches
 mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
