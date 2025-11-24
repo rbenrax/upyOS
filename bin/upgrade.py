@@ -153,7 +153,7 @@ def __main__(args):
             #print(f"File: {fp} {fs}")
             
             hsh=None
-            if len(tmp) == 3:
+            if len(tmp) > 2:
                 hsh = tmp[2]
             
             if "v" in mod:

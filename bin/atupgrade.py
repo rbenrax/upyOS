@@ -132,7 +132,7 @@ def __main__(args):
             fs = int(tmp[1])
             
             hsh=None
-            if len(tmp) == 3:
+            if len(tmp) > 2:
                 hsh = tmp[2]
             
             #print(f"File: {fp} {fs}")
@@ -145,11 +145,9 @@ def __main__(args):
             if hsh:
                 lhsh = hash_sha1(fp)
                 if hsh == lhsh:
-                    print("p1")
                     cont+=1
                     continue
             
-            print("p2")
             upgr=False
             tmpfsz=0
             for r in range(3):
