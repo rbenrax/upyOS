@@ -60,6 +60,16 @@ def pull(url, f_path):
         if ssl_socket: ssl_socket.close()
         if s: s.close()
     
+def hash_sha1(filename):
+    h = hashlib.sha1()
+    with open(filename, 'rb') as f:
+        while True:
+            chunk = f.read(512)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.digest().hex()
+    
 def __main__(args):
 
     mod="" 
