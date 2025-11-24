@@ -1,6 +1,9 @@
 import os    
 import machine
-import utime
+import time
+import hashlib
+import utls
+import sdata
 
 try:
     import urequests
@@ -8,12 +11,6 @@ try:
     import ssl
 except:
     print("Try atupgrade with esp-at modem instead")
-
-import hashlib
-import utls
-import sdata
-import sys
-import time
 
 # Source branches
 mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
@@ -144,8 +141,8 @@ def __main__(args):
             ln = f.readline()
             
             if not ln: break
-            if ln.strip()=="": continue   # Empty lines skipped
-            if ln.strip().startswith("#"): continue # Commanted lines skipped
+            if ln.strip()=="": continue
+            if ln.strip().startswith("#"): continue
             
             tmp = ln.split(",")
             
@@ -168,8 +165,6 @@ def __main__(args):
                 if hsh == lhsh:
                     cont+=1
                     continue
-            
-            ptini = time.ticks_ms()
             
             upgr=False
             tmpfsz=0
@@ -195,9 +190,6 @@ def __main__(args):
                     cont+=1
                     break
 
-            ptfin = time.ticks_diff(time.ticks_ms(), ptini)
-            #print(f" <-> S2: {size2} {ptfin}ms")
-
             if not upgr:
                 print(f"\nDownload error: {fp} {fs} != {tmpfsz}")
                 print(f"upgrade.inf file may not be up to date")
@@ -206,9 +198,6 @@ def __main__(args):
                 cntup+=1
             
 #     os.remove(uf)
-
-    #print(str(ftu))
-    #print(str(cont))
     
     if ftu == cont:
         print("]OK\n100% Upgrade complete.")
@@ -216,9 +205,9 @@ def __main__(args):
     else:
         print("]Error in upgrade,\nUpgrade not complete.")
         
-    utime.sleep(2)
+    time.sleep(2)
     
     if "r" in mod:
         print("Rebooting...")
-        utime.sleep(2)
+        time.sleep(2)
         machine.soft_reset()
