@@ -198,7 +198,7 @@ def __main__(args):
             #print(f" <-> S2: {size2} {ptfin}ms")
 
             if not upgr:
-                print(f"Error descarga: {fp} {fs} != {tmpfsz}")
+                print(f"\nDownload error: {fp} {fs} != {tmpfsz}")
                 print(f"upgrade.inf file may not be up to date")
                 if not "i" in mod: break # ignore and show errors
             else:

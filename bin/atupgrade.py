@@ -171,7 +171,7 @@ def __main__(args):
                     break
 
             if not upgr:
-                print(f"\nError descarga: {fp} src: {fs} != dest: {tmpfsz}")
+                print(f"\nDownload error: {fp} src: {fs} != dest: {tmpfsz}")
                 print(f"upgrade.inf file may not be up to date")
                 if not "i" in mod: break # ignore and show errors
             else:
