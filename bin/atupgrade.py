@@ -1,7 +1,7 @@
 from esp_at import ModemManager
 import os
 import machine
-import utime
+import time
 import hashlib
 import utls
 import sdata
@@ -16,7 +16,7 @@ def pull(mm, url, f_path):
  
         sts = mm.http_get_to_file_t(url, f_path)
         if not sts:
-            print(f"- Error downloading {f_path}")
+            print(f"\nError downloading {f_path}")
         return sts
  
     except Exception as e:
@@ -125,8 +125,8 @@ def __main__(args):
             ln = f.readline()
             
             if not ln: break
-            if ln.strip()=="": continue   # Empty lines skipped
-            if ln.strip().startswith("#"): continue # Commanted lines skipped
+            if ln.strip()=="": continue
+            if ln.strip().startswith("#"): continue
             
             tmp = ln.split(",")
             
@@ -163,7 +163,7 @@ def __main__(args):
                 stat = utls.get_stat(tmpf)           
                 tmpfsz = stat[6]
                 
-                if tmpfsz == fs or "o" in mod: # Overwrite diffs
+                if tmpfsz == fs or "o" in mod: # Overwrite files
                     if utls.file_exists(fp):
                         os.remove(fp)
                     os.rename(tmpf, fp)
@@ -182,16 +182,13 @@ def __main__(args):
 
     # Close connectiopn
     if mm.tcp_conn: 
-        utime.sleep(1)
+        time.sleep(1)
         mm.modem.write("+++")
-        utime.sleep(1)
+        time.sleep(1)
         mm.atCMD("AT+CIPMODE=0", 3)
         
         mm.close_conn()  
         mm.atCMD("ATE1", 2)    
-    
-    #print(str(ftu))
-    #print(str(cont))
     
     if ftu == cont:
         print("]OK\n100% Upgrade complete.")
@@ -199,9 +196,9 @@ def __main__(args):
     else:
         print("]Error in upgrade,\nUpgrade not complete.")
         
-    utime.sleep(2)
+    time.sleep(2)
     
     if "r" in mod:
         print("Rebooting...")
-        utime.sleep(2)
+        time.sleep(2)
         machine.soft_reset()
