@@ -230,5 +230,4 @@ def __main__(args):
         
     finally:
         # Limpieza final si fuera necesaria
-
         print("Upgrade process completed")
