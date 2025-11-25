@@ -34,7 +34,7 @@ def __main__(args):
     while i < len(args):
         arg = args[i]
         
-        if ">" in arg: break
+        if ">" in arg or ">>" in arg: break
         
         if arg in ["-X"]:
             if i + 1 < len(args):
