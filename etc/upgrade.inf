@@ -78,7 +78,7 @@
 /lib/utls.py,7301,43132c83827ddb1ef8ff692a3c01b9cc0d6ae4a5,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
 /libx/editstr.py,6445,6e4059fdf2df28be1e09164ca7ed8ecca618e9ee,
-/libx/esp_at.py,22832,3b8ca815c1272ec9122922976ae48558fdcd50e7,
+/libx/esp_at.py,22818,1c7d4b2c21da3e1d8de2ba0645689ea00ab2e400,
 /libx/microWebSrv.py,34548,42780574b59490eab8ad25958d663166a857d1d1,
 /libx/microWebTemplate.py,13597,9b74e227ef22f2be768f46e404d62a150eaa95a2,
 /libx/ssd1306.py,4584,ef7c8a250f6824020cb6072adaa1126b9f3f136b,
