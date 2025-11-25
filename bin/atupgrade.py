@@ -175,14 +175,14 @@ def __main__(args):
                     if not "i" in mod: break # ignore and show errors
                 else:
                     cntup+=1
-
+                    
         #os.remove(uf) 
 
         if ftu == cont:
             print("]OK\n100% Upgrade complete.")
             print(f"{cntup} Upgraded files")
         else:
-            print("]Error in upgrade,\nUpgrade not complete.")
+            print(f"]\nUpgrade not complete. {ftu} != {cont}")
             
         time.sleep(2)
         
