@@ -170,7 +170,7 @@ def __main__(args):
                         break
 
                 if not upgr:
-                    print(f"\nDownload error: {fp} src: {fs} != dest: {tmpfsz}")
+                    print(f"\nDownload error: {fp} src size: {fs} - downloaded size: {tmpfsz}")
                     print(f"upgrade.inf file may not be up to date")
                     if not "i" in mod: break # ignore and show errors
                 else:
@@ -182,7 +182,7 @@ def __main__(args):
             print("]OK\n100% Upgrade complete.")
             print(f"{cntup} Upgraded files")
         else:
-            print(f"]\nUpgrade not complete. {ftu} != {cont}")
+            print(f"]\nUpgrade not complete. {cont}/{ftu}")
             
         time.sleep(2)
         
