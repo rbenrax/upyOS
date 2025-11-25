@@ -34,7 +34,7 @@ def __main__(args):
     while i < len(args):
         arg = args[i]
         
-        if ">" in arg or ">>" in arg: break
+        if ">" in arg: break
         
         if arg in ["-X"]:
             if i + 1 < len(args):
@@ -75,7 +75,7 @@ def __main__(args):
         else:
             print(f"Error: Unknown option: {arg}")
             return
-    
+
     if not url:
         print("Error: URL required")
         print("Usage: atcurl [OPTIONS] <URL>")
@@ -124,7 +124,9 @@ def __main__(args):
         # Create connection
         if verbose:
             print(f"Connecting to {host}:{port}...")
-            
+        
+        mm.atCMD("AT+CIPMODE=0", 3)
+        
         if not mm.create_url_conn(url, keepalive=20):
             print("Error: Cannot connect to server")
             return
