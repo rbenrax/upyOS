@@ -228,6 +228,6 @@ def __main__(args):
     except Exception as e:
         print(f"\nUnexpected error during upgrade process: {str(e)}")
         
-    #finally:
+    finally:
         # Limpieza final si fuera necesaria
-    #    print("Upgrade process completed")
+        print("Upgrade process completed")
