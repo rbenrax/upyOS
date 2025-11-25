@@ -4,7 +4,7 @@
 /bin/atcurl.py,5167,efd0bc15fdedfb17538d3ea800cd765201bd3901,
 /bin/atmodem.py,3107,472fc33bc1dc0f49bbc7293427391465b86bedf4,
 /bin/atmqttc.py,5525,f1d4667f7ad388a9a619b96aad4cd8c0a2e2fa76,
-/bin/atupgrade.py,6556,d410df3a429b8761eddfb641323304a5fd07c976,
+/bin/atupgrade.py,6536,287b54a4808db4babde08d8737caaa0d87e07508,
 /bin/atwget.py,1285,05e58cae5858e9e16aeb62fa1289f21f06ac0d53,
 /bin/cat.py,1909,61a960f81c53e649bdc5cd00c9087c4d2de3b0e3,
 /bin/cd.py,330,0355baffd6599cf6fe152000d592571a64ef96ae,
