@@ -9,7 +9,7 @@ import sdata
 # Source branches
 mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
 testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test'
-
+ 
 def pull(mm, url, f_path):
 
     try:
@@ -75,6 +75,16 @@ def __main__(args):
         print("\nError: Cant connect")
         return
     
+    def close_conn():
+        if mm.tcp_conn: 
+            time.sleep(0.5)
+            mm.modem.write("+++")
+            time.sleep(0.5)
+            mm.atCMD("AT+CIPMODE=0", 3)
+            
+            mm.close_conn()  
+            mm.atCMD("ATE1", 2)
+        
     mm.atCMD("ATE0") # Echo off
     mm.atCMD("AT+CIPMODE=1") # Transmissnon type 1
     mm.send_passthrow() # Send for passthrow
@@ -87,6 +97,7 @@ def __main__(args):
     
     if not utls.file_exists(uf):
         print("No upgrade file available, system can not be upgraded")
+        close_conn()
         return
 
     ini=None
@@ -112,6 +123,7 @@ def __main__(args):
         print(f"upyOS new version: {ini[1]} ({ini[2]})" )
         r = input("Confirm upgrade (y/N)? ")
         if r!="y":
+            close_conn()
             print("Upgrade canceled.")
             return
          
@@ -181,14 +193,7 @@ def __main__(args):
     #os.remove(uf) 
 
     # Close connectiopn
-    if mm.tcp_conn: 
-        time.sleep(1)
-        mm.modem.write("+++")
-        time.sleep(1)
-        mm.atCMD("AT+CIPMODE=0", 3)
-        
-        mm.close_conn()  
-        mm.atCMD("ATE1", 2)    
+    close_conn()  
     
     if ftu == cont:
         print("]OK\n100% Upgrade complete.")
