@@ -12,9 +12,7 @@ try:
 except:
     print("Try atupgrade with esp-at modem instead")
 
-# Source branches
-mainb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main'
-testb = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/test'
+url_base = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads'
 
 def pull(url, f_path):    
     s = None
@@ -54,9 +52,22 @@ def pull(url, f_path):
                 
     except Exception as e:
         print(f"\nupgrade/pull: {f_path} - {str(e)}")
+        return False
+    else:
+        return True
     finally:
-        if ssl_socket: ssl_socket.close()
-        if s: s.close()
+        # Esta sección siempre se ejecuta para cerrar las conexiones
+        try:
+            if ssl_socket:
+                ssl_socket.close()
+        except Exception as e:
+            print(f"Error closing SSL socket: {e}")
+        
+        try:
+            if s:
+                s.close()
+        except Exception as e:
+            print(f"Error closing socket: {e}")
     
 def hash_sha1(filename):
     if not utls.file_exists(filename): return ""
@@ -70,144 +81,153 @@ def hash_sha1(filename):
     return h.digest().hex()
     
 def __main__(args):
+    try:
+        mod="" 
+        for i in args:
+            if i[0]=="-": mod +=i [1:]
 
-    mod="" 
-    for i in args:
-        if i[0]=="-": mod +=i [1:]
+        for p in sdata.procs:
+            if p.isthr:
+                print("Stop all process before upgrade")
+                return
 
-    for p in sdata.procs:
-        if p.isthr:
-            print("Stop all process before upgrade")
+        if "h" in mod:
+            print("Upgrade upyOS from git repository")
+            print("Usage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
+            print(", -t test branch, -i ignore errors, -o overwrite diffs")
             return
 
-    if "h" in mod:
-        print("Upgrade upyOS from git repository")
-        print("Usage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
-        print(", -t test branch, -i ignore errors, -o overwrite diffs")
-        return
-
-    print("upyOS OTA Upgrade 2.0, \nDownloading upgrade list ", end="")
-    
-    if "t" in mod:
-        url_raw = testb # test
-        print("from test branch", end="")
-    else:
-        url_raw = mainb # Default main
-        print("from main branch", end="")
+        print("upyOS OTA Upgrade 2.0, \nDownloading upgrade list ", end="")
         
-    uf="/etc/upgrade.inf"
-    if utls.file_exists(uf):
-        os.remove(uf)
-    pull(url_raw + uf, uf)
-    print(", OK")
-    
-    if not utls.file_exists(uf):
-        print("No upgrade file available, system can not be upgraded")
-        return
-
-    ini=None
-    end=None
-    with open(uf, 'r') as f:
-        for l in f:
-            if l.startswith('#upyOS'):
-                ini = l.strip().split(',')
-            elif l.startswith('#files'):
-                end = l.strip().split(',')
-
-    print()
-    #print(ini)
-    #print(end)
-    
-    if len(end) > 1:
-        ftu=int(end[1]) # files to upgrade
-    else:
-        print("Error ungrade file, see /etc/upgrade.inf")
-
-    if not "f" in mod:
-        print(f"upyOS current version: {sdata.version}")
-        print(f"upyOS new version: {ini[1]} ({ini[2]})" )
-        r = input("Confirm upgrade (y/N)? ")
-        if r!="y":
-            print("Upgrade canceled.")
+        if "t" in mod:
+            url = url_base + "/test" # test
+            print("from test branch", end="")
+        else:
+            url = url_base + "/main" # Default main
+            print("from main branch", end="")
+            
+        uf="/etc/upgrade.inf"
+        if utls.file_exists(uf):
+            os.remove(uf)
+        
+        success = pull(url + uf, uf)
+        print(", OK")
+        
+        if not success or not utls.file_exists(uf):
+            print("No upgrade file available, system can not be upgraded")
             return
-         
-    print("Upgrading from upyOS github repository, wait...")
-    print("[", end="")
-    
-    cont=0
-    cntup=0
-    with open(uf, 'r') as f:
-        while True:
-            ln = f.readline()
-            
-            if not ln: break
-            if ln.strip()=="": continue
-            if ln.strip().startswith("#"): continue
-            
-            tmp = ln.split(",")
-            
-            fp = tmp[0]
-            fs = int(tmp[1])
-            
-            #print(f"File: {fp} {fs}")
-            
-            hsh=None
-            if len(tmp) > 2:
-                hsh = tmp[2]
-            
-            if "v" in mod:
-                print(fp, end=", ")
-            else:
-                print(".", end="")
-            
-            if hsh:
-                lhsh = hash_sha1(fp)
-                if hsh == lhsh:
-                    cont+=1
-                    continue
-            
-            upgr=False
-            tmpfsz=0
-            tmpf = "/tmp/ptf_file.tmp"
-            for r in range(3):
-                
-                #if utls.file_exists(tmpf):
-                #    print(f"{tmpf} {utls.file_exists(tmpf)}")
-                #    os.remove(tmpf)
-                
-                pull(url_raw + fp, tmpf)
-                
-                time.sleep(.3)
-                
-                stat = utls.get_stat(tmpf)
-                tmpfsz = stat[6]
-                
-                if tmpfsz == fs or "o" in mod: # Overwrite diffs
-                    if utls.file_exists(fp):
-                        os.remove(fp)
-                    os.rename(tmpf, fp)
-                    upgr=True
-                    cont+=1
-                    break
 
-            if not upgr:
-                print(f"\nDownload error: {fp} {fs} != {tmpfsz}")
-                print(f"upgrade.inf file may not be up to date")
-                if not "i" in mod: break # ignore and show errors
-            else:
-                cntup+=1
-            
-#     os.remove(uf)
-    
-    if ftu == cont:
-        print("]OK\n100% Upgrade complete.")
-        print(f"{cntup} Upgraded files")
-    else:
-        print("]Error in upgrade,\nUpgrade not complete.")
+        ini=None
+        end=None
+        with open(uf, 'r') as f:
+            for l in f:
+                if l.startswith('#upyOS'):
+                    ini = l.strip().split(',')
+                elif l.startswith('#files'):
+                    end = l.strip().split(',')
+
+        print()
+        #print(ini)
+        #print(end)
         
-    time.sleep(2)
-    
-    if "r" in mod:
-        print("Rebooting...")
+        if len(end) > 1:
+            ftu=int(end[1]) # files to upgrade
+        else:
+            print("Error ungrade file, see /etc/upgrade.inf")
+            return
+
+        if not "f" in mod:
+            print(f"upyOS current version: {sdata.version}")
+            print(f"upyOS new version: {ini[1]} ({ini[2]})" )
+            r = input("Confirm upgrade (y/N)? ")
+            if r!="y":
+                print("Upgrade canceled.")
+                return
+             
+        print("Upgrading from upyOS github repository, wait...")
+        print("[", end="")
+        
+        cont=0
+        cntup=0
+        with open(uf, 'r') as f:
+            while True:
+                ln = f.readline()
+                
+                if not ln: break
+                if ln.strip()=="": continue
+                if ln.strip().startswith("#"): continue
+                
+                tmp = ln.split(",")
+                
+                fp = tmp[0]
+                fs = int(tmp[1])
+                
+                #print(f"File: {fp} {fs}")
+                
+                hsh=None
+                if len(tmp) > 2:
+                    hsh = tmp[2]
+                
+                if "v" in mod:
+                    print(fp, end=", ")
+                else:
+                    print(".", end="")
+                
+                if hsh:
+                    lhsh = hash_sha1(fp)
+                    if hsh == lhsh:
+                        cont+=1
+                        continue
+                
+                upgr=False
+                tmpfsz=0
+                tmpf = "/tmp/ptf_file.tmp"
+                for r in range(3):
+                    
+                    #if utls.file_exists(tmpf):
+                    #    print(f"{tmpf} {utls.file_exists(tmpf)}")
+                    #    os.remove(tmpf)
+                    
+                    success = pull(url + fp, tmpf)
+                    
+                    time.sleep(.3)
+                    
+                    stat = utls.get_stat(tmpf)
+                    tmpfsz = stat[6]
+                    
+                    if tmpfsz == fs or "o" in mod: # Overwrite diffs
+                        if utls.file_exists(fp):
+                            os.remove(fp)
+                        os.rename(tmpf, fp)
+                        upgr=True
+                        cont+=1
+                        break
+
+                if not upgr:
+                    print(f"\nDownload error: {fp} src size: {fs} - downloaded size: {tmpfsz}")
+                    print(f"upgrade.inf file may not be up to date")
+                    if not "i" in mod: break # ignore and show errors
+                else:
+                    cntup+=1
+                
+    #     os.remove(uf)
+        
+        if ftu == cont:
+            print("]OK\n100% Upgrade complete.")
+            print(f"{cntup} Upgraded files")
+        else:
+           print(f"]\nUpgrade not complete. {cont}/{ftu}")
+            
         time.sleep(2)
-        machine.soft_reset()
+        
+        if "r" in mod:
+            print("Rebooting...")
+            time.sleep(2)
+            machine.soft_reset()
+            
+    except Exception as e:
+        print(f"\nUnexpected error during upgrade process: {str(e)}")
+        
+    finally:
+        # Limpieza final si fuera necesaria
+        print("Upgrade process completed")
