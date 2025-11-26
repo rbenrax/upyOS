@@ -2,14 +2,12 @@
 # Developed by rbenrax 2023
 
 import sys
-import uos
-import utime
+import os
+import time
 from machine import reset as reboot
-
 import sdata
 import utls
 import proc
-import syscfg
 
 class upyOS:
 
@@ -22,27 +20,20 @@ class upyOS:
         print("\033[2J\033[HBooting upyOS...")
         
         # sdata store all system data
-        sdata.name    = "upyOS-" + uos.uname()[0]
-        sdata.version = "0.9.2"
-        sdata.initime = utime.time()
+        sdata.name    = "upyOS-" + os.uname()[0]
+        sdata.version = "0.9.3"
+        sdata.initime = time.time()
         sdata.upyos   = self
         
         # Stop system
         self.stop = False
         
-        # Initialization
-        board = uos.uname()[4]
-
         # Create directories
-        if not utls.file_exists("/etc"):
-            uos.mkdir("/etc")
+        dirs = ["/etc", "/etc/boards", "/opt", "/tmp", "/var", "/local"]
+        for d in dirs:
+            if not utls.file_exists(d):
+                os.mkdir(d)
             
-        if not utls.file_exists("/opt"): # Specific solutions directory
-            uos.mkdir("/opt")
-
-        if not utls.file_exists("/tmp"): # Temp directory
-            uos.mkdir("/tmp")
-
         # Set library path for modules finding, by default is /lib only
         sys.path.append("/bin")
         sys.path.append("/libx")
@@ -51,55 +42,54 @@ class upyOS:
         from ubinascii import hexlify
         from machine import unique_id
         sdata.sid=hexlify(unique_id()).decode().upper()
-
+        
         # Internal Commands definition
         self.user_commands = {
             "exit" : self.exit,
-            #"halt": self.halt,
             "loadconfig": self.loadconfig,
             "loadboard": self.loadboard
         }
-
-        sco=None # class with default configuration
         
         # Create sysconfig
         if not utls.file_exists("/etc/system.conf"):
-            sco = syscfg.SysCfg(board) # create class with default structures
-            utls.save_conf_file(sco.getConf(), "/etc/system.conf")
+            sdata.sysconfig={"ver"    : 1.0,
+                             "board"  : "/etc/default.board",
+                             "pfiles" : ["/boot.py","/main.py"],
+                             "alias"  : {"": "", "": ""},
+                             "env"    : {"TZ": "+1", "?": "", "0": ""},
+                             "auth"   : {"user": "admin", "paswd": ""}
+                            }
+            
+            utls.save_conf_file(sdata.sysconfig, "/etc/system.conf")
             print(f"/etc/system.conf file created.")
-
-        self.loadconfig()
+        else:
+            self.loadconfig()
+        
+        def_board = "/etc/default.board"
+        if "board" in sdata.sysconfig:
+            board = sdata.sysconfig["board"]
+        
+            if not utls.file_exists(board):
+                print(f"** Board {board} not found")
+                board = def_board
+        else:
+            print(f"** Please add board in /etc/system.conf")
+            board = def_board
+            
+        self.loadboard(board)
 
         if utls.file_exists("/etc/init.sh") and not "-r" in boot_args:
             self.print_msg("Normal mode boot")
-            #print("Launching init.sh:")
             self.run_cmd("sh /etc/init.sh")
-
-            if not sdata.board:
-                file = "/etc/" + sdata.name + ".board"
-                
-                if not utls.file_exists(file):
-                    if not sco:
-                        sco = syscfg.SysCfg(board) # create class with default structures
-                    utls.save_conf_file(sco.getBoard(), file)
-                    print(f"\nBoard config file generated, you may config {file} before continue.")
-                    
-                    #self.loadboard(file)
-
         else:
             self.print_msg("Recovery mode boot")
-            
-        try:
-            del sys.modules["syscfg"]
-        except:
-            pass
 
         self.print_msg("Type 'help' for a upyOS manual.")
 
         # Main command processing loop
         while not self.stop:
             try:
-                user_input = input(uos.getcwd() + " $: ")
+                user_input = input(os.getcwd() + " $: ")
                 self.run_cmd(user_input)
                 
             except KeyboardInterrupt:
@@ -146,7 +136,7 @@ class upyOS:
             self.run_py_code(f"print({fcmd[2:]})")
             return
         elif fcmd[:2]=="./":
-            cwd = uos.getcwd()
+            cwd = os.getcwd()
             if cwd == "/":
                 fcmd = "/" + fcmd[2:]
             else:
@@ -189,11 +179,11 @@ class upyOS:
                     # RP-2040 suport only two threads, esp32 and others, many
                     try:
                         from _thread import start_new_thread, stack_size
-                        #if uos.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
+                        #if os.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3
                         if sys.platform=="esp32": stack_size(8192)   # stack overflow in ESP32C3
                         newProc = proc.Proc()
                         start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
-                        utime.sleep(.150)
+                        timesleep(.150)
                     except ImportError:
                         print("System has not thread support")
                     except Exception as ex:
@@ -246,7 +236,7 @@ class upyOS:
                     for p in sdata.procs:
                         if p.isthr: end=False
                     if end: break
-                    utime.sleep(.5)
+                    timesleep(.5)
                     
             self.print_msg("Shutdown upyOS..., bye.")
             print("")
@@ -273,7 +263,7 @@ class upyOS:
             print(f"{conf} not found")
         
     def loadboard(self, board=""):
-        if board == "": board = "/etc/" + sdata.name + ".board"
+        if board == "": board = "/etc/default.board"
         if utls.file_exists(board):
             sdata.board=utls.load_conf_file(board)
             print(f"Board cfg loaded: {board}")
