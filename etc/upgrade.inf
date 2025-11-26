@@ -86,7 +86,7 @@
 /libx/uiperf3.py,16588,81ddbc929ac7e40c259d280f06b9a55f334cc790,
 /libx/uping.py,3348,bd62f18eabcbb9ab2b330622f21d4b0d9a21bc62,
 /libx/utelnetserver.py,5365,de145649db2327a0f897a6d9299f03a5da39c0a6,
-/etc/default.board,1879,0fd8e6946db5590263762a3cc387bae9e9c81abc,
+/etc/default.board,761,24838a46ff31ca783a1d80e0a18ce93d3697f47d,
 /etc/end.sh,88,5c0d73498bf922a6129a366c2212e71428a2a343,
 /etc/help.txt,70,096bbc36f22bfd7e9a4cc1aa717421ad6f0cbd3c,
 /etc/init.sh,3341,0bde722ee6bf871f3d19c1d97ca78c2593d2fe7a,

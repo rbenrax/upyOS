@@ -1,6 +1,6 @@
 {
-    "ir": true,
-    "rtc": true,
+    "ir": false,
+    "rtc": false,
     "ver": 1.0,
     "uart": [
         {
@@ -8,7 +8,7 @@
             "rx": 9
         }
     ],
-    "temp": true,
+    "temp": false,
     "spi": [
         {
             "mosi": 7,
