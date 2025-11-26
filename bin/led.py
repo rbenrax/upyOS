@@ -40,7 +40,7 @@ def __main__(args):
                    np[i] = (0, 0, 0, 0)
                    np.write()       
             except Exception as ex:
-                print("Warning: (rgbio) Possibly a bad .board file in loadboard command. See /etc/init.sh")
+                print("Warning: (rgbio) Bad .board file in /etc/system.conf")
                 return False
         
         np=None
@@ -55,7 +55,7 @@ def __main__(args):
                system_leds.append(machine.Pin(pn, machine.Pin.OUT))
                
         except Exception as ex:
-            print("Warning: (ledio) Possibly a bad .board file in loadboard command. See /etc/init.sh")
+            print("Warning: (ledio) Bad .board file in /etc/system.conf")
             return False
 
         if ln < 0 or ln>len(system_leds)-1:

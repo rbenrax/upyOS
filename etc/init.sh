@@ -10,24 +10,16 @@
 > sdata.debug = False          # Debug mode
 > sdata.log   = False          # Not implemented yet
 
+# Choose your board model and layout
+# Deprecated: loadboard /etc/upyOS-esp32c3_mini.board
+# Set your board model in /etc/system.conf or copy your model to /etc/default.board
+
 #cpufreq 160  # Set MCU clock speed
 
 # Welcome banner
 < "\033[1;33;44m", end=""
 cat /etc/welcome.txt
 < "\033[0m", end=""
-
-# Choose your board model and layout
-
-#loadboard /etc/upyOS-esp32c3_mini.board
-
-#loadboard /etc/upyOS-esp32c3_luatos.board
-#loadboard /etc/upyOS-esp32c3_vcc_gnd.board
-#loadboard /etc/upyOS-esp32s3_vcc_gnd.board
-#loadboard /etc/upyOS-esp8266.board
-#loadboard /etc/upyOS-esp32-wroom-32.board
-#loadboard /etc/upyOS-rp2.board
-loadboard /etc/upyOS-esp32c6_muse_labs.board
 
 < "\\n"
 lshw -b
