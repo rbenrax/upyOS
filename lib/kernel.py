@@ -183,7 +183,7 @@ class upyOS:
                         if sys.platform=="esp32": stack_size(8192)   # stack overflow in ESP32C3
                         newProc = proc.Proc()
                         start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
-                        timesleep(.150)
+                        time.sleep(.150)
                     except ImportError:
                         print("System has not thread support")
                     except Exception as ex:
@@ -236,7 +236,7 @@ class upyOS:
                     for p in sdata.procs:
                         if p.isthr: end=False
                     if end: break
-                    timesleep(.5)
+                    time.sleep(.5)
                     
             self.print_msg("Shutdown upyOS..., bye.")
             print("")
