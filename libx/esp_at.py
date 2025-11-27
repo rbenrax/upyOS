@@ -246,9 +246,9 @@ class ModemManager:
             
             # remove +IPD
             if "\r\n+IPD," in headers:
-                pos_http = headers.find("HTTP/")
-                if pos_http != -1:
-                    headers = headers[pos_http:]
+                sep = headers.find(":")
+                if sep != -1:
+                    headers = headers[sep + 1:]
             
             retResp = retResp[body_ini + 4:] 
 
