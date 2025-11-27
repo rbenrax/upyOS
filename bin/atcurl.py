@@ -171,7 +171,7 @@ def __main__(args):
             ret=""
             if show_response_headers:
                 #print(headers)
-                ret+=headers
+                ret+=headers + "\r\n\r\n"
             #print(body)
             ret+=body
             utls.outs(args, ret)
