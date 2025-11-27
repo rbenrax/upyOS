@@ -572,6 +572,15 @@ atmodem AT+UART_CUR=115200,8,1,0,3     # Enable hardware flow control on ESP mod
 > mm.set_ntp_server(); mm.set_datetime(); del mm
 date
 
+test -f /upgrade > up    # use "touch upgrade" to upgrade at boot
+if $up == False goto lb
+  echo "Upgrading......"
+  atupgrade -f -t
+  rm /upgrade
+  reset
+
+:lb
+
 ```
 
 ```bash
