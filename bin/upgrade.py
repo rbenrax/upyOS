@@ -215,7 +215,8 @@ def __main__(args):
                 else:
                     cntup+=1
                 
-    #     os.remove(uf)
+        if not "v" in mod:
+            os.remove(uf)
         
         if ftu == cont:
             print("]OK\n100% Upgrade complete.")
