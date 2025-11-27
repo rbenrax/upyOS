@@ -5,6 +5,7 @@ import time
 import hashlib
 import utls
 import sdata
+import sys
 
 url_base = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads'
 
@@ -193,6 +194,7 @@ def __main__(args):
             
     except Exception as e:
         print(f"\nError during upgrade process: {str(e)}")
+        sys.print_exception(e)
         
     finally:
         # Esta sección siempre se ejecutará, haya habido error o no

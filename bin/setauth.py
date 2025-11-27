@@ -2,11 +2,24 @@ import sdata
 import utls
 
 def __main__(args):
-    
+   
+    doc = """
+    USER AUTHENTICATION MANAGEMENT
+
+    Usage:
+      setauth <username> <password> <repeat_password>  Set username and password
+
+    Options:
+      -v,   Display current username
+      -d,   Disable authentication
+
+    Notes:
+      - Credentials stored in /etc/system.conf
+      - Applies to Telnet and FTP services
+      - Empty password or -d disables security access
+    """
     if len(args) == 0 or args[0]=="--h":
-        print("Set/view user name and  set password\nUsage: setauth <username> <password> <repeat password>: -v view username -d disable auth")
-        print("user name and password are stored in /etc/system.conf and are valid for telent and ftp services")
-        print('if password is empty or -d, then the security access is disabled')
+        print(doc)
         return
     
     elif len(args) == 3:
