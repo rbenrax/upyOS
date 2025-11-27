@@ -180,8 +180,9 @@ def __main__(args):
                     if not "i" in mod: break # ignore and show errors
                 else:
                     cntup+=1
-                    
-        #os.remove(uf) 
+        
+        if not "v" in mod:
+            os.remove(uf)
 
         if ftu == cont:
             print("]OK\n100% Upgrade complete.")
