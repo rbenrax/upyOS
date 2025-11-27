@@ -184,6 +184,25 @@ def __main__(args):
         if not "v" in mod:
             os.remove(uf)
 
+        # Cleaning
+        to_rm=[
+        "/bin/ATmodem.py",
+        "/bin/ATmqttc.py",
+        "/etc/upyOS-esp32c3_luatos.board",
+        "/etc/upyOS-esp32c3_vcc_gnd.board",
+        "/etc/upyOS-esp32c6_muse_labs.board",
+        "/etc/upyOS-esp32s3_vcc_gnd.board",
+        "/etc/upyOS-esp32-wroom-32.board",
+        "/etc/upyOS-esp8266.board",
+        "/etc/upyOS-rp2.board",
+        "/etc/upyOS-esp32.board",
+        "/etc/upgrade2.inf",
+        "/etc/wellcome.txt",]
+
+        for f in to_rm:
+            if utls.file_exists(f):
+                os.remove(f)
+
         if ftu == cont:
             print("]OK\n100% Upgrade complete.")
             print(f"{cntup} Upgraded files")

@@ -436,10 +436,10 @@ date
 # Upgrade on reboot (touch /upgrade and reset)
 test -f /upgrade > up
 if $up == False skip 4
-echo "Upgrading......"
-upgrade -f
-rm /upgrade
-reset
+  echo "Upgrading......"
+  upgrade -f
+  rm /upgrade
+  reset
 
 wifi sta ifconfig
 
