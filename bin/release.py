@@ -38,7 +38,7 @@ def __main__(args):
                 
             for f in fr:
                 fu.write(f + "," + str(fsize(f)) + "," + hash_sha1(f) + "," + "\n")
-                print(f + "," + str(fsize(f)))
+                print(f)
                 cont+=1
                 
             for d in dr:
@@ -47,7 +47,7 @@ def __main__(args):
                     if f in fi: continue
                     fp = d + "/" + f
                     fu.write(fp + "," + str(fsize(fp)) + "," + hash_sha1(fp) + "," + "\n")
-                    print(fp + "," + str(fsize(fp)))
+                    print(fp)
                     cont+=1
                     
             ls = f"#files,{cont}"
