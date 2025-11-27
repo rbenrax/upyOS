@@ -243,6 +243,13 @@ class ModemManager:
         body_ini = retResp.find("\r\n\r\n")
         if body_ini > -1:
             headers = retResp[:body_ini]
+            
+            # remove +IPD
+            if "\r\n+IPD," in headers:
+                pos_http = headers.find("HTTP/")
+                if pos_http != -1:
+                    headers = headers[pos_http:]
+            
             retResp = retResp[body_ini + 4:] 
 
         if self.sresp:
@@ -476,7 +483,7 @@ class ModemManager:
         prot, _, hostport, path = url.split('/', 3)
         port = 443 if prot.lower() == "https:" else 80
         ct = "SSL" if prot.lower() == "https:" else "TCP"
-
+        
         tmp = hostport.split(':')
         if len(tmp) == 1:
             host = tmp[0]
@@ -487,6 +494,10 @@ class ModemManager:
         return self.create_conn(host, port, ct, keepalive, tout)
     
     def create_conn(self, host, port, ct="TCP", keepalive=60, tout=10.0):
+        
+        if ct == "SSL":
+           _, _ = self.atCMD(f'AT+CIPSSLCSNI="{host}"') 
+        
         command = f'AT+CIPSTART="{ct}","{host}",{port},{keepalive}'
         sts, _ = self.atCMD(command, tout, "CONNECT")
         
