@@ -129,6 +129,10 @@ def __main__(args):
                 
                 tmp = ln.split(",")
                 
+                if len(tmp) != 3:
+                    print(f"upgrade.inf file error {tmp}")
+                    break
+                
                 fp = tmp[0]
                 fs = int(tmp[1])
                 
