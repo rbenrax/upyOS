@@ -4,6 +4,7 @@ import time
 import hashlib
 import utls
 import sdata
+import sys
 
 try:
     import urequests
@@ -227,7 +228,8 @@ def __main__(args):
             
     except Exception as e:
         print(f"\nUnexpected error during upgrade process: {str(e)}")
+        sys.print_exception(e)
         
-    finally:
+    #finally:
         # Limpieza final si fuera necesaria
-        print("Upgrade process completed")
+    #    print("Upgrade process completed")
