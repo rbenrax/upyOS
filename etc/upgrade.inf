@@ -1,4 +1,4 @@
-#upyOS,0.9.3,2025-11-27
+#upyOS,0.9.3,2025-11-28
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -29,6 +29,7 @@
 /bin/ifconfig.py,851,c2dee30fbf968a69209dbb6475b8379e4ec1f8a7,
 /bin/incr.py,691,b9ef2d9cbca620dd3f48c0d953d45e237b88391b,
 /bin/iperf3.py,513,030eda6ecef39cf1ab216f16bb92951930981fa6,
+/bin/jq.py,2610,d92a850701acb1a3687bc09f3de40454712c6c8c,
 /bin/kill.py,349,584f7c4d9c52c0430b85222b064331108197edd7,
 /bin/killall.py,274,ff36795c51cf8ded14bc1cc4a27785ee1fd2debb,
 /bin/led.py,2339,76fd9dac44dc550392e284d1b11f4116bd29ef79,
@@ -99,4 +100,4 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-#files,100
+#files,101
