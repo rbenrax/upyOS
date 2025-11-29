@@ -1,4 +1,4 @@
-#upyOS,0.9.3,2025-11-28
+#upyOS,0.9.3,2025-11-29
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -91,7 +91,7 @@
 /etc/end.sh,88,5c0d73498bf922a6129a366c2212e71428a2a343,
 /etc/help.txt,70,096bbc36f22bfd7e9a4cc1aa717421ad6f0cbd3c,
 /etc/init.sh,3341,0bde722ee6bf871f3d19c1d97ca78c2593d2fe7a,
-/etc/modem.inf,1788,dd2a76f7c667d24f036226a3929f66397dca70a2,
+/etc/modem.inf,2384,ad7357841cbefad47a3557ec7329a1300b0a6a90,
 /etc/welcome.txt,329,11a86867eb5ce308624aa37300caf7a3f815325a,
 /etc/boards/upyOS-esp32-wroom-32.board,2342,495a7ceca9e7387ba1341dc22487f0af25d377c2,
 /etc/boards/upyOS-esp32c3_luatos.board,1804,1e43cf8ced1992602f72e9a76925752e50d3f5b0,

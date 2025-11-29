@@ -56,5 +56,24 @@ AT+CIFSR
 #sleep 5
 #AT+CIPSNTPTIME?
 
+# HTTP examples if ESP-AT firmware is supported
+#AT+HTTPCLIENT=2,1,"https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main/etc/help.txt",,,1
+#AT+HTTPCLIENT=2,3,"https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads/main/etc/help.txt","","",2
 
+# Server mode
+#atmodem AT -v
+#AT+CWMODE=2 -v
+#AT+CWSAP="RedR","rborbo123",6,3 -v
+##AT+CWSAP? -v # estado
+#AT+CIPMUX=1 -v # multiples conexiones
+#AT+CIPSERVER=1,2045 -v # crear servidor
+
+#AT+CIPAP? -v # IP
+#AT+CWLIF -v # active conn
+
+#< sdata.modem0.read()
+
+#AT+CIPSERVER=0 # stop server
+#AT+CIPSEND=0,longitud # send
+#AT+CIPCLOSE=0 # close
 
