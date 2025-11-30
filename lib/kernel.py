@@ -117,7 +117,8 @@ class upyOS:
         ##### Test for quotation marks passthrow
         #if fcmd[:5]=="atmodem":
         if fcmd[:3]=="AT+":
-             fcmd = "atmodem " + fcmd.replace('"', "\\@")
+             #fcmd = "atmodem " + fcmd.replace('"', "\\@")
+             fcmd = "atmodem " + fcmd #.replace('"', "\\@")
              #print(fcmd)
         ##### ATTENTION: for testing only
 

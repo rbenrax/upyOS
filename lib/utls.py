@@ -190,15 +190,43 @@ def shlex(ent):
     """cmd line sh lexical parser"""
     args = []
     argact = ""
-    incom = False
+    incom_doble = False
+    incom_simple = False
+    escape = False
+    quote_stack = []  # Pila para manejar comillas anidadas
 
     for c in ent:
-        if c == '"':
-            incom = not incom
-        elif c == ' ' and not incom:
+        if escape:
+            # Si estamos en modo escape, agregamos el carácter literalmente
+            argact += c
+            escape = False
+        elif c == '\\':
+            # Iniciamos secuencia de escape
+            escape = True
+        elif c == '"' and not incom_simple and not escape:
+            if incom_doble:
+                # Cerrando comilla doble
+                incom_doble = False
+                if quote_stack and quote_stack[-1] == '"':
+                    quote_stack.pop()
+            else:
+                # Abriendo comilla doble
+                incom_doble = True
+                quote_stack.append('"')
+        elif c == "'" and not incom_doble and not escape:
+            if incom_simple:
+                # Cerrando comilla simple
+                incom_simple = False
+                if quote_stack and quote_stack[-1] == "'":
+                    quote_stack.pop()
+            else:
+                # Abriendo comilla simple
+                incom_simple = True
+                quote_stack.append("'")
+        elif c == ' ' and not incom_doble and not incom_simple:
             if argact:
                 args.append(argact)
-            argact = ""
+                argact = ""
         else:
             argact += c
 

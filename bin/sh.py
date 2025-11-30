@@ -110,6 +110,7 @@ def run(ssf, lbl_ln):
 
                 # Función para convertir valores a su tipo apropiado
                 def conv_v(value):
+                    value = value.replace('"', "")
                     try:
                         # Intentar convertir a entero
                         return int(value)
@@ -119,7 +120,7 @@ def run(ssf, lbl_ln):
                             return float(value)
                         except ValueError:
                             # Si no es numérico, devolver como cadena (sin comillas adicionales)
-                            return value.replace('"', "")
+                            return value
 
                 # Convertir operandos a sus tipos apropiados
                 try:
