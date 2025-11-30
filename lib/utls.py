@@ -285,6 +285,9 @@ def outs(args, val, prt=True):
         print(f"Error outs: {e}")
         return False
 
+#def strip_quot(v):
+#    return v[1:-1] if len(v) >= 2 and v[0] in ('"', "'") and v[-1] == v[0] else v
+
 
 #if __name__ == "__main__":      
 #    print(human(1257))
