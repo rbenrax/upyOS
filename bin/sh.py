@@ -109,17 +109,19 @@ def run(ssf, lbl_ln):
                     return 0
 
                 # Función para convertir valores a su tipo apropiado
-                def conv_v(value):
+                def conv_v(v):
+                    #v = v.replace('"', "")
+                    v = v[1:-1] if len(v) >= 2 and v[0] in ('"', "'") and v[-1] == v[0] else v
                     try:
                         # Intentar convertir a entero
-                        return int(value)
+                        return int(v)
                     except ValueError:
                         try:
                             # Intentar convertir a float
-                            return float(value)
+                            return float(v)
                         except ValueError:
                             # Si no es numérico, devolver como cadena (sin comillas adicionales)
-                            return value.replace('"', "")
+                            return v
 
                 # Convertir operandos a sus tipos apropiados
                 try:

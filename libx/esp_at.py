@@ -101,7 +101,7 @@ class ModemManager:
         cmdsts=False
 
         # Passthrow quotation marks
-        command = command.replace("\\@", '"')
+        #command = command.replace("\\@", '"')
 
         # Enviar comando
         self.modem.write(command + '\r\n')

@@ -1,4 +1,4 @@
-#upyOS,0.9.3,2025-11-29
+#upyOS,0.9.3,2025-11-30
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -24,6 +24,7 @@
 /bin/gpio.py,693,06d6a947a45e3d912e5c560c870c69e36e5116c6,
 /bin/grep.py,1214,8948249bc4a11d6457b1aef75159354f64a4e6ae,
 /bin/help.py,519,c7ce74394008f6be35ce8b7f7c866b4725e0f0fc,
+/bin/hexdump.py,1027,2209548f6b6d4d14c988a1c435eac13080400f9c,
 /bin/hold.py,373,7ef2ef5318eaa95d78a99eec92db50e87daf0710,
 /bin/i2cscan.py,1132,0622649f5e2cc04674b72781881c782a7464a1d8,
 /bin/ifconfig.py,851,c2dee30fbf968a69209dbb6475b8379e4ec1f8a7,
@@ -56,7 +57,7 @@
 /bin/screen.py,1341,9b171685d6e4f9f429a154b0ee1b3cbd0242a259,
 /bin/sensors.py,624,b41a58568e5919b905ebd54f21814f13c78d78bb,
 /bin/setauth.py,1614,716f0b0b38f6f6bcaf77598e9e54e70637b793af,
-/bin/sh.py,7040,9b80db4dec28f3bf436c9f4f41210ee7a3ec3d65,
+/bin/sh.py,7148,d68a53057391b4d1538d60fe3245a00565050119,
 /bin/si.py,1227,886322b38870256c6dc465a9c0fcd751f4e3e192,
 /bin/sleep.py,185,b60b00f1560f003b37951369dbbcf986d3eedc8a,
 /bin/test.py,796,732a2223a157ff715bd26f193419aa0d970ed2e8,
@@ -72,13 +73,13 @@
 /bin/watch.py,693,db487f6aeddbdd9e3336db4a53f9bdf876d84526,
 /bin/wget.py,487,ced7ac69cb39ca3f3a30986950d3a29af57dbae8,
 /bin/wifi.py,10243,0ee1eafbaf25cfeeab24b44924e7aa4396c0d9af,
-/lib/kernel.py,8915,42ce3853826b93ccb59a74f235a3134f4d8a107e,
+/lib/kernel.py,8977,b29cf639ed8e879e5579dddb1566073618a0d7a6,
 /lib/proc.py,3915,779724ea67b67a8bc16e187feea9c0172a2db8ca,
 /lib/sdata.py,464,6f906c456e15f3307d236f483f2d50d5cbb1c8f1,
-/lib/utls.py,7301,43132c83827ddb1ef8ff692a3c01b9cc0d6ae4a5,
+/lib/utls.py,8561,c07bbccedf1d0bc8a059c085a6e8d5fe3572e6e3,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
 /libx/editstr.py,6445,6e4059fdf2df28be1e09164ca7ed8ecca618e9ee,
-/libx/esp_at.py,23134,80df7bbb0385fd6e1f167ab69e5d292a9cbe9137,
+/libx/esp_at.py,23135,d6eacab340f3e8993ff26ed9778ce3af738b318c,
 /libx/microWebSrv.py,34548,42780574b59490eab8ad25958d663166a857d1d1,
 /libx/microWebTemplate.py,13597,9b74e227ef22f2be768f46e404d62a150eaa95a2,
 /libx/ssd1306.py,4584,ef7c8a250f6824020cb6072adaa1126b9f3f136b,
@@ -100,4 +101,4 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-#files,101
+#files,102
