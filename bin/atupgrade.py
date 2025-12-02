@@ -75,8 +75,8 @@ def __main__(args):
             return
         
         mm.atCMD("ATE0") # Echo off
-        mm.atCMD("AT+CIPMODE=1") # Transmissnon type 1
-        mm.send_passthrow() # Send for passthrow
+        mm.atCMD("AT+CIPMODE=1") # Transmission type 1
+        mm.send_passthrough() # Send for passthrough
         
         uf="/etc/upgrade.inf"
         if utls.file_exists(uf):
@@ -221,7 +221,7 @@ def __main__(args):
         sys.print_exception(e)
         
     finally:
-        # Esta sección siempre se ejecutará, haya habido error o no
+        # This section will always run, whether there was an error or not
         if mm and mm.tcp_conn:
             try:
                 print("\nClosing conn...", end="")

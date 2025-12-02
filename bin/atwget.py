@@ -32,7 +32,7 @@ def __main__(args):
         
         mm.atCMD("ATE0") # Echo off
         mm.atCMD("AT+CIPMODE=1") # Transmissnon type 1
-        mm.send_passthrow() # Send for passthrow
+        mm.send_passthrough() # Send for passthrough
         
         sts = mm.http_get_to_file_t(url, filename)
         if not sts:

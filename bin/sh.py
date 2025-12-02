@@ -44,7 +44,7 @@ def run(ssf, lbl_ln):
             
             if lin.strip()=="": continue   # Empty lines skipped
 
-            if lin.lstrip().startswith("#"): continue # Commanted lines skipped
+            if lin.lstrip().startswith("#"): continue # Commented lines skipped
             
             cmdl=lin.split(" #")[0] # First part of commented line
             
@@ -60,7 +60,7 @@ def run(ssf, lbl_ln):
                 
                 labels[cmdl[1:-1]]=line # Save labels and his line
                 #print(labels)
-                continue # Labels are not procesed
+                continue # Labels are not processed
             
             if ltf != "": continue # looking for a label
             
@@ -108,27 +108,27 @@ def run(ssf, lbl_ln):
                     print(f"sh - Values: {tmp} in {ssf} - {line} - {cmdl}")
                     return 0
 
-                # Función para convertir valores a su tipo apropiado
+                # Function to convert values to their appropriate type
                 def conv_v(v):
                     #v = v.replace('"', "")
                     v = v[1:-1] if len(v) >= 2 and v[0] in ('"', "'") and v[-1] == v[0] else v
                     try:
-                        # Intentar convertir a entero
+                        # Try to convert to integer
                         return int(v)
                     except ValueError:
                         try:
-                            # Intentar convertir a float
+                            # Try to convert to float
                             return float(v)
                         except ValueError:
-                            # Si no es numérico, devolver como cadena (sin comillas adicionales)
+                            # If not numeric, return as string (without additional quotes)
                             return v
 
-                # Convertir operandos a sus tipos apropiados
+                # Convert operands to their appropriate types
                 try:
                     arg1_c = conv_v(arg1)
                     arg2_c = conv_v(arg2)
                     
-                    # Evaluar la expresión
+                    # Evaluate the expression
                     if op == "==":
                         res = arg1_c == arg2_c
                     elif op == "!=":
@@ -144,14 +144,14 @@ def run(ssf, lbl_ln):
                     elif op == "in": 
                         res = arg1_c in arg2_c
                     else:
-                        print(f"sh - Operador no válido: {op} in {ssf} - {line} - {cmdl}")
+                        print(f"sh - Invalid operator: {op} in {ssf} - {line} - {cmdl}")
                         return 0
                         
                 except Exception as e:
                     print(f"sh - Evaluating expression error:\n{ssf} - {line} - {cmdl}{e}")
                     return 0
 
-                # Resto del código para manejar la acción (acc)...
+                # Rest of the code to handle the action (acc)...
 
                 if res: # Eval result
                     if acc == "goto":

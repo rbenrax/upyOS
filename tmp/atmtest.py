@@ -48,7 +48,7 @@ def __main__(args):
         #req = f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: upyOS\r\nAccept: */*\r\n\r\n"
 
         # Entrar en modo transparente
-        mt.send_passthrow()
+        mt.send_passthrough()
         
         time.sleep_ms(30)
         mt._drain()
@@ -117,7 +117,7 @@ def __main__(args):
 
         # Entrar en modo transparente
         #mt.modem.write("AT+CIPSEND\r\n")
-        mt.send_passthrow()
+        mt.send_passthrough()
         
         time.sleep(.5)
         print(f"Sending: {req}")
