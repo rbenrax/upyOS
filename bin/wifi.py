@@ -108,14 +108,14 @@ def __main__(args):
 
     if len(args) == 0:
         print("wifi management command\nUsage:")
-        print("\twifi sta/ap status - show wifi interfase status")
-        print("\twifi sta/ap on - activate wifi interfase")
-        print("\twifi sta/ap off - deactivate wifi interfase")
+        print("\twifi sta/ap status - show wifi interface status")
+        print("\twifi sta/ap on - activate wifi interface")
+        print("\twifi sta/ap off - deactivate wifi interface")
         print("\twifi sta scan - list visible wireless networks")
         print("\twifi sta/ap config - show/set networks connection parameters (essid=<essid> password=<pass> ...")
-        print("\twifi sta/ap ifconfig - show/set: IPs parmeters (ip, mask, gateway, dns)")
+        print("\twifi sta/ap ifconfig - show/set: IPs parameters (ip, mask, gateway, dns)")
         print("\twifi sta connect <SSID> <PSK> [Timeout] - connect to wireless network ap")
-        print("\twifi sta disconnect - disconnect wifi comnection")
+        print("\twifi sta disconnect - disconnect wifi connection")
         print("\twifi country <country> - get/set country")
         print("\twifi hostname <hostname> - get/set hostname")
         print("\twifi phy_mode <phy_mode> - get/set phy_mode")
@@ -252,7 +252,7 @@ def __main__(args):
         """sta_if if.config(essid='micropython',password=b"micropython",channel=11,authmode=network.AUTH_WPA_WPA2_PSK)  #Set up an access point"""
         try:
             if len(args)==2:
-                print("wifi_sta config - Show/Set: mac, [e]ssid, password, channel, hidden, security, key, reconects, txpower, pm, authmode")
+                print("wifi_sta config - Show/Set: mac, [e]ssid, password, channel, hidden, security, key, reconnects, txpower, pm, authmode")
                 return
             
             if len(args)>2:
@@ -261,7 +261,7 @@ def __main__(args):
                     if "=" in e:
                         tmp=e.split("=")
                         # TODO: check type
-                        if tmp[0] in ["channel", "authmode", "security", "hidden", "reconects", "pm"]: tmp[1] = int(tmp[1])
+                        if tmp[0] in ["channel", "authmode", "security", "hidden", "reconnects", "pm"]: tmp[1] = int(tmp[1])
                         if tmp[0] in ["txpower"]: tmp[1] = float(tmp[1])
                         p[tmp[0]]=tmp[1]
 

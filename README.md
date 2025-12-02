@@ -541,7 +541,7 @@ Added call caching to the File System (FS). On systems with low memory, this sho
 
 ## 📶 ESP-AT serial Modem Support
 
-Added support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated conectivity, such as RP2040, etc.
+Added support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated connectivity, such as RP2040, etc.
 ### RP2040 connected to an ESP8266 as wifi coprocessor
 ![rp2040+esp8266](media/rp2040_esp8266.jpg)
 
@@ -586,10 +586,10 @@ if $up == False goto lb
 ```bash
 # /etc/modem.inf connection example 
 
-echo Reseting Modem
+echo Resetting Modem
 reset 22 3
 
-# Create serial comunication (see modem --h command)
+# Create serial communication (see modem --h command)
 uart 1 115200 4 5 modem0   # From programs you can access as sdata.modem0
 
 AT
@@ -618,7 +618,7 @@ AT+CIFSR
 
 ```bash
 
-# OTA upgrade command for MCUs without integrated conectivity, using ESP-AT serial modem
+# OTA upgrade command for MCUs without integrated connectivity, using ESP-AT serial modem
 
 / $: atupgrade
 upyOS OTA Upgrade 2.0 (ESP-AT), 
