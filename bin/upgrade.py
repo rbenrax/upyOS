@@ -94,7 +94,7 @@ def __main__(args):
 
         if "h" in mod:
             print("Upgrade upyOS from git repository")
-            print("Usage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
+            print("Usage: upgrade <options>:-f quiet mode, -r reboot after upgrade, -v view file list")
             print(", -t test branch, -i ignore errors, -o overwrite diffs")
             return
 
@@ -134,7 +134,7 @@ def __main__(args):
         if len(end) > 1:
             ftu=int(end[1]) # files to upgrade
         else:
-            print("Error ungrade file, see /etc/upgrade.inf")
+            print("Error upgrade file, see /etc/upgrade.inf")
             return
 
         if not "f" in mod:

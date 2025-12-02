@@ -114,7 +114,7 @@ class upyOS:
 
         fcmd=fcmd.strip()
         
-        ##### Test for quotation marks passthrow
+        ##### Test for quotation marks passthrough
         #if fcmd[:5]=="atmodem":
         if fcmd[:3]=="AT+":
              #fcmd = "atmodem " + fcmd.replace('"', "\\@")
@@ -177,7 +177,7 @@ class upyOS:
                     ext  = ""
 
                 if len(parts) > 1 and parts[-1]=="&": # If new thread
-                    # RP-2040 suport only two threads, esp32 and others, many
+                    # RP-2040 support only two threads, esp32 and others, many
                     try:
                         from _thread import start_new_thread, stack_size
                         #if os.uname()[0]=="esp32": stack_size(7168)   # stack overflow in ESP32C3

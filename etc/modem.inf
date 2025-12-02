@@ -24,7 +24,7 @@ echo Reset Modem
 # reset <gpio pin> <wait to ready>
 reset 22 3
 
-# Create serial comunication (see modem --h command)
+# Create serial communication (see modem --h command)
 # uart <id> <baudrate> <txgpio> <rxgpio> [<modemname (modem0)]>
 uart 1 115200 4 5 modem0   # From programs you can access as sdata.modem0
 
