@@ -64,9 +64,9 @@ AT+CIFSR
 #atmodem AT -v
 #AT+CWMODE=2 -v
 #AT+CWSAP="RedR","rborbo123",6,3 -v
-##AT+CWSAP? -v # estado
-#AT+CIPMUX=1 -v # multiples conexiones
-#AT+CIPSERVER=1,2045 -v # crear servidor
+##AT+CWSAP? -v # status
+#AT+CIPMUX=1 -v # multiple connections
+#AT+CIPSERVER=1,2045 -v # create server
 
 #AT+CIPAP? -v # IP
 #AT+CWLIF -v # active conn
