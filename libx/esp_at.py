@@ -508,7 +508,7 @@ class ModemManager:
             
         return sts
     
-    def send_passthrow(self, tout=3):
+    def send_passthrough(self, tout=3):
         lcmd = "AT+CIPSEND"
         sts, ret = self.atCMD(lcmd, tout, ">")
         if sts:
