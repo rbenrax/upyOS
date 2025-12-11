@@ -40,8 +40,14 @@ def _get_cached_stat(filename):
 
 def file_exists(filename):
     """Check if file exists using cached stat"""
-    file_stat = _get_cached_stat(filename)
-    return file_stat is not None and (file_stat[0] & 0xc000) != 0
+    #file_stat = _get_cached_stat(filename)
+    #return file_stat is not None and (file_stat[0] & 0xc000) != 0
+
+    try:
+        stat(filename)
+        return True
+    except OSError:
+        return False
 
 def isdir(filename):
     """Check if path is directory using cached stat"""
