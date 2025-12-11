@@ -180,7 +180,7 @@ def __main__(args):
                 
                 if hsh:
                     lhsh = hash_sha1(fp)
-                    if hsh == lhsh and not "o" in mod: # Overwrite diffs:
+                    if hsh == lhsh and not "o" in mod: # Overwrite files
                         cont+=1
                         continue
                 
