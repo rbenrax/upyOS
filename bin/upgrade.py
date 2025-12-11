@@ -52,7 +52,7 @@ def pull(url, f_path):
                 f.write(chunk)
                 
     except Exception as e:
-        print(f"\nupgrade/pull: {f_path} - {str(e)}")
+        print(f"\nupgrade/pull: {url} -> {f_path} - {str(e)}")
         return False
     else:
         return True
@@ -180,7 +180,7 @@ def __main__(args):
                 
                 if hsh:
                     lhsh = hash_sha1(fp)
-                    if hsh == lhsh:
+                    if hsh == lhsh and not "o" in mod: # Overwrite files
                         cont+=1
                         continue
                 
@@ -200,7 +200,7 @@ def __main__(args):
                     stat = utls.get_stat(tmpf)
                     tmpfsz = stat[6]
                     
-                    if tmpfsz == fs or "o" in mod: # Overwrite diffs
+                    if tmpfsz == fs:
                         if utls.file_exists(fp):
                             os.remove(fp)
                         os.rename(tmpf, fp)
