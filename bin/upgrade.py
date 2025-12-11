@@ -110,8 +110,7 @@ def __main__(args):
             print("from main branch", end="")
             
         uf="/etc/upgrade.inf"
-        
-        #print(f"\nRM: {utls.file_exists(uf)}")
+
         if utls.file_exists(uf):
             os.remove(uf)
         
