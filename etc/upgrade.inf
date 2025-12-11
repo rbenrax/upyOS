@@ -76,7 +76,6 @@
 /lib/kernel.py,8980,f677910849ec90de118aca98ee0cace40aea2c7c,
 /lib/proc.py,3915,779724ea67b67a8bc16e187feea9c0172a2db8ca,
 /lib/sdata.py,464,6f906c456e15f3307d236f483f2d50d5cbb1c8f1,
-/lib/syscfg.py,3087,86590be565a680ce7d134ef76ef67ea4f0fd2089,
 /lib/utls.py,8561,c07bbccedf1d0bc8a059c085a6e8d5fe3572e6e3,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
 /libx/editstr.py,6445,6e4059fdf2df28be1e09164ca7ed8ecca618e9ee,
@@ -94,7 +93,6 @@
 /etc/help.txt,70,096bbc36f22bfd7e9a4cc1aa717421ad6f0cbd3c,
 /etc/init.sh,3341,0bde722ee6bf871f3d19c1d97ca78c2593d2fe7a,
 /etc/modem.inf,2384,088757e3ee374bd2b9d46892de7b567cbd0d2864,
-/etc/upyOS-esp32c3_mini.board,758,d0b06d42e0111b8b201f993d0539a171ecacd6d6,
 /etc/welcome.txt,329,11a86867eb5ce308624aa37300caf7a3f815325a,
 /etc/boards/upyOS-esp32-wroom-32.board,2342,495a7ceca9e7387ba1341dc22487f0af25d377c2,
 /etc/boards/upyOS-esp32c3_luatos.board,1804,1e43cf8ced1992602f72e9a76925752e50d3f5b0,
@@ -103,4 +101,4 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-#files,104
+#files,102
