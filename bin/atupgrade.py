@@ -16,7 +16,7 @@ def pull(mm, url, f_path):
             print(f"\nError downloading {f_path}")
         return sts
     except Exception as e:
-        print(f"\natupgrade/pull: {f_path} - {str(e)}")
+        print(f"\natupgrade/pull: {url} -> {f_path} - {str(e)}")
         return False
 
 def hash_sha1(filename):
