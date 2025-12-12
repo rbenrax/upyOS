@@ -1,4 +1,4 @@
-#upyOS,0.9.3,2025-12-11
+#upyOS,0.9.3,2025-12-12
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -54,7 +54,7 @@
 /bin/rm.py,996,5e457dee936d002a02cbaf33e639b8213fb9a736,
 /bin/rmdir.py,284,0dcadbfb2f1c17cd8b0f38b0ce0b427bd41d806f,
 /bin/rmmod.py,141,e65df5127cfcb51059f5449b40438dbcef5cc88c,
-/bin/screen.py,1341,9b171685d6e4f9f429a154b0ee1b3cbd0242a259,
+/bin/screen.py,1753,f7ebfe51a8182262230aa8c500db50bdca6129eb,
 /bin/sensors.py,624,b41a58568e5919b905ebd54f21814f13c78d78bb,
 /bin/setauth.py,1614,716f0b0b38f6f6bcaf77598e9e54e70637b793af,
 /bin/sh.py,7134,4e496b6f9acebcfd1013025c668f6798b584bbfb,

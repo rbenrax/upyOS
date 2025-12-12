@@ -4,7 +4,6 @@ import uselect
 import sdata
 
 def __main__(args):
-    
     if "--h" in args:
         print("Modem (uart) direct access\nUsage: screen modem (modem0), see /etc/modem.inf")
         return
@@ -13,37 +12,46 @@ def __main__(args):
     if len(args) == 1:
         device = args[0]
     
-    uart = None
     if not hasattr(sdata, device):
         print(f"Device {device} not found")
         return
-    else:
-        uart = getattr(sdata, device)
+    uart = getattr(sdata, device)
     
     if not uart:
-        print("Device no connected")
+        print("Device not connected")
         return
 
-    # Configurar poll para entrada estándar (consola)
     poll = uselect.poll()
     poll.register(sys.stdin, uselect.POLLIN)
 
     print(f"Connected to {device}, Ctrl+C to stop")
+    line_buffer = ""
 
     try:
         while True:
-            # Verificar si hay datos en la consola (entrada estándar)
+            # Leer teclas una por una (solo si hay datos)
             if poll.poll(0):
-                data_console = sys.stdin.readline().strip()
-                if data_console:
-                    uart.write(data_console + '\r\n')
-                    print(f"{data_console}")
-            
-            # Verificar si hay datos en UART
+                char = sys.stdin.read(1)
+                if char:
+                    if char == '\n' or char == '\r':
+                        # Mostrar el salto de línea en local
+                        sys.stdout.write('\r\n')
+                        # Enviar la línea completa al UART con \r\n
+                        if line_buffer:
+                            uart.write(line_buffer + '\r\n')
+                        else:
+                            uart.write('\r\n')
+                        line_buffer = ""  # reset buffer
+                    else:
+                        # Eco local y acumular
+                        sys.stdout.write(char)
+                        line_buffer += char
+
+            # Leer y mostrar cualquier dato entrante del UART
             if uart.any():
-                data_uart = uart.read()
-                if data_uart:
-                    print(f"{data_uart.decode('utf-8').strip()}")
+                data = uart.read()
+                if data:
+                    sys.stdout.write(data.decode('utf-8'))
                     
     except KeyboardInterrupt:
         print("\nProgram terminated")
