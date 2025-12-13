@@ -51,7 +51,10 @@ def __main__(args):
             if uart.any():
                 data = uart.read()
                 if data:
-                    sys.stdout.write(data.decode('utf-8'))
+                    try:
+                        sys.stdout.write(data.decode('utf-8'))
+                    except:
+                        pass
                     
     except KeyboardInterrupt:
         print("\nProgram terminated")
