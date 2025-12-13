@@ -60,16 +60,19 @@ class ModemManager:
 
             self.device = device
             
-            flow=UART.RTS|UART.CTS
-            if flow_type == "r":   
-                flow=UART.RTS
-            elif flow_type == "c":
-                flow=UART.CTS
-            elif flow_type == "off":
-                flow=0
-            
-            # Flow control enabled for RPO4020, default
-            self.modem = UART(id, baud, bits=8, parity=None, stop=1,
+            if rts==0 or cts==0 or flow_type == "off":
+                self.modem = UART(id, baud, bits=8, parity=None, stop=1,
+                                        txbuf=txbuf, rxbuf=rxbuf,
+                                        timeout=timeout, timeout_char=timeout_char)
+            else:
+                # Flow control enabled for RPO4020, default
+                flow=UART.RTS|UART.CTS
+                if flow_type == "r":   
+                    flow=UART.RTS
+                elif flow_type == "c":
+                    flow=UART.CTS
+                
+                self.modem = UART(id, baud, bits=8, parity=None, stop=1,
                                         tx=Pin(tx), rx=Pin(rx),
                                         rts=Pin(rts), cts=Pin(cts),
                                         txbuf=txbuf, rxbuf=rxbuf,
