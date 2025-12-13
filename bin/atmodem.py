@@ -43,13 +43,17 @@ def executeLine(mm, tmp):
             if len(tmp) == 6:
                mm.device = tmp[5] # Modem name (modem0)
 
+            rts=0
+            cts=0
+            txbuf=256
+            rxbuf=1024
+            tout=0
+            tout_char=0
+            flow_type="off"
+
             if len(tmp) > 6:
                 rts=int(tmp[6])
                 cts=int(tmp[7])
-                txbuf=256
-                rxbuf=1024
-                tout=0
-                tout_char=0
                 flow_type=tmp[8] # r, s, rs, off
 
             mm.createUART(id, baud, tx, rx, mm.device,
