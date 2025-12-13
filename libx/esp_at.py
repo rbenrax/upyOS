@@ -4,6 +4,7 @@ from machine import UART, Pin, RTC
 import time
 import sdata
 import utls
+import sys
 
 proc = None
 
@@ -50,19 +51,29 @@ class ModemManager:
             print(", Error\nModem reset error, " + str(ex))
             return False
         return True
-        
-    def createUART(self, id, baud, tx, rx, device="modem0", rts=7, cts=6, flow=UART.RTS|UART.CTS):
+    
+    def createUART(self, id, baud, tx, rx, device="modem0",
+                   rts=7, cts=6, txbuf=256, rxbuf=1024,
+                   timeout=0, timeout_char=0, flow_type="rc"):
 
         try:
 
             self.device = device
             
+            flow=UART.RTS|UART.CTS
+            if flow_type == "r":   
+                flow=UART.RTS
+            elif flow_type == "c":
+                flow=UART.CTS
+            elif flow_type == "off":
+                flow=0
+            
             # Flow control enabled for RPO4020, default
             self.modem = UART(id, baud, bits=8, parity=None, stop=1,
                                         tx=Pin(tx), rx=Pin(rx),
                                         rts=Pin(rts), cts=Pin(cts),
-                                        txbuf=256, rxbuf=1024,
-                                        timeout=0, timeout_char=0,
+                                        txbuf=txbuf, rxbuf=rxbuf,
+                                        timeout=timeout, timeout_char=timeout_char,
                                         flow=flow) # Important!!!
 
             setattr(sdata, self.device, self.modem)
@@ -72,6 +83,7 @@ class ModemManager:
             
         except Exception as ex:
             print("Create uart error, " + str(ex))
+            sys.print_exception(ex)
             return False
         
         time.sleep(1)  # Wait for the port to stabilize
