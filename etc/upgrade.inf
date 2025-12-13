@@ -1,8 +1,8 @@
-#upyOS,0.9.3,2025-12-12
+#upyOS,0.9.3,2025-12-13
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
-/bin/atmodem.py,3107,472fc33bc1dc0f49bbc7293427391465b86bedf4,
+/bin/atmodem.py,3751,3df5a56ba4313859533c17a885ae48e8eb39185a,
 /bin/atmqttc.py,5525,f1d4667f7ad388a9a619b96aad4cd8c0a2e2fa76,
 /bin/atupgrade.py,7374,b722070001f932a3e1e8f08140c0f8b3a2c3292c,
 /bin/atwget.py,1289,83ade2812f30fa492cb6c949600cb4fb83cf22ad,
@@ -54,7 +54,7 @@
 /bin/rm.py,996,5e457dee936d002a02cbaf33e639b8213fb9a736,
 /bin/rmdir.py,284,0dcadbfb2f1c17cd8b0f38b0ce0b427bd41d806f,
 /bin/rmmod.py,141,e65df5127cfcb51059f5449b40438dbcef5cc88c,
-/bin/screen.py,1753,f7ebfe51a8182262230aa8c500db50bdca6129eb,
+/bin/screen.py,1839,47276f397be430a6946fd240fcb2bd6992c37052,
 /bin/sensors.py,624,b41a58568e5919b905ebd54f21814f13c78d78bb,
 /bin/setauth.py,1614,716f0b0b38f6f6bcaf77598e9e54e70637b793af,
 /bin/sh.py,7134,4e496b6f9acebcfd1013025c668f6798b584bbfb,
@@ -79,7 +79,7 @@
 /lib/utls.py,8663,6ae83ab7878a9ebaeedaaf5641b8570ed4b1fb9c,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
 /libx/editstr.py,6445,6e4059fdf2df28be1e09164ca7ed8ecca618e9ee,
-/libx/esp_at.py,23137,cde127930409ff1b2ef5176c0f5add4855f70f51,
+/libx/esp_at.py,23519,bc757ad442cf8ff73d4b741b3c812103f28ff991,
 /libx/microWebSrv.py,34548,42780574b59490eab8ad25958d663166a857d1d1,
 /libx/microWebTemplate.py,13597,9b74e227ef22f2be768f46e404d62a150eaa95a2,
 /libx/ssd1306.py,4584,ef7c8a250f6824020cb6072adaa1126b9f3f136b,

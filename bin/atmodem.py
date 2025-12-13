@@ -6,6 +6,7 @@ from esp_at import ModemManager
 import time
 import sdata
 import utls
+import sys
 
 def executeScript(mm, file):
     
@@ -34,13 +35,28 @@ def executeLine(mm, tmp):
         mm.resetHW(gpio, wait)
 
     elif tmp[0].lower() == "uart" or tmp[0].lower() == "-c":
-        id   = int(tmp[1])  # uC Uart ID
-        baud = int(tmp[2])  # Baudrate
-        tx   = int(tmp[3])  # TX gpio
-        rx   = int(tmp[4])  # RX gpio
-        if len(tmp) == 6:
-           mm.device = tmp[5] # Modem name (modem0)
-        mm.createUART(id, baud, tx, rx, mm.device)
+
+            id   = int(tmp[1])  # uC Uart ID
+            baud = int(tmp[2])  # Baudrate
+            tx   = int(tmp[3])  # TX gpio
+            rx   = int(tmp[4])  # RX gpio
+            if len(tmp) == 6:
+               mm.device = tmp[5] # Modem name (modem0)
+
+            if len(tmp) > 6:
+                rts=int(tmp[6])
+                cts=int(tmp[7])
+                txbuf=256
+                rxbuf=1024
+                tout=0
+                tout_char=0
+                flow_type=tmp[8] # r, s, rs, off
+
+            mm.createUART(id, baud, tx, rx, mm.device,
+                          rts, cts,
+                          txbuf, rxbuf,
+                          tout, tout,
+                          flow_type)
 
     elif tmp[0].lower() == "sleep":
         if mm.sctrl:
@@ -72,23 +88,28 @@ def __main__(args):
         print("\t-v verbose, -tm timings")
         return
     
-    # Create a modem manager instance
-    modem = ModemManager() # Def device sdata.modem0
-    
-    if "-v" in args:
-        modem.sctrl = True
-        modem.scmds = True
-        modem.sresp = True
-        # Remover el flag -n de los argumentos
-        args = [arg for arg in args if arg != "-v"]
+    try:
+        # Create a modem manager instance
+        modem = ModemManager() # Def device sdata.modem0
         
-    if "-tm" in args:
-        modem.timing = True
-        # Remover el flag -n de los argumentos
-        args = [arg for arg in args if arg != "-tm"]
-   
-    if args[0] == "-f":
-        file = args[1]
-        executeScript(modem, file)
-    else:
-        executeLine(modem, args)
+        if "-v" in args:
+            modem.sctrl = True
+            modem.scmds = True
+            modem.sresp = True
+            # Remover el flag -n de los argumentos
+            args = [arg for arg in args if arg != "-v"]
+            
+        if "-tm" in args:
+            modem.timing = True
+            # Remover el flag -n de los argumentos
+            args = [arg for arg in args if arg != "-tm"]
+       
+        if args[0] == "-f":
+            file = args[1]
+            executeScript(modem, file)
+        else:
+            executeLine(modem, args)
+            
+    except Exception as ex:
+        print("atmodem error, " + str(ex))
+        sys.print_exception(ex)
