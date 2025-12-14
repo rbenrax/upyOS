@@ -1,4 +1,4 @@
-#upyOS,0.9.3,2025-12-13
+#upyOS,0.9.3,2025-12-14
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -54,7 +54,7 @@
 /bin/rm.py,996,5e457dee936d002a02cbaf33e639b8213fb9a736,
 /bin/rmdir.py,284,0dcadbfb2f1c17cd8b0f38b0ce0b427bd41d806f,
 /bin/rmmod.py,141,e65df5127cfcb51059f5449b40438dbcef5cc88c,
-/bin/screen.py,1839,47276f397be430a6946fd240fcb2bd6992c37052,
+/bin/screen.py,1972,3cea514488922c17d2052e7d08f2f514deb27742,
 /bin/sensors.py,624,b41a58568e5919b905ebd54f21814f13c78d78bb,
 /bin/setauth.py,1614,716f0b0b38f6f6bcaf77598e9e54e70637b793af,
 /bin/sh.py,7134,4e496b6f9acebcfd1013025c668f6798b584bbfb,
@@ -71,6 +71,7 @@
 /bin/vi.py,288,b08dac2e69d61f209ea492fe81ae11e0805fd413,
 /bin/wait.py,387,345cb79804dbd29139a06b96a1f8fa1d257a2506,
 /bin/watch.py,693,db487f6aeddbdd9e3336db4a53f9bdf876d84526,
+/bin/wdt.py,2734,d641d7e326d7bfdb187393ca6a8fc433881caa7d,
 /bin/wget.py,487,ced7ac69cb39ca3f3a30986950d3a29af57dbae8,
 /bin/wifi.py,10246,03e539bf985c3052fd3dd461936fd1c89ee0c08c,
 /lib/kernel.py,8980,f677910849ec90de118aca98ee0cace40aea2c7c,
@@ -101,4 +102,4 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-#files,102
+#files,103
