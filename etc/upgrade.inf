@@ -54,7 +54,7 @@
 /bin/rm.py,996,5e457dee936d002a02cbaf33e639b8213fb9a736,
 /bin/rmdir.py,284,0dcadbfb2f1c17cd8b0f38b0ce0b427bd41d806f,
 /bin/rmmod.py,141,e65df5127cfcb51059f5449b40438dbcef5cc88c,
-/bin/screen.py,1972,3cea514488922c17d2052e7d08f2f514deb27742,
+/bin/screen.py,1964,90df17ca4adbe1098ef64c1030a2e94384e58fbe,
 /bin/sensors.py,624,b41a58568e5919b905ebd54f21814f13c78d78bb,
 /bin/setauth.py,1614,716f0b0b38f6f6bcaf77598e9e54e70637b793af,
 /bin/sh.py,7134,4e496b6f9acebcfd1013025c668f6798b584bbfb,
