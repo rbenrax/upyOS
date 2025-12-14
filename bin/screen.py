@@ -24,7 +24,7 @@ def __main__(args):
     poll = uselect.poll()
     poll.register(sys.stdin, uselect.POLLIN)
 
-    print(f"Connected to {device}, Ctrl+C to stop")
+    print(f"Connected to {device}, Ctrl+Q to exit Ctrl+C to stop")
     line_buffer = ""
 
     try:
@@ -32,7 +32,11 @@ def __main__(args):
             # Leer teclas una por una (solo si hay datos)
             if poll.poll(0):
                 char = sys.stdin.read(1)
+                #print(hex(ord(char)))
                 if char:
+                    if char == '\x11':
+                         break
+
                     if char == '\n' or char == '\r':
                         # Mostrar el salto de línea en local
                         sys.stdout.write('\r\n')
