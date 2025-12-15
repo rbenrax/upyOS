@@ -90,8 +90,12 @@ class upyOS:
         while not self.stop:
             try:
                 user_input = input(os.getcwd() + " $: ")
-                self.run_cmd(user_input)
                 
+                # Command line with multiple commands
+                commands = [c.strip() for c in user_input.split(';') if c.strip()]
+                for cmd in commands:
+                    self.run_cmd(cmd)
+                    
             except KeyboardInterrupt:
                 self.exit()
 
