@@ -6,9 +6,9 @@ def __main__(args):
     doc = """
     watchdog - Watchdog using persistent WDT(id=0)
     Usage:
-      watchdog -t SECONDS [-d SECONDS]    # Start watchdog (id=0)
-      watchdog -f                         # Feed existing watchdog (id=0)
-      watchdog --h                        # Show help
+      watchdog -t SECONDS [-d SECONDS] -q  # Start watchdog (id=0)
+      watchdog -f -q                       # Feed existing watchdog (id=0)
+      watchdog --h                         # Show help
 
     Options:
       -t SECONDS    Set timeout and start WDT(id=0)
@@ -29,7 +29,8 @@ def __main__(args):
             # Re-acquire WDT instance with same id (0)
             wdt = WDT(id=0)
             wdt.feed()
-            print("Watchdog fed.")
+            if not "-q" in args:
+                print("Watchdog fed.")
         except Exception as e:
             print(f"Error feeding watchdog (was it started?): {e}")
         return
@@ -82,8 +83,9 @@ def __main__(args):
     try:
         # Create WDT with id=0 (persistent on ESP32)
         wdt = WDT(id=0, timeout=timeout * 1000)
-        print(f"Watchdog started (id=0) with timeout = {timeout} seconds")
-        print("Use 'watchdog -f' to feed it later.")
+        if not "-q" in args:
+            print(f"Watchdog started (id=0) with timeout = {timeout} seconds")
+            print("Use 'watchdog -f' to feed it later.")
     except Exception as e:
         print(f"Error starting watchdog: {e}")
         sys.print_exception(e)
