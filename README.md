@@ -185,6 +185,7 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 * `/lib` - System implementations libraries
 * `/opt` - Specific solution or add-on programs (not in path)
 * `/tmp` - Temporary directory (for files you don't know where else to put :-)
+* `/var` - Directory for variable data
 * `/www` - Web server directory
 
 ---
@@ -200,7 +201,7 @@ If the system hangs during boot (e.g., due to a defective program), you can boot
 
 ### External Commands (60+)
 
-`cat`, `cd`, `clear`, `cp`, `cpufreq`, `date`, `decr`, `df`, `echo`, `env`, `export`, `fileup`, `find`, `free`, `gpio`, `grep`, `help`, `hold`, `i2cscan`, `ifconfig`, `incr`, `iperf3`, `kill`, `killall`, `led`, `ls`, `lshw`, `lsmod`, `mi`, `mkdir`, `mv`, `ntpupdate`, `ping`, `ps`, `pwd`, `read`, `reboot`, `release`, `reset`, `resume`, `rm`, `rmdir`, `rmmod`, `sensors`, `setauth`, `sh`, `si`, `sleep`, `test`, `touch`, `uftpd`, `uhttpd`, `unset`, `upgrade`, `uptime`, `utelnetd`, `vi`, `wait`, `watch`, `wget`, `wifi`
+`atcurl`, `atmodem`, `atmqttc`, `atupgrade`, `atwget`, `cat`, `cd`, `clear`, `cp`, `cpufreq`, `curl`, `date`, `decr`, `df`, `echo`, `env`, `export`, `fileup`, `find`, `free`, `gpio`, `grep`, `help`, `hexdump`, `hold`, `i2cscan`, `ifconfig`, `incr`, `iperf3`, `jq`, `kill`, `killall`, `led`, `ls`, `lshw`, `lsmod`, `mi`, `mkdir`, `mqttc`, `mv`, `ntpupdate`, `ping`, `ps`, `pwd`, `read`, `reboot`, `release`, `reset`, `resume`, `rm`, `rmdir`, `rmmod`, `screen`, `sensors`, `setauth`, `sh`, `si`, `sleep`, `test`, `touch`, `uftpd`, `uhttpd`, `unset`, `upgrade`, `uptime`, `utelnetd`, `vi`, `wait`, `watch`, `wdt`, `wget`, `wifi`
 
 ### Command Output Redirection
 
@@ -273,9 +274,9 @@ Basic **conditional execution** in shell scripts is supported, as well as **labe
 ```bash
 export var1 5   # Set variable var1 to "5" (variables can also be accessed from Python programs and embedded Python)
 if $var1 != 5 skip 3 # Skip 3 lines if comparison is true (will continue in 4, 5, etc)
-< 1
-< 2
-< skip 2
+  < 1
+  < 2
+  < skip 2
 < 4
 < 5
 if $var1 == 3 return        # Ends shell script
@@ -549,7 +550,7 @@ Added support for **Espressif ESP-AT UART modems**, especially for MCUs without 
 
 # /etc/init.sh wifi connection example using ESP-AT serial modem 
 
-atmodem -r 22 3     # Reset modem <reset_gpio> <time_toready_state>
+atmodem -r 22 3     # Reset modem <reset_gpio> <time_to_ready_state>
 
 atmodem -c 1 115200 4 5 modem0 -v -tm  # Initialize UART and modem: -v verbose, -tm show timings
 atmodem AT+UART_CUR=115200,8,1,0,3     # Enable hardware flow control on ESP module
