@@ -651,8 +651,6 @@ mqttc unsub -t "#"
 
 ```
 
-```bash
-
 ---
 # Multiple commands in command line and Watchdog
 
