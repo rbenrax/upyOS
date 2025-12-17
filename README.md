@@ -652,6 +652,29 @@ mqttc unsub -t "#"
 ```
 
 ```bash
+
+---
+# Multiple commands in command line and Watchdog
+
+Added **`Command line with multiple commands (;) and Watchdog command`**.
+
+```bash
+/ $: wdt -t 8 -d 4; watch -q wdt -f -q & 
+Delaying watchdog activation for 4 seconds...
+Watchdog started (id=0) with timeout = 8 seconds
+Use 'watchdog -f' to feed it later.
+
+[23]
+/ $: ps
+  Proc Sts    Init_T       Elapsed   Thread_Id   Cmd/Args
+    23  R   09:17:37   0d 00:00:06  1070369900   watch -q wdt -f -q
+    27  R   09:17:43   0d 00:00:00           0   ps 
+/ $: 
+
+```
+
+```bash
+
 # MQTT examples for MCUs without integrated connectivity using an ESP8266 or any from the ESP family with ESP-AT firmware installed.
 
 export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
