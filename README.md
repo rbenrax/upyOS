@@ -651,6 +651,19 @@ mqttc unsub -t "#"
 
 ```
 
+```bash
+
+# MQTT examples for MCUs without integrated connectivity using an ESP8266 or any from the ESP family with ESP-AT firmware installed.
+
+export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
+
+atmqttc pub -h $h -t "home/bedroom/temp" -m "25"
+atmqttc sub -t "#"
+atmqttc listen
+atmqttc listsub -t "#"
+atmqttc unsub -t "#"
+
+```
 ---
 # Multiple commands in command line and Watchdog
 
@@ -670,21 +683,6 @@ Use 'watchdog -f' to feed it later.
 / $: 
 
 ```
-
-```bash
-
-# MQTT examples for MCUs without integrated connectivity using an ESP8266 or any from the ESP family with ESP-AT firmware installed.
-
-export h = 192.168.2.132 # mqtt server (ex. Mosquitto)
-
-atmqttc pub -h $h -t "home/bedroom/temp" -m "25"
-atmqttc sub -t "#"
-atmqttc listen
-atmqttc listsub -t "#"
-atmqttc unsub -t "#"
-
-```
-
 
 ---
 
