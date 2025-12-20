@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>upyOS upyDesktop</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <header class="top-bar">
+            <div class="logo">upyOS upyDesktop</div>
+            <div class="status-bar">
+                <span id="connection-status" class="status-indicator">Connected</span>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <nav>
+                    <button class="nav-btn active" data-view="status">Status</button>
+                    <button class="nav-btn" data-view="files">Files</button>
+                    <button class="nav-btn" data-view="gpio">GPIO</button>
+                    <button class="nav-btn" data-view="run">Run</button>
+                    <button class="nav-btn" data-view="about">About</button>
+                </nav>
+            </aside>
+
+            <main class="content-area">
+                <!-- File Manager View -->
+                <div id="view-files" class="view-section">
+                    <div class="toolbar">
+                        <button id="btn-refresh">Refresh</button>
+                        <button id="btn-up">Up</button>
+                        <span id="current-path">/</span>
+                        <div class="spacer"></div>
+                        <button id="btn-mkdir">New Folder</button>
+                        <button id="btn-newfile">New File</button>
+                    </div>
+                    <div class="file-browser" id="file-list">
+                        <!-- File items will be injected here -->
+                    </div>
+
+                    <!-- Code Editor Overlay -->
+                    <div id="editor-overlay" class="hidden">
+                        <div class="editor-toolbar">
+                            <span id="editor-filename">filename.py</span>
+                            <div class="spacer"></div>
+                            <button id="btn-save">Save</button>
+                            <button id="btn-close-editor">Close</button>
+                        </div>
+                        <textarea id="code-editor" spellcheck="false"></textarea>
+                    </div>
+                </div>
+
+                <!-- GPIO View -->
+                <div id="view-gpio" class="view-section">
+                    <div class="toolbar">
+                        <h2>GPIO Dashboard</h2>
+                        <button id="btn-refresh-gpio">Refresh</button>
+                    </div>
+                    <div class="gpio-grid" id="gpio-list">
+                        <!-- GPIO items -->
+                    </div>
+                </div>
+
+                <!-- Status View -->
+                <div id="view-status" class="view-section active">
+                    <div class="toolbar">
+                        <h2>System Status</h2>
+                        <button id="btn-refresh-status">Refresh</button>
+                    </div>
+                    <div class="status-content" id="status-container" style="padding: 20px;">
+                        <!-- injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Run View -->
+                <div id="view-run" class="view-section">
+                    <div class="toolbar">
+                        <h2>Run Command</h2>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <input type="text" id="cmd-input" placeholder="Enter command (e.g. ls -la)"
+                                style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--header-bg); color: white;">
+                            <button id="btn-run-cmd">Execute</button>
+                        </div>
+                        <div id="cmd-output"
+                            style="background: #111; color: #0f0; padding: 15px; border-radius: 4px; font-family: monospace; min-height: 200px; white-space: pre-wrap;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About View -->
+                <div id="view-about" class="view-section">
+                    <div class="about-content">
+                        <h1>upyDesktop v0.1</h1>
+                        <p>Web-based Operating Environment for MicroPython.</p>
+                        <p>Running on upyOS.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

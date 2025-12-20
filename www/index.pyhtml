@@ -1,63 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>upyOS MicroWebSrv</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" type="text/css" href="style.css">
-  
-  {{py}}
-  import sdata
-  import utls
-  import gc
-  import uos 
-  
-  bit_tuple = uos.statvfs("/")
-  blksize = bit_tuple[0]  # system block size  
-  
-  ts = bit_tuple[2] * blksize
-  fs = bit_tuple[3] * blksize
-  us = ts - fs
-  ps = f'({fs/ts*100:.2f}%)' 
-  
-  fm = gc.mem_free()
-  am = gc.mem_alloc()
-  tm = fm+am
-  pm = f'({fm/tm*100:.2f}%)'
-  t = bit_tuple[2] * blksize
-  
-  {{end}}
-  
+    <meta http-equiv="refresh" content="0; url=index.html" />
 </head>
 <body>
-
-  <h1>MicroWebSrv upyOS</h1>
-  
-  <p>MCU: <strong> {{sdata.board["mcu"][0]["type"]}} </strong></p>
-  <p>Arch: <strong> {{sdata.board["mcu"][0]["arch"]}} </strong></p>
-  
-  <p>Board: <strong> {{sdata.board["board"]["name"]}} </strong></p>
-  <p>Vendor: <strong> {{sdata.board["board"]["vendor"]}} </strong></p>
-  
-  <p>
-  <a href="/on.pyhtml"><button class="button">ON</button></a>
-  <a href="/off.pyhtml"><button class="button button2">OFF</button></a>
-  <a href="/info.pyhtml"><button class="button button2">Info</button></a>
-  </p>
-  
-    <form action="/runcmd1" method="GET">
-        <label for="l1">Comando (Get):</label>
-        <input type="text" id="c1" name="cmd1" required>
-        <button type="submit">Ejecutar</button>
-    </form>
-    
-    <form action="/runcmd2" method="POST">
-        <div>
-            <label for="l2">Comando (Post):</label>
-            <input type="text" id="c2" name="cmd2">
-            <button type="Ejecutar">Enviar</button>
-        </div>
-    </form>
-    
+    <p>Redirecting to <a href="index.html">uppyDesktop</a>...</p>
+    <script>window.location.href = "index.html";</script>
 </body>
 </html>
