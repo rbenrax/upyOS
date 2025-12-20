@@ -77,7 +77,6 @@
 /lib/kernel.py,9184,0063dc777ad7a7158dd6986671425ff32ea0eee4,
 /lib/proc.py,3915,779724ea67b67a8bc16e187feea9c0172a2db8ca,
 /lib/sdata.py,464,6f906c456e15f3307d236f483f2d50d5cbb1c8f1,
-/lib/tools.py,2951,b15aec8c34ecc059a7d21d47cb8cf4a196bd8989,
 /lib/upyDesktop.py,10738,b55c5bd61e227245595d479799b1ae6d183019b9,
 /lib/utls.py,8623,ba4a9e726e866c3265a211e5de70551fdbcfa277,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
@@ -104,4 +103,4 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-#files,105
+#files,104
