@@ -2,7 +2,7 @@
 
 ***MicroPython 1.27 Upgraded***
 
-**upyOS** is a modular flash **Operating System** for microcontrollers based on **MicroPython**. It provides the user with a **POSIX-like environment**. 
+**upyOS** is a modular flash **Operating System** for microcontrollers based on **MicroPython**. It provides the user with a **POSIX-like environment**.
 
 The goal is to provide a common, modular base for using microcontrollers in a **standalone** manner, moving away from monolithic programs, promoting **module reuse**, and making it fun to use.
 
@@ -472,7 +472,7 @@ Added user and password authentication for accessing the telnet and ftp servers.
 
 ### Android Development
 
-By starting `utelnetd` and `uftpd` on boot, you can develop remotely from **Android** using apps like **"Serial wifi terminal"** and **"Squircle CE"** from Google Play. **Termux** is also an excellent option as a telnet client.
+By starting `utelnetd` and `uftpd` on boot, you can develop remotely from **Android** using apps like **"Serial WiFi Terminal"** and **"Squircle CE"** from Google Play. **Termux** is also an excellent option as a telnet client.
 
 ![Android development environment](media/Screenshot_20251012_092146_Termux.jpg)
 

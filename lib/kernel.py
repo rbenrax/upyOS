@@ -1,4 +1,4 @@
-# Based in the work of Krzysztof Krystian Jankowski in http://smol.p1x.in/os/
+# Based on the work of Krzysztof Krystian Jankowski in http://smol.p1x.in/os/
 # Developed by rbenrax 2023
 
 import sys
@@ -19,7 +19,7 @@ class upyOS:
         # Clean screen and boot
         print("\033[2J\033[HBooting upyOS...")
         
-        # sdata store all system data
+        # sdata stores all system data
         sdata.name    = "upyOS-" + os.uname()[0]
         sdata.version = "0.9.3"
         sdata.initime = time.time()
@@ -34,7 +34,7 @@ class upyOS:
             if not utls.file_exists(d):
                 os.mkdir(d)
             
-        # Set library path for modules finding, by default is /lib only
+        # Set library path for module finding, by default is /lib only
         sys.path.append("/bin")
         sys.path.append("/libx")
 
@@ -190,7 +190,7 @@ class upyOS:
                         start_new_thread(newProc.run, (True, ext, cmdl, args[:-1]))
                         time.sleep(.150)
                     except ImportError:
-                        print("System has not thread support")
+                        print("System does not have thread support")
                     except Exception as ex:
                         print(f"Error launching thread {ex}")
 
@@ -229,7 +229,7 @@ class upyOS:
         try:
             # Stop threads before exit
             if len(sdata.procs)>0:
-                print("\nStopping process...")
+                print("\nStopping processes...")
 
                 # Launch shutdown services script
                 if utls.file_exists("/etc/end.sh"):
