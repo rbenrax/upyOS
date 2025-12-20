@@ -28,7 +28,7 @@ class ModemManager:
         
         self.tcp_conn = False # TCP Connected?
         
-    def setCallBack(self, callback): # add Callback
+    def setCallBack(self, callback): # add callback
         self._callback = callback
 
     def resetHW(self, pin, wait=2):
@@ -44,7 +44,7 @@ class ModemManager:
 
             self.tcp_conn = False
 
-            time.sleep(wait) # wait to ready
+            time.sleep(wait) # wait for ready
             if self.sctrl:
                 print(", Ready")
         except Exception as ex:
@@ -85,7 +85,7 @@ class ModemManager:
                 print(f"UART {id} created as {device}")
             
         except Exception as ex:
-            print("Create uart error, " + str(ex))
+            print("UART creation error, " + str(ex))
             sys.print_exception(ex)
             return False
         
@@ -105,7 +105,7 @@ class ModemManager:
             self.tini = time.ticks_ms()
 
         if self.modem is None:
-            print("The modem uart is not initialized, see help")
+            print("The modem UART is not initialized, see help")
             return False, ""
 
         timeout = timeout  * 1000
@@ -118,7 +118,7 @@ class ModemManager:
         # Passthrow quotation marks
         #command = command.replace("\\@", '"')
 
-        # Enviar comando
+        # Send command
         self.modem.write(command + '\r\n')
        
         if self.scmds:
@@ -126,7 +126,7 @@ class ModemManager:
        
         time.sleep(0.050)
        
-        # Esperar respuesta
+        # Wait for response
         resp = b""
         start_time = time.ticks_ms()
         
@@ -273,7 +273,7 @@ class ModemManager:
 
         if self.timing:            
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
-            print(f"## Tiempo rcv: {ptfin}ms" )
+            print(f"## Rcv time: {ptfin}ms" )
             
         return True, retResp, headers
     
@@ -288,13 +288,13 @@ class ModemManager:
         
         timeout = timeout * 1000
 
-        # Esperar respuesta
+        # Wait for response
         start_time = time.ticks_ms()
         ndc = 0  # No data count
         
         hf = False
         headers = ""
-        buffer = b""  # Buffer para acumular datos antes de encontrar headers
+        buffer = b""  # Buffer to accumulate data before finding headers
         
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             
@@ -307,34 +307,34 @@ class ModemManager:
                 #time.sleep_ms(10)
                 
                 if not hf:
-                    # Acumular datos mientras no se hayan encontrado los headers
+                    # Accumulate data while headers are not found
                     buffer += data
                     
-                    # Buscar el separador de headers en los datos acumulados
+                    # Find header separator in accumulated data
                     body_ini = buffer.find(b"\r\n\r\n")
                     
                     if body_ini > -1:
-                        # Headers encontrados
+                        # Headers found
                         headers = buffer[:body_ini + 4]
-                        data = buffer[body_ini + 4:]  # El resto es body
+                        data = buffer[body_ini + 4:]  # The rest is body
                         hf = True
-                        buffer = b""  # Limpiar el buffer
+                        buffer = b""  # Clear buffer
                         #print(f"*** Headers found!")
 
                         # Verificar error HTTP en headers
                         if headers.find(b"HTTP/1.1 200 OK") == -1 and headers.find(b"HTTP/") > -1:
-                            # Si hay respuesta HTTP pero no es 200 OK
+                            # If there is HTTP response but not 200 OK
                             #print(f"HTTP Error in headers: {headers}")
-                            # Continuar para verificar si hay error en el body también
+                            # Continue to check if there is error in body too
                             return False, headers
                     else:
-                        # Headers aún no completos, continuar acumulando
-                        start_time = time.ticks_ms()  # Reiniciar timeout
+                        # Headers not complete yet, continue accumulating
+                        start_time = time.ticks_ms()  # Restart timeout
                         continue
                 
-                # Procesar body solo si ya se encontraron los headers
+                # Process body only if headers already found
                 if hf:
-                    # Escribir datos al archivo
+                    # Write data to file
                     try:
                         fh.write(data)
                         #print(f"Data {data}")
@@ -342,7 +342,7 @@ class ModemManager:
                         print(f"Error writing file - {str(e)}")
                         return False, headers
                 
-                start_time = time.ticks_ms()  # Reiniciar timeout si hay nuevos datos
+                start_time = time.ticks_ms()  # Restart timeout if new data
 
             else:
                 if ndc > 0:
@@ -362,7 +362,7 @@ class ModemManager:
         
         if self.timing:
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
-            print(f"## Tiempo rcv: {ptfin}ms")
+            print(f"## Rcv time: {ptfin}ms")
         
         return True, headers
 
@@ -408,7 +408,7 @@ class ModemManager:
             return ret.replace("\r\nOK\r\n", "").replace("AT+GMR\r\n", "")
         
     def wifi_set_mode(self, mode=1):
-        """Establecer modo WiFi (1=station, 2=AP, 3=both)"""
+        """Set WiFi mode (1=station, 2=AP, 3=both)"""
         sts, _ = self.atCMD(f"AT+CWMODE={mode}")
         return sts
         
@@ -450,33 +450,33 @@ class ModemManager:
                     fecha_str = linea.split(':', 1)[1]
                     break
 
-            # Diccionarios para traducir abreviaciones
+            # Dictionaries to translate abbreviations
             dias_semana = {"Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6, "Sun": 7}
             meses = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
                      "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
 
-            # Separar la cadena por espacios y limpiar huecos dobles
+            # Split string by spaces and clean double gaps
             partes = fecha_str.split()
-            # Resultado típico: ['Thu', 'Jan', '1', '00:00:07', '1970']
+            # Typical result: ['Thu', 'Jan', '1', '00:00:07', '1970']
 
             dia_semana_str, mes_str, dia_str, hora_str, anio_str = partes
 
-            # Descomponer la hora
+            # Decompose time
             hora, minuto, segundo = [int(x) for x in hora_str.split(":")]
 
-            # Crear la tupla que espera el RTC
+            # Create tuple expected by RTC
             fecha_rtc = (
-                int(anio_str),          # Año
-                meses[mes_str],         # Mes
-                int(dia_str),           # Día
-                dias_semana[dia_semana_str],  # Día de la semana (1=Lunes ... 7=Domingo)
-                hora,                   # Hora
-                minuto,                 # Minuto
-                segundo,                # Segundo
+                int(anio_str),          # Year
+                meses[mes_str],         # Month
+                int(dia_str),           # Day
+                dias_semana[dia_semana_str],  # Day of week (1=Monday ... 7=Sunday)
+                hora,                   # Hour
+                minuto,                 # Minute
+                segundo,                # Second
                 0                       # Subsegundos
             )
 
-            # Configurar el RTC
+            # Configure RTC
             rtc = RTC()
             rtc.datetime(fecha_rtc)
             return rtc.datetime()
@@ -539,7 +539,7 @@ class ModemManager:
         lcmd = f"AT+CIPSEND={len(data)}"
         sts, ret = self.atCMD(lcmd, tout, ">")
         if sts:
-            # Enviar datos
+            # Send data
             sts, ret = self.atCMD(data, tout, "SEND OK")
             #ret = self.clear_ipd(ret)
             return sts, ret
@@ -562,7 +562,7 @@ class ModemManager:
         return False, ""
     
     def close_conn(self):
-        """Cerrar conexión"""
+        """Close connecting"""
         sts, _ = self.atCMD("AT+CIPCLOSE")
         self.tcp_conn = False
         return sts
@@ -623,21 +623,21 @@ class MqttManager(ModemManager):
     
     def parse_mqttsubrecv(self, data):
         """
-        Parsea los mensajes +MQTTSUBRECV del formato:
+        Parses +MQTTSUBRECV messages of format:
         +MQTTSUBRECV:<LinkID>,<topic>,<data_length>,<data>
         
         Returns:
-            dict con link_id, topic, data_length, data o None si no es válido
+            dict with link_id, topic, data_length, data or None if not valid
         """
         if '+MQTTSUBRECV:' not in data:
             return None
         
         try:
-            # Extraer la línea que contiene +MQTTSUBRECV
+            # Extract line containing +MQTTSUBRECV
             lines = data.split('\n')
             for line in lines:
                 if '+MQTTSUBRECV:' in line:
-                    # Formato: +MQTTSUBRECV:<LinkID>,"<topic>",<length>,<data>
+                    # Format: +MQTTSUBRECV:<LinkID>,"<topic>",<length>,<data>
                     line = line.strip()
                     parts = line.replace('+MQTTSUBRECV:', '').split(',', 3)
                     
@@ -655,28 +655,28 @@ class MqttManager(ModemManager):
                             'raw': line
                         }
         except Exception as e:
-            print(f"Error parseando mensaje: {e}")
+            print(f"Error parsing message: {e}")
         
         return None
     
     def check_messages(self, timeout_ms=100):
         """
-        Comprueba si hay mensajes MQTT recibidos
+        Checks if MQTT messages received
         
         Returns:
-            Lista de mensajes parseados o lista vacía
+            List of parsed messages or empty list
         """
         messages = []
         
-        # Leer datos disponibles
+        # Read available data
         if self.modem.any():
             data = self.modem.read()
             if data:
                 self.buffer += data.decode('utf-8', 'ignore')
                 
-                # Buscar mensajes completos en el buffer
+                # Find complete messages in buffer
                 while '+MQTTSUBRECV:' in self.buffer:
-                    # Buscar el final del mensaje (normalmente \n o OK)
+                    # Find message end (usually \n or OK)
                     end_idx = self.buffer.find('\n', self.buffer.find('+MQTTSUBRECV:'))
                     
                     if end_idx != -1:
@@ -686,12 +686,12 @@ class MqttManager(ModemManager):
                         if parsed:
                             messages.append(parsed)
                             if self.debug:
-                                print(f"[MQTT] Mensaje recibido:")
+                                print(f"[MQTT] Message received:")
                                 print(f"  Topic: {parsed['topic']}")
                                 print(f"  Data: {parsed['data']}")
                                 print(f"  Length: {parsed['data_length']}")
                         
-                        # Eliminar el mensaje procesado del buffer
+                        # Remove processed message from buffer
                         self.buffer = self.buffer[end_idx + 1:]
                     else:
                         break
@@ -700,11 +700,11 @@ class MqttManager(ModemManager):
     
     def msgs_loop(self, callback=None):
         """
-        Bucle continuo de monitoreo de mensajes MQTT
+        Continuous monitoring loop for MQTT messages
         
         Args:
-            callback: Función a llamar cuando se recibe un mensaje
-                     Debe aceptar un dict con el mensaje parseado
+            callback: Function to call when a message is received
+                      Must accept a dict with the parsed message
         """
         print("Starting callback MQTT message monitoring ...")
         print("Ctrl+C to stop")
@@ -725,8 +725,8 @@ class MqttManager(ModemManager):
                     if callback:
                         callback(msg)
                 
-                time.sleep_ms(10)  # Pequeña pausa para no saturar
+                time.sleep_ms(10)  # Small pause to avoid saturation
                 
         except KeyboardInterrupt:
-            print("\nMonitoreo detenido")
+            print("\nMonitoring stopped")
 

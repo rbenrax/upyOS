@@ -82,12 +82,12 @@ def getenv(var):
         return ""
 
 def setenv(var, val):
-    """Set a value to a environment variable"""
+    """Set a value to an environment variable"""
     if var=="": return        
     sdata.sysconfig["env"][var]=val
     
 def unset(var):
-    """Remove a environment variable"""
+    """Remove an environment variable"""
     if var in sdata.sysconfig["env"]:
         del sdata.sysconfig["env"][var]
 
@@ -199,34 +199,34 @@ def shlex(ent):
     incom_doble = False
     incom_simple = False
     escape = False
-    quote_stack = []  # Pila para manejar comillas anidadas
+    quote_stack = []  # Stack to handle nested quotes
 
     for c in ent:
         if escape:
-            # Si estamos en modo escape, agregamos el carácter literalmente
+            # If we are in escape mode, add the character literally
             argact += c
             escape = False
         elif c == '\\':
-            # Iniciamos secuencia de escape
+            # Start escape sequence
             escape = True
         elif c == '"' and not incom_simple and not escape:
             if incom_doble:
-                # Cerrando comilla doble
+                # Closing double quote
                 incom_doble = False
                 if quote_stack and quote_stack[-1] == '"':
                     quote_stack.pop()
             else:
-                # Abriendo comilla doble
+                # Opening double quote
                 incom_doble = True
                 quote_stack.append('"')
         elif c == "'" and not incom_doble and not escape:
             if incom_simple:
-                # Cerrando comilla simple
+                # Closing single quote
                 incom_simple = False
                 if quote_stack and quote_stack[-1] == "'":
                     quote_stack.pop()
             else:
-                # Abriendo comilla simple
+                # Opening single quote
                 incom_simple = True
                 quote_stack.append("'")
         elif c == ' ' and not incom_doble and not incom_simple:
@@ -260,7 +260,7 @@ def outs(args, val, prt=True):
         return False
 
     try:
-        # Detectar operador y modo de apertura
+        # Detect operator and open mode
         if ">>" in args:
             idx, mode = args.index(">>"), "a"
         else:
@@ -268,17 +268,17 @@ def outs(args, val, prt=True):
 
         # Validar destino
         if idx + 1 >= len(args):
-            print("Error: falta destino después de '>'")
+            print("Error: missing destination after '>'")
             return False
 
         target = args[idx + 1]
         
-        # Redirigir a archivo
+        # Redirect to file
         if "." in target or "/" in target:
             with open(target, mode) as f:
                 f.write(str(val) + "\n")
         else:
-            # Redirigir a "variable de entorno"
+            # Redirect to "environment variable"
             if mode == "a":
                 current = getenv(target)
                 setenv(target, current + val)
