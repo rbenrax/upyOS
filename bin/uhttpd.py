@@ -84,7 +84,14 @@ def __main__(args):
                                             contentCharset  = "UTF-8",
                                             content         = content)
 
-            routeHandlers = [
+            routeHandlers = []
+            try:
+                import upyDesktop
+                routeHandlers += upyDesktop.routes
+            except ImportError:
+                print("Could not import upyDesktop")
+
+            routeHandlers += [
               ( "/edit/<testid>/<testpath>", "GET", handlerFuncEdit),
               ( "/runcmd1", "GET", cmdGetHandler),
               ( "/runcmd2", "POST", cmdPostHandler)
