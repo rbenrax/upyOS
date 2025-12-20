@@ -1,0 +1,302 @@
+
+// State
+const state = {
+    currentPath: '/',
+    currentFile: null,
+    files: [],
+    view: 'status'
+};
+
+// API Helpers
+async function apiCall(endpoint, method = 'POST', body = {}) {
+    try {
+        const options = {
+            method,
+            headers: { 'Content-Type': 'application/json' }
+        };
+
+        if (method !== 'GET' && method !== 'HEAD') {
+            options.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(endpoint, options);
+
+        if (response.status === 401) {
+            window.location.href = 'login.html';
+            throw new Error("Unauthorized");
+        }
+
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        return data;
+    } catch (err) {
+        alert('Error: ' + err.message);
+        throw err;
+    }
+}
+
+// Navigation
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+
+        btn.classList.add('active');
+        const viewId = btn.dataset.view;
+        document.getElementById(`view-${viewId}`).classList.add('active');
+        state.view = viewId;
+
+        if (viewId === 'files') loadFiles();
+        if (viewId === 'gpio') loadGPIO();
+        if (viewId === 'status') loadStatus();
+        if (viewId === 'run') document.getElementById('cmd-input').focus();
+    });
+});
+
+// --- Run Command ---
+
+document.getElementById('btn-run-cmd').addEventListener('click', async () => {
+    const input = document.getElementById('cmd-input');
+    const output = document.getElementById('cmd-output');
+    const cmd = input.value.trim();
+
+    if (!cmd) return;
+
+    output.innerText += `> ${cmd}\n`;
+
+    try {
+        const data = await apiCall('/api/cmd/run', 'POST', { cmd });
+        output.innerText += `${data.output}\n\n`;
+        input.value = '';
+    } catch (e) {
+        output.innerText += `Error: ${e.message}\n\n`;
+    }
+
+    // Auto scroll to bottom
+    output.scrollTop = output.scrollHeight;
+});
+
+// Allow Enter key to run
+document.getElementById('cmd-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('btn-run-cmd').click();
+    }
+});
+
+
+// --- Status ---
+
+async function loadStatus() {
+    try {
+        const data = await apiCall('/api/status', 'GET');
+        const container = document.getElementById('status-container');
+
+        container.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="card" style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Board</h3>
+                    <p><strong>Board:</strong> ${data.board.name || 'N/A'}</p>
+                    <p><strong>Vendor:</strong> ${data.board.vendor || 'N/A'}</p>
+                    <p><strong>MCU:</strong> ${data.mcu.type || 'N/A'} (${data.mcu.arch || 'N/A'})</p>
+                    <p><strong>OS:</strong> ${data.sys.name || 'upyOS'} ${data.sys.version || ''}</p>
+                </div>
+                
+                <div class="card" style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Resources</h3>
+                    <p><strong>Storage:</strong> ${formatBytes(data.storage.free)} free / ${formatBytes(data.storage.total)} total</p>
+                    <div style="background: #313244; height: 10px; border-radius: 5px; margin-top: 5px;">
+                        <div style="background: var(--success); width: ${(data.storage.free / data.storage.total * 100) || 0}%; height: 100%; border-radius: 5px;"></div>
+                    </div>
+                    <br>
+                    <p><strong>Memory:</strong> ${formatBytes(data.memory.free)} free / ${formatBytes(data.memory.total)} total</p>
+                    <div style="background: #313244; height: 10px; border-radius: 5px; margin-top: 5px;">
+                        <div style="background: var(--success); width: ${(data.memory.free / data.memory.total * 100) || 0}%; height: 100%; border-radius: 5px;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+document.getElementById('btn-refresh-status').addEventListener('click', loadStatus);
+
+// --- File Manager ---
+
+async function loadFiles(path = state.currentPath) {
+    try {
+        const data = await apiCall('/api/fs/list', 'POST', { path });
+        state.currentPath = data.path;
+        state.files = data.entries;
+        renderFiles();
+        document.getElementById('current-path').textContent = state.currentPath;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function renderFiles() {
+    const list = document.getElementById('file-list');
+    list.innerHTML = '';
+
+    // Sort directories first
+    state.files.sort((a, b) => {
+        if (a.is_dir === b.is_dir) return a.name.localeCompare(b.name);
+        return a.is_dir ? -1 : 1;
+    });
+
+    state.files.forEach(file => {
+        const el = document.createElement('div');
+        el.className = 'file-item';
+        el.innerHTML = `
+            <div class="file-icon">${file.is_dir ? '📁' : '📄'}</div>
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${file.is_dir ? '-' : formatBytes(file.size)}</div>
+            <div class="file-actions">
+                <button class="btn-icon btn-rename">✏️</button>
+                <button class="btn-icon btn-delete">🗑️</button>
+            </div>
+        `;
+
+        // Click to navigate or edit
+        el.querySelector('.file-name').addEventListener('click', () => {
+            const fullPath = (state.currentPath === '/' ? '' : state.currentPath) + '/' + file.name;
+            if (file.is_dir) {
+                loadFiles(fullPath);
+            } else {
+                openEditor(fullPath);
+            }
+        });
+
+        // Actions
+        el.querySelector('.btn-rename').addEventListener('click', (e) => {
+            e.stopPropagation();
+            renameFile(file.name);
+        });
+
+        el.querySelector('.btn-delete').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteFile(file.name);
+        });
+
+        list.appendChild(el);
+    });
+}
+
+function formatBytes(bytes, decimals = 2) {
+    if (!+bytes) return '0 B';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
+async function renameFile(name) {
+    const newName = prompt("New name:", name);
+    if (newName && newName !== name) {
+        const fullOld = (state.currentPath === '/' ? '' : state.currentPath) + '/' + name;
+        const fullNew = (state.currentPath === '/' ? '' : state.currentPath) + '/' + newName;
+        await apiCall('/api/fs/rename', 'POST', { old_path: fullOld, new_path: fullNew });
+        loadFiles();
+    }
+}
+
+async function deleteFile(name) {
+    if (confirm(`Delete ${name}?`)) {
+        const fullPath = (state.currentPath === '/' ? '' : state.currentPath) + '/' + name;
+        await apiCall('/api/fs/delete', 'POST', { path: fullPath });
+        loadFiles();
+    }
+}
+
+document.getElementById('btn-refresh').addEventListener('click', () => loadFiles());
+
+document.getElementById('btn-up').addEventListener('click', () => {
+    let p = state.currentPath.split('/');
+    p.pop();
+    let newPath = p.join('/');
+    if (newPath === '') newPath = '/';
+    loadFiles(newPath);
+});
+
+document.getElementById('btn-mkdir').addEventListener('click', async () => {
+    const name = prompt("Folder name:");
+    if (name) {
+        const fullPath = (state.currentPath === '/' ? '' : state.currentPath) + '/' + name;
+        await apiCall('/api/fs/mkdir', 'POST', { path: fullPath });
+        loadFiles();
+    }
+});
+
+document.getElementById('btn-newfile').addEventListener('click', async () => {
+    const name = prompt("File name:");
+    if (name) {
+        const fullPath = (state.currentPath === '/' ? '' : state.currentPath) + '/' + name;
+        // Create empty file
+        await apiCall('/api/fs/write', 'POST', { path: fullPath, content: '' });
+        loadFiles();
+    }
+});
+
+// --- Editor ---
+
+async function openEditor(path) {
+    state.currentFile = path;
+    const data = await apiCall('/api/fs/read', 'POST', { path });
+
+    document.getElementById('editor-filename').textContent = path;
+    document.getElementById('code-editor').value = data.content;
+    document.getElementById('editor-overlay').classList.remove('hidden');
+}
+
+document.getElementById('btn-close-editor').addEventListener('click', () => {
+    document.getElementById('editor-overlay').classList.add('hidden');
+    state.currentFile = null;
+});
+
+document.getElementById('btn-save').addEventListener('click', async () => {
+    if (state.currentFile) {
+        const content = document.getElementById('code-editor').value;
+        await apiCall('/api/fs/write', 'POST', { path: state.currentFile, content });
+        alert('Saved!');
+    }
+});
+
+
+// --- GPIO ---
+
+async function loadGPIO() {
+    try {
+        const data = await apiCall('/api/gpio/status', 'GET');
+        const list = document.getElementById('gpio-list');
+        list.innerHTML = '';
+
+        data.pins.forEach(pin => {
+            const card = document.createElement('div');
+            card.className = 'gpio-card';
+            card.innerHTML = `
+                <div class="gpio-id">GPIO ${pin.pin}</div>
+                <label class="gpio-switch">
+                    <input type="checkbox" ${pin.val ? 'checked' : ''} data-pin="${pin.pin}">
+                    <span class="slider"></span>
+                </label>
+            `;
+
+            card.querySelector('input').addEventListener('change', async (e) => {
+                const val = e.target.checked ? 1 : 0;
+                await apiCall('/api/gpio/set', 'POST', { pin: pin.pin, val });
+            });
+
+            list.appendChild(card);
+        });
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+document.getElementById('btn-refresh-gpio').addEventListener('click', loadGPIO);
+
+// Init
+loadStatus();

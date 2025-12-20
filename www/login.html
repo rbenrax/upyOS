@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>upyDesktop Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-card {
+            background-color: #181825;
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid #313244;
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #89b4fa;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #1e1e2e;
+            border: 1px solid #313244;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #89b4fa;
+            color: #11111b;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #b4befe;
+        }
+
+        .error {
+            color: #f38ba8;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <h1>upyDesktop</h1>
+        <form id="login-form">
+            <input type="text" id="user" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div id="error-msg" class="error">Invalid credentials</div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('user').value;
+            const password = document.getElementById('password').value;
+            const err = document.getElementById('error-msg');
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user, password })
+                });
+
+                if (res.ok) {
+                    window.location.href = 'desktop.html'; // Redirect to desktop
+                } else {
+                    err.style.display = 'block';
+                }
+            } catch (e) {
+                err.textContent = "Error connecting";
+                err.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>
