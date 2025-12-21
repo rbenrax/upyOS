@@ -300,3 +300,17 @@ document.getElementById('btn-refresh-gpio').addEventListener('click', loadGPIO);
 
 // Init
 loadStatus();
+
+// Logout
+document.getElementById('btn-logout').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to logout?')) {
+        try {
+            await apiCall('/api/logout', 'GET');
+            window.location.href = 'login.html';
+        } catch (e) {
+            console.error('Logout failed:', e);
+            // Fallback: just redirect
+            window.location.href = 'login.html';
+        }
+    }
+});
