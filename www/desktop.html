@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>upyOS upyDesktop</title>
+    <title>upyOS Desktop</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
@@ -12,7 +12,7 @@
 <body>
     <div id="app">
         <header class="top-bar">
-            <div class="logo">upyOS upyDesktop</div>
+            <div class="logo">upyOS Desktop</div>
             <div class="status-bar">
                 <span id="connection-status" class="status-indicator">Connected</span>
             </div>
@@ -26,6 +26,8 @@
                     <button class="nav-btn" data-view="gpio">GPIO</button>
                     <button class="nav-btn" data-view="run">Run</button>
                     <button class="nav-btn" data-view="about">About</button>
+                    <div class="nav-spacer"></div>
+                    <button class="nav-btn logout-btn" id="btn-logout">Logout</button>
                 </nav>
             </aside>
 
@@ -98,7 +100,7 @@
                 <!-- About View -->
                 <div id="view-about" class="view-section">
                     <div class="about-content">
-                        <h1>upyDesktop v0.1</h1>
+                        <h1>upyOS Desktop v0.2</h1>
                         <p>Web-based Operating Environment for MicroPython.</p>
                         <p>Running on upyOS.</p>
                     </div>
