@@ -85,13 +85,13 @@ body {
 }
 
 nav {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .nav-spacer {
-    flex: 1;
+  flex: 1;
 }
 
 .nav-btn {
@@ -120,9 +120,9 @@ nav {
 }
 
 .logout-btn:hover {
-    background-color: var(--danger) !important;
-    color: var(--header-bg) !important;
-    border-left-color: var(--danger) !important;
+  background-color: var(--danger) !important;
+  color: var(--header-bg) !important;
+  border-left-color: var(--danger) !important;
 }
 
 .content-area {
@@ -359,4 +359,25 @@ input:checked+.slider:before {
 .about-content {
   padding: 40px;
   text-align: center;
+}
+
+#cmd-output {
+  text-align: left !important;
+}
+
+.gpio-card.led-card {
+  border-left: 3px solid var(--accent);
+}
+
+.gpio-card.rgb-card {
+  grid-column: span 2;
+  border-left: 3px solid #fab387;
+}
+
+.btn-small:hover {
+  filter: brightness(1.1);
+}
+
+.btn-small:active {
+  transform: scale(0.95);
 }

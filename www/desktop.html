@@ -84,6 +84,9 @@
                 <div id="view-run" class="view-section">
                     <div class="toolbar">
                         <h2>Run Command</h2>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary); margin-left: auto;">
+                            ⚠️ Interactive commands (input) are disabled. Use <strong>utelnetd</strong> for full shell.
+                        </span>
                     </div>
                     <div style="padding: 20px;">
                         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
@@ -92,7 +95,7 @@
                             <button id="btn-run-cmd">Execute</button>
                         </div>
                         <div id="cmd-output"
-                            style="background: #111; color: #0f0; padding: 15px; border-radius: 4px; font-family: monospace; min-height: 200px; white-space: pre-wrap;">
+                            style="background: #111; color: #0f0; padding: 15px; border-radius: 4px; font-family: monospace; height: 400px; overflow-y: auto; white-space: pre-wrap;">
                         </div>
                     </div>
                 </div>

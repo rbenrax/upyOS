@@ -1,6 +1,46 @@
-
 import os
-import sys
+
+try:
+    import usys as sys
+except ImportError:
+    import sys
+
+try:
+    import uio as io
+except ImportError:
+    import io
+
+try:
+    from uio import IOBase
+except ImportError:
+    class IOBase: pass
+
+try:
+    import builtins
+except ImportError:
+    # Some MicroPython versions use __builtins__ directly or other names
+    import __main__ as builtins 
+
+# Stream wrapper for MicroPython compatibility (emulates UART/Socket)
+class StreamWrapper(IOBase):
+    def __init__(self):
+        self.buffer = io.StringIO()
+    def write(self, data):
+        if isinstance(data, (bytes, bytearray)):
+            try:
+                data = data.decode()
+            except:
+                data = str(data)
+        self.buffer.write(data)
+        return len(data)
+    def readinto(self, buf):
+        return 0
+    def ioctl(self, op, arg):
+        if op == 4: # MP_STREAM_FLUSH
+            return 0
+        return 0
+    def getvalue(self):
+        return self.buffer.getvalue()
 
 # JSON helper
 def sendJSON(httpResponse, data):
@@ -60,6 +100,13 @@ def login_handler(httpClient, httpResponse):
         )
     else:
         httpResponse.WriteResponseJSONError(401, obj={'error': 'Invalid credentials'})
+
+def logout_handler(httpClient, httpResponse):
+    httpResponse.WriteResponseOk(
+        headers={'Set-Cookie': 'auth_token=; Path=/; Max-Age=0'},
+        contentType="application/json",
+        content=json.dumps({'status': 'ok'})
+    )
 
 # --- File System Handlers ---
 
@@ -206,32 +253,86 @@ except ImportError:
 
 @check_auth
 def gpio_status_handler(httpClient, httpResponse):
-    # This is tricky because we don't know exactly which pins are available 
-    # and safe to query on every board.
-    # We will just return a comprehensive list of "common" ESP32 pins for now.
-    # In a real scenario, this might need configuration.
+    import sdata
     
-    common_pins = [0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33]
+    # Use GPIOs from board configuration if available
+    pin_map = {} # GPIO -> Board Pin
+    if isinstance(sdata.board.get('gpio'), list):
+        for gpio_group in sdata.board['gpio']:
+            if isinstance(gpio_group, dict):
+                for gpio_id_str, board_pin in gpio_group.items():
+                    try:
+                        gpio_id = int(gpio_id_str)
+                        pin_map[gpio_id] = board_pin
+                    except ValueError:
+                        pass
+    
+    # Fallback to common pins if no board config found
+    if not pin_map:
+        for p in [0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33]:
+            pin_map[p] = p
+    
+    pins_to_check = sorted(pin_map.keys())
     
     pins_data = []
-    for p_id in common_pins:
+    for g_id in pins_to_check:
         try:
-            # We just create a pin object to read it? 
-            # DANGEROUS: Creating Pin object might reset its mode.
-            # Ideally we would track state. For this demo, we will just 
-            # pretend we can read the value if it's already set up, 
-            # or just default to 0. 
-            # SAFEST: Only report what we can without disturbing.
-            # But users want to see status.
-            
-            # For the dashboard demo, we'll just mock the reading or read if it's safe.
-            # In MicroPython, `Pin(n).value()` reads input.
-            val = Pin(p_id).value()
-            pins_data.append({'pin': p_id, 'val': val})
+            val = Pin(g_id).value()
+            pins_data.append({
+                'gpio': g_id, 
+                'pin': pin_map[g_id], 
+                'val': val
+            })
         except:
             pass
+
+    # Extract board leds (ledio)
+    leds_data = []
+    if isinstance(sdata.board.get('ledio'), list):
+        for led_group in sdata.board['ledio']:
+            if isinstance(led_group, dict):
+                for label, g_id in led_group.items():
+                    try:
+                        val = Pin(int(g_id)).value()
+                        leds_data.append({'label': label, 'gpio': g_id, 'val': val})
+                    except:
+                        pass
+
+    # Extract rgb info (rgbio)
+    rgb_data = []
+    if isinstance(sdata.board.get('rgbio'), list):
+        for rgb_group in sdata.board['rgbio']:
+            if isinstance(rgb_group, dict):
+                for label, g_id in rgb_group.items():
+                    rgb_data.append({'label': label, 'gpio': g_id})
             
-    sendJSON(httpResponse, {'pins': pins_data})
+    sendJSON(httpResponse, {
+        'pins': pins_data,
+        'leds': leds_data,
+        'rgb': rgb_data
+    })
+
+@check_auth
+def rgb_set_handler(httpClient, httpResponse):
+    data = httpClient.ReadRequestContentAsJSON()
+    gpio = data.get('gpio')
+    r = data.get('r', 0)
+    g = data.get('g', 0)
+    b = data.get('b', 0)
+    
+    if gpio is None:
+        sendError(httpResponse, 400, "Missing gpio")
+        return
+        
+    try:
+        import neopixel
+        from machine import Pin
+        np = neopixel.NeoPixel(Pin(int(gpio)), 1)
+        np[0] = (int(r), int(g), int(b))
+        np.write()
+        sendJSON(httpResponse, {'status': 'ok'})
+    except Exception as e:
+        sendError(httpResponse, 500, str(e))
 
 @check_auth
 def gpio_set_handler(httpClient, httpResponse):
@@ -261,10 +362,55 @@ def cmd_run_handler(httpClient, httpResponse):
         
     try:
         import sdata
-        sdata.upyos.run_cmd(cmd)
-        # run_cmd does not return output, but prints to stdout. 
-        # We confirm execution value.
-        sendJSON(httpResponse, {'status': 'ok', 'cmd': cmd, 'output': 'Command executed\n (output sent to serial/stdout, Use utelnetd if you want remote access to a full terminal)'})
+        
+        # Capture output using dupterm or direct assignment
+        wrapper = StreamWrapper()
+        capture_active = False
+        
+        try:
+            # Try dupterm first as it's more standard in MicroPython for redirection
+            import uos
+            # We use index 0 which is usually the default console
+            uos.dupterm(wrapper, 0)
+            capture_active = "dupterm"
+        except:
+            try:
+                # Fallback to sys.stdout assignment if dupterm fails
+                old_stdout = sys.stdout
+                sys.stdout = wrapper
+                capture_active = "stdout"
+            except:
+                pass
+
+        # Protect against input() blocking
+        orig_input = None
+        try:
+            if hasattr(builtins, 'input'):
+                orig_input = builtins.input
+                def blocked_input(*args, **kwargs):
+                    raise Exception("Interactive input() is not supported in upyDesktop. Use utelnetd.")
+                builtins.input = blocked_input
+        except:
+            pass
+
+        try:
+            sdata.upyos.run_cmd(cmd)
+            # Remove leading/trailing vertical whitespace, preserve internal alignment
+            output = wrapper.getvalue().strip('\r\n')
+        finally:
+            if orig_input:
+                builtins.input = orig_input
+            
+            if capture_active == "dupterm":
+                import uos
+                uos.dupterm(None, 0)
+            elif capture_active == "stdout":
+                sys.stdout = old_stdout
+
+        if not output:
+             output = "Command executed (no output)\n"
+
+        sendJSON(httpResponse, {'status': 'ok', 'cmd': cmd, 'output': output})
     except Exception as e:
         sendError(httpResponse, 500, str(e))
 
@@ -303,12 +449,25 @@ def system_status_handler(httpClient, httpResponse):
         except:
              pass
 
+        # Services status
+        services = {
+            "utelnetd": "utelnetserver" in sys.modules,
+            "uftpd": "uftpdserver" in sys.modules,
+            "uhttpd": "microWebSrv" in sys.modules 
+        }
+        # Fallback check in sdata.procs just in case
+        for p in sdata.procs:
+            if p.cmd == "utelnetd": services["utelnetd"] = True
+            if p.cmd == "uftpd": services["uftpd"] = True
+            if p.cmd == "uhttpd": services["uhttpd"] = True
+
         info = {
             'mcu': {'type': mcu_type, 'arch': mcu_arch},
             'board': {'name': board_name, 'vendor': board_vendor},
             'memory': {'total': total_mem, 'free': free_mem, 'alloc': alloc_mem},
             'storage': {'total': total_storage, 'free': free_storage},
-            'sys': {'name': sdata.name, 'version': sdata.version}
+            'sys': {'name': sdata.name, 'version': sdata.version},
+            'services': services
         }
         sendJSON(httpResponse, info)
     except Exception as e:
@@ -320,6 +479,7 @@ def system_status_handler(httpClient, httpResponse):
 routes = [
     # Auth
     ( "/api/login", "POST", login_handler ),
+    ( "/api/logout", "GET", logout_handler ),
     
     # Status
     ( "/api/status", "GET", system_status_handler ),
@@ -338,4 +498,5 @@ routes = [
     # GPIO
     ( "/api/gpio/status", "GET", gpio_status_handler ),
     ( "/api/gpio/set",    "POST", gpio_set_handler ),
+    ( "/api/rgb/set",     "POST", rgb_set_handler ),
 ]

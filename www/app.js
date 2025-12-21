@@ -62,14 +62,16 @@ document.getElementById('btn-run-cmd').addEventListener('click', async () => {
 
     if (!cmd) return;
 
-    output.innerText += `> ${cmd}\n`;
+    output.textContent += `> ${cmd}\n`;
 
     try {
         const data = await apiCall('/api/cmd/run', 'POST', { cmd });
-        output.innerText += `${data.output}\n\n`;
+        // Strip ANSI escape codes
+        const cleanOutput = data.output.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-z]/g, '');
+        output.textContent += `${cleanOutput}\n\n`;
         input.value = '';
     } catch (e) {
-        output.innerText += `Error: ${e.message}\n\n`;
+        output.textContent += `Error: ${e.message}\n\n`;
     }
 
     // Auto scroll to bottom
@@ -111,6 +113,19 @@ async function loadStatus() {
                     <p><strong>Memory:</strong> ${formatBytes(data.memory.free)} free / ${formatBytes(data.memory.total)} total</p>
                     <div style="background: #313244; height: 10px; border-radius: 5px; margin-top: 5px;">
                         <div style="background: var(--success); width: ${(data.memory.free / data.memory.total * 100) || 0}%; height: 100%; border-radius: 5px;"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px; grid-column: span 2;">
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Services</h3>
+                    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                        ${Object.entries(data.services || {}).map(([name, running]) => `
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: ${running ? 'var(--success)' : '#45475a'}"></div>
+                                <span>${name}</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary)">(${running ? 'Running' : 'Stopped'})</span>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             </div>
@@ -273,26 +288,106 @@ async function loadGPIO() {
         const list = document.getElementById('gpio-list');
         list.innerHTML = '';
 
-        data.pins.forEach(pin => {
-            const card = document.createElement('div');
-            card.className = 'gpio-card';
-            card.innerHTML = `
-                <div class="gpio-id">GPIO ${pin.pin}</div>
-                <label class="gpio-switch">
-                    <input type="checkbox" ${pin.val ? 'checked' : ''} data-pin="${pin.pin}">
-                    <span class="slider"></span>
-                </label>
-            `;
+        const createSection = (title) => {
+            const h = document.createElement('h3');
+            h.textContent = title;
+            h.style.gridColumn = '1 / -1';
+            h.style.margin = '20px 0 10px 0';
+            h.style.color = 'var(--accent)';
+            h.style.borderBottom = '1px solid #313244';
+            h.style.paddingBottom = '5px';
+            list.appendChild(h);
+        };
 
-            card.querySelector('input').addEventListener('change', async (e) => {
-                const val = e.target.checked ? 1 : 0;
-                await apiCall('/api/gpio/set', 'POST', { pin: pin.pin, val });
+        // Standard GPIOs
+        if (data.pins && data.pins.length > 0) {
+            createSection('Standard GPIOs');
+            data.pins.forEach(pin => {
+                const card = document.createElement('div');
+                card.className = 'gpio-card';
+                card.innerHTML = `
+                    <div class="gpio-id" style="font-size: 0.9rem;">
+                        GPIO ${pin.gpio} <br>
+                        <small style="color: var(--text-secondary);">(Pin ${pin.pin})</small>
+                    </div>
+                    <label class="gpio-switch">
+                        <input type="checkbox" ${pin.val ? 'checked' : ''} data-pin="${pin.gpio}">
+                        <span class="slider"></span>
+                    </label>
+                `;
+
+                card.querySelector('input').addEventListener('change', async (e) => {
+                    const val = e.target.checked ? 1 : 0;
+                    await apiCall('/api/gpio/set', 'POST', { pin: pin.gpio, val });
+                });
+
+                list.appendChild(card);
             });
+        }
 
-            list.appendChild(card);
-        });
+        // Board LEDs
+        if (data.leds && data.leds.length > 0) {
+            createSection('Board LEDs');
+            data.leds.forEach(led => {
+                const card = document.createElement('div');
+                card.className = 'gpio-card led-card';
+                card.innerHTML = `
+                    <div class="gpio-id" style="font-size: 0.9rem;">
+                        LED ${led.label} <br>
+                        <small style="color: var(--text-secondary);">(GPIO ${led.gpio})</small>
+                    </div>
+                    <label class="gpio-switch">
+                        <input type="checkbox" ${led.val ? 'checked' : ''} data-pin="${led.gpio}">
+                        <span class="slider"></span>
+                    </label>
+                `;
+
+                card.querySelector('input').addEventListener('change', async (e) => {
+                    const val = e.target.checked ? 1 : 0;
+                    await apiCall('/api/gpio/set', 'POST', { pin: led.gpio, val });
+                });
+
+                list.appendChild(card);
+            });
+        }
+
+        // RGB LED
+        if (data.rgb && data.rgb.length > 0) {
+            createSection('RGB Control (WS2812B)');
+            data.rgb.forEach(rgb => {
+                const card = document.createElement('div');
+                card.className = 'gpio-card rgb-card';
+                card.style.display = 'block';
+                card.innerHTML = `
+                    <div class="gpio-id" style="margin-bottom: 10px; font-size: 0.9rem;">
+                        ${rgb.label} <small style="color: var(--text-secondary);">(GPIO ${rgb.gpio})</small>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="color" value="#000000" style="width: 40px; height: 30px; border: none; background: none; cursor: pointer;">
+                        <button class="btn-small" style="padding: 4px 8px; font-size: 0.8rem; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer;">Set</button>
+                        <button class="btn-small btn-off" style="padding: 4px 8px; font-size: 0.8rem; background: #f38ba8; color: white; border: none; border-radius: 4px; cursor: pointer;">Off</button>
+                    </div>
+                `;
+
+                const setRgb = async (color) => {
+                    const r = parseInt(color.substr(1, 2), 16);
+                    const g = parseInt(color.substr(3, 2), 16);
+                    const b = parseInt(color.substr(5, 2), 16);
+                    await apiCall('/api/rgb/set', 'POST', { gpio: rgb.gpio, r, g, b });
+                };
+
+                const buttons = card.querySelectorAll('button');
+                buttons[0].addEventListener('click', () => setRgb(card.querySelector('input').value));
+                buttons[1].addEventListener('click', () => {
+                    card.querySelector('input').value = '#000000';
+                    setRgb('#000000');
+                });
+
+                list.appendChild(card);
+            });
+        }
     } catch (e) {
-        console.error(e);
+        console.error('GPIO Load Error:', e);
     }
 }
 
@@ -300,6 +395,7 @@ document.getElementById('btn-refresh-gpio').addEventListener('click', loadGPIO);
 
 // Init
 loadStatus();
+document.getElementById('cmd-output').textContent = '';
 
 // Logout
 document.getElementById('btn-logout').addEventListener('click', async () => {
