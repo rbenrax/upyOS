@@ -73,7 +73,8 @@
                 <div id="view-status" class="view-section active">
                     <div class="toolbar">
                         <h2>System Status</h2>
-                        <button id="btn-refresh-status">Refresh</button>
+                        <button id="btn-refresh-status" style="margin-right: 10px;">Refresh</button>
+                        <button id="btn-reset-mcu" style="background: var(--error);">Reset MCU</button>
                     </div>
                     <div class="status-content" id="status-container" style="padding: 20px;">
                         <!-- injected via JS -->
@@ -84,8 +85,10 @@
                 <div id="view-run" class="view-section">
                     <div class="toolbar">
                         <h2>Run Command</h2>
-                        <span style="font-size: 0.8rem; color: var(--text-secondary); margin-left: auto;">
-                            ⚠️ Interactive commands (input) are disabled. Use <strong>utelnetd</strong> for full shell.
+                        <span
+                            style="font-size: 0.8rem; color: var(--text-secondary); margin-left: auto; text-align: right;">
+                            ⚠️ Not a full terminal. Some commands may fail or hang, requiring an MCU reset. <br>
+                            Interactive commands (input) are disabled. Use <strong>utelnetd</strong> for full shell.
                         </span>
                     </div>
                     <div style="padding: 20px;">
@@ -93,6 +96,7 @@
                             <input type="text" id="cmd-input" placeholder="Enter command (e.g. ls -la)"
                                 style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--header-bg); color: white;">
                             <button id="btn-run-cmd">Execute</button>
+                            <button id="btn-stop-cmd" style="background: var(--error);">Stop</button>
                         </div>
                         <div id="cmd-output"
                             style="background: #111; color: #0f0; padding: 15px; border-radius: 4px; font-family: monospace; height: 400px; overflow-y: auto; white-space: pre-wrap;">
