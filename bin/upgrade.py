@@ -234,8 +234,13 @@ def __main__(args):
         "/etc/upyOS-rp2.board",
         "/etc/upyOS-esp32.board",
         "/etc/upgrade2.inf",
-        "/etc/wellcome.txt"]
-
+        "/etc/wellcome.txt",
+        "/lib/upyDesktop.py",
+        "/www/index.pyhtml",
+        "/www/info.pyhtml",
+        "/www/off.pyhtml",
+        "/www/on.pyhtml"]
+        
         for f in to_rm:
             if utls.file_exists(f):
                 os.remove(f)
