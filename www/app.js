@@ -62,13 +62,11 @@ document.getElementById('btn-run-cmd').addEventListener('click', async () => {
 
     if (!cmd) return;
 
-    output.textContent += `> ${cmd}\n`;
-
     try {
         const data = await apiCall('/api/cmd/run', 'POST', { cmd });
         // Strip ANSI escape codes
         const cleanOutput = data.output.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-z]/g, '');
-        output.textContent += `${cleanOutput}\n\n`;
+        output.textContent += `${data.cwd || '/'} $: ${cmd}\n${cleanOutput}\n\n`;
         input.value = '';
     } catch (e) {
         output.textContent += `Error: ${e.message}\n\n`;

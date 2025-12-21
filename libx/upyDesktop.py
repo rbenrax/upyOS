@@ -410,7 +410,8 @@ def cmd_run_handler(httpClient, httpResponse):
         if not output:
              output = "Command executed (no output)\n"
 
-        sendJSON(httpResponse, {'status': 'ok', 'cmd': cmd, 'output': output})
+        import uos
+        sendJSON(httpResponse, {'status': 'ok', 'cmd': cmd, 'output': output, 'cwd': uos.getcwd()})
     except Exception as e:
         sendError(httpResponse, 500, str(e))
 
@@ -500,6 +501,7 @@ def system_status_handler(httpClient, httpResponse):
             if p.cmd == "uftpd": services["uftpd"] = True
             if p.cmd == "uhttpd": services["uhttpd"] = True
 
+        import uos
         info = {
             'mcu': {'type': mcu_type, 'arch': mcu_arch},
             'board': {'name': board_name, 'vendor': board_vendor},
@@ -509,7 +511,8 @@ def system_status_handler(httpClient, httpResponse):
                 'name': sdata.name, 
                 'version': sdata.version, 
                 'id': sdata.sid,
-                'cpu_freq': 0 # Fallback
+                'cpu_freq': 0,
+                'cwd': uos.getcwd()
             },
             'services': services
         }
