@@ -97,7 +97,7 @@ class upyOS:
                     self.run_cmd(cmd)
                     
             except KeyboardInterrupt:
-                self.exit()
+                print("^C")
 
             except EOFError:
                 self.print_msg("Send EOF")

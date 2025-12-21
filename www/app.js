@@ -85,6 +85,15 @@ document.getElementById('cmd-input').addEventListener('keypress', (e) => {
     }
 });
 
+document.getElementById('btn-stop-cmd').addEventListener('click', async () => {
+    try {
+        await apiCall('/api/cmd/interrupt', 'POST');
+        document.getElementById('cmd-output').textContent += `\n[Interrupt signal sent]\n`;
+    } catch (e) {
+        console.error('Stop command failed:', e);
+    }
+});
+
 
 // --- Status ---
 
@@ -97,9 +106,11 @@ async function loadStatus() {
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="card" style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
                     <h3 style="color: var(--accent); margin-bottom: 10px;">Board</h3>
+                    <p><strong>System ID:</strong> ${data.sys.id || 'N/A'}</p>
                     <p><strong>Board:</strong> ${data.board.name || 'N/A'}</p>
                     <p><strong>Vendor:</strong> ${data.board.vendor || 'N/A'}</p>
                     <p><strong>MCU:</strong> ${data.mcu.type || 'N/A'} (${data.mcu.arch || 'N/A'})</p>
+                    <p><strong>CPU Speed:</strong> ${data.sys.cpu_freq ? (data.sys.cpu_freq / 1000000).toFixed(0) + ' MHz' : 'N/A'}</p>
                     <p><strong>OS:</strong> ${data.sys.name || 'upyOS'} ${data.sys.version || ''}</p>
                 </div>
                 
@@ -136,6 +147,20 @@ async function loadStatus() {
 }
 
 document.getElementById('btn-refresh-status').addEventListener('click', loadStatus);
+
+document.getElementById('btn-reset-mcu').addEventListener('click', async () => {
+    if (confirm("Are you sure you want to reset the MCU?")) {
+        try {
+            await apiCall('/api/system/reset', 'POST');
+            alert("Reset signal sent. The connection will be lost as the device reboots.");
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (e) {
+            console.error('Reset failed:', e);
+        }
+    }
+});
 
 // --- File Manager ---
 

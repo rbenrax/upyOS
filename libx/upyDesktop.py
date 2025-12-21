@@ -414,6 +414,45 @@ def cmd_run_handler(httpClient, httpResponse):
     except Exception as e:
         sendError(httpResponse, 500, str(e))
 
+@check_auth
+def cmd_interrupt_handler(httpClient, httpResponse):
+    try:
+        import sdata
+        import machine
+        # Safe list of services not to stop
+        services = ["uhttpd", "utelnetd", "uftpd"]
+        
+        # Stop background processes by setting status to "S" (Stop)
+        # This targets commands like 'watch'
+        for p in sdata.procs:
+            if p.cmd not in services:
+                p.sts = "S"
+        
+        # General signal to stop current execution in the main thread (if any)
+        # Since we modified kernel.py, this will now just print ^C and return to prompt
+        # if no command is running there.
+        if hasattr(machine, 'KeyboardInterrupt'):
+            machine.KeyboardInterrupt()
+            
+        sendJSON(httpResponse, {'status': 'ok', 'msg': 'Interrupt signal sent'})
+    except Exception as e:
+        sendError(httpResponse, 500, str(e))
+
+@check_auth
+def system_reset_handler(httpClient, httpResponse):
+    try:
+        import machine
+        import utime
+        # Try to send response before reset
+        try:
+            sendJSON(httpResponse, {'status': 'ok', 'msg': 'Resetting MCU...'})
+            utime.sleep(0.5)
+        except:
+            pass
+        machine.reset()
+    except Exception as e:
+        sendError(httpResponse, 500, str(e))
+
 # --- System Status Handlers ---
 
 @check_auth
@@ -466,9 +505,21 @@ def system_status_handler(httpClient, httpResponse):
             'board': {'name': board_name, 'vendor': board_vendor},
             'memory': {'total': total_mem, 'free': free_mem, 'alloc': alloc_mem},
             'storage': {'total': total_storage, 'free': free_storage},
-            'sys': {'name': sdata.name, 'version': sdata.version},
+            'sys': {
+                'name': sdata.name, 
+                'version': sdata.version, 
+                'id': sdata.sid,
+                'cpu_freq': 0 # Fallback
+            },
             'services': services
         }
+        
+        try:
+            import machine
+            info['sys']['cpu_freq'] = machine.freq()
+        except:
+            pass
+
         sendJSON(httpResponse, info)
     except Exception as e:
         sendError(httpResponse, 500, str(e))
@@ -483,9 +534,11 @@ routes = [
     
     # Status
     ( "/api/status", "GET", system_status_handler ),
+    ( "/api/system/reset", "POST", system_reset_handler ),
     
     # Command
     ( "/api/cmd/run", "POST", cmd_run_handler ),
+    ( "/api/cmd/interrupt", "POST", cmd_interrupt_handler ),
 
     # File System
     ( "/api/fs/list",   "POST", fs_list_handler ),

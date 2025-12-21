@@ -230,7 +230,11 @@ class MicroWebSrv :
                 client, cliAddr = self._server.accept()
             except :
                 break
-            self._client(self, client, cliAddr)
+            try:
+                import _thread
+                _thread.start_new_thread(self._client, (self, client, cliAddr))
+            except ImportError:
+                self._client(self, client, cliAddr)
         self._started = False
 
     # ============================================================================
