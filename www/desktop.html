@@ -41,6 +41,8 @@
                         <div class="spacer"></div>
                         <button id="btn-mkdir">New Folder</button>
                         <button id="btn-newfile">New File</button>
+                        <button id="btn-upload">Upload</button>
+                        <input type="file" id="file-input" style="display: none;">
                     </div>
                     <div class="file-browser" id="file-list">
                         <!-- File items will be injected here -->
@@ -54,7 +56,10 @@
                             <button id="btn-save">Save</button>
                             <button id="btn-close-editor">Close</button>
                         </div>
-                        <textarea id="code-editor" spellcheck="false"></textarea>
+                        <div class="editor-wrapper">
+                            <pre id="highlight-layer" aria-hidden="true"></pre>
+                            <textarea id="code-editor" spellcheck="false"></textarea>
+                        </div>
                     </div>
                 </div>
 
