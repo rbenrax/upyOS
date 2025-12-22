@@ -26,11 +26,6 @@ def __main__(args):
         elif args[0]=="stop":
             sdata.upyos.run_cmd("killall uhttpd")
             
-            import usocket
-            sock = usocket.socket()
-            sock.connect(("127.0.0.1", dport))
-            sock.close()
-            
             try:
                 del sys.modules["microWebSrv"]
                 del sys.modules["microWebTemplate"]
