@@ -186,6 +186,7 @@ class MicroWebSrv :
         self._webPath       = webPath
         self._notFoundUrl   = None
         self._started       = False
+        self._clients       = [] # rbenrax: tracked clients
 
         self.MaxWebSocketRecvLen     = 1024
         self.WebSocketThreaded       = True
@@ -220,7 +221,7 @@ class MicroWebSrv :
             try :
                 # rbenrax: control the process end when killed
                 if self.proc and self.proc.sts=="S":
-                    self.Stop()
+                    # self.Stop() # Stop will be called after loop
                     break
                 
                 if self.proc and self.proc.sts=="H":
@@ -228,6 +229,8 @@ class MicroWebSrv :
                     continue
 
                 client, cliAddr = self._server.accept()
+            except OSError : # Timeout
+                continue
             except :
                 break
             try:
@@ -235,6 +238,7 @@ class MicroWebSrv :
                 _thread.start_new_thread(self._client, (self, client, cliAddr))
             except ImportError:
                 self._client(self, client, cliAddr)
+        self.Stop() # rbenrax: Ensure everything is closed
         self._started = False
 
     # ============================================================================
@@ -251,6 +255,7 @@ class MicroWebSrv :
                                      1 )
             self._server.bind(self._srvAddr)
             self._server.listen(1)
+            self._server.settimeout(2.0) # rbenrax: timeout for shutdown check
             if threaded :
                 MicroWebSrv._tryStartThread(self._serverProcess)
             else :
@@ -260,7 +265,18 @@ class MicroWebSrv :
 
     def Stop(self) :
         if self._started :
-            self._server.close()
+            self._started = False # rbenrax: stop the loop check
+            try:
+                self._server.close()
+            except:
+                pass
+            # rbenrax: close all tracked clients
+            for client in self._clients:
+                try:
+                    client._socket.close()
+                except:
+                    pass
+            self._clients = []
 
     # ----------------------------------------------------------------------------
 
@@ -348,7 +364,8 @@ class MicroWebSrv :
                 self._socketfile = self._socket
             else:   # CPython
                 self._socketfile = self._socket.makefile('rwb')
-                        
+            
+            self._microWebSrv._clients.append(self) # rbenrax: tracking
             self._processRequest()
 
         # ------------------------------------------------------------------------
@@ -401,6 +418,10 @@ class MicroWebSrv :
                     self._socketfile.close()
                 self._socket.close()
             except :
+                pass
+            try:
+                self._microWebSrv._clients.remove(self) # rbenrax: cleanup
+            except:
                 pass
 
         # ------------------------------------------------------------------------
