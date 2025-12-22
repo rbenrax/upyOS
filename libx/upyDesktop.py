@@ -226,6 +226,53 @@ def fs_mkdir_handler(httpClient, httpResponse):
     except Exception as e:
         sendError(httpResponse, 500, str(e))
 
+@check_auth
+def fs_download_handler(httpClient, httpResponse):
+    path = httpClient.GetRequestQueryParams().get('path')
+    if not path:
+        sendError(httpResponse, 400, "Missing path")
+        return
+        
+    try:
+        filename = path.split('/')[-1]
+        headers = {
+            "Content-Disposition": 'attachment; filename="%s"' % filename
+        }
+        if not httpResponse.WriteResponseFile(path, contentType="application/octet-stream", headers=headers):
+            sendError(httpResponse, 404, "File not found or empty")
+    except Exception as e:
+        sendError(httpResponse, 500, str(e))
+
+@check_auth
+def fs_upload_handler(httpClient, httpResponse):
+    path = httpClient.GetRequestQueryParams().get('path')
+    if not path:
+        sendError(httpResponse, 400, "Missing path")
+        return
+
+    contentLength = httpClient.GetRequestContentLength()
+    if contentLength <= 0:
+        sendError(httpResponse, 400, "Missing or invalid Content-Length")
+        return
+
+    try:
+        with open(path, 'wb') as f:
+            remaining = contentLength
+            while remaining > 0:
+                chunk_size = min(remaining, 1024)
+                chunk = httpClient.ReadRequestContent(size=chunk_size)
+                if not chunk:
+                    break
+                f.write(chunk)
+                remaining -= len(chunk)
+        
+        if remaining == 0:
+            sendJSON(httpResponse, {'status': 'ok'})
+        else:
+            sendError(httpResponse, 500, "Incomplete upload")
+    except Exception as e:
+        sendError(httpResponse, 500, str(e))
+
 # --- GPIO Handlers ---
 # Mocking machine if strictly running on PC for testing, 
 # but writing for MicroPython. 
@@ -545,11 +592,13 @@ routes = [
 
     # File System
     ( "/api/fs/list",   "POST", fs_list_handler ),
-    ( "/api/fs/read",   "POST", fs_read_handler ),
-    ( "/api/fs/write",  "POST", fs_write_handler ),
+    ( "/api/fs/read",    "POST", fs_read_handler ),
+    ( "/api/fs/write",   "POST", fs_write_handler ),
     ( "/api/fs/delete", "POST", fs_delete_handler ),
     ( "/api/fs/rename", "POST", fs_rename_handler ),
     ( "/api/fs/mkdir",  "POST", fs_mkdir_handler ),
+    ( "/api/fs/download", "GET", fs_download_handler ),
+    ( "/api/fs/upload", "POST", fs_upload_handler ),
     
     # GPIO
     ( "/api/gpio/status", "GET", gpio_status_handler ),

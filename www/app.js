@@ -114,14 +114,14 @@ async function loadStatus() {
                 
                 <div class="card" style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
                     <h3 style="color: var(--accent); margin-bottom: 10px;">Resources</h3>
-                    <p><strong>Storage:</strong> ${formatBytes(data.storage.free)} free / ${formatBytes(data.storage.total)} total</p>
-                    <div style="background: #313244; height: 10px; border-radius: 5px; margin-top: 5px;">
-                        <div style="background: var(--success); width: ${(data.storage.free / data.storage.total * 100) || 0}%; height: 100%; border-radius: 5px;"></div>
-                    </div>
-                    <br>
                     <p><strong>Memory:</strong> ${formatBytes(data.memory.free)} free / ${formatBytes(data.memory.total)} total</p>
                     <div style="background: #313244; height: 10px; border-radius: 5px; margin-top: 5px;">
                         <div style="background: var(--success); width: ${(data.memory.free / data.memory.total * 100) || 0}%; height: 100%; border-radius: 5px;"></div>
+                    </div>
+                    <br>
+                    <p><strong>Storage:</strong> ${formatBytes(data.storage.free)} free / ${formatBytes(data.storage.total)} total</p>
+                    <div style="background: #313244; height: 10px; border-radius: 5px; margin-top: 5px;">
+                        <div style="background: var(--success); width: ${(data.storage.free / data.storage.total * 100) || 0}%; height: 100%; border-radius: 5px;"></div>
                     </div>
                 </div>
 
@@ -192,6 +192,7 @@ function renderFiles() {
             <div class="file-name">${file.name}</div>
             <div class="file-size">${file.is_dir ? '-' : formatBytes(file.size)}</div>
             <div class="file-actions">
+                ${!file.is_dir ? '<button class="btn-icon btn-download" title="Download">📥</button>' : ''}
                 <button class="btn-icon btn-rename">✏️</button>
                 <button class="btn-icon btn-delete">🗑️</button>
             </div>
@@ -208,6 +209,14 @@ function renderFiles() {
         });
 
         // Actions
+        if (!file.is_dir) {
+            el.querySelector('.btn-download').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const fullPath = (state.currentPath === '/' ? '' : state.currentPath) + '/' + file.name;
+                downloadFile(fullPath);
+            });
+        }
+
         el.querySelector('.btn-rename').addEventListener('click', (e) => {
             e.stopPropagation();
             renameFile(file.name);
@@ -278,6 +287,48 @@ document.getElementById('btn-newfile').addEventListener('click', async () => {
     }
 });
 
+async function downloadFile(path) {
+    // We use a direct link to the download API
+    window.location.href = `/api/fs/download?path=${encodeURIComponent(path)}`;
+}
+
+document.getElementById('btn-upload').addEventListener('click', () => {
+    document.getElementById('file-input').click();
+});
+
+document.getElementById('file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fullPath = (state.currentPath === '/' ? '' : state.currentPath) + '/' + file.name;
+
+    // We check if file exists
+    if (state.files.find(f => f.name === file.name)) {
+        if (!confirm(`File ${file.name} already exists. Overwrite?`)) {
+            e.target.value = '';
+            return;
+        }
+    }
+
+    try {
+        const response = await fetch(`/api/fs/upload?path=${encodeURIComponent(fullPath)}`, {
+            method: 'POST',
+            body: file // Browser handles streaming for large files automatically when body is a File/Blob
+        });
+
+        if (response.ok) {
+            alert('Upload successful!');
+            loadFiles();
+        } else {
+            const data = await response.json();
+            alert('Upload failed: ' + (data.error || response.statusText));
+        }
+    } catch (err) {
+        alert('Upload error: ' + err.message);
+    }
+    e.target.value = ''; // Reset input
+});
+
 // --- Editor ---
 
 async function openEditor(path) {
@@ -285,8 +336,11 @@ async function openEditor(path) {
     const data = await apiCall('/api/fs/read', 'POST', { path });
 
     document.getElementById('editor-filename').textContent = path;
-    document.getElementById('code-editor').value = data.content;
+    const editor = document.getElementById('code-editor');
+    editor.value = data.content;
+    updateEditorHighlight();
     document.getElementById('editor-overlay').classList.remove('hidden');
+    editor.focus();
 }
 
 document.getElementById('btn-close-editor').addEventListener('click', () => {
@@ -415,6 +469,47 @@ async function loadGPIO() {
 }
 
 document.getElementById('btn-refresh-gpio').addEventListener('click', loadGPIO);
+
+// --- Syntax Highlighting ---
+
+function highlightPython(text) {
+    // Escape HTML
+    text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // Order: Strings, Comments, Keywords, Numbers
+    const regex = /(".*?"|'.*?'|#.*|\b(?:def|class|if|else|elif|for|while|try|except|finally|import|from|as|return|yield|break|continue|pass|lambda|global|nonlocal|assert|with|del|in|is|and|or|not|True|False|None)\b|\d+)/g;
+
+    return text.replace(regex, (match) => {
+        if (match.startsWith('"') || match.startsWith("'")) return `<span class="hl-str">${match}</span>`;
+        if (match.startsWith('#')) return `<span class="hl-cmt">${match}</span>`;
+        if (/\d+/.test(match)) return `<span class="hl-num">${match}</span>`;
+        return `<span class="hl-kw">${match}</span>`;
+    });
+}
+
+function updateEditorHighlight() {
+    const editor = document.getElementById('code-editor');
+    const highlightLayer = document.getElementById('highlight-layer');
+    if (!editor || !highlightLayer) return;
+
+    const ext = state.currentFile ? state.currentFile.split('.').pop().toLowerCase() : '';
+    if (ext === 'py') {
+        highlightLayer.innerHTML = highlightPython(editor.value) + (editor.value.endsWith('\n') ? ' ' : '');
+    } else {
+        highlightLayer.textContent = editor.value + (editor.value.endsWith('\n') ? ' ' : '');
+    }
+}
+
+// Editor synchronization
+const editorEl = document.getElementById('code-editor');
+const highlightEl = document.getElementById('highlight-layer');
+if (editorEl && highlightEl) {
+    editorEl.addEventListener('input', updateEditorHighlight);
+    editorEl.addEventListener('scroll', () => {
+        highlightEl.scrollTop = editorEl.scrollTop;
+        highlightEl.scrollLeft = editorEl.scrollLeft;
+    });
+}
 
 // Init
 loadStatus();
