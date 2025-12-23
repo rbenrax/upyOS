@@ -1,6 +1,10 @@
 # upyOS
 
-***MicroPython 1.27 Upgraded***
+Last minute update:
+- Now passwords are stored encrypted, use setauth command to reset the password.
+- Try the new upyOS Desktop web interface and sendme your opinion.
+- New AT commands set to use with an ESP-AT UART modem.
+- MicroPython 1.27 Upgraded
 
 **upyOS** is a modular flash **Operating System** for microcontrollers based on **MicroPython**. It provides the user with a **POSIX-like environment**.
 

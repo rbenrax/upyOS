@@ -1,4 +1,5 @@
 import os
+import utls
 
 try:
     import usys as sys
@@ -92,7 +93,7 @@ def login_handler(httpClient, httpResponse):
     expected_user = USER_CREDENTIALS.get('user')
     expected_pass = USER_CREDENTIALS.get('paswd')
 
-    if user == expected_user and password == expected_pass:
+    if user == expected_user and utls.sha1(password) == expected_pass:
         httpResponse.WriteResponseOk(
             headers={'Set-Cookie': 'auth_token=valid_session; Path=/'},
             contentType="application/json",

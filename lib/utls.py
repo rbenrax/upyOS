@@ -241,6 +241,25 @@ def shlex(ent):
 
     return args
 
+def sha1(data, is_file=False):
+    """Generate SHA1 hash of a string or file"""
+    if not data:
+        return ""
+    
+    import uhashlib
+    import ubinascii
+    h = uhashlib.sha1()
+    if is_file:
+        with open(data, 'rb') as f:
+            while True:
+                chunk = f.read(512)
+                if not chunk:
+                    break
+                h.update(chunk)
+    else:
+        h.update(data.encode())
+    return ubinascii.hexlify(h.digest()).decode()
+
 def log(src, msg):
     if sdata.log:
         print(f"{src}: {msg}")

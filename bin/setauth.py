@@ -33,7 +33,7 @@ def __main__(args):
             return
         
         sdata.sysconfig["auth"]["user"]  = args[0]
-        sdata.sysconfig["auth"]["paswd"] = args[1].strip()
+        sdata.sysconfig["auth"]["paswd"] = utls.sha1(args[1].strip())
         
         utls.save_conf_file(sdata.sysconfig, "/etc/system.conf")
         
