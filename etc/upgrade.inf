@@ -98,7 +98,7 @@
 /etc/welcome.txt,329,11a86867eb5ce308624aa37300caf7a3f815325a,
 /etc/boards/upyOS-esp32-wroom-32.board,2342,495a7ceca9e7387ba1341dc22487f0af25d377c2,
 /etc/boards/upyOS-esp32c3_luatos.board,1804,1e43cf8ced1992602f72e9a76925752e50d3f5b0,
-/etc/boards/upyOS-esp32c3_vcc_gnd.board,1866,e6b12a8d3d3ed31d4ff30c0b82cb0968bbeeef1a,
+/etc/boards/upyOS-esp32c3_vcc_gnd.board,1910,714262d97fba11ad558a93d003076f3c73226581,
 /etc/boards/upyOS-esp32c6_muse_labs.board,1879,0fd8e6946db5590263762a3cc387bae9e9c81abc,
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
