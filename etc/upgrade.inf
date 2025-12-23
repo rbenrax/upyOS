@@ -15,7 +15,7 @@
 /bin/date.py,645,ac4154be340d29d7cd1fd2cb1c75ec71ba317de3,
 /bin/decr.py,698,5c0ebb84c9e0e13a9d311a32c568e27caa7027f5,
 /bin/df.py,986,01dc1174c67834c7ba6354751fc37725bc923bb1,
-/bin/echo.py,1578,f4a14b6caf49b60b58a7da93d5c5cba21c7e7d92,
+/bin/echo.py,1561,d67c5af4f55a893f00f7959cd6c45a81fc86984c,
 /bin/env.py,228,86fe6e681b65b1bd2386dbe0edd91d836847721f,
 /bin/export.py,842,d610956a15a467e9d2e4eff84f4afdea7783844e,
 /bin/fileup.py,487,5d5f72aa736ec57d3a2f958cd9a5f54c45faea4b,
