@@ -23,7 +23,9 @@ body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 #app {
@@ -38,8 +40,20 @@ body {
   background-color: var(--header-bg);
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 15px;
   border-bottom: 1px solid var(--border-color);
+  z-index: 1000;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-right: 15px;
+  cursor: pointer;
+  padding: 5px;
 }
 
 .logo {
@@ -438,4 +452,91 @@ input:checked+.slider:before {
 
 .btn-small:active {
   transform: scale(0.95);
+}
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidebar {
+    position: absolute;
+    left: -220px;
+    top: 50px;
+    bottom: 0;
+    z-index: 900;
+    width: 200px;
+    transition: left 0.3s ease;
+    box-shadow: 10px 0 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 800;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  .content-area {
+    width: 100%;
+  }
+
+  .toolbar {
+    padding: 0 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .toolbar h2 {
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .file-browser,
+  #cmd-output,
+  .gpio-grid,
+  .status-content {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Adjust GPIO grid for smaller screens */
+  .gpio-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    padding: 10px;
+  }
+
+  .card {
+    grid-column: span 2 !important;
+  }
+
+  /* Modal/Editor tweaks */
+  .editor-toolbar {
+    padding: 0 10px;
+  }
+
+  #editor-filename {
+    font-size: 0.8rem;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  button {
+    padding: 8px 12px;
+    min-height: 40px; /* Better touch target */
+  }
 }

@@ -46,11 +46,28 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         document.getElementById(`view-${viewId}`).classList.add('active');
         state.view = viewId;
 
+        // Auto close sidebar on mobile
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebar-overlay').classList.remove('active');
+        }
+
         if (viewId === 'files') loadFiles();
         if (viewId === 'gpio') loadGPIO();
         if (viewId === 'status') loadStatus();
         if (viewId === 'run') document.getElementById('cmd-input').focus();
     });
+});
+
+// Mobile Sidebar Toggle
+document.getElementById('menu-toggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebar-overlay').classList.toggle('active');
+});
+
+document.getElementById('sidebar-overlay').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('active');
 });
 
 // --- Run Command ---
@@ -505,9 +522,18 @@ const editorEl = document.getElementById('code-editor');
 const highlightEl = document.getElementById('highlight-layer');
 if (editorEl && highlightEl) {
     editorEl.addEventListener('input', updateEditorHighlight);
+
+    // Use requestAnimationFrame for smoother scroll sync on mobile
+    let isSyncing = false;
     editorEl.addEventListener('scroll', () => {
-        highlightEl.scrollTop = editorEl.scrollTop;
-        highlightEl.scrollLeft = editorEl.scrollLeft;
+        if (!isSyncing) {
+            window.requestAnimationFrame(() => {
+                highlightEl.scrollTop = editorEl.scrollTop;
+                highlightEl.scrollLeft = editorEl.scrollLeft;
+                isSyncing = false;
+            });
+            isSyncing = true;
+        }
     });
 }
 

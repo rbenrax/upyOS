@@ -12,6 +12,7 @@
 <body>
     <div id="app">
         <header class="top-bar">
+            <button class="menu-toggle" id="menu-toggle">☰</button>
             <div class="logo">upyOS Desktop</div>
             <div class="status-bar">
                 <span id="connection-status" class="status-indicator">Connected</span>
@@ -19,7 +20,7 @@
         </header>
 
         <div class="main-container">
-            <aside class="sidebar">
+            <aside class="sidebar" id="sidebar">
                 <nav>
                     <button class="nav-btn active" data-view="status">Status</button>
                     <button class="nav-btn" data-view="files">Files</button>
@@ -30,6 +31,7 @@
                     <button class="nav-btn logout-btn" id="btn-logout">Logout</button>
                 </nav>
             </aside>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
             <main class="content-area">
                 <!-- File Manager View -->
@@ -98,7 +100,8 @@
                     </div>
                     <div style="padding: 20px;">
                         <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
-                            <input type="text" id="cmd-input" placeholder="Enter command"
+                            <input type="text" id="cmd-input" placeholder="Enter command" autocapitalize="none"
+                                autocorrect="off" spellcheck="false"
                                 style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--header-bg); color: white;">
                             <button id="btn-run-cmd">Execute</button>
                             <button id="btn-stop-cmd" style="background: var(--error);">Stop</button>
