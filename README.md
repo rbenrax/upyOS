@@ -1,7 +1,7 @@
 # upyOS
 
 Last-minute update:
-- Passwords are now stored encrypted, use setauth command to reset the password.
+- Passwords are now stored encrypted, use setauth command to reset the password immediately after upgrade.
 - Try the new upyOS Desktop web interface and send your feedback.
 - Added a new set of AT commands for use with an ESP-AT UART modem.
 - Upgraded to MicroPython 1.27
