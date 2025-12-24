@@ -148,32 +148,38 @@ def fs_list_handler(httpClient, httpResponse):
 
 @check_auth
 def fs_read_handler(httpClient, httpResponse):
-    data = httpClient.ReadRequestContentAsJSON()
-    path = data.get('path')
+    path = httpClient.GetRequestQueryParams().get('path')
     if not path:
         sendError(httpResponse, 400, "Missing path")
         return
         
     try:
-        with open(path, 'r') as f:
-            content = f.read()
-        sendJSON(httpResponse, {'content': content})
+        if not httpResponse.WriteResponseFile(path, contentType="text/plain"):
+            sendError(httpResponse, 404, "File not found or empty")
     except Exception as e:
         sendError(httpResponse, 500, str(e))
 
 @check_auth
 def fs_write_handler(httpClient, httpResponse):
-    data = httpClient.ReadRequestContentAsJSON()
-    path = data.get('path')
-    content = data.get('content')
-    
-    if not path or content is None:
-        sendError(httpResponse, 400, "Missing path or content")
+    path = httpClient.GetRequestQueryParams().get('path')
+    if not path:
+        sendError(httpResponse, 400, "Missing path")
         return
         
+    contentLength = httpClient.GetRequestContentLength()
+    
     try:
         with open(path, 'w') as f:
-            f.write(content)
+            remaining = contentLength
+            while remaining > 0:
+                chunk_size = min(remaining, 1024)
+                chunk = httpClient.ReadRequestContent(size=chunk_size)
+                if not chunk:
+                    break
+                if isinstance(chunk, bytes):
+                    chunk = chunk.decode()
+                f.write(chunk)
+                remaining -= len(chunk)
         sendJSON(httpResponse, {'status': 'ok'})
     except Exception as e:
         sendError(httpResponse, 500, str(e))
@@ -599,7 +605,7 @@ routes = [
 
     # File System
     ( "/api/fs/list",   "POST", fs_list_handler ),
-    ( "/api/fs/read",    "POST", fs_read_handler ),
+    ( "/api/fs/read",    "GET",  fs_read_handler ),
     ( "/api/fs/write",   "POST", fs_write_handler ),
     ( "/api/fs/delete", "POST", fs_delete_handler ),
     ( "/api/fs/rename", "POST", fs_rename_handler ),
