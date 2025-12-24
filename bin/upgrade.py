@@ -264,5 +264,5 @@ def __main__(args):
         sys.print_exception(e)
         
     #finally:
-        # Final cleanup if necessary
+    #    Final cleanup if necessary
     #    print("Upgrade process completed")
