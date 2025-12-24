@@ -4,15 +4,6 @@ import sdata
 import utls
 import hashlib
 
-def hash_sha1(filename):
-    h = hashlib.sha1()
-    with open(filename, 'rb') as f:
-        while True:
-            chunk = f.read(512)
-            if not chunk:
-                break
-            h.update(chunk)
-    return h.digest().hex()
     
 def __main__(args):
     
@@ -37,7 +28,7 @@ def __main__(args):
             print(ver)
                 
             for f in fr:
-                fu.write(f + "," + str(fsize(f)) + "," + hash_sha1(f) + "," + "\n")
+                fu.write(f + "," + str(fsize(f)) + "," + utls.sha1(f, is_file=True) + "," + "\n")
                 print(f)
                 cont+=1
                 
@@ -46,7 +37,7 @@ def __main__(args):
                 for f in tmp:
                     if f in fi: continue
                     fp = d + "/" + f
-                    fu.write(fp + "," + str(fsize(fp)) + "," + hash_sha1(fp) + "," + "\n")
+                    fu.write(fp + "," + str(fsize(fp)) + "," + utls.sha1(fp, is_file=True) + "," + "\n")
                     print(fp)
                     cont+=1
                     

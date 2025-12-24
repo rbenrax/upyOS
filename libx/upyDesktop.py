@@ -1,4 +1,5 @@
 import os
+import utls
 
 try:
     import usys as sys
@@ -92,7 +93,7 @@ def login_handler(httpClient, httpResponse):
     expected_user = USER_CREDENTIALS.get('user')
     expected_pass = USER_CREDENTIALS.get('paswd')
 
-    if user == expected_user and password == expected_pass:
+    if user == expected_user and utls.sha1(password) == expected_pass:
         httpResponse.WriteResponseOk(
             headers={'Set-Cookie': 'auth_token=valid_session; Path=/'},
             contentType="application/json",
@@ -147,32 +148,38 @@ def fs_list_handler(httpClient, httpResponse):
 
 @check_auth
 def fs_read_handler(httpClient, httpResponse):
-    data = httpClient.ReadRequestContentAsJSON()
-    path = data.get('path')
+    path = httpClient.GetRequestQueryParams().get('path')
     if not path:
         sendError(httpResponse, 400, "Missing path")
         return
         
     try:
-        with open(path, 'r') as f:
-            content = f.read()
-        sendJSON(httpResponse, {'content': content})
+        if not httpResponse.WriteResponseFile(path, contentType="text/plain"):
+            sendError(httpResponse, 404, "File not found or empty")
     except Exception as e:
         sendError(httpResponse, 500, str(e))
 
 @check_auth
 def fs_write_handler(httpClient, httpResponse):
-    data = httpClient.ReadRequestContentAsJSON()
-    path = data.get('path')
-    content = data.get('content')
-    
-    if not path or content is None:
-        sendError(httpResponse, 400, "Missing path or content")
+    path = httpClient.GetRequestQueryParams().get('path')
+    if not path:
+        sendError(httpResponse, 400, "Missing path")
         return
         
+    contentLength = httpClient.GetRequestContentLength()
+    
     try:
         with open(path, 'w') as f:
-            f.write(content)
+            remaining = contentLength
+            while remaining > 0:
+                chunk_size = min(remaining, 1024)
+                chunk = httpClient.ReadRequestContent(size=chunk_size)
+                if not chunk:
+                    break
+                if isinstance(chunk, bytes):
+                    chunk = chunk.decode()
+                f.write(chunk)
+                remaining -= len(chunk)
         sendJSON(httpResponse, {'status': 'ok'})
     except Exception as e:
         sendError(httpResponse, 500, str(e))
@@ -464,27 +471,33 @@ def cmd_run_handler(httpClient, httpResponse):
 
 @check_auth
 def cmd_interrupt_handler(httpClient, httpResponse):
+    # Send response first to avoid NetworkError in browser
+    sendJSON(httpResponse, {'status': 'ok', 'msg': 'Interrupt signal sent'})
+    
     try:
         import sdata
         import machine
+        import utime
+        
+        # Give some time for the TCP response to be sent before disrupting the system
+        utime.sleep_ms(300)
+        
         # Safe list of services not to stop
         services = ["uhttpd", "utelnetd", "uftpd"]
         
         # Stop background processes by setting status to "S" (Stop)
-        # This targets commands like 'watch'
         for p in sdata.procs:
             if p.cmd not in services:
                 p.sts = "S"
         
-        # General signal to stop current execution in the main thread (if any)
-        # Since we modified kernel.py, this will now just print ^C and return to prompt
-        # if no command is running there.
+        # General signal to stop current execution in the main thread
         if hasattr(machine, 'KeyboardInterrupt'):
-            machine.KeyboardInterrupt()
-            
-        sendJSON(httpResponse, {'status': 'ok', 'msg': 'Interrupt signal sent'})
-    except Exception as e:
-        sendError(httpResponse, 500, str(e))
+            try:
+                machine.KeyboardInterrupt()
+            except:
+                pass
+    except:
+        pass
 
 @check_auth
 def system_reset_handler(httpClient, httpResponse):
@@ -592,7 +605,7 @@ routes = [
 
     # File System
     ( "/api/fs/list",   "POST", fs_list_handler ),
-    ( "/api/fs/read",    "POST", fs_read_handler ),
+    ( "/api/fs/read",    "GET",  fs_read_handler ),
     ( "/api/fs/write",   "POST", fs_write_handler ),
     ( "/api/fs/delete", "POST", fs_delete_handler ),
     ( "/api/fs/rename", "POST", fs_rename_handler ),

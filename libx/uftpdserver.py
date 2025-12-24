@@ -30,7 +30,7 @@ from micropython import alloc_emergency_exception_buf
 
 #-- Auth rbenrax -->
 import sdata
-from utls import log
+import utls
 #-- Auth rbenrax --<
 
 # constant definitions
@@ -253,7 +253,7 @@ class FTP_client:
                 # "530 Not logged in.\r\n" in case it's wrong
                 # self.logged_in = True
                 ##cl.sendall("230 Logged in.\r\n")
-                if self.user == sdata.sysconfig["auth"]["user"] and payload==sdata.sysconfig["auth"]["paswd"]:
+                if self.user == sdata.sysconfig["auth"]["user"] and utls.sha1(payload)==sdata.sysconfig["auth"]["paswd"]:
                     cl.sendall("230 Logged in.\r\n")
                     log_msg(0, f"user {self.user} logged in from {self.remote_addr}")
                 else:
@@ -429,7 +429,7 @@ def log_msg(level, *args):
     global verbose_l
     if verbose_l >= level:
         #print(*args)
-        log("Ftp", "level " + str(level) + " " +  " ".join(args))
+        utls.log("Ftp", "level " + str(level) + " " +  " ".join(args))
 
 # close client and remove it from the list
 def close_client(cl):
