@@ -465,27 +465,33 @@ def cmd_run_handler(httpClient, httpResponse):
 
 @check_auth
 def cmd_interrupt_handler(httpClient, httpResponse):
+    # Send response first to avoid NetworkError in browser
+    sendJSON(httpResponse, {'status': 'ok', 'msg': 'Interrupt signal sent'})
+    
     try:
         import sdata
         import machine
+        import utime
+        
+        # Give some time for the TCP response to be sent before disrupting the system
+        utime.sleep_ms(300)
+        
         # Safe list of services not to stop
         services = ["uhttpd", "utelnetd", "uftpd"]
         
         # Stop background processes by setting status to "S" (Stop)
-        # This targets commands like 'watch'
         for p in sdata.procs:
             if p.cmd not in services:
                 p.sts = "S"
         
-        # General signal to stop current execution in the main thread (if any)
-        # Since we modified kernel.py, this will now just print ^C and return to prompt
-        # if no command is running there.
+        # General signal to stop current execution in the main thread
         if hasattr(machine, 'KeyboardInterrupt'):
-            machine.KeyboardInterrupt()
-            
-        sendJSON(httpResponse, {'status': 'ok', 'msg': 'Interrupt signal sent'})
-    except Exception as e:
-        sendError(httpResponse, 500, str(e))
+            try:
+                machine.KeyboardInterrupt()
+            except:
+                pass
+    except:
+        pass
 
 @check_auth
 def system_reset_handler(httpClient, httpResponse):

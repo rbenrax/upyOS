@@ -191,6 +191,7 @@ class MicroWebSrv :
         self.MaxWebSocketRecvLen     = 1024
         self.WebSocketThreaded       = True
         self.AcceptWebSocketCallback = None
+        self.MaxConcurrentClients    = 5 # rbenrax: limit concurrent clients
 
         self._routeHandlers = []
         routeHandlers += self._docoratedRouteHandlers
@@ -228,16 +229,23 @@ class MicroWebSrv :
                     utime.sleep(1)
                     continue
 
+                if len(self._clients) >= self.MaxConcurrentClients:
+                    # Too many clients, wait a bit or reject
+                    utime.sleep(0.5)
+                    continue
+
                 client, cliAddr = self._server.accept()
             except OSError : # Timeout
                 continue
             except :
                 break
-            try:
-                import _thread
-                _thread.start_new_thread(self._client, (self, client, cliAddr))
-            except ImportError:
-                self._client(self, client, cliAddr)
+            
+            # rbenrax: Use _tryStartThread for better reliability (includes gc.collect)
+            if not MicroWebSrv._tryStartThread(self._client, (self, client, cliAddr)):
+                try:
+                    client.close()
+                except:
+                    pass
         self.Stop() # rbenrax: Ensure everything is closed
         self._started = False
 
