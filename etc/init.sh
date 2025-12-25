@@ -6,7 +6,6 @@
 # <  (Print Python code execution output)
 
 # Change default configuration values:
-> sdata.cache_enabled = False  # Enable filesystem cache (requires more memory)
 > sdata.debug = False          # Debug mode
 > sdata.log   = False          # Not implemented yet
 

@@ -39,15 +39,21 @@ def __main__(args):
         for i in args:
             if i[0]=="-": mod +=i [1:]
 
-        for p in sdata.procs:
-            if p.isthr:
-                print("Stop all process before upgrade")
+        # Check for running processes
+        has_processes = any(p.isthr for p in sdata.procs)
+        
+        if has_processes:
+            if "s" in mod:
+                print("Stopping all processes...")
+                sdata.upyos.killall("")  # Kill all processes
+            else:
+                print("Stop all processes before upgrade (use -s to stop automatically)")
                 return
 
         if "h" in mod:
             print("Upgrade upyOS from git repository")
-            print("Usage: upgrade <options>:-f quite mode, -r reboot after upgrade, -v view file list")
-            print(", -t test branch, -i ignore errors, -o overwrite diffs")
+            print("Usage: upgrade <options>:-f quiet mode, -r reboot after upgrade, -v view file list")
+            print(", -t test branch, -i ignore errors, -o overwrite diffs, -s stop all processes")
             return
 
         print("upyOS OTA Upgrade 2.0 (ESP-AT), \nDownloading upgrade list ", end="")

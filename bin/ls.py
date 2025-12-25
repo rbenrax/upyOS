@@ -1,101 +1,133 @@
 import uos
-import utls
 import utime
+from utls import MONTH
+import sdata
+
+def human(bytes):
+    """Format bytes in human-readable format"""
+    if bytes > 1024:
+        if bytes > 1024 * 1024:
+            return f"{bytes / (1024 * 1024):7.2f}M"
+        else:
+            return f"{bytes / 1024:7.2f}K"
+    return f"{bytes:7} "
 
 def info(path="", mode="-l"):
-
-    #print(f"{path}")
-    if not utls.file_exists(path):
-        print("File not found")
-        return
     
-    filename= path.split("/")[-1]
+    # Get filename from path
+    filename = path.split("/")[-1]
     
     # Hidden files
     if not "a" in mode:
-        if filename[0]==".": return 0
+        if filename[0] == ".": 
+            return 0
     
-    stat = utls.get_stat(path)
+    # Call stat() only once and cache the result
+    try:
+        stat = uos.stat(path)
+    except OSError:
+        print("File not found")
+        return 0
     
-    #mode = stat[0]
+    # Extract stat fields
+    stat_mode = stat[0]
     size = stat[6]
     mtime = stat[8]
     localtime = utime.localtime(mtime)
 
-    if utls.isdir(path):
-        fattr= "d"
-        if size > 1000000: size = 0  # TODO: Correct hudge size in dirs
+    # Check if directory using stat mode bits directly
+    is_dir = (stat_mode & 0x4000) != 0
+    
+    if is_dir:
+        fattr = "d"
+        if size > 1000000: 
+            size = 0  # TODO: Correct huge size in dirs
     else:
-        fattr= " "
+        fattr = " "
 
-    if utls.protected(path):
+    # Check if protected (inline for performance)
+    if "/" not in path:
+        abs_path = ("/" + path) if uos.getcwd() == "/" else (uos.getcwd() + "/" + path)
+    else:
+        abs_path = path
+    
+    if abs_path in sdata.sysconfig["pfiles"]:
         fattr += "r-"
     else:
         fattr += "rw"
 
+    # Check if executable
     if ".py" in path or ".sh" in path:
         fattr += 'x'
     else:
         fattr += '-'
     
+    # Format size
     if "h" in mode:
-        ssize = f"{utls.human(size)}"
+        ssize = human(size)
     else:
         ssize = f"{size:7}"
         
+    # Print file info
     if not "n" in mode:
-       
-        if "d" in mode: # Extended
+        if "d" in mode:  # Extended date format
             print(f"{fattr} {ssize} {localtime[0]:>4} {localtime[1]:0>2} {localtime[2]:0>2} " + \
                   f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
         else:
-            print(f"{fattr} {ssize} {utls.MONTH[localtime[1]]} {localtime[2]:0>2} " + \
+            print(f"{fattr} {ssize} {MONTH[localtime[1]]} {localtime[2]:0>2} " + \
                   f"{localtime[3]:0>2}:{localtime[4]:0>2}:{localtime[5]:0>2} {filename}")
           
-    return size
+    return (size, is_dir)  # Return both size and directory flag for reuse
 
 
 def ls(path="", mode="-l"):
 
-    cur_dir=uos.getcwd()
-    #print("0", cur_dir)
+    cur_dir = uos.getcwd()
+    tsize = 0
     
-    tsize=0
-    if utls.isdir(path):
-        uos.chdir(path)
-        
-        if path=="" or path==".." : path=uos.getcwd()
-
-        #print("1", path)
-        
-        if len(path)>0:
-            if path[0]  !="/": path = "/" + path
-            if path[-1] !="/": path+="/"
-
-        #print("2", path)
-        
-        tmp=uos.listdir()
-        tmp.sort()
-
-        for file in tmp:
-            tsize += info(path + file, mode)
-            if "s" in mode and utls.isdir(path + file):
-                print("\n" + path + file + ":")
-                tsize += ls(path + file, mode)
-                print("")
-        
-        uos.chdir(cur_dir)
-        
-        if not 'k' in mode:
-            if 'h' in mode:
-                print(f"\nTotal {path}: {utls.human(tsize)}")
-            else:
-                print(f"\nTotal {path}: {tsize} bytes")
-
-    else:
+    # Check if path is directory using direct stat
+    try:
+        path_stat = uos.stat(path) if path else uos.stat(".")
+        if not (path_stat[0] & 0x4000):
+            print("Invalid directory")
+            return tsize
+    except OSError:
         print("Invalid directory")
-    #print("3", uos.getcwd())
+        return tsize
     
+    uos.chdir(path)
+    
+    if path == "" or path == "..": 
+        path = uos.getcwd()
+    
+    if len(path) > 0:
+        if path[0] != "/": 
+            path = "/" + path
+        if path[-1] != "/": 
+            path += "/"
+    
+    tmp = uos.listdir()
+    tmp.sort()
+    
+    for file in tmp:
+        fullpath = path + file
+        size, is_dir = info(fullpath, mode)  # Get both size and directory flag
+        tsize += size
+        
+        # For recursive mode, use cached is_dir flag (no duplicate stat!)
+        if "s" in mode and is_dir:
+            print("\n" + fullpath + ":")
+            tsize += ls(fullpath, mode)
+            print("")
+    
+    uos.chdir(cur_dir)
+    
+    if not 'k' in mode:
+        if 'h' in mode:
+            print(f"\nTotal {path}: {human(tsize)}")
+        else:
+            print(f"\nTotal {path}: {tsize} bytes")
+
     return tsize
 
 def __main__(args):

@@ -109,6 +109,11 @@ document.getElementById('btn-stop-cmd').addEventListener('click', async () => {
     }
 });
 
+document.getElementById('btn-clear-output').addEventListener('click', () => {
+    document.getElementById('cmd-output').textContent = '';
+});
+
+
 
 // --- Status ---
 

@@ -9,6 +9,8 @@
   --border-color: #313244;
   --item-hover: #313244;
   --danger: #f38ba8;
+  --error: #f38ba8;
+  --warning: #fab387;
   --success: #a6e3a1;
 }
 
