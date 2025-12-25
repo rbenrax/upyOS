@@ -11,38 +11,10 @@ import sdata
 MONTH = ('', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
 WEEKDAY = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
 
-# -- Cache control
-# Cached stat results to avoid repeated filesystem calls
-_stat_cache = {}
-_cache_timeout = 1000  # 1 second cache timeout
-
-def _get_cached_stat(filename):
-    """Get file stat with caching to reduce filesystem calls"""
-    current_time = utime.ticks_ms()
-    
-    # Check if cache is enabled and has valid entry
-    if sdata.cache_enabled and filename in _stat_cache:
-        cached_stat, timestamp = _stat_cache[filename]
-        if utime.ticks_diff(current_time, timestamp) < _cache_timeout:
-            return cached_stat
-    
-    try:
-        file_stat = stat(filename)
-        # Only cache if enabled
-        if sdata.cache_enabled:
-            _stat_cache[filename] = (file_stat, current_time)
-        return file_stat
-    except OSError:
-        # Cache negative results too, but only if enabled
-        if sdata.cache_enabled:
-            _stat_cache[filename] = (None, current_time)
-        return None
+# -- Filesystem access functions
 
 def file_exists(filename):
-    """Check if file exists using cached stat"""
-    #file_stat = _get_cached_stat(filename)
-    #return file_stat is not None and (file_stat[0] & 0xc000) != 0
-
+    """Check if file exists"""
     try:
         stat(filename)
         return True
@@ -50,27 +22,36 @@ def file_exists(filename):
         return False
 
 def isdir(filename):
-    """Check if path is directory using cached stat"""
-    file_stat = _get_cached_stat(filename)
-    return file_stat is not None and (file_stat[0] & 0x4000) != 0
+    """Check if path is directory"""
+    try:
+        file_stat = stat(filename)
+        return (file_stat[0] & 0x4000) != 0
+    except OSError:
+        return False
 
 def isfile(filename):
-    """Check if path is file using cached stat"""
-    file_stat = _get_cached_stat(filename)
-    return file_stat is not None and (file_stat[0] & 0x8000) != 0
+    """Check if path is file"""
+    try:
+        file_stat = stat(filename)
+        return (file_stat[0] & 0x8000) != 0
+    except OSError:
+        return False
 
 def get_mode(filename):
-    """Get file mode using cached stat"""
-    file_stat = _get_cached_stat(filename)
-    return file_stat[0] if file_stat else 0
+    """Get file mode"""
+    try:
+        file_stat = stat(filename)
+        return file_stat[0]
+    except OSError:
+        return 0
 
 def get_stat(filename):
     """Get full file stat with error handling"""
-    file_stat = _get_cached_stat(filename)
-    if file_stat is None:
+    try:
+        return stat(filename)
+    except OSError:
         print("Error: utls.get_stat")
         return (0,) * 10
-    return file_stat
 
 # -- Env var
 
