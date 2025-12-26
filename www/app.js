@@ -303,9 +303,22 @@ document.getElementById('btn-newfile').addEventListener('click', async () => {
     const name = prompt("File name:");
     if (name) {
         const fullPath = (state.currentPath === '/' ? '' : state.currentPath) + '/' + name;
-        // Create empty file
-        await apiCall('/api/fs/write', 'POST', { path: fullPath, content: '' });
-        loadFiles();
+        // Create empty file using raw fetch to match backend expectation
+        try {
+            const response = await fetch(`/api/fs/write?path=${encodeURIComponent(fullPath)}`, {
+                method: 'POST',
+                body: ''
+            });
+
+            if (response.ok) {
+                loadFiles();
+            } else {
+                const data = await response.json().catch(() => ({}));
+                alert('Error creating file: ' + (data.error || response.statusText));
+            }
+        } catch (err) {
+            alert('Error creating file: ' + err.message);
+        }
     }
 });
 

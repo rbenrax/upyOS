@@ -1,4 +1,4 @@
-#upyOS,0.9.3,2025-12-25
+#upyOS,0.9.3,2025-12-26
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -103,7 +103,7 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-/www/app.js,22129,f5aa3f4f9b8252590d4adfabb41e277fa1d5ecfd,
+/www/app.js,22600,444debccea4d8eca5a11e369d33c8458e8807558,
 /www/desktop.html,6277,915d185a66397114aaf1c7fd1eeed132f3c70b55,
 /www/index.html,3071,7527be9854e4bb7ff808d94f7aa7c99877baa00a,
 /www/login.html,3146,95560f1aff4c1bd0eac60fbd309382799ad98826,
