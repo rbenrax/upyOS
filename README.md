@@ -474,6 +474,8 @@ unset passw
 
 Added user and password authentication for accessing the telnet and ftp servers. The user and password are stored in the `/etc/system.conf` file. If no password is set, authentication is disabled.
 
+To set a user and password use: setauth admin password password
+
 ### Android Development
 
 By starting `utelnetd` and `uftpd` on boot, you can develop remotely from **Android** using apps like **"Serial WiFi Terminal"** and **"Squircle CE"** from Google Play. **Termux** is also an excellent option as a telnet client.
