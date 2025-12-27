@@ -131,6 +131,7 @@ async function loadStatus() {
                     <p><strong>Vendor:</strong> ${data.board.vendor || 'N/A'}</p>
                     <p><strong>MCU:</strong> ${data.mcu.type || 'N/A'} (${data.mcu.arch || 'N/A'})</p>
                     <p><strong>CPU Speed:</strong> ${data.sys.cpu_freq ? (data.sys.cpu_freq / 1000000).toFixed(0) + ' MHz' : 'N/A'}</p>
+                    <p><strong>CPU Temp:</strong> ${data.sys.cpu_temp ? data.sys.cpu_temp.toFixed(1) + ' °C' : 'N/A'}</p>
                     <p><strong>OS:</strong> ${data.sys.name || 'upyOS'} ${data.sys.version || ''}</p>
                 </div>
                 
@@ -144,6 +145,76 @@ async function loadStatus() {
                     <p><strong>Storage:</strong> ${formatBytes(data.storage.free)} free / ${formatBytes(data.storage.total)} total</p>
                     <div style="background: #313244; height: 10px; border-radius: 5px; margin-top: 5px;">
                         <div style="background: var(--success); width: ${(data.storage.free / data.storage.total * 100) || 0}%; height: 100%; border-radius: 5px;"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px; grid-column: span 2;">
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Configuration</h3>
+                    <div style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                        ${(() => {
+                if (!data.config || Object.keys(data.config).length === 0)
+                    return '<p style="color: var(--text-secondary); font-style: italic;">No configuration data available.</p>';
+
+                const entries = Object.entries(data.config);
+
+                // Buckets for sorting
+                const bools = [], texts = [], complex = [], nums = [], others = [];
+
+                entries.forEach(([key, val]) => {
+                    const type = typeof val;
+                    if (type === 'boolean') bools.push([key, val]);
+                    else if (type === 'string') texts.push([key, val]);
+                    else if (type === 'number') nums.push([key, val]);
+                    else if (Array.isArray(val) || (type === 'object' && val !== null)) complex.push([key, val]);
+                    else others.push([key, val]);
+                });
+
+                // Sort within buckets by key
+                const sortFn = (a, b) => a[0].localeCompare(b[0]);
+                bools.sort(sortFn);
+                texts.sort(sortFn);
+                complex.sort(sortFn);
+                nums.sort(sortFn);
+                others.sort(sortFn);
+
+                // Combined order: Bool -> Text -> Complex -> Number -> Others
+                const sortedEntries = [...bools, ...texts, ...complex, ...nums, ...others];
+
+                return `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                ${sortedEntries.map(([key, val]) => {
+                    let displayVal = val;
+                    try {
+                        if (typeof val === 'boolean') {
+                            displayVal = val ? '<span style="color:var(--success)">Available</span>' : '<span style="color:var(--text-secondary)">Not Available</span>';
+                        } else if (Array.isArray(val)) {
+                            if (val.length === 0) displayVal = '<span style="color:var(--text-secondary)">[]</span>';
+                            else {
+                                displayVal = val.map((item, idx) => {
+                                    if (typeof item === 'object' && item !== null) {
+                                        return `<div style="margin-left:10px; font-size: 0.85em; color: var(--text-secondary); border-left: 2px solid #45475a; padding-left: 5px; margin-top: 2px;">
+                                                            ${Object.entries(item).map(([k, v]) => `${k}=${v}`).join(', ')}
+                                                        </div>`;
+                                    }
+                                    return `<div>${item}</div>`;
+                                }).join('');
+                            }
+                        } else if (typeof val === 'object' && val !== null) {
+                            displayVal = `<div style="font-size: 0.85em;">${JSON.stringify(val)}</div>`;
+                        }
+                    } catch (e) {
+                        displayVal = '<span style="color:var(--error)">Error rendering</span>';
+                    }
+
+                    return `
+                                        <div style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; overflow: hidden;">
+                                            <div style="font-weight: bold; font-size: 0.9em; margin-bottom: 4px; color: var(--text-primary); text-transform: uppercase;">${key}</div>
+                                            <div style="font-size: 0.9em; word-break: break-all;">${displayVal}</div>
+                                        </div>
+                                    `;
+                }).join('')}
+                            </div>`;
+            })()}
                     </div>
                 </div>
 

@@ -561,10 +561,41 @@ def system_status_handler(httpClient, httpResponse):
             if p.cmd == "uftpd": services["uftpd"] = True
             if p.cmd == "uhttpd": services["uhttpd"] = True
 
+        # Filter board config for display
+        board_config = {}
+        excluded_keys = ['mcu', 'board', 'gpio', 'ledio', 'rgbio']
+        try:
+            for k, v in sdata.board.items():
+                if k not in excluded_keys:
+                    board_config[k] = v
+        except:
+            pass
+
+        # CPU Temp
+        cpu_temp = 0
+        try:
+            import esp32
+            # raw_temperature returns Fahrenheit on some ports, but let's check basic availability
+            # Note: On recent ESP32 ports, raw_temperature() might be deprecated or removed.
+            # Convert F to C: (F - 32) / 1.8
+            f = esp32.raw_temperature()
+            cpu_temp = (f - 32) / 1.8
+        except:
+            try:
+                # RP2040 standard temp sensor
+                import machine
+                sensor_temp = machine.ADC(4)
+                conversion_factor = 3.3 / (65535)
+                reading = sensor_temp.read_u16() * conversion_factor
+                cpu_temp = 27 - (reading - 0.706)/0.001721
+            except:
+                pass
+
         import uos
         info = {
             'mcu': {'type': mcu_type, 'arch': mcu_arch},
             'board': {'name': board_name, 'vendor': board_vendor},
+            'config': board_config,
             'memory': {'total': total_mem, 'free': free_mem, 'alloc': alloc_mem},
             'storage': {'total': total_storage, 'free': free_storage},
             'sys': {
@@ -572,6 +603,7 @@ def system_status_handler(httpClient, httpResponse):
                 'version': sdata.version, 
                 'id': sdata.sid,
                 'cpu_freq': 0,
+                'cpu_temp': cpu_temp,
                 'cwd': uos.getcwd()
             },
             'services': services
