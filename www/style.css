@@ -542,3 +542,9 @@ input:checked+.slider:before {
     min-height: 40px; /* Better touch target */
   }
 }
+
+.status-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}

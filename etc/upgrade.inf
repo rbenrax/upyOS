@@ -104,9 +104,9 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-/www/app.js,26915,c5cb5802c417835a0f09f4d802cbdaef98a7038e,
-/www/desktop.html,6277,915d185a66397114aaf1c7fd1eeed132f3c70b55,
+/www/app.js,26866,3fe3db490b5e4b930fc3f066e5595d59ccc90991,
+/www/desktop.html,6220,f8265d052aeddcffc852a6b707554568bb3b8012,
 /www/index.html,3071,7527be9854e4bb7ff808d94f7aa7c99877baa00a,
 /www/login.html,3146,95560f1aff4c1bd0eac60fbd309382799ad98826,
-/www/style.css,8774,5b5b1b877504b9c91362dad4a0d649bafc21bb96,
+/www/style.css,8843,ec86b95c5f711489b6c70ff3bc3ebfc024cc0ba4,
 #files,110

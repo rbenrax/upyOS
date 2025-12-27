@@ -557,7 +557,7 @@ async function loadGPIO() {
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="color" value="#000000" style="width: 40px; height: 30px; border: none; background: none; cursor: pointer;">
                         <button class="btn-small" style="padding: 4px 8px; font-size: 0.8rem; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer;">Set</button>
-                        <button class="btn-small btn-off" style="padding: 4px 8px; font-size: 0.8rem; background: #f38ba8; color: white; border: none; border-radius: 4px; cursor: pointer;">Off</button>
+                        <button class="btn-small btn-off" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; cursor: pointer;">Off</button>
                     </div>
                 `;
 
