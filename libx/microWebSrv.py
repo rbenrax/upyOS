@@ -705,6 +705,9 @@ class MicroWebSrv :
                             return True
                         self.WriteResponseInternalServerError()
                         return False
+                elif size == 0:
+                     self._writeBeforeContent(200, headers, contentType, None, 0)
+                     return True
             except :
                 pass
             self.WriteResponseNotFound()
