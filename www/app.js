@@ -13,6 +13,196 @@ function stripAnsi(text) {
     return text.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-z]/g, '');
 }
 
+function ansiToHtml(text) {
+    if (!text) return '';
+    let html = '';
+    let classes = new Set();
+    let i = 0;
+
+    // Simple SGR parser
+    while (i < text.length) {
+        if (text[i] === '\x1b' && text[i + 1] === '[') {
+            let j = i + 2;
+            let seq = "";
+            while (j < text.length && !/[a-zA-Z]/.test(text[j])) {
+                seq += text[j];
+                j++;
+            }
+            if (j < text.length) {
+                const command = text[j];
+                if (command === 'm') {
+                    const codes = seq.split(';').map(p => parseInt(p) || 0);
+                    codes.forEach(code => {
+                        if (code === 0) classes.clear();
+                        else if (code === 1) classes.add('1');
+                        else if (code >= 30 && code <= 37) {
+                            for (let c = 30; c <= 37; c++) classes.delete(c.toString());
+                            for (let c = 90; c <= 97; c++) classes.delete(c.toString());
+                            classes.add(code.toString());
+                        } else if (code >= 90 && code <= 97) {
+                            for (let c = 30; c <= 37; c++) classes.delete(c.toString());
+                            for (let c = 90; c <= 97; c++) classes.delete(c.toString());
+                            classes.add(code.toString());
+                        }
+                    });
+                } else if (command === 'J' || command === 'H' || command === 'f') {
+                    html = ''; // Clear current buffer
+                }
+                i = j + 1;
+                continue;
+            }
+        }
+
+        let char = text[i];
+        if (char === '<') char = '&lt;';
+        else if (char === '>') char = '&gt;';
+
+        if (classes.size > 0) {
+            const classStr = Array.from(classes).map(c => `ansi-${c}`).join(' ');
+            html += `<span class="${classStr}">${char}</span>`;
+        } else {
+            html += char;
+        }
+        i++;
+    }
+    return html;
+}
+
+let terminalRenderer = null;
+
+class TerminalRenderer {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.currentSpan = null;
+        this.classes = new Set();
+    }
+
+    reset() {
+        if (!this.container) return;
+        this.container.textContent = "";
+        this.currentSpan = null;
+        this.classes.clear();
+    }
+
+    createSpan() {
+        const span = document.createElement('span');
+        if (this.classes.size > 0) {
+            span.className = Array.from(this.classes).map(c => `ansi-${c}`).join(' ');
+        }
+        this.container.appendChild(span);
+        this.currentSpan = span;
+    }
+
+    append(text) {
+        if (!this.container) return;
+
+        // Remove cursor before adding content
+        const cursor = document.getElementById('term-cursor-el');
+        if (cursor) cursor.remove();
+
+        let i = 0;
+        while (i < text.length) {
+            if (text[i] === '\x1b' && text[i + 1] === '[') {
+                let j = i + 2;
+                let seq = "";
+                while (j < text.length && !/[a-zA-Z]/.test(text[j])) {
+                    seq += text[j];
+                    j++;
+                }
+
+                if (j < text.length) {
+                    const command = text[j];
+                    this.handleSequence(command, seq);
+                    i = j + 1;
+                    continue;
+                }
+            }
+
+            const char = text[i];
+            if (char === '\b') {
+                this.handleBackspace();
+            } else if (char === '\r') {
+                // Ignore \r
+            } else if (char === '\n') {
+                this.addText("\n");
+                this.currentSpan = null;
+            } else {
+                this.addText(char);
+            }
+            i++;
+        }
+
+        // Add cursor back
+        const newCursor = document.createElement('span');
+        newCursor.id = 'term-cursor-el';
+        newCursor.className = 'term-cursor';
+        this.container.appendChild(newCursor);
+
+        this.container.scrollTop = this.container.scrollHeight;
+    }
+
+    addText(text) {
+        if (!this.currentSpan) {
+            this.createSpan();
+        }
+        this.currentSpan.textContent += text;
+    }
+
+    handleBackspace() {
+        if (this.container.lastChild) {
+            let last = this.container.lastChild;
+            while (last && (last.id === 'term-cursor-el' || (last.nodeType === 1 && last.textContent === ""))) {
+                if (last.id !== 'term-cursor-el') last.remove();
+                last = this.container.lastChild;
+            }
+
+            if (last) {
+                if (last.nodeType === 3) { // Text node
+                    last.textContent = last.textContent.slice(0, -1);
+                } else if (last.tagName === 'SPAN') {
+                    last.textContent = last.textContent.slice(0, -1);
+                    if (last.textContent === "") {
+                        last.remove();
+                        this.currentSpan = null;
+                    }
+                }
+            }
+        }
+    }
+
+    handleSequence(command, params) {
+        if (command === 'm') {
+            const codes = params.split(';').map(p => parseInt(p) || 0);
+            codes.forEach(code => {
+                if (code === 0) {
+                    this.classes.clear();
+                } else if (code === 1) {
+                    this.classes.add('1');
+                } else if (code >= 30 && code <= 37) {
+                    for (let c = 30; c <= 37; c++) this.classes.delete(c.toString());
+                    for (let c = 90; c <= 97; c++) this.classes.delete(c.toString());
+                    this.classes.add(code.toString());
+                } else if (code >= 90 && code <= 97) {
+                    for (let c = 30; c <= 37; c++) this.classes.delete(c.toString());
+                    for (let c = 90; c <= 97; c++) this.classes.delete(c.toString());
+                    this.classes.add(code.toString());
+                }
+            });
+            this.currentSpan = null;
+        } else if (command === 'J') {
+            if (params === '2' || params === '3' || params === '') {
+                this.container.textContent = "";
+                this.currentSpan = null;
+            }
+        } else if (command === 'H' || command === 'f') {
+            // Home (cursor to 0,0) - In our simple terminal, this is equivalent to clearing
+            // if we don't support partial screen updates.
+            this.container.textContent = "";
+            this.currentSpan = null;
+        }
+    }
+}
+
 // API Helpers
 async function apiCall(endpoint, method = 'POST', body = {}) {
     try {
@@ -88,7 +278,8 @@ document.getElementById('btn-run-cmd').addEventListener('click', async () => {
 
     try {
         const data = await apiCall('/api/cmd/run', 'POST', { cmd });
-        output.textContent += `${data.cwd || '/'} $: ${cmd}\n${stripAnsi(data.output)}\n\n`;
+        const cleanCmd = cmd.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        output.innerHTML += `${data.cwd || '/'} $: ${cleanCmd}\n${ansiToHtml(data.output)}\n\n`;
         input.value = '';
     } catch (e) {
         output.textContent += `Error: ${e.message}\n\n`;
@@ -634,31 +825,10 @@ function connectTerminal() {
         };
 
         termWs.onmessage = (e) => {
-            if (termContainer) {
-                // Remove existing cursor if any
-                const cursor = document.getElementById('term-cursor-el');
-                if (cursor) cursor.remove();
-
-                // Handle backspace \b and other basic chars in clean data
-                let cleanData = stripAnsi(e.data);
-                for (let char of cleanData) {
-                    if (char === '\b') {
-                        termContainer.textContent = termContainer.textContent.slice(0, -1);
-                    } else if (char === '\r') {
-                        // Skip \r
-                    } else {
-                        termContainer.textContent += char;
-                    }
-                }
-
-                // Ensure blinking cursor is at the end
-                const newCursor = document.createElement('span');
-                newCursor.id = 'term-cursor-el';
-                newCursor.className = 'term-cursor';
-                termContainer.appendChild(newCursor);
-
-                termContainer.scrollTop = termContainer.scrollHeight;
+            if (!terminalRenderer) {
+                terminalRenderer = new TerminalRenderer('terminal-container');
             }
+            terminalRenderer.append(e.data);
         };
 
         termWs.onclose = (e) => {
@@ -708,10 +878,6 @@ if (termInputProxy) {
 
         if (key === 'Enter') {
             e.preventDefault();
-            // Immediate clear
-            if (termLineBuffer.trim().toLowerCase() === 'clear') {
-                termContainer.textContent = "";
-            }
             termWs.send('\r');
             termLineBuffer = "";
         } else if (key === 'Backspace') {
