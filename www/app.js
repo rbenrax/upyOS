@@ -635,7 +635,28 @@ function connectTerminal() {
 
         termWs.onmessage = (e) => {
             if (termContainer) {
-                termContainer.textContent += stripAnsi(e.data);
+                // Remove existing cursor if any
+                const cursor = document.getElementById('term-cursor-el');
+                if (cursor) cursor.remove();
+
+                // Handle backspace \b and other basic chars in clean data
+                let cleanData = stripAnsi(e.data);
+                for (let char of cleanData) {
+                    if (char === '\b') {
+                        termContainer.textContent = termContainer.textContent.slice(0, -1);
+                    } else if (char === '\r') {
+                        // Skip \r
+                    } else {
+                        termContainer.textContent += char;
+                    }
+                }
+
+                // Ensure blinking cursor is at the end
+                const newCursor = document.createElement('span');
+                newCursor.id = 'term-cursor-el';
+                newCursor.className = 'term-cursor';
+                termContainer.appendChild(newCursor);
+
                 termContainer.scrollTop = termContainer.scrollHeight;
             }
         };
@@ -643,6 +664,8 @@ function connectTerminal() {
         termWs.onclose = (e) => {
             termStatus.textContent = "Disconnected";
             termStatus.style.color = "var(--error)";
+            const cursor = document.getElementById('term-cursor-el');
+            if (cursor) cursor.remove();
             termWs = null;
             updateTermUI(false);
         };
@@ -685,13 +708,11 @@ if (termInputProxy) {
 
         if (key === 'Enter') {
             e.preventDefault();
-            // Intercept clear
+            // Immediate clear
             if (termLineBuffer.trim().toLowerCase() === 'clear') {
-                if (termContainer) termContainer.textContent = "";
-                termWs.send('\r'); // Still send to let device show prompt
-            } else {
-                termWs.send('\r');
+                termContainer.textContent = "";
             }
+            termWs.send('\r');
             termLineBuffer = "";
         } else if (key === 'Backspace') {
             e.preventDefault();
@@ -712,8 +733,14 @@ if (termInputProxy) {
         } else if (key === 'ArrowLeft') {
             e.preventDefault();
             termWs.send('\x1b[D');
+        } else if (key === 'Delete') {
+            e.preventDefault();
+            termWs.send('\x1b[3~');
         } else if (e.ctrlKey) {
-            if (key.length === 1 && /[a-z]/i.test(key)) {
+            if (key.toLowerCase() === 'c') {
+                e.preventDefault();
+                apiCall('/api/cmd/interrupt', 'POST').catch(err => console.error("Interrupt failed:", err));
+            } else if (key.length === 1 && /[a-z]/i.test(key)) {
                 e.preventDefault();
                 const code = key.toUpperCase().charCodeAt(0) - 64;
                 if (code > 0 && code <= 26) {

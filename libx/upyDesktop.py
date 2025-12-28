@@ -144,7 +144,7 @@ class WS_Terminal(IOBase):
             except: pass
             uos.dupterm(self, 0)
             if self.ws and not self.ws.IsClosed():
-                self.ws.SendText(f"\r\nupyOS WebTerminal connected. {sys.platform}\r\n / $: ")
+                self.ws.SendText(f"\r\nupyOS WebTerminal connected. {sys.platform}\r\n/ $: ")
         except Exception as e:
             print("WS_Terminal dupterm error:", e)
 
