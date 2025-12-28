@@ -563,3 +563,23 @@ input:checked+.slider:before {
   overflow-y: auto;
   padding: 20px;
 }
+/* ANSI Colors and Formatting */
+.ansi-1 { font-weight: bold; }
+.ansi-30 { color: #45475a; } /* Surface1 */
+.ansi-31 { color: #f38ba8; } /* Red */
+.ansi-32 { color: #a6e3a1; } /* Green */
+.ansi-33 { color: #f9e2af; } /* Yellow */
+.ansi-34 { color: #89b4fa; } /* Blue */
+.ansi-35 { color: #f5c2e7; } /* Pink/Magenta */
+.ansi-36 { color: #94e2d5; } /* Teal/Cyan */
+.ansi-37 { color: #bac2de; } /* Subtext1/White */
+
+/* Bright Versions */
+.ansi-90 { color: #585b70; } /* Surface2 */
+.ansi-91 { color: #f38ba8; }
+.ansi-92 { color: #a6e3a1; }
+.ansi-93 { color: #f9e2af; }
+.ansi-94 { color: #89b4fa; }
+.ansi-95 { color: #f5c2e7; }
+.ansi-96 { color: #94e2d5; }
+.ansi-97 { color: #a6adc8; } /* Subtext0 */
