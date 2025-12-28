@@ -28,11 +28,9 @@ class StreamWrapper(IOBase):
         self.buffer = io.StringIO()
     def write(self, data):
         if isinstance(data, (bytes, bytearray)):
-            try:
-                data = data.decode()
-            except:
-                data = str(data)
-        self.buffer.write(data)
+            try: data = data.decode()
+            except: data = str(data)
+        if data: self.buffer.write(data)
         return len(data)
     def readinto(self, buf):
         return 0
@@ -108,6 +106,101 @@ def logout_handler(httpClient, httpResponse):
         contentType="application/json",
         content=json.dumps({'status': 'ok'})
     )
+
+# --- Terminal WS (Callback) ---
+
+try:
+    try:
+        from libx.microWebSocket import MicroWebSocket
+    except ImportError:
+        from microWebSocket import MicroWebSocket
+except ImportError:
+    MicroWebSocket = None
+
+try:
+    import _thread
+except ImportError:
+    pass
+
+try:
+    from uio import IOBase
+except ImportError:
+    class IOBase: pass
+
+class WS_Terminal(IOBase):
+    def __init__(self):
+        self.ws = None
+        self.lock = _thread.allocate_lock()
+        self.rx_buf = []
+        self._is_writing = False
+    
+    def accept_ws(self, ws, httpClient):
+        self.ws = ws
+        self.ws.RecvTextCallback = self.recv_text
+        self.ws.ClosedCallback   = self.closed
+        try:
+            import uos
+            try: uos.dupterm(None, 0)
+            except: pass
+            uos.dupterm(self, 0)
+            if self.ws and not self.ws.IsClosed():
+                self.ws.SendText(f"\r\nupyOS WebTerminal connected. {sys.platform}\r\n/ $: ")
+        except Exception as e:
+            print("WS_Terminal dupterm error:", e)
+
+    def write(self, data):
+        if self._is_writing or not self.ws or self.ws.IsClosed(): return len(data)
+        self._is_writing = True
+        try:
+            if isinstance(data, (bytes, bytearray)):
+                try: data = data.decode()
+                except: data = str(data)
+            if data: self.ws.SendText(data)
+        except: pass
+        finally: self._is_writing = False
+        return len(data)
+
+    def readinto(self, buf):
+        self.lock.acquire()
+        try:
+            if not self.rx_buf: return None
+            n = 0
+            while self.rx_buf and n < len(buf):
+                b = self.rx_buf.pop(0)
+                buf[n] = ord(b) if isinstance(b, str) else b
+                n += 1
+            return n
+        finally: self.lock.release()
+            
+    def ioctl(self, op, arg):
+        if op == 3: return (1 if self.rx_buf else 0) | (4 if self.ws and not self.ws.IsClosed() else 0)
+        if op == 4: self.close()
+        return 0
+
+    def close(self):
+        if self.ws: self.ws.Close()
+
+    def recv_text(self, ws, msg):
+        self.lock.acquire()
+        try:
+            for char in msg: self.rx_buf.append(char)
+        finally: self.lock.release()
+        try:
+            import uos
+            if hasattr(uos, 'dupterm_notify'): uos.dupterm_notify(self)
+        except: pass
+
+    def closed(self, ws):
+        try:
+            import uos
+            uos.dupterm(None, 0)
+        except: pass
+
+def ws_accept_callback(webSocket, httpClient) :
+    if MicroWebSocket:
+        WS_Terminal().accept_ws(webSocket, httpClient)
+    else:
+        webSocket.Close()
 
 # --- File System Handlers ---
 

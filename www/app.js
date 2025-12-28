@@ -7,6 +7,12 @@ const state = {
     view: 'status'
 };
 
+// Utils
+function stripAnsi(text) {
+    if (!text) return '';
+    return text.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-z]/g, '');
+}
+
 // API Helpers
 async function apiCall(endpoint, method = 'POST', body = {}) {
     try {
@@ -54,6 +60,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 
         if (viewId === 'files') loadFiles();
         if (viewId === 'gpio') loadGPIO();
+        if (viewId === 'terminal') loadTerminal();
         if (viewId === 'status') loadStatus();
         if (viewId === 'run') document.getElementById('cmd-input').focus();
     });
@@ -81,9 +88,7 @@ document.getElementById('btn-run-cmd').addEventListener('click', async () => {
 
     try {
         const data = await apiCall('/api/cmd/run', 'POST', { cmd });
-        // Strip ANSI escape codes
-        const cleanOutput = data.output.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-z]/g, '');
-        output.textContent += `${data.cwd || '/'} $: ${cmd}\n${cleanOutput}\n\n`;
+        output.textContent += `${data.cwd || '/'} $: ${cmd}\n${stripAnsi(data.output)}\n\n`;
         input.value = '';
     } catch (e) {
         output.textContent += `Error: ${e.message}\n\n`;
@@ -582,8 +587,176 @@ async function loadGPIO() {
         console.error('GPIO Load Error:', e);
     }
 }
-
 document.getElementById('btn-refresh-gpio').addEventListener('click', loadGPIO);
+// --- Terminal (Full REPL) ---
+
+let termWs = null;
+let termLineBuffer = ""; // To detect "clear"
+const termStatus = document.getElementById('term-status');
+const termContainer = document.getElementById('terminal-container');
+const termInputProxy = document.getElementById('term-input-proxy');
+const btnTermConnect = document.getElementById('btn-term-connect');
+
+function logTerm(msg, isError = false) {
+    if (isError && termContainer) {
+        termContainer.textContent += `[ERROR] ${msg}\n`;
+        termContainer.scrollTop = termContainer.scrollHeight;
+    }
+    console.log(`[TERM] ${msg}`);
+}
+
+function loadTerminal() {
+    if (termInputProxy) termInputProxy.focus();
+}
+
+function connectTerminal() {
+    if (termWs) {
+        termWs.close();
+        termWs = null;
+        updateTermUI(false);
+        return;
+    }
+
+    const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const url = `${proto}://${window.location.host}/ws`;
+
+    termStatus.textContent = "Connecting...";
+    termStatus.style.color = "var(--text-secondary)";
+
+    try {
+        termWs = new WebSocket(url);
+
+        termWs.onopen = () => {
+            termStatus.textContent = "Connected";
+            termStatus.style.color = "var(--success)";
+            updateTermUI(true);
+            if (termInputProxy) termInputProxy.focus();
+        };
+
+        termWs.onmessage = (e) => {
+            if (termContainer) {
+                // Remove existing cursor if any
+                const cursor = document.getElementById('term-cursor-el');
+                if (cursor) cursor.remove();
+
+                // Handle backspace \b and other basic chars in clean data
+                let cleanData = stripAnsi(e.data);
+                for (let char of cleanData) {
+                    if (char === '\b') {
+                        termContainer.textContent = termContainer.textContent.slice(0, -1);
+                    } else if (char === '\r') {
+                        // Skip \r
+                    } else {
+                        termContainer.textContent += char;
+                    }
+                }
+
+                // Ensure blinking cursor is at the end
+                const newCursor = document.createElement('span');
+                newCursor.id = 'term-cursor-el';
+                newCursor.className = 'term-cursor';
+                termContainer.appendChild(newCursor);
+
+                termContainer.scrollTop = termContainer.scrollHeight;
+            }
+        };
+
+        termWs.onclose = (e) => {
+            termStatus.textContent = "Disconnected";
+            termStatus.style.color = "var(--error)";
+            const cursor = document.getElementById('term-cursor-el');
+            if (cursor) cursor.remove();
+            termWs = null;
+            updateTermUI(false);
+        };
+
+        termWs.onerror = (e) => {
+            termStatus.textContent = "Error";
+            termStatus.style.color = "var(--error)";
+            logTerm("WebSocket Error", true);
+        };
+
+    } catch (e) {
+        logTerm(`Exception: ${e.message}`, true);
+    }
+}
+
+function updateTermUI(connected) {
+    if (btnTermConnect) {
+        btnTermConnect.textContent = connected ? "Disconnect" : "Connect";
+    }
+}
+
+if (btnTermConnect) {
+    btnTermConnect.addEventListener('click', connectTerminal);
+}
+
+// Handle inputs for REPL (char by char)
+if (termInputProxy) {
+    termInputProxy.addEventListener('input', (e) => {
+        if (!termWs) return;
+        if (e.data) {
+            termWs.send(e.data);
+            termLineBuffer += e.data;
+        }
+        termInputProxy.value = '';
+    });
+
+    termInputProxy.addEventListener('keydown', (e) => {
+        if (!termWs) return;
+        const key = e.key;
+
+        if (key === 'Enter') {
+            e.preventDefault();
+            // Immediate clear
+            if (termLineBuffer.trim().toLowerCase() === 'clear') {
+                termContainer.textContent = "";
+            }
+            termWs.send('\r');
+            termLineBuffer = "";
+        } else if (key === 'Backspace') {
+            e.preventDefault();
+            termWs.send('\x08');
+            termLineBuffer = termLineBuffer.slice(0, -1);
+        } else if (key === 'Tab') {
+            e.preventDefault();
+            termWs.send('\t');
+        } else if (key === 'ArrowUp') {
+            e.preventDefault();
+            termWs.send('\x1b[A');
+        } else if (key === 'ArrowDown') {
+            e.preventDefault();
+            termWs.send('\x1b[B');
+        } else if (key === 'ArrowRight') {
+            e.preventDefault();
+            termWs.send('\x1b[C');
+        } else if (key === 'ArrowLeft') {
+            e.preventDefault();
+            termWs.send('\x1b[D');
+        } else if (key === 'Delete') {
+            e.preventDefault();
+            termWs.send('\x1b[3~');
+        } else if (e.ctrlKey) {
+            if (key.toLowerCase() === 'c') {
+                e.preventDefault();
+                apiCall('/api/cmd/interrupt', 'POST').catch(err => console.error("Interrupt failed:", err));
+            } else if (key.length === 1 && /[a-z]/i.test(key)) {
+                e.preventDefault();
+                const code = key.toUpperCase().charCodeAt(0) - 64;
+                if (code > 0 && code <= 26) {
+                    termWs.send(String.fromCharCode(code));
+                }
+            }
+        }
+    });
+}
+// Support clicking on the black box
+if (termContainer) {
+    termContainer.addEventListener('click', () => {
+        if (termInputProxy) termInputProxy.focus();
+    });
+}
+
 
 // --- Syntax Highlighting ---
 

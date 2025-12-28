@@ -95,6 +95,7 @@ class MicroWebSocket :
                     return
             print("MicroWebSocket : Out of memory on new WebSocket connection.")
         try :
+            self._closed = True
             if self._socketfile is not self._socket:
                 self._socketfile.close()
             self._socket.close()
@@ -107,7 +108,10 @@ class MicroWebSocket :
 
     def _handshake(self, httpResponse) :
         try :
-            key = self._httpCli.GetRequestHeaders().get('sec-websocket-key', None)
+            headers = self._httpCli.GetRequestHeaders()
+            key = headers.get('sec-websocket-key')
+            if not key:
+                key = next((headers[k] for k in headers if k.lower() == 'sec-websocket-key'), None)
             if key :
                 key += self._handshakeSign
                 r = sha1(key.encode()).digest()
