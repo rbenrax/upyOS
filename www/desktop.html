@@ -25,6 +25,7 @@
                     <button class="nav-btn active" data-view="status">Status</button>
                     <button class="nav-btn" data-view="files">Files</button>
                     <button class="nav-btn" data-view="gpio">GPIO</button>
+                    <button class="nav-btn" data-view="terminal">Terminal (Beta)</button>
                     <button class="nav-btn" data-view="run">Run</button>
                     <button class="nav-btn" data-view="about">About</button>
                     <div class="nav-spacer"></div>
@@ -85,6 +86,35 @@
                     </div>
                     <div class="status-content" id="status-container">
                         <!-- injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Terminal View -->
+                <div id="view-terminal" class="view-section">
+                    <div class="toolbar">
+                        <h2>Terminal (Beta)</h2>
+                        <span id="term-status"
+                            style="font-size: 0.8rem; color: var(--text-secondary); margin-left: auto; margin-right: 10px;">Disconnected</span>
+                        <button id="btn-term-connect">Connect</button>
+                    </div>
+                    <div style="padding: 20px; height: calc(100% - 60px); position: relative;">
+                        <div id="terminal-container" style="
+                            background: #000; 
+                            color: #0f0; 
+                            font-family: 'Courier New', monospace; 
+                            width: 100%; 
+                            height: 100%; 
+                            padding: 10px; 
+                            border-radius: 4px; 
+                            overflow-y: auto; 
+                            white-space: pre-wrap; 
+                            border: 1px solid var(--border-color);
+                            cursor: text;
+                         "></div>
+                        <!-- Hidden input to capture mobile/hidden keyboard input -->
+                        <input type="text" id="term-input-proxy"
+                            style="opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0;"
+                            autocomplete="off" autocapitalize="off" spellcheck="false">
                     </div>
                 </div>
 

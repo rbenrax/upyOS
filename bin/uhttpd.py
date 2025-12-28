@@ -21,6 +21,11 @@ def __main__(args):
                 print("Could not import upyDesktop")
             
             mws = MicroWebSrv(proc, routeHandlers=routeHandlers, port=dport, bindIP='0.0.0.0', webPath="/www")
+            
+            # Hook Terminal WebSocket
+            if hasattr(upyDesktop, 'ws_accept_callback'):
+                 mws.AcceptWebSocketCallback = upyDesktop.ws_accept_callback
+                 
             mws.Start(threaded=False)
 
         elif args[0]=="stop":
