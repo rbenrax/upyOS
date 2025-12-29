@@ -191,7 +191,7 @@ class MicroWebSrv :
         self.MaxWebSocketRecvLen     = 1024
         self.WebSocketThreaded       = True
         self.AcceptWebSocketCallback = None
-        self.MaxConcurrentClients    = 5 # rbenrax: limit concurrent clients
+        self.MaxConcurrentClients    = 10 # rbenrax: limit concurrent clients
 
         self._routeHandlers = []
         routeHandlers += self._docoratedRouteHandlers
