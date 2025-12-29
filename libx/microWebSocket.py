@@ -139,6 +139,12 @@ class MicroWebSocket :
                 self.ClosedCallback(self)
             except Exception as ex :
                 print("MicroWebSocket : Error on closed callback (%s)." % str(ex))
+        
+        # rbenrax: Cleanup from server's tracking list
+        try:
+            self._httpCli._microWebSrv._clients.remove(self._httpCli)
+        except:
+            pass
 
     # ----------------------------------------------------------------------------
 
