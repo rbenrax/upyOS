@@ -671,8 +671,11 @@ def system_status_handler(httpClient, httpResponse):
             # raw_temperature returns Fahrenheit on some ports, but let's check basic availability
             # Note: On recent ESP32 ports, raw_temperature() might be deprecated or removed.
             # Convert F to C: (F - 32) / 1.8
-            f = esp32.raw_temperature()
-            cpu_temp = (f - 32) / 1.8
+            try:
+                cpu_temp = esp32.mcu_temperature()
+            except:
+                f = esp32.raw_temperature()
+                cpu_temp = (f - 32) / 1.8
         except:
             try:
                 # RP2040 standard temp sensor
