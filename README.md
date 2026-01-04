@@ -538,12 +538,6 @@ Upgrading from upyOS github repository, wait...
 
 ---
 
-## 💾 File System Cache
-
-Added call caching to the File System (FS). On systems with low memory, this should be disabled in `sdata.py`. On systems with more memory (e.g., ESP32S3 with 8MB of PSRAM), enabling it speeds up file system access.
-
----
-
 ## 📶 ESP-AT serial Modem Support
 
 Added support for **Espressif ESP-AT UART modems**, especially for MCUs without integrated connectivity, such as RP2040, etc.
