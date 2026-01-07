@@ -542,7 +542,6 @@ class MicroWebSrv :
         # ------------------------------------------------------------------------
 
         def ReadRequestContent(self, size=None) :
-            self._socket.setblocking(False)
             b = None
             try :
                 if not size :
@@ -551,7 +550,6 @@ class MicroWebSrv :
                     b = self._socketfile.read(size)
             except :
                 pass
-            self._socket.setblocking(True)
             return b if b else b''
 
         # ------------------------------------------------------------------------
