@@ -262,18 +262,20 @@ def fs_write_handler(httpClient, httpResponse):
     contentLength = httpClient.GetRequestContentLength()
     
     try:
-        with open(path, 'w') as f:
+        with open(path, 'wb') as f:
             remaining = contentLength
             while remaining > 0:
                 chunk_size = min(remaining, 1024)
                 chunk = httpClient.ReadRequestContent(size=chunk_size)
                 if not chunk:
                     break
-                if isinstance(chunk, bytes):
-                    chunk = chunk.decode()
                 f.write(chunk)
                 remaining -= len(chunk)
-        sendJSON(httpResponse, {'status': 'ok'})
+        
+        if remaining == 0:
+            sendJSON(httpResponse, {'status': 'ok'})
+        else:
+            sendError(httpResponse, 500, "Incomplete transfer: expected %d bytes, got %d" % (contentLength, contentLength - remaining))
     except Exception as e:
         sendError(httpResponse, 500, str(e))
 
