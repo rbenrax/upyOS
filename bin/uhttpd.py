@@ -32,8 +32,10 @@ def __main__(args):
             sdata.upyos.run_cmd("killall uhttpd")
             
             try:
-                del sys.modules["microWebSrv"]
+                del sys.modules["upyDesktop"]
+                del sys.modules["microWebSocket"]
                 del sys.modules["microWebTemplate"]
+                del sys.modules["microWebSrv"]
             except:
                 pass
             
