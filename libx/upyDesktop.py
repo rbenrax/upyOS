@@ -110,10 +110,7 @@ def logout_handler(httpClient, httpResponse):
 # --- Terminal WS (Callback) ---
 
 try:
-    try:
-        from libx.microWebSocket import MicroWebSocket
-    except ImportError:
-        from microWebSocket import MicroWebSocket
+    from microWebSocket import MicroWebSocket
 except ImportError:
     MicroWebSocket = None
 
