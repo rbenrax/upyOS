@@ -38,14 +38,19 @@ def __main__(args):
         if not sts:
             print(f"\nError downloading {filename}")
     
-        if mm.tcp_conn: 
-            time.sleep(1)
-            mm.modem.write("+++")
-            time.sleep(1)
-            mm.atCMD("AT+CIPMODE=0", 3)
-            
-            mm.close_conn()  
-            mm.atCMD("ATE1", 2)   
     except Exception as ex:
         print(f"atwget: {filename} - {str(ex)}")
         sys.print_exception(ex)
+    
+    finally:
+        if mm and mm.modem: 
+            try:
+                time.sleep(1)
+                mm.modem.write("+++")
+                time.sleep(1)
+                mm.atCMD("AT+CIPMODE=0", 3)
+                if mm.tcp_conn:
+                    mm.close_conn()  
+                mm.atCMD("ATE1", 2)
+            except:
+                pass

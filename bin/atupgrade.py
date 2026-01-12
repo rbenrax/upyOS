@@ -192,16 +192,16 @@ def __main__(args):
 
         # Cleaning
         to_rm=[
-        "/bin/ATmodem.py",
-        "/bin/ATmqttc.py",
-        "/etc/upyOS-esp32c3_luatos.board",
-        "/etc/upyOS-esp32c3_vcc_gnd.board",
-        "/etc/upyOS-esp32c6_muse_labs.board",
-        "/etc/upyOS-esp32s3_vcc_gnd.board",
-        "/etc/upyOS-esp32-wroom-32.board",
-        "/etc/upyOS-esp8266.board",
-        "/etc/upyOS-rp2.board",
-        "/etc/upyOS-esp32.board",
+        "/bin/atmodem.py",
+        "/bin/atmqttc.py",
+        "/etc/upyos-esp32c3_luatos.board",
+        "/etc/upyos-esp32c3_vcc_gnd.board",
+        "/etc/upyos-esp32c6_muse_labs.board",
+        "/etc/upyos-esp32s3_vcc_gnd.board",
+        "/etc/upyos-esp32-wroom-32.board",
+        "/etc/upyos-esp8266.board",
+        "/etc/upyos-rp2.board",
+        "/etc/upyos-esp32.board",
         "/etc/upgrade2.inf",
         "/etc/wellcome.txt",
         "/lib/upyDesktop.py",
@@ -233,14 +233,16 @@ def __main__(args):
         
     finally:
         # This section will always run, whether there was an error or not
-        if mm and mm.tcp_conn:
+        if mm and mm.modem:
             try:
                 print("\nClosing conn...", end="")
                 time.sleep(0.5)
+                # Ensure we exit passthrough mode if we were in it
                 mm.modem.write("+++")
                 time.sleep(0.5)
                 mm.atCMD("AT+CIPMODE=0", 3)
-                mm.close_conn()  
+                if mm.tcp_conn:
+                    mm.close_conn()  
                 mm.atCMD("ATE1", 2)
                 print("Closed")
             except Exception as close_error:

@@ -30,12 +30,17 @@ def executeScript(mm, file):
 def executeLine(mm, tmp):
 
     if tmp[0].lower() == "reset" or tmp[0].lower() == "-r":
+        if len(tmp) < 3:
+            print("Error: reset requires <mcu gpio> <wait>")
+            return
         gpio  = int(tmp[1])  # Gpio reset pin in mcu
         wait  = int(tmp[2])  # Modem wait to ready
         mm.resetHW(gpio, wait)
 
     elif tmp[0].lower() == "uart" or tmp[0].lower() == "-c":
-
+            if len(tmp) < 5:
+                print("Error: uart requires <id> <baud> <tx> <rx>")
+                return
             id   = int(tmp[1])  # uC Uart ID
             baud = int(tmp[2])  # Baudrate
             tx   = int(tmp[3])  # TX gpio
@@ -51,7 +56,7 @@ def executeLine(mm, tmp):
             tout_char=0
             flow_type="off"
 
-            if len(tmp) > 6:
+            if len(tmp) >= 9:
                 rts=int(tmp[6])
                 cts=int(tmp[7])
                 flow_type=tmp[8] # r, s, rs, off

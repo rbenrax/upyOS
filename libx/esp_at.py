@@ -143,13 +143,11 @@ class ModemManager:
                 resp += data
 
                 if exp in exp_resp:
-                    if f"\r\n{exp}\r\n" in resp:
+                    if f"\r\n{exp}\r\n" in resp or resp.endswith(f"\r\n{exp}\r\n") or resp == f"{exp}\r\n":
                         if exp in {"OK", "SEND OK", "SET OK"}:
-                            #print("*** P1 OK***")
                             cmdsts = True
                             break
-                elif exp in resp:
-                    #print("*** P1 Other***")
+                elif exp.encode('utf-8') in resp:
                     cmdsts = True
                     break
 
@@ -372,7 +370,15 @@ class ModemManager:
             print("http_get_to_file_t: TCP Not connected")
             return False
         
-        _, _, hostport, path = url.split('/', 3)
+        parts = url.split('/')
+        if len(parts) < 4:
+             # Handle http://host or http://host:port
+             hostport = parts[2] if len(parts) > 2 else url
+             path = "/"
+        else:
+             hostport = parts[2]
+             path = "/" + "/".join(parts[3:])
+
         tmp = hostport.split(':')
         host = tmp[0]
         
@@ -485,11 +491,27 @@ class ModemManager:
     def get_ip_mac(self, ip_mac):
         sts, ret = self.atCMD("AT+CIFSR")
         if sts:
-            lines = ret.split('\n')
-            if ip_mac.lower()=="ip":
-                return(lines[1].split(",")[1])
-            else:
-                return(lines[2].split(",")[1])
+            for line in ret.split('\n'):
+                if ip_mac.lower() == "ip" and "STAIP" in line:
+                    try:
+                        return line.split('"')[1]
+                    except:
+                        pass
+                if ip_mac.lower() == "mac" and "STAMAC" in line:
+                    try:
+                        return line.split('"')[1]
+                    except:
+                        pass
+            
+            # Fallback if specific tags not found
+            lines = [l for l in ret.split('\n') if l.strip()]
+            try:
+                if ip_mac.lower() == "ip":
+                    return lines[1].split(',')[1].strip('"')
+                else:
+                    return lines[2].split(',')[1].strip('"')
+            except:
+                pass
             
         return "Error get IP/mac"
     
