@@ -233,14 +233,16 @@ def __main__(args):
         
     finally:
         # This section will always run, whether there was an error or not
-        if mm and mm.tcp_conn:
+        if mm and mm.modem:
             try:
                 print("\nClosing conn...", end="")
                 time.sleep(0.5)
+                # Ensure we exit passthrough mode if we were in it
                 mm.modem.write("+++")
                 time.sleep(0.5)
                 mm.atCMD("AT+CIPMODE=0", 3)
-                mm.close_conn()  
+                if mm.tcp_conn:
+                    mm.close_conn()  
                 mm.atCMD("ATE1", 2)
                 print("Closed")
             except Exception as close_error:

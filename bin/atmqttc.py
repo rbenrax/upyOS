@@ -54,9 +54,8 @@ def __main__(args):
             if mod in args:
                 i = args.index(mod)
                 if i+1 < len(args):
-                    return args[i + 1] if i > 0 else ""
+                    return args[i + 1]
                 else:
-                    print(mod + " value, not found")
                     return ""
             else:
                 return ""
@@ -87,7 +86,8 @@ def __main__(args):
     mm = MqttManager() # default dev= sdata.modem0
     
     # If modem not connected
-    if not mm.modem or mm.wifi_status() == 2:
+    status = mm.wifi_status()
+    if not mm.modem or status == "2" or status == "":
         print("No connected")
         return
     
@@ -177,9 +177,9 @@ def __main__(args):
         while True:
             
             # Thread control
-            if proc.sts=="S":break
+            if proc and proc.sts=="S":break
 
-            if proc.sts=="H":
+            if proc and proc.sts=="H":
                 time.sleep(1)
                 continue
             

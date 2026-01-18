@@ -122,6 +122,14 @@ Ctrl+D
 ![upyos04](media/upyos_04.png)
 ![upyos05](media/upyos_05.png)
 
+### upyOSDesktop
+
+![upyDesktop1](media/upyDesktop1.png)
+![upyDesktop2](media/upyDesktop2.png)
+![upyDesktop3](media/upyDesktop3.png)
+![upyDesktop4](media/upyDesktop4.png)
+![upyDesktop5](media/upyDesktop5.png)
+
 ---
 
 ## 💡 upyOS Explanation
