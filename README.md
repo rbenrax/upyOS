@@ -111,7 +111,15 @@ Ctrl+D
 
 ## 📸 Screenshots
 
-### RP2040 Module Running upyOS
+### upyOSDesktop Web interface
+
+![upyDesktop1](media/upyDesktop1.png)
+![upyDesktop2](media/upyDesktop2.png)
+![upyDesktop3](media/upyDesktop3.png)
+![upyDesktop4](media/upyDesktop4.png)
+![upyDesktop5](media/upyDesktop5.png)
+
+### RP2040 Module Running upyOS Terminal interface
 
 ![upyos01](media/upyos_01.png)
 ![upyos02](media/upyos_02.png)
@@ -121,14 +129,6 @@ Ctrl+D
 ![upyos03](media/upyos_03.png)
 ![upyos04](media/upyos_04.png)
 ![upyos05](media/upyos_05.png)
-
-### upyOSDesktop
-
-![upyDesktop1](media/upyDesktop1.png)
-![upyDesktop2](media/upyDesktop2.png)
-![upyDesktop3](media/upyDesktop3.png)
-![upyDesktop4](media/upyDesktop4.png)
-![upyDesktop5](media/upyDesktop5.png)
 
 ---
 
