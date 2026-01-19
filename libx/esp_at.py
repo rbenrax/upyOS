@@ -5,6 +5,7 @@ import time
 import sdata
 import utls
 import sys
+import gc
 
 proc = None
 
@@ -95,9 +96,9 @@ class ModemManager:
     
     def _drain(self):
         # empty UART buffer
-        t0 = time.time()
-        while self.modem.any() and (time.time() - t0) < 0.01:
-            self.modem.read()
+        t0 = time.ticks_ms()
+        while self.modem.any() and time.ticks_diff(time.ticks_ms(), t0) < 50:
+            self.modem.read(2048)
             
     def atCMD(self, command, timeout=2.0, exp="OK"):
 
@@ -138,7 +139,7 @@ class ModemManager:
 
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if self.modem.any():
-                data = self.modem.read()
+                data = self.modem.read(2048)
                 #print(f"**atCMD*** << {data}")
                 resp += data
 
@@ -213,7 +214,7 @@ class ModemManager:
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             if self.modem.any():
                 ndc = 1
-                data = self.modem.read()
+                data = self.modem.read(2048)
                 #print(f"*rcvDATA*** <<  {data}")
                 
                 if b"\r\nCLOSED\r\n" in data:
@@ -294,48 +295,52 @@ class ModemManager:
         headers = ""
         buffer = b""  # Buffer to accumulate data before finding headers
         
+        gc.collect()
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             
             if self.modem.any():
                 
-                data = self.modem.read()
+                data = self.modem.read(2048)
                 ndc = 1
-                
-                #print(f"*rcvDATA*** <<  {data}")
-                #time.sleep_ms(10)
+                gc.collect()
+
+                if b"CLOSED" in data:
+                    break
                 
                 if not hf:
                     # Accumulate data while headers are not found
-                    buffer += data
-                    
-                    # Find header separator in accumulated data
-                    body_ini = buffer.find(b"\r\n\r\n")
-                    
-                    if body_ini > -1:
-                        # Headers found
-                        headers = buffer[:body_ini + 4]
-                        data = buffer[body_ini + 4:]  # The rest is body
+                    if len(buffer) + len(data) > 4096:
+                        # Force header end if buffer too large to prevent MemoryError
                         hf = True
-                        buffer = b""  # Clear buffer
-                        #print(f"*** Headers found!")
-
-                        # Verificar error HTTP en headers
-                        if headers.find(b"HTTP/1.1 200 OK") == -1 and headers.find(b"HTTP/") > -1:
-                            # If there is HTTP response but not 200 OK
-                            #print(f"HTTP Error in headers: {headers}")
-                            # Continue to check if there is error in body too
-                            return False, headers
+                        fh.write(buffer)
+                        buffer = b""
+                        # Current 'data' will be written in the next block
                     else:
-                        # Headers not complete yet, continue accumulating
-                        start_time = time.ticks_ms()  # Restart timeout
-                        continue
+                        buffer += data
+                        # Find header separator in accumulated data
+                        body_ini = buffer.find(b"\r\n\r\n")
+                        
+                        if body_ini > -1:
+                            # Headers found
+                            headers = buffer[:body_ini + 4]
+                            data = buffer[body_ini + 4:]  # The rest is body
+                            hf = True
+                            buffer = b""  # Clear buffer
+                            #print(f"*** Headers found!")
+
+                            # Verificar error HTTP en headers
+                            if headers.find(b"HTTP/1.1 200 OK") == -1 and headers.find(b"HTTP/") > -1:
+                                return False, headers
+                        else:
+                            # Headers not complete yet, continue accumulating
+                            start_time = time.ticks_ms()  # Restart timeout
+                            continue
                 
                 # Process body only if headers already found
                 if hf:
                     # Write data to file
                     try:
                         fh.write(data)
-                        #print(f"Data {data}")
                     except Exception as e:
                         print(f"Error writing file - {str(e)}")
                         return False, headers
@@ -393,6 +398,8 @@ class ModemManager:
         if self.scmds:
             print(req)
         
+        self._drain()
+        gc.collect()
         self.modem.write(req.encode('utf-8'))
         sts = False
         with open(filename, 'wb') as f:
@@ -692,7 +699,7 @@ class MqttManager(ModemManager):
         
         # Read available data
         if self.modem.any():
-            data = self.modem.read()
+            data = self.modem.read(2048)
             if data:
                 self.buffer += data.decode('utf-8', 'ignore')
                 
