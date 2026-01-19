@@ -1,11 +1,11 @@
-#upyOS,0.9.3,2026-01-18
+#upyOS,0.9.3,2026-01-19
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
 /bin/atmodem.py,4025,e93727cba60e8a50383a7182a3bfe77347b3bc68,
 /bin/atmqttc.py,5511,0b96971b1dc9fd9382a09c131f3a49f401ca4c91,
-/bin/atupgrade.py,7917,0e9b43afb2848bc181aa38bc1dafe8ec92f44720,
-/bin/atwget.py,1413,ecf38cad8d9107628a8f343c95471a98d0896f64,
+/bin/atupgrade.py,7979,8fe20e575ff10bd4139ac32bafeee63272a53f19,
+/bin/atwget.py,1530,284baff095a463c5c85b3864574ee334619ecbbb,
 /bin/cat.py,1909,61a960f81c53e649bdc5cd00c9087c4d2de3b0e3,
 /bin/cd.py,330,0355baffd6599cf6fe152000d592571a64ef96ae,
 /bin/clear.py,63,079be4ed19df5f15875a79633de80f38e6b7e19b,
@@ -80,7 +80,7 @@
 /lib/utls.py,8050,02a0edd0bdfc50321eb7b9f77444f005bc8b850b,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
 /libx/editstr.py,6445,6e4059fdf2df28be1e09164ca7ed8ecca618e9ee,
-/libx/esp_at.py,24437,573f5f2ff16d7470f0c9a5cdc5e45aac6700dced,
+/libx/esp_at.py,25086,eee0b34e44baaadaf708a2b4134bddcee9379f8f,
 /libx/microWebSocket.py,11155,cce84ba2921fef36e4a9d5bb698eeb1f91bdb38f,
 /libx/microWebSrv.py,35978,225fbb83e42abc2a811feefdd3c75a9dc1f33e82,
 /libx/microWebTemplate.py,13597,9b74e227ef22f2be768f46e404d62a150eaa95a2,
