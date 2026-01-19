@@ -1,13 +1,14 @@
 from esp_at import ModemManager
 import time
 import sys
+import gc
 
 #atwget https://github.com/rbenrax/upyOS/blob/main/media/ftpfs.py
 
 def __main__(args):
     
     if len(args) == 0:
-        print ("Get a file from the net\nUsage:wget <url>")
+        print ("Get a file from the net\nUsage:wget <url> [<size>]")
         return
     
     url = args[0]
@@ -17,6 +18,10 @@ def __main__(args):
         filename = "index"
     else:
         filename = url.split("/")[-1].split("?")[0]
+    
+    size = 0
+    if len(args) > 1:
+        size = int(args[1])
 
     mm = ModemManager("modem0")
     #mm.sctrl = True
@@ -34,7 +39,8 @@ def __main__(args):
         mm.atCMD("AT+CIPMODE=1") # Transmissnon type 1
         mm.send_passthrough() # Send for passthrough
         
-        sts = mm.http_get_to_file_t(url, filename)
+        gc.collect()
+        sts = mm.http_get_to_file_t(url, filename, sz=size)
         if not sts:
             print(f"\nError downloading {filename}")
     
