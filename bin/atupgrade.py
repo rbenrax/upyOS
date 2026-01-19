@@ -6,12 +6,13 @@ import hashlib
 import utls
 import sdata
 import sys
+import gc
 
 url_base = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads'
 
-def pull(mm, url, f_path):
+def pull(mm, url, f_path, size=0):
     try:
-        sts = mm.http_get_to_file_t(url, f_path)
+        sts = mm.http_get_to_file_t(url, f_path, sz=size)
         if not sts:
             print(f"\nError downloading {f_path}")
         return sts
@@ -166,8 +167,9 @@ def __main__(args):
                     
                     if utls.file_exists(tmpf):
                         os.remove(tmpf)
-                        
-                    pull(mm, url + fp, tmpf)
+                    
+                    gc.collect()
+                    pull(mm, url + fp, tmpf, fs)
                     
                     stat = utls.get_stat(tmpf)           
                     tmpfsz = stat[6]

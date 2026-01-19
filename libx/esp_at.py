@@ -276,7 +276,7 @@ class ModemManager:
             
         return True, retResp, headers
     
-    def rcv_to_file_t(self, fh, timeout=15):
+    def rcv_to_file_t(self, fh, timeout=15, msz=0):
         
         if not self.tcp_conn:
             print("rcv_to_file_t: TCP Not connected")
@@ -294,7 +294,7 @@ class ModemManager:
         hf = False
         headers = ""
         buffer = b""  # Buffer to accumulate data before finding headers
-        
+        rcvd_body = 0
         gc.collect()
         while time.ticks_diff(time.ticks_ms(), start_time) < timeout:
             
@@ -304,17 +304,14 @@ class ModemManager:
                 ndc = 1
                 gc.collect()
 
-                if b"CLOSED" in data:
-                    break
-                
                 if not hf:
                     # Accumulate data while headers are not found
                     if len(buffer) + len(data) > 4096:
                         # Force header end if buffer too large to prevent MemoryError
                         hf = True
                         fh.write(buffer)
+                        rcvd_body += len(buffer)
                         buffer = b""
-                        # Current 'data' will be written in the next block
                     else:
                         buffer += data
                         # Find header separator in accumulated data
@@ -326,7 +323,6 @@ class ModemManager:
                             data = buffer[body_ini + 4:]  # The rest is body
                             hf = True
                             buffer = b""  # Clear buffer
-                            #print(f"*** Headers found!")
 
                             # Verificar error HTTP en headers
                             if headers.find(b"HTTP/1.1 200 OK") == -1 and headers.find(b"HTTP/") > -1:
@@ -340,7 +336,20 @@ class ModemManager:
                 if hf:
                     # Write data to file
                     try:
+                        if msz > 0:
+                            rem = msz - rcvd_body
+                            if len(data) > rem:
+                                data = data[:rem]
+                                fh.write(data)
+                                rcvd_body += len(data)
+                                break
+                        
                         fh.write(data)
+                        rcvd_body += len(data)
+                        
+                        if msz > 0 and rcvd_body >= msz:
+                            break
+                            
                     except Exception as e:
                         print(f"Error writing file - {str(e)}")
                         return False, headers
@@ -369,7 +378,7 @@ class ModemManager:
         
         return True, headers
 
-    def http_get_to_file_t(self, url, filename="", tout=15):
+    def http_get_to_file_t(self, url, filename="", tout=15, sz=0):
         
         if not self.tcp_conn:
             print("http_get_to_file_t: TCP Not connected")
@@ -403,7 +412,7 @@ class ModemManager:
         self.modem.write(req.encode('utf-8'))
         sts = False
         with open(filename, 'wb') as f:
-            sts, headers = self.rcv_to_file_t(f, tout)
+            sts, headers = self.rcv_to_file_t(f, tout, sz)
         return sts
 
 # ------ Command Implementations
