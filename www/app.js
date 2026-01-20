@@ -7,98 +7,32 @@ const state = {
     view: 'status'
 };
 
-// Utils
-function stripAnsi(text) {
-    if (!text) return '';
-    return text.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-z]/g, '');
-}
-
-function ansiToHtml(text) {
-    if (!text) return '';
-    let html = '';
-    let classes = new Set();
-    let i = 0;
-
-    // Simple SGR parser
-    while (i < text.length) {
-        if (text[i] === '\x1b' && text[i + 1] === '[') {
-            let j = i + 2;
-            let seq = "";
-            while (j < text.length && !/[a-zA-Z]/.test(text[j])) {
-                seq += text[j];
-                j++;
-            }
-            if (j < text.length) {
-                const command = text[j];
-                if (command === 'm') {
-                    const codes = seq.split(';').map(p => parseInt(p) || 0);
-                    codes.forEach(code => {
-                        if (code === 0) classes.clear();
-                        else if (code === 1) classes.add('1');
-                        else if (code >= 30 && code <= 37) {
-                            for (let c = 30; c <= 37; c++) classes.delete(c.toString());
-                            for (let c = 90; c <= 97; c++) classes.delete(c.toString());
-                            classes.add(code.toString());
-                        } else if (code >= 90 && code <= 97) {
-                            for (let c = 30; c <= 37; c++) classes.delete(c.toString());
-                            for (let c = 90; c <= 97; c++) classes.delete(c.toString());
-                            classes.add(code.toString());
-                        }
-                    });
-                } else if (command === 'J' || command === 'H' || command === 'f') {
-                    html = ''; // Clear current buffer
-                }
-                i = j + 1;
-                continue;
-            }
-        }
-
-        let char = text[i];
-        if (char === '<') char = '&lt;';
-        else if (char === '>') char = '&gt;';
-
-        if (classes.size > 0) {
-            const classStr = Array.from(classes).map(c => `ansi-${c}`).join(' ');
-            html += `<span class="${classStr}">${char}</span>`;
-        } else {
-            html += char;
-        }
-        i++;
-    }
-    return html;
-}
 
 let terminalRenderer = null;
 
 class TerminalRenderer {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
-        this.currentSpan = null;
-        this.classes = new Set();
+        this.reset();
     }
 
     reset() {
         if (!this.container) return;
         this.container.textContent = "";
-        this.currentSpan = null;
-        this.classes.clear();
+        this.classes = new Set();
+        this.cursorX = 0;
+        this.activeLineNodes = []; // Nodes that belong to the current line (since last \n)
     }
 
-    createSpan() {
-        const span = document.createElement('span');
-        if (this.classes.size > 0) {
-            span.className = Array.from(this.classes).map(c => `ansi-${c}`).join(' ');
-        }
-        this.container.appendChild(span);
-        this.currentSpan = span;
+    commitLine() {
+        // Clear cursor marks from current nodes before forgetting them
+        this.activeLineNodes.forEach(n => n.classList.remove('term-cursor-active'));
+        this.activeLineNodes = [];
+        this.cursorX = 0;
     }
 
     append(text) {
         if (!this.container) return;
-
-        // Remove cursor before adding content
-        const cursor = document.getElementById('term-cursor-el');
-        if (cursor) cursor.remove();
 
         let i = 0;
         while (i < text.length) {
@@ -120,53 +54,78 @@ class TerminalRenderer {
 
             const char = text[i];
             if (char === '\b') {
-                this.handleBackspace();
+                this.cursorX = Math.max(0, this.cursorX - 1);
             } else if (char === '\r') {
-                // Ignore \r
+                this.cursorX = 0;
             } else if (char === '\n') {
-                this.addText("\n");
-                this.currentSpan = null;
+                this.addRawText("\n");
+                this.commitLine();
             } else {
-                this.addText(char);
+                this.writeChar(char);
             }
             i++;
         }
 
-        // Add cursor back
-        const newCursor = document.createElement('span');
-        newCursor.id = 'term-cursor-el';
-        newCursor.className = 'term-cursor';
-        this.container.appendChild(newCursor);
-
+        this.renderCursor();
         this.container.scrollTop = this.container.scrollHeight;
     }
 
-    addText(text) {
-        if (!this.currentSpan) {
-            this.createSpan();
+    writeChar(char) {
+        if (this.cursorX < this.activeLineNodes.length) {
+            // Overwrite existing character
+            const node = this.activeLineNodes[this.cursorX];
+            node.textContent = char;
+            this.applyClasses(node);
+        } else {
+            // Append new character
+            this.addRawText(char);
         }
-        this.currentSpan.textContent += text;
+        this.cursorX++;
     }
 
-    handleBackspace() {
-        if (this.container.lastChild) {
-            let last = this.container.lastChild;
-            while (last && (last.id === 'term-cursor-el' || (last.nodeType === 1 && last.textContent === ""))) {
-                if (last.id !== 'term-cursor-el') last.remove();
-                last = this.container.lastChild;
-            }
+    getActiveLineText() {
+        return this.activeLineNodes.map(n => n.textContent).join('');
+    }
 
-            if (last) {
-                if (last.nodeType === 3) { // Text node
-                    last.textContent = last.textContent.slice(0, -1);
-                } else if (last.tagName === 'SPAN') {
-                    last.textContent = last.textContent.slice(0, -1);
-                    if (last.textContent === "") {
-                        last.remove();
-                        this.currentSpan = null;
-                    }
-                }
-            }
+    addRawText(text) {
+        const span = document.createElement('span');
+        this.applyClasses(span);
+        span.textContent = text;
+        this.container.appendChild(span);
+        if (text !== "\n") {
+            this.activeLineNodes.push(span);
+        }
+    }
+
+    applyClasses(node) {
+        if (this.classes.size > 0) {
+            node.className = Array.from(this.classes).map(c => `ansi-${c}`).join(' ');
+        } else {
+            node.className = "";
+        }
+    }
+
+    clearFromCursor() {
+        // Remove nodes from current position to end of active line
+        const toRemove = this.activeLineNodes.splice(this.cursorX);
+        toRemove.forEach(n => n.remove());
+    }
+
+    renderCursor() {
+        // Clear previous cursor marks
+        this.container.querySelectorAll('.term-cursor-active').forEach(el => el.classList.remove('term-cursor-active'));
+        const oldTrailing = document.getElementById('term-cursor-el');
+        if (oldTrailing) oldTrailing.remove();
+
+        if (this.cursorX < this.activeLineNodes.length) {
+            // Highlight the character under the cursor
+            this.activeLineNodes[this.cursorX].classList.add('term-cursor-active');
+        } else {
+            // Show trailing cursor at the end
+            const cursor = document.createElement('span');
+            cursor.id = 'term-cursor-el';
+            cursor.className = 'term-cursor-trailing';
+            this.container.appendChild(cursor);
         }
     }
 
@@ -174,11 +133,9 @@ class TerminalRenderer {
         if (command === 'm') {
             const codes = params.split(';').map(p => parseInt(p) || 0);
             codes.forEach(code => {
-                if (code === 0) {
-                    this.classes.clear();
-                } else if (code === 1) {
-                    this.classes.add('1');
-                } else if (code >= 30 && code <= 37) {
+                if (code === 0) this.classes.clear();
+                else if (code === 1) this.classes.add('1');
+                else if (code >= 30 && code <= 37) {
                     for (let c = 30; c <= 37; c++) this.classes.delete(c.toString());
                     for (let c = 90; c <= 97; c++) this.classes.delete(c.toString());
                     this.classes.add(code.toString());
@@ -188,17 +145,18 @@ class TerminalRenderer {
                     this.classes.add(code.toString());
                 }
             });
-            this.currentSpan = null;
         } else if (command === 'J') {
-            if (params === '2' || params === '3' || params === '') {
-                this.container.textContent = "";
-                this.currentSpan = null;
-            }
+            if (params === '2' || params === '3' || params === '') this.reset();
         } else if (command === 'H' || command === 'f') {
-            // Home (cursor to 0,0) - In our simple terminal, this is equivalent to clearing
-            // if we don't support partial screen updates.
-            this.container.textContent = "";
-            this.currentSpan = null;
+            this.reset();
+        } else if (command === 'K') {
+            this.clearFromCursor();
+        } else if (command === 'D') { // Left
+            const move = parseInt(params) || 1;
+            this.cursorX = Math.max(0, this.cursorX - move);
+        } else if (command === 'C') { // Right
+            const move = parseInt(params) || 1;
+            this.cursorX = Math.min(this.activeLineNodes.length, this.cursorX + move);
         }
     }
 }
@@ -252,7 +210,6 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         if (viewId === 'gpio') loadGPIO();
         if (viewId === 'terminal') loadTerminal();
         if (viewId === 'status') loadStatus();
-        if (viewId === 'run') document.getElementById('cmd-input').focus();
     });
 });
 
@@ -267,47 +224,6 @@ document.getElementById('sidebar-overlay').addEventListener('click', () => {
     document.getElementById('sidebar-overlay').classList.remove('active');
 });
 
-// --- Run Command ---
-
-document.getElementById('btn-run-cmd').addEventListener('click', async () => {
-    const input = document.getElementById('cmd-input');
-    const output = document.getElementById('cmd-output');
-    const cmd = input.value.trim();
-
-    if (!cmd) return;
-
-    try {
-        const data = await apiCall('/api/cmd/run', 'POST', { cmd });
-        const cleanCmd = cmd.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        output.innerHTML += `${data.cwd || '/'} $: ${cleanCmd}\n${ansiToHtml(data.output)}\n\n`;
-        input.value = '';
-    } catch (e) {
-        output.textContent += `Error: ${e.message}\n\n`;
-    }
-
-    // Auto scroll to bottom
-    output.scrollTop = output.scrollHeight;
-});
-
-// Allow Enter key to run
-document.getElementById('cmd-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        document.getElementById('btn-run-cmd').click();
-    }
-});
-
-document.getElementById('btn-stop-cmd').addEventListener('click', async () => {
-    try {
-        await apiCall('/api/cmd/interrupt', 'POST');
-        document.getElementById('cmd-output').textContent += `\n[Interrupt signal sent]\n`;
-    } catch (e) {
-        console.error('Stop command failed:', e);
-    }
-});
-
-document.getElementById('btn-clear-output').addEventListener('click', () => {
-    document.getElementById('cmd-output').textContent = '';
-});
 
 
 
@@ -878,6 +794,15 @@ if (termInputProxy) {
 
         if (key === 'Enter') {
             e.preventDefault();
+            const cmd = termLineBuffer.trim().toLowerCase();
+            if (cmd === 'exit') {
+                if (terminalRenderer) {
+                    terminalRenderer.append("\r\n\x1b[93m[Warning: The 'exit' command is restricted in the Web Terminal to avoid system shutdown.]\x1b[0m\r\n");
+                }
+                termWs.send('\x03');
+                termLineBuffer = "";
+                return;
+            }
             termWs.send('\r');
             termLineBuffer = "";
         } else if (key === 'Backspace') {
@@ -916,6 +841,36 @@ if (termInputProxy) {
         }
     });
 }
+
+// Paste support
+const btnTermPaste = document.getElementById('btn-term-paste');
+if (btnTermPaste) {
+    btnTermPaste.addEventListener('click', async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text && termWs) {
+                termWs.send(text);
+            }
+        } catch (err) {
+            const text = prompt("Paste command content:");
+            if (text && termWs) {
+                termWs.send(text);
+            }
+        }
+        if (termInputProxy) termInputProxy.focus();
+    });
+}
+
+if (termContainer) {
+    termContainer.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (text && termWs) {
+            termWs.send(text);
+        }
+    });
+}
+
 // Support clicking on the black box
 if (termContainer) {
     termContainer.addEventListener('click', () => {
@@ -976,7 +931,6 @@ if (editorEl && highlightEl) {
 
 // Init
 loadStatus();
-document.getElementById('cmd-output').textContent = '';
 
 // Logout
 document.getElementById('btn-logout').addEventListener('click', async () => {

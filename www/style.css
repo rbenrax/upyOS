@@ -439,19 +439,23 @@ input:checked+.slider:before {
   text-align: left !important;
 }
 
-.term-cursor {
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.term-cursor-active {
+  background-color: #0f0;
+  color: #000;
+}
+
+.term-cursor-trailing {
   display: inline-block;
   width: 8px;
   height: 1.2em;
   background-color: #0f0;
   vertical-align: middle;
-  margin-left: 1px;
   animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
 }
 
 .gpio-card.led-card {

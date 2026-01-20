@@ -2,7 +2,7 @@
 
 Last-minute update:
 - Passwords are now stored encrypted, use setauth command to reset the password immediately after upgrade.
-- Try the new upyOS Desktop web interface and send your feedback (You need to uncomment the line "uhttpd start &" in /etc/init.sh).
+- Try the new upyOS Desktop web interface and send your feedback (You need to uncomment the line "uhttpd start" in /etc/init.sh).
 - Added a new set of AT commands for use with an ESP-AT UART modem.
 - Upgraded to MicroPython 1.27
 
@@ -344,7 +344,7 @@ wifi sta ifconfig
 
 utelnetd start
 uftpd start
-uhttpd start &
+uhttpd start 
 
 :exit
 ```
@@ -456,7 +456,7 @@ wifi sta ifconfig
 
 utelnetd start                      # Start telnet server
 uftpd start                         # Start ftp server
-uhttpd start &                      # Start web server
+uhttpd start                        # Start web server
 
 #/local/dsp.py &                    # Start utility program as a thread
 

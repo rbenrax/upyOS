@@ -108,7 +108,7 @@ led rgb 1             # Test the board's RGB LED (if available)
 
 #utelnetd start               # Start Telnet server
 #uftpd start                  # Start FTP server
-#uhttpd start &               # Start HTTP server
+#uhttpd start                 # Start HTTP server
 
 :exit
 
