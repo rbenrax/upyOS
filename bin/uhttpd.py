@@ -26,7 +26,7 @@ def __main__(args):
             if hasattr(upyDesktop, 'ws_accept_callback'):
                  mws.AcceptWebSocketCallback = upyDesktop.ws_accept_callback
                  
-            mws.Start(threaded=False)
+            mws.Start(threaded=True)
 
         elif args[0]=="stop":
             sdata.upyos.run_cmd("killall uhttpd")

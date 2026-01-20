@@ -21,7 +21,7 @@ class upyOS:
         
         # sdata stores all system data
         sdata.name    = "upyOS-" + os.uname()[0]
-        sdata.version = "0.9.3"
+        sdata.version = "0.9.4"
         sdata.initime = time.time()
         sdata.upyos   = self
         

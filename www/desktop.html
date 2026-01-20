@@ -25,8 +25,7 @@
                     <button class="nav-btn active" data-view="status">Status</button>
                     <button class="nav-btn" data-view="gpio">GPIOs</button>
                     <button class="nav-btn" data-view="files">Files</button>
-                    <button class="nav-btn" data-view="terminal">Terminal (Beta)</button>
-                    <button class="nav-btn" data-view="run">Run</button>
+                    <button class="nav-btn" data-view="terminal">Terminal</button>
                     <button class="nav-btn" data-view="about">About</button>
                     <div class="nav-spacer"></div>
                     <button class="nav-btn logout-btn" id="btn-logout">Logout</button>
@@ -92,10 +91,12 @@
                 <!-- Terminal View -->
                 <div id="view-terminal" class="view-section">
                     <div class="toolbar">
-                        <h2>Terminal (Beta)</h2>
+                        <h2>Terminal</h2>
                         <span id="term-status"
                             style="font-size: 0.8rem; color: var(--text-secondary); margin-left: auto; margin-right: 10px;">Disconnected</span>
                         <button id="btn-term-connect">Connect</button>
+                        <button id="btn-term-paste" style="margin-left: 5px;"
+                            title="Paste from clipboard">Paste</button>
                     </div>
                     <div style="padding: 20px; height: calc(100% - 60px); position: relative;">
                         <div id="terminal-container" style="
@@ -118,35 +119,11 @@
                     </div>
                 </div>
 
-                <!-- Run View -->
-                <div id="view-run" class="view-section">
-                    <div class="toolbar">
-                        <h2>Run Command</h2>
-                        <span
-                            style="font-size: 0.8rem; color: var(--text-secondary); margin-left: auto; text-align: right;">
-                            ⚠️ Not a full terminal. Some commands may fail or hang, requiring an MCU reset. <br>
-                            Interactive commands (input) are disabled. Use <strong>utelnetd</strong> for full shell.
-                        </span>
-                    </div>
-                    <div style="padding: 20px;">
-                        <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
-                            <input type="text" id="cmd-input" placeholder="Enter command" autocapitalize="none"
-                                autocorrect="off" spellcheck="false"
-                                style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--header-bg); color: white;">
-                            <button id="btn-run-cmd">Execute</button>
-                            <button id="btn-stop-cmd">Stop</button>
-                            <button id="btn-clear-output">Clear</button>
-                        </div>
-                        <div id="cmd-output"
-                            style="background: #111; color: #0f0; padding: 15px; border-radius: 4px; font-family: monospace; height: 400px; overflow-y: auto; white-space: pre-wrap;">
-                        </div>
-                    </div>
-                </div>
 
                 <!-- About View -->
                 <div id="view-about" class="view-section">
                     <div class="about-content">
-                        <h1>upyOS Desktop v0.3</h1>
+                        <h1>upyOS Desktop v0.4</h1>
                         <p>Web-based Operating Environment for MicroPython.</p>
                         <p>Running on upyOS.</p>
                     </div>
