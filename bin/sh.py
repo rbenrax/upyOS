@@ -1,211 +1,196 @@
 import utls
 import sdata
 
-# Shell script conditional execution
-# Basic language:
-#
-# if <arg1> <comparison operator> <arg2> <action> <action arg>
-#
-# <args>: String constant and environment variables (ex: $0, $?, $path, etc)
-# <comparison operator>: Like Python (==, <, >, etc)
-# <action>:
-#    - run and/or the program o command to run (ls, etc.)
-#    - skip and an integer, the number of lines to skip, empty lines included
-#    - return, end script execution 
-#    - allowed labels (:label) and goto command
-#
-# unconditional, skip n, return and goto
-#
+# Shell script executor for upyOS
+# Optimized for low ROM/RAM MCUs by reading line by line.
 
-labels={}
-
-def run(ssf, lbl_ln):
-    line=0
+def run(ssf, args=[]):
+    """Executes a shell script file line by line."""
+    labels = {} # Cache for label line numbers
     
-    with open(ssf,'r') as f:
+    # Environment variables for the script ($0, $1, etc.)
+    # $0 is the script name, $1... are positional arguments
+    utls.setenv("0", ssf)
+    for i, arg in enumerate(args):
+        utls.setenv(str(i+1), arg)
 
-        skip_lines = 0
-        ltf="" # Forward label to find
-        
-        while True:
-            lin = f.readline()
-            if not lin:
-                if ltf!="": print(f"sh - Label {ltf} not found, ending")
-                break
+    try:
+        with open(ssf, 'r') as f:
+            line_num = 0
+            skip_lines = 0
             
-            line+=1
-
-            if lbl_ln > 0 and line <= lbl_ln: # Skip lines for goto label command
-                continue
-
-            if skip_lines > 0: # Skip lines forward in skip command
-                skip_lines-=1
-                continue
-            
-            if lin.strip()=="": continue   # Empty lines skipped
-
-            if lin.lstrip().startswith("#"): continue # Commented lines skipped
-            
-            cmdl=lin.split(" #")[0] # First part of commented line
-            
-            #print(cmdl)
-            
-            global labels
-            #print(cmdl)
-            if cmdl[0]==":":
-                #print(ltf, cmdl[1:-1])
-                if ltf==cmdl[1:-1]:  # -1 is carriage return at end of the line
-                    #print("encontrada")
-                    ltf=""
+            while True:
+                lin = f.readline()
+                if not lin:
+                    break
                 
-                labels[cmdl[1:-1]]=line # Save labels and his line
-                #print(labels)
-                continue # Labels are not processed
-            
-            if ltf != "": continue # looking for a label
-            
-            # Unconditional commands
-            # End script
-            if cmdl[:6] =="return": 
-                break
-            # Skip lines
-            elif cmdl[:5] =="skip ":
-                tmp = cmdl.split()
-                acca = tmp[1]
-                if acca.isdigit():
-                   skip_lines=int(acca)
-                   continue
-            # Goto :label
-            elif cmdl[:5] == "goto ":
-                tmp = cmdl.split()
-                acca = tmp[1]
-                if not acca in labels:
-                    ltf=acca
+                line_num += 1
+                
+                # Check for skip_lines first
+                if skip_lines > 0:
+                    skip_lines -= 1
                     continue
-                else:
-                    lbl_ln=labels[acca]
-                    return lbl_ln
-            # Conditional execution: if $0 == 5 return (ex.)
-            elif cmdl[:3] =="if ":
-                tmp = cmdl.split()
+                
+                raw_lin = lin.strip()
+                if not raw_lin or raw_lin.startswith("#"):
+                    continue
 
-                # Translate env vars
-                for i, e in enumerate(tmp):
-                    if e[0] == "$":
-                        tmp[i] = str(utls.getenv(e[1:]))
+                # Remove trailing comments
+                cmdl_parts = raw_lin.split(" #", 1)
+                cmd_string = cmdl_parts[0].strip()
+                
+                if not cmd_string:
+                    continue
 
-                arg1 = tmp[1]  # operand1
-                op = tmp[2]    # operator
-                arg2 = tmp[3]  # operand2
-                acc = tmp[4]   # action
+                # Process labels
+                if cmd_string.startswith(":"):
+                    lbl_name = cmd_string[1:].strip()
+                    labels[lbl_name] = line_num
+                    continue
 
-                acca = ""
-                if len(tmp) > 5:
-                    acca = tmp[5]  # action arg
+                # Parse command line using shlex
+                tokens = utls.shlex(cmd_string)
+                if not tokens:
+                    continue
 
-                if arg1 == "" or arg2 == "" or acc == "":
-                    print(f"sh - Invalid args: {cmdl[:-1]}")
-                    print(f"sh - Values: {tmp} in {ssf} - {line} - {cmdl}")
-                    return 0
+                # Environment variable substitution for all tokens
+                for i, t in enumerate(tokens):
+                    if t.startswith("$"):
+                        tokens[i] = str(utls.getenv(t[1:]))
 
-                # Function to convert values to their appropriate type
-                def conv_v(v):
-                    #v = v.replace('"', "")
-                    v = v[1:-1] if len(v) >= 2 and v[0] in ('"', "'") and v[-1] == v[0] else v
-                    try:
-                        # Try to convert to integer
-                        return int(v)
-                    except ValueError:
-                        try:
-                            # Try to convert to float
-                            return float(v)
-                        except ValueError:
-                            # If not numeric, return as string (without additional quotes)
-                            return v
+                cmd = tokens[0]
 
-                # Convert operands to their appropriate types
-                try:
-                    arg1_c = conv_v(arg1)
-                    arg2_c = conv_v(arg2)
-                    
-                    # Evaluate the expression
-                    if op == "==":
-                        res = arg1_c == arg2_c
-                    elif op == "!=":
-                        res = arg1_c != arg2_c
-                    elif op == "<":
-                        res = arg1_c < arg2_c
-                    elif op == ">":
-                        res = arg1_c > arg2_c
-                    elif op == "<=":
-                        res = arg1_c <= arg2_c
-                    elif op == ">=":
-                        res = arg1_c >= arg2_c
-                    elif op == "in": 
-                        res = arg1_c in arg2_c
-                    else:
-                        print(f"sh - Invalid operator: {op} in {ssf} - {line} - {cmdl}")
-                        return 0
+                # Special built-in shell commands
+                if cmd == "return":
+                    break
+                
+                elif cmd == "skip":
+                    if len(tokens) > 1 and tokens[1].isdigit():
+                        skip_lines = int(tokens[1])
+                    continue
+                
+                elif cmd == "goto":
+                    if len(tokens) > 1:
+                        target = tokens[1]
+                        if target.startswith(":"): target = target[1:]
                         
-                except Exception as e:
-                    print(f"sh - Evaluating expression error:\n{ssf} - {line} - {cmdl}{e}")
-                    return 0
-
-                # Rest of the code to handle the action (acc)...
-
-                if res: # Eval result
-                    if acc == "goto":
-                        if not acca in labels:
-                            ltf=acca
-                            continue
+                        if target in labels:
+                            # Jump back or forward to known label
+                            target_line = labels[target]
+                            f.seek(0)
+                            line_num = 0
+                            for _ in range(target_line):
+                                f.readline()
+                                line_num += 1
                         else:
-                            lbl_ln=labels[acca]
-                            return lbl_ln # return the label line number, and rerun the script 
-                       
-                    if acc == "return": break
-                    
-                    elif acc=="skip" and acca.isdigit():
-                        skip_lines=int(acca)
+                            # Forward scan for label
+                            found = False
+                            while True:
+                                flin = f.readline()
+                                if not flin: break
+                                line_num += 1
+                                fs = flin.strip()
+                                if fs.startswith(":") and fs[1:].strip() == target:
+                                    labels[target] = line_num
+                                    found = True
+                                    break
+                                elif fs.startswith(":"):
+                                    labels[fs[1:].strip()] = line_num
+                            
+                            if not found:
+                                print(f"sh: '{ssf}' line {line_num}: label '{target}' not found")
+                                break
+                    continue
+
+                elif cmd == "if":
+                    # if <arg1> <op> <arg2> <action> [action_args...]
+                    if len(tokens) < 5:
+                        print(f"sh: '{ssf}' line {line_num}: invalid 'if' syntax")
                         continue
                     
-                    elif acc=="run":
-                        sdata.upyos.run_cmd(" ".join(tmp[5:]))
+                    arg1, op, arg2, action = tokens[1], tokens[2], tokens[3], tokens[4]
+                    action_args = tokens[5:] if len(tokens) > 5 else []
+
+                    # Helper to convert values to numeric if possible
+                    def conv(v):
+                        try:
+                            if "." in v: return float(v)
+                            return int(v)
+                        except:
+                            return v
+
+                    v1, v2 = conv(arg1), conv(arg2)
+                    res = False
+                    try:
+                        if op == "==": res = (v1 == v2)
+                        elif op == "!=": res = (v1 != v2)
+                        elif op == "<":  res = (v1 < v2)
+                        elif op == ">":  res = (v1 > v2)
+                        elif op == "<=": res = (v1 <= v2)
+                        elif op == ">=": res = (v1 >= v2)
+                        elif op == "in": res = (str(v1) in str(v2))
+                    except Exception as e:
+                        print(f"sh: '{ssf}' line {line_num}: eval error: {e}")
+                        continue
+                    
+                    if res:
+                        # Handle the action
+                        if action == "goto":
+                            if not action_args: continue
+                            target = action_args[0]
+                            if target.startswith(":"): target = target[1:]
+                            
+                            if target in labels:
+                                target_line = labels[target]
+                                f.seek(0)
+                                line_num = 0
+                                for _ in range(target_line):
+                                    f.readline()
+                                    line_num += 1
+                            else:
+                                found = False
+                                while True:
+                                    flin = f.readline()
+                                    if not flin: break
+                                    line_num += 1
+                                    fs = flin.strip()
+                                    if fs.startswith(":") and fs[1:].strip() == target:
+                                        labels[target] = line_num
+                                        found = True
+                                        break
+                                    elif fs.startswith(":"):
+                                        labels[fs[1:].strip()] = line_num
+                                if not found:
+                                    print(f"sh: '{ssf}' line {line_num}: label '{target}' not found")
+                                    break
+                            continue
                         
-                    else:
-                        #if sdata.debug:
-                        #    print(" ".join(tmp[4:]))
-                        sdata.upyos.run_cmd(" ".join(tmp[4:]))
-                continue
+                        elif action == "return":
+                            break
+                        elif action == "skip":
+                            if action_args and action_args[0].isdigit():
+                                skip_lines = int(action_args[0])
+                            continue
+                        elif action == "run":
+                            sdata.upyos.run_cmd(" ".join(action_args))
+                        else:
+                            # Default: the action is the command itself
+                            sdata.upyos.run_cmd(" ".join(tokens[4:]))
+                    continue
 
-            sdata.upyos.run_cmd(cmdl)
-            
-        return 0
+                # Default: regular command execution
+                sdata.upyos.run_cmd(cmd_string)
 
+    except Exception as e:
+        print(f"sh: error executing '{ssf}': {e}")
 
 def __main__(args):
-
-    if len(args) == 0:
-        print("Execute shell script file\nUsage: sh <script file>")
+    if not args:
+        print("Execute shell script file\nUsage: sh <script file> [args...]")
         return
     
-    ssf=args[0]
-    
-    # Run shell script file
+    ssf = args[0]
     if utls.file_exists(ssf):
-        lbl_ln=0 
-        while True:
-            lbl_ln = run(ssf, lbl_ln) # Call script once on every label
-            # if lbl_ln = 0 then end the script
-            # if lbl_ln <> 0 then goto statement in course
-            if lbl_ln==0:
-                break   
+        run(ssf, args[1:])
     else:
-        print(f"{ssf}: script not found")
-
-
-    
-        
-
-        
-
-
+        print(f"sh: {ssf}: script not found")
