@@ -2,12 +2,11 @@ import socket
 import network
 import uos
 import errno
+import gc
 from uio import IOBase
 
-#-- Auth rbenrax -->
 import sdata
 import utls
-#-- Auth rbenrax --<
 
 last_client_socket = None
 server_socket = None
@@ -56,15 +55,89 @@ class TelnetWrapper(IOBase):
                 written_bytes = self.socket.write(data)
                 data = data[written_bytes:]
             except OSError as e:
-                if len(e.args) > 0 and e.args[0] == errno.EAGAIN:
-                    # can't write yet, try again
-                    pass
+                # EBADF (9) means socket is closed. EAGAIN means wait.
+                if len(e.args) > 0:
+                    if e.args[0] == errno.EAGAIN:
+                        pass
+                    elif e.args[0] == 9: # EBADF
+                        break
+                    else:
+                        raise
                 else:
-                    # something else...propagate the exception
                     raise
     
     def close(self):
         self.socket.close()
+
+# Helper function to read input (user/password) with Telnet IAC filtering
+# Optimized to use bytearray to minimize memory allocation
+def read_input(sock, mask=None):
+    val = bytearray()
+    while True:
+        try:
+            char = sock.recv(1)
+            if not char:
+                break # Connection closed
+            
+            # Telnet IAC (Interpret As Command) Handling
+            if char == b'\xff':
+                # Should be blocking read, so we expect the cmd byte
+                cmd = sock.recv(1)
+                if not cmd: break # Should not happen mid-sequence
+                
+                ord_cmd = ord(cmd)
+                
+                # WILL, WONT, DO, DONT take one parameter
+                if ord_cmd >= 251 and ord_cmd <= 254:
+                    sock.recv(1) # Consume option byte
+                    continue
+                
+                # IAC IAC -> Literal 255
+                if ord_cmd == 255:
+                    # Proceed to process char (which is \xff)
+                    # Let it fall through to printable check
+                    pass 
+                else:
+                    # Other commands (SE, SB, etc) - simpler to ignore just the cmd byte for now
+                    continue
+
+            if char == b'\r':
+                # Handle CR (Enter)
+                # Try to consume an immediately following \n or \0
+                sock.setblocking(False)
+                try:
+                    # Verify if there is a next byte immediately available
+                    next_char = sock.recv(1)
+                    if next_char != b'\n' and next_char != b'\0':
+                        pass 
+                except:
+                    pass
+                sock.setblocking(True)
+                
+                sock.sendall(b'\r\n')
+                break
+            
+            if char == b'\n':
+                sock.sendall(b'\r\n')
+                break
+                
+            # Handle backspace (0x08) and DEL (0x7f)
+            if char == b'\x08' or char == b'\x7f':
+                if len(val) > 0:
+                    val.pop()
+                    sock.sendall(b'\x08 \x08')
+                continue
+
+            # Printable characters
+            if char >= b' ':
+                val.extend(char)
+                if mask:
+                    sock.sendall(mask.encode())
+                else:
+                    sock.sendall(char)
+        except Exception:
+            break
+    return val.decode()
 
 # Attach new clients to dupterm and 
 # send telnet control characters to disable line mode
@@ -77,34 +150,30 @@ def accept_telnet_connect(telnet_server):
         uos.dupterm(None)
         last_client_socket.close()
     
+    # Run GC to free up memory before allocating new connection resources
+    gc.collect()
+    
     last_client_socket, remote_addr = telnet_server.accept()
     utls.log(f"Telnet", f"Connection from: {remote_addr}")
     
-#-- Auth rbenrax -->
+    # Negotiate Telnet options IMMEDIATELY to control echo and line mode
+    # IAC WONT LINEMODE (255, 252, 34) - Force character mode
+    # IAC WILL ECHO (255, 251, 1) - Server will handle echoing (essential for masking)
+    last_client_socket.sendall(bytes([255, 252, 34])) 
+    last_client_socket.sendall(bytes([255, 251, 1]))
 
     last_client_socket.sendall(b'System: ' + sdata.sid + b'\r\n')
     
     if sdata.sysconfig["auth"]["paswd"]!="":
     
         last_client_socket.setblocking(True)
-        
-        # Añadido para queitar el Enter
-        last_client_socket.settimeout(10)
-        try:
-            last_client_socket.recv(1024)  # Limpiar buffer inicial
-        except:
-            pass
-        # Fin añadido para queitar el Enter
+        last_client_socket.settimeout(None) 
         
         last_client_socket.sendall(b'Login: ')
-        user=last_client_socket.readline().decode()[:-2] # remove CR
-        
-#        last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
+        user = read_input(last_client_socket, mask=None) # Echo ON for user
         
         last_client_socket.sendall(b'Password: ')
-        pasw=last_client_socket.readline().decode()[:-2] # remove CR
-
-        #print(user, pasw)
+        pasw = read_input(last_client_socket, mask="*") # Echo '*' for password
         
         if sdata.sysconfig["auth"]["user"] != user or sdata.sysconfig["auth"]["paswd"] != utls.sha1(pasw):
             last_client_socket.sendall(b'Not logged in.\r\n')
@@ -118,16 +187,9 @@ def accept_telnet_connect(telnet_server):
 
     else:
         last_client_socket.sendall(b'No password has been set, Press enter\r\n')
-        
-#-- Auth rbenrax --<
     
     last_client_socket.setblocking(False)
-    
-    # dupterm_notify() not available under MicroPython v1.1
     last_client_socket.setsockopt(socket.SOL_SOCKET, 20, uos.dupterm_notify)
-        
-    last_client_socket.sendall(bytes([255, 252, 34])) # dont allow line mode
-    last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
         
     uos.dupterm(TelnetWrapper(last_client_socket))
 
