@@ -93,7 +93,7 @@ def __main__(args):
         print("Usage:\tExecute modem script: atmodem -f <file.inf>, See /etc/modem.inf")
         print("\tReset modem: atmodem -r <mcu gpio> <wait to ready>")
         print("\tCreate serial uart: atmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio> [<modemname (modem0)>]")
-        print("\tExecute AT command: atmodem <AT Command> <timeout> <expected resp>, Note: quotation marks must be sent as \\@")
+        print("\tExecute AT command: atmodem <AT Command> <timeout> <expected resp>")
         print("\t-v verbose, -tm timings")
         return
     
