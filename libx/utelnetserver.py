@@ -42,6 +42,10 @@ class TelnetWrapper(IOBase):
                         return None
                     else:
                         return readbytes
+                # Handle common disconnection errors
+                # ECONNRESET: 104, EPIPE: 32, ETIMEDOUT: 110, EBADF: 9, ENOTCONN: 128
+                elif len(e.args) > 0 and e.args[0] in (104, 32, 110, 9, 128):
+                    return 0 # Return 0 to indicate end of stream/disconnection
                 else:
                     raise
         return readbytes
@@ -56,11 +60,12 @@ class TelnetWrapper(IOBase):
                 data = data[written_bytes:]
             except OSError as e:
                 # EBADF (9) means socket is closed. EAGAIN means wait.
+                # ECONNRESET (104), EPIPE (32), ETIMEDOUT (110) mean disconnection.
                 if len(e.args) > 0:
                     if e.args[0] == errno.EAGAIN:
                         pass
-                    elif e.args[0] == 9: # EBADF
-                        break
+                    elif e.args[0] in (9, 104, 32, 110, 128):
+                        return # Stop writing, connection is gone
                     else:
                         raise
                 else:

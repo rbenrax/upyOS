@@ -1,8 +1,8 @@
-#upyOS,0.9.4,2026-01-22
+#upyOS,0.9.4,2026-01-23
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
-/bin/atmodem.py,3982,e93727cba60e8a50383a7182a3bfe77347b3bc68,
+/bin/atmodem.py,4025,e93727cba60e8a50383a7182a3bfe77347b3bc68,
 /bin/atmqttc.py,5511,0b96971b1dc9fd9382a09c131f3a49f401ca4c91,
 /bin/atupgrade.py,7979,8fe20e575ff10bd4139ac32bafeee63272a53f19,
 /bin/atwget.py,1530,284baff095a463c5c85b3864574ee334619ecbbb,
@@ -90,7 +90,7 @@
 /libx/uiperf3.py,16588,81ddbc929ac7e40c259d280f06b9a55f334cc790,
 /libx/uping.py,3348,bd62f18eabcbb9ab2b330622f21d4b0d9a21bc62,
 /libx/upyDesktop.py,23153,6b237e073f1269dd645413512236a373836d82a2,
-/libx/utelnetserver.py,7854,bb1ae8f1236d2f9b63b04a1fc309215dc45e69ca,
+/libx/utelnetserver.py,8289,4654121f9b9555c276c1baf8cc619d22f2885f30,
 /etc/default.board,761,24838a46ff31ca783a1d80e0a18ce93d3697f47d,
 /etc/end.sh,47,ce39b4f98e97a2073c00d6bf93ab600a4ab1b083,
 /etc/help.txt,70,096bbc36f22bfd7e9a4cc1aa717421ad6f0cbd3c,
