@@ -115,20 +115,20 @@ def load_conf_file(path):
 # ---
 
 def protected(path):
-    
+    """Check if path is a protected system file"""
     if not "/" in path:
         if getcwd() == "/":
             path = "/" + path
         else:
             path = getcwd() + "/" + path
-        
-    #print(sdata.sysconfig["pfiles"])
-    #print(path)
     
-    if path in sdata.sysconfig["pfiles"]:
-        return True
-    else:
-        return False
+    try:
+        if path in sdata.sysconfig.get("pfiles", []):
+            return True
+    except:
+        pass
+    
+    return False
 
 def human(bytes):
     if bytes > 1024:

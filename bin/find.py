@@ -31,7 +31,7 @@ def __main__(args):
                     print(f"Found: {apath}{f}")
                         
             elif "r" in mode:
-                search(atxt, f, amode)
+                search(atxt, apath + f, amode)
 
     search(txt, "", mode)
 

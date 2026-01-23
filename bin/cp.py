@@ -12,7 +12,7 @@ def cp(sp, dp):
     with open(sp, 'rb') as fs:
         with open(dp, "wb") as fd:
             while True:
-                buf = fs.read(256)
+                buf = fs.read(512)
                 if not buf:
                     break
                 fd.write(buf)
