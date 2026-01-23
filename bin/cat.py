@@ -32,9 +32,8 @@ def __main__(args):
                         while True:
                             lin = f.readline()
                             if not lin: break
-                            out.write(lin)
-                        out.write("\n")
-                        #TODO: remove a \n at end 
+                            out.write(lin.rstrip('\n'))
+                        out.write("\n") 
         else:
             for a in args:
                 if "-" in a: continue

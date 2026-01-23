@@ -21,7 +21,7 @@ def __main__(args):
         tmp.sort()
         #print(f"{atxt=} {apath=} {amode=}")
 
-        if apath !="/" and len(apath)>1:
+        if apath != "/" and len(apath)>1:
             if apath[-1] != "/": apath+="/"
         
         for f in tmp:
