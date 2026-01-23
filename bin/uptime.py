@@ -14,7 +14,7 @@ def __main__(args):
     uptime_seconds_remaining = uptime_seconds % 86400
     uptime_hms = utime.gmtime(uptime_seconds_remaining)
     
-    ret = "{:0>2}:{:0>2}:{:0>2} {:3} days {:0>2}:{:0>2}:{:0>2} up".format(
+    ret = "{:0>2}:{:0>2}:{:0>2} up {} days, {:0>2}:{:0>2}:{:0>2}".format(
         localt[3], localt[4], localt[5], 
         uptime_days, uptime_hms[3], uptime_hms[4], uptime_hms[5]
     )

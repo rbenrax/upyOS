@@ -5,38 +5,42 @@ import utls
 def __main__(args):
 
     if len(args) == 0:
-        print("Find files in directories\nUsage: find <option>: <pattern> [-r]")
+        print("Find files in directories\nUsage: find <pattern> [-r] [path]")
         return
     
-    txt=""
+    txt=args[0]
     mode=""
+    path="/"
     
-    if len(args) == 1:
-       txt=args[0]
-    elif len(args) > 1:
-        txt=args[0]
-        mode=args[1]
+    if len(args) > 1:
+        for a in args[1:]:
+            if a == "-r":
+                mode = "-r"
+            else:
+                path = a
 
     def search(atxt, apath, amode):
-        tmp=uos.listdir(apath)
+        try:
+            tmp=uos.listdir(apath)
+        except OSError:
+            return
+            
         tmp.sort()
-        #print(f"{atxt=} {apath=} {amode=}")
 
-        if apath != "/" and len(apath)>1:
+        if apath != "/" and not apath.endswith("/"):
             apath+="/"
         
         for f in tmp:
-            if not utls.isdir(apath + f):
-                if atxt in f:
-                    print(f"Found: {apath}{f}")
+            full_path = apath + f
+            if atxt in f:
+                print(f"Found: {full_path}")
+            
+            if utls.isdir(full_path) and "r" in amode:
+                search(atxt, full_path, amode)
 
-            elif "r" in mode:
-                search(atxt, apath + f, amode)
-
-    search(txt, "", mode)
+    search(txt, path, mode)
 
 if __name__ == "__main__":
-
     args = ["re", "-r"]
     __main__(args)
         
