@@ -21,11 +21,11 @@ def remove(path):
     else:
           r = input("remove all files in dir " + path + "? ")
           if r=="y":
-               tmp=uos.listdir(path)
-               for f in tmp:
-                   if not utls.isdir(f):
-                       if not protected(f):
-                           osremove(path + "/" + f)
+                tmp=uos.listdir(path)
+                for f in tmp:
+                    if not utls.isdir(path + "/" + f):
+                        if not protected(path + "/" + f):
+                            osremove(path + "/" + f)
                    else:
                        remove(path + "/" + f)
 
