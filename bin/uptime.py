@@ -9,8 +9,14 @@ def __main__(args):
         return
     
     localt = utime.gmtime(utime.time())
-    uptime = utime.gmtime(utime.time() - (sdata.initime))
+    uptime_seconds = utime.time() - sdata.initime
+    uptime_days = uptime_seconds // 86400
+    uptime_seconds_remaining = uptime_seconds % 86400
+    uptime_hms = utime.gmtime(uptime_seconds_remaining)
     
-    ret = f"{localt[3]:0>2}:{localt[4]:0>2}:{localt[5]:0>2} {uptime[7]-1:3} days {uptime[3]:0>2}:{uptime[4]:0>2}:{uptime[5]:0>2} up"
+    ret = "{:0>2}:{:0>2}:{:0>2} {:3} days {:0>2}:{:0>2}:{:0>2} up".format(
+        localt[3], localt[4], localt[5], 
+        uptime_days, uptime_hms[3], uptime_hms[4], uptime_hms[5]
+    )
     
     utls.outs(args, ret)

@@ -45,7 +45,7 @@ class MicroWebSocket :
 
     @staticmethod
     def _tryStartThread(func, args=()) :
-        for x in range(10) :
+        for x in range(5) :  # Reduced attempts for faster failure
             try :
                 gc.collect()
                 start_new_thread(func, args)
@@ -125,7 +125,7 @@ class MicroWebSocket :
     # ----------------------------------------------------------------------------
 
     def _wsProcess(self, acceptCallback) :
-        self._socket.settimeout(3600)
+        self._socket.settimeout(300)  # Reduced timeout for embedded systems
         self._closed = False
         try :
             acceptCallback(self, self._httpCli)

@@ -6,7 +6,7 @@ def protected(p):
         print(f"Can not remove system file {p}")
         return True
     else:
-        False
+        return False
 
 def osremove(path):
     if utls.file_exists(path):
