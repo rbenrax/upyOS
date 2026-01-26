@@ -360,17 +360,22 @@ class ModemManager:
                 if ndc > 0:
                     ndc += 1
                 #print(f"No data {ndc}")
-                if ndc > 25:
+                if ndc > 100:
                     break
                 
-                time.sleep_ms(20)
+                time.sleep_ms(25)
         
             time.sleep_ms(5)
         
         fh.flush()
         
-        if ndc==0:
+        if ndc == 0:
             print(f"Error: Timeout {timeout/1000}s reached with no data")
+            return False, headers
+
+        if msz > 0 and rcvd_body < msz:
+            print(f"Error: Incomplete download. Expected {msz}, got {rcvd_body}")
+            return False, headers
         
         if self.timing:
             ptfin = time.ticks_diff(time.ticks_ms(), ptini)
