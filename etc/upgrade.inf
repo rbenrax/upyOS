@@ -1,4 +1,4 @@
-#upyOS,0.9.4,2026-01-26
+#upyOS,0.9.4,2026-01-27
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -104,9 +104,9 @@
 /etc/boards/upyOS-esp32s3_vcc_gnd.board,1891,9b90572ee826b068be9856ec6ddaf3582db345a7,
 /etc/boards/upyOS-esp8266.board,749,9eda615b9cd300c517a512203a26c0c0e79460dc,
 /etc/boards/upyOS-rp2.board,2281,8ed5cd81268ef39bf98254c905dd2f227d5394da,
-/www/app.js,36353,167cb155f491a37022403ece4be9fa37c9238467,
-/www/desktop.html,6305,f7d7828aa6cb9baeca5260cf865082f30dd6e7d6,
+/www/app.js,36596,e495fed1726a1e5d30202566d5c0e2383f1709b1,
+/www/desktop.html,6396,680402cc77e410d634f924ae33b11eb71478e12e,
 /www/index.html,3071,7527be9854e4bb7ff808d94f7aa7c99877baa00a,
 /www/login.html,3146,95560f1aff4c1bd0eac60fbd309382799ad98826,
-/www/style.css,9854,b3f7f78cb2691b7375e0cbeb4f53f17dbc6ab813,
+/www/style.css,10057,687d931034916b4643cb11ecc8ed59a2be688232,
 #files,110

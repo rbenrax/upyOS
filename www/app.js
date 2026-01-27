@@ -703,6 +703,7 @@ const termStatus = document.getElementById('term-status');
 const termContainer = document.getElementById('terminal-container');
 const termInputProxy = document.getElementById('term-input-proxy');
 const btnTermConnect = document.getElementById('btn-term-connect');
+const btnTermStop = document.getElementById('btn-term-stop');
 
 function logTerm(msg, isError = false) {
     if (isError && termContainer) {
@@ -775,6 +776,12 @@ function updateTermUI(connected) {
 
 if (btnTermConnect) {
     btnTermConnect.addEventListener('click', connectTerminal);
+}
+
+if (btnTermStop) {
+    btnTermStop.addEventListener('click', () => {
+        apiCall('/api/cmd/interrupt', 'POST').catch(err => console.error("Interrupt failed:", err));
+    });
 }
 
 // Handle inputs for REPL (char by char)
