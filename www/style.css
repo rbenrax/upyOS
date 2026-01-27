@@ -186,6 +186,17 @@ button:hover {
   border-color: var(--accent);
 }
 
+#btn-term-stop {
+    background-color: transparent;
+    border-color: var(--error);
+    color: var(--error);
+}
+
+#btn-term-stop:hover {
+    background-color: var(--error);
+    color: var(--header-bg);
+}
+
 #current-path {
   font-family: monospace;
   color: var(--text-secondary);
