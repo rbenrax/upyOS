@@ -94,30 +94,49 @@ def __main__(args):
         print("\tReset modem: atmodem -r <mcu gpio> <wait to ready>")
         print("\tCreate serial uart: atmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio> [<modemname (modem0)>]")
         print("\tExecute AT command: atmodem <AT Command> <timeout> <expected resp>")
-        print("\t-v verbose, -tm timings")
+        print("\tOptions: -m <modemname> (def: modem0), -v verbose, -tm timings")
         return
     
     try:
+        device = "modem0"
+        if "-m" in args:
+            idx = args.index("-m")
+            if idx + 1 < len(args):
+                device = args[idx+1]
+                del args[idx:idx+2]
+            else:
+                print("Error: -m requires a modem name")
+                return
+        
+        elif "--modem" in args: # Support for --modem alias
+            idx = args.index("--modem")
+            if idx + 1 < len(args):
+                device = args[idx+1]
+                del args[idx:idx+2]
+            else:
+                print("Error: --modem requires a modem name")
+                return
+
         # Create a modem manager instance
-        modem = ModemManager() # Def device sdata.modem0
+        mm = ModemManager(device) # Def device sdata.modem0
         
         if "-v" in args:
-            modem.sctrl = True
-            modem.scmds = True
-            modem.sresp = True
+            mm.sctrl = True
+            mm.scmds = True
+            mm.sresp = True
             # Remover el flag -n de los argumentos
             args = [arg for arg in args if arg != "-v"]
             
         if "-tm" in args:
-            modem.timing = True
+            mm.timing = True
             # Remover el flag -n de los argumentos
             args = [arg for arg in args if arg != "-tm"]
        
         if args[0] == "-f":
             file = args[1]
-            executeScript(modem, file)
+            executeScript(mm, file)
         else:
-            executeLine(modem, args)
+            executeLine(mm, args)
             
     except Exception as ex:
         print("atmodem error, " + str(ex))

@@ -47,6 +47,7 @@ def __main__(args):
         print("\t atmqttc <unsub>")
         print("\t atmqttc <close>")
         print("\t atmqttc <listen> or [-l], [-v] verbose, [-tm] timings")
+        print("\t Options: -m <modemname> (or --modem) (def: modem0)")
         return
 
     def parse(mod):
@@ -76,14 +77,35 @@ def __main__(args):
     recon = 1 if recon == "1" else 0
     
     topic = parse("-t")
-    messg = parse("-m")
+    messg = parse("-m") # Wait, -m is used for message!
+
+    # CONFLICT: -m is already used for message!
+    # I must check the file content first.
+    # line 44: print("\t atmqttc <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
+    # Yes, -m is message.
+    # The user request says: "modificar todos los comandos ... para que permitan el paso de un nuevo parametro opcional que sea modemname, o simplemente modem"
+    # I will use --modem primarily, and maybe -dev or -M?
+    # Or just rely on --modem.
+    # The user said "parametro opcional que sea modemname, o simplemente modem".
+    # Since -m is taken, I will use --modem and maybe -dev?
+    # Or I can use -d (but usually data).
+    # I'll stick to --modem.
     
+    # Wait, the user said "allow passing a new optional parameter that is modemname, or simply modem"
+    # Maybe he meant the *value* is modemname?
+    # "que sea modemname, o simplemente modem" -> parameter name.
+    # I will use `--modem` to avoid conflict with `-m` (message).
+    
+    device = parse("--modem")
+    if device == "":
+        device = "modem0"
+
     qos   = parse("-q")
     qos   = int(qos) if qos in ["1", "2"] else 0
     retain = parse("-r")
     retain = 1 if retain == "1" else 0
 
-    mm = MqttManager() # default dev= sdata.modem0
+    mm = MqttManager(device) # default dev= sdata.modem0
     
     # If modem not connected
     status = mm.wifi_status()

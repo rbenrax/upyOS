@@ -36,6 +36,19 @@ def __main__(args):
     mm = None
     
     try:
+        # Handle modem name argument
+        device = "modem0"
+        if "-m" in args:
+            idx = args.index("-m")
+            if idx + 1 < len(args):
+                device = args[idx+1]
+                del args[idx:idx+2]
+        elif "--modem" in args:
+            idx = args.index("--modem")
+            if idx + 1 < len(args):
+                device = args[idx+1]
+                del args[idx:idx+2]
+
         mod="" 
         for i in args:
             if i[0]=="-": mod +=i [1:]
@@ -55,6 +68,7 @@ def __main__(args):
             print("Upgrade upyOS from git repository")
             print("Usage: upgrade <options>:-f quiet mode, -r reboot after upgrade, -v view file list")
             print(", -t test branch, -i ignore errors, -o overwrite diffs, -s stop all processes")
+            print(", -m <modemname> (or --modem) specify modem device")
             return
 
         print("upyOS OTA Upgrade 2.0 (ESP-AT), \nDownloading upgrade list ", end="")
@@ -66,7 +80,7 @@ def __main__(args):
             url = url_base + "/main" # Default main
             print("from main branch", end="")
         
-        mm = ModemManager("modem0")
+        mm = ModemManager(device)
         #mm.sctrl = True
         #mm.scmds = True
         #mm.sresp = True

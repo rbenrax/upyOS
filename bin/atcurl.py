@@ -14,6 +14,7 @@ def __main__(args):
       -d, DATA    Data to send in body (for POST/PUT)
       -i,         Show response headers
       -v,         Verbose mode
+      -m, --modem Modem name (default: modem0)
       --h         Show this help
     """
     
@@ -28,6 +29,7 @@ def __main__(args):
     show_response_headers = False
     verbose = False
     url = None
+    device = "modem0"
     
     # Parse arguments
     i = 0
@@ -68,6 +70,14 @@ def __main__(args):
             verbose = True
             i += 1
             
+        elif arg in ["-m", "--modem"]:
+            if i + 1 < len(args):
+                device = args[i + 1]
+                i += 2
+            else:
+                print("Error: -m requires a modem name")
+                return
+
         elif not arg.startswith("-"):
             url = arg
             i += 1
@@ -111,7 +121,7 @@ def __main__(args):
         return
     
     # Setup modem
-    mm = ModemManager("modem0")
+    mm = ModemManager(device)
     
     # Enable debugging if verbose
     if verbose:
