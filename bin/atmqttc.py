@@ -47,6 +47,7 @@ def __main__(args):
         print("\t atmqttc <unsub>")
         print("\t atmqttc <close>")
         print("\t atmqttc <listen> or [-l], [-v] verbose, [-tm] timings")
+        print("\t Options: -M <modemname> (def: modem0)")
         return
 
     def parse(mod):
@@ -76,14 +77,18 @@ def __main__(args):
     recon = 1 if recon == "1" else 0
     
     topic = parse("-t")
-    messg = parse("-m")
+    messg = parse("-m") 
     
+    device = parse("-M")
+    if device == "":
+        device = "modem0"
+
     qos   = parse("-q")
     qos   = int(qos) if qos in ["1", "2"] else 0
     retain = parse("-r")
     retain = 1 if retain == "1" else 0
 
-    mm = MqttManager() # default dev= sdata.modem0
+    mm = MqttManager(device) # default dev= sdata.modem0
     
     # If modem not connected
     status = mm.wifi_status()

@@ -7,8 +7,15 @@ import gc
 
 def __main__(args):
     
+    device = "modem0"
+    if "-M" in args:
+        idx = args.index("-M")
+        if idx + 1 < len(args):
+            device = args[idx+1]
+            del args[idx:idx+2]
+            
     if len(args) == 0:
-        print ("Get a file from the net\nUsage:wget <url> [<size>]")
+        print ("Get a file from the net\nUsage:wget <url> [<size>] [-M <modem>]")
         return
     
     url = args[0]
@@ -23,7 +30,7 @@ def __main__(args):
     if len(args) > 1:
         size = int(args[1])
 
-    mm = ModemManager("modem0")
+    mm = ModemManager(device)
     #mm.sctrl = True
     #mm.scmds = True
     #mm.sresp = True
