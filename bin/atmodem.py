@@ -45,7 +45,7 @@ def executeLine(mm, tmp):
             baud = int(tmp[2])  # Baudrate
             tx   = int(tmp[3])  # TX gpio
             rx   = int(tmp[4])  # RX gpio
-            if len(tmp) == 6:
+            if len(tmp) >= 6:
                mm.device = tmp[5] # Modem name (modem0)
 
             rts=0
