@@ -1,4 +1,4 @@
-#upyOS,0.9.4,2026-01-27
+#upyOS,0.9.4,2026-01-29
 /boot.py,139,3947b36ed837906d45bee3e0d8a0befa17d9052c,
 /main.py,71,a7a7b13b9fe5a328fb06b13ea488c6a762d23a16,
 /bin/atcurl.py,5180,16ca62e34521e9094231b8a793a8dd58e500103d,
@@ -80,7 +80,7 @@
 /lib/utls.py,8058,fe7d20827cccc2ce25f6da8203cd9a91eb240a3d,
 /libx/editor.py,12606,219963ac31b981de65deec87a7a0ce97fd4342ea,
 /libx/editstr.py,6445,6e4059fdf2df28be1e09164ca7ed8ecca618e9ee,
-/libx/esp_at.py,25280,ca537bda036961388c3277f01778a0464172f51d,
+/libx/esp_at.py,25307,211b58ef03476d40889fbb3a0ef6a4c61a43e4a3,
 /libx/microWebSocket.py,11232,62fa0f2bbe017a44da75d1178cced1912247dc4b,
 /libx/microWebSrv.py,35978,225fbb83e42abc2a811feefdd3c75a9dc1f33e82,
 /libx/microWebTemplate.py,13597,9b74e227ef22f2be768f46e404d62a150eaa95a2,
