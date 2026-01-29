@@ -8,19 +8,14 @@ import gc
 def __main__(args):
     
     device = "modem0"
-    if "-m" in args:
-        idx = args.index("-m")
-        if idx + 1 < len(args):
-            device = args[idx+1]
-            del args[idx:idx+2]
-    elif "--modem" in args: # Support for --modem alias
-        idx = args.index("--modem")
+    if "-M" in args:
+        idx = args.index("-M")
         if idx + 1 < len(args):
             device = args[idx+1]
             del args[idx:idx+2]
             
     if len(args) == 0:
-        print ("Get a file from the net\nUsage:wget <url> [<size>] [-m <modem>]")
+        print ("Get a file from the net\nUsage:wget <url> [<size>] [-M <modem>]")
         return
     
     url = args[0]

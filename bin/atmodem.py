@@ -94,27 +94,18 @@ def __main__(args):
         print("\tReset modem: atmodem -r <mcu gpio> <wait to ready>")
         print("\tCreate serial uart: atmodem -c <uart_id> <baud rate> <tx gpio> <rx gpio> [<modemname (modem0)>]")
         print("\tExecute AT command: atmodem <AT Command> <timeout> <expected resp>")
-        print("\tOptions: -m <modemname> (def: modem0), -v verbose, -tm timings")
+        print("\tOptions: -M <modemname> (def: modem0), -v verbose, -tm timings")
         return
     
     try:
         device = "modem0"
-        if "-m" in args:
-            idx = args.index("-m")
+        if "-M" in args:
+            idx = args.index("-M")
             if idx + 1 < len(args):
                 device = args[idx+1]
                 del args[idx:idx+2]
             else:
-                print("Error: -m requires a modem name")
-                return
-        
-        elif "--modem" in args: # Support for --modem alias
-            idx = args.index("--modem")
-            if idx + 1 < len(args):
-                device = args[idx+1]
-                del args[idx:idx+2]
-            else:
-                print("Error: --modem requires a modem name")
+                print("Error: -M requires a modem name")
                 return
 
         # Create a modem manager instance
