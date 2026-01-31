@@ -82,7 +82,7 @@ class ModemManager:
 
             setattr(sdata, self.device, self.modem)
 
-            time.sleep(1)
+            time.sleep(2)
 
             if self.sctrl:
                 print(f"UART {id} created as {device}")
