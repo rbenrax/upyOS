@@ -486,7 +486,7 @@ To set a user and password use: setauth admin password password
 
 ### Android Development
 
-By starting `utelnetd` and `uftpd` on boot, you can develop remotely from **Android** using apps like **"Serial WiFi Terminal"** and **"Squircle CE"** from Google Play. **Termux** is also an excellent option as a telnet client.
+By starting `utelnetd` and `uftpd` on boot, you can develop remotely from **Android** using apps like **"Serial WiFi Terminal"** and **"Squircle CE"** from Google Play. **Termux** is also an excellent option as a telnet client (No extra installation is needed).
 
 ![Android development environment](media/Screenshot_20251012_092146_Termux.jpg)
 
@@ -523,7 +523,7 @@ ls ~/dev_upyos
 fusermount -u ~/dev_upyos
 ```
 
-**Android Alternative:** Squircle CE + Termux Apps (No extra installation is needed)
+**Other alternatives:** In my repositories, you can find the same utility mentioned above, but implemented using different programming languages. This is part of an experiment whose goal was to identify the differences among several of the most prominent programming languages in use (Go, Rust, Python, etc.), all applied to the same function, and to evaluate their performance, stability, development time, and so on.
 
 ---
 
