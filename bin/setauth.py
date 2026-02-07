@@ -40,13 +40,11 @@ def __main__(args):
         if args[1].strip() == "":
             print(f"Security has been disabled")
         else:
-            print(f"New password has been set fot user {args[0]}")
-            
-        #TODO: Save file
+            print(f"New password has been set for user {args[0]}")
         
     elif len(args) == 1:
         if args[0] == "-v":
-            print(f"Curren user is {sdata.sysconfig["auth"]["user"]}")
+            print(f"Current user is {sdata.sysconfig['auth']['user']}")
             
         elif args[0] == "-d":
             sdata.sysconfig["auth"]["paswd"] = ""

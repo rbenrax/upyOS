@@ -9,22 +9,41 @@ def __main__(args):
 
         ret = False
         if "-f" in args:
-            ret = utls.file_exists(args[1])
+            idx = args.index("-f")
+            if idx + 1 < len(args):
+                ret = utls.file_exists(args[idx + 1])
+            else:
+                print("test: missing argument after -f")
+                return
 
         if "-d" in args:
-            ret = utls.isdir(args[1])
+            idx = args.index("-d")
+            if idx + 1 < len(args):
+                ret = utls.isdir(args[idx + 1])
+            else:
+                print("test: missing argument after -d")
+                return
 
         if "-p" in args:
-            pn = args[1]
-            for i in sdata.procs:
-                if pn in i.cmd:
-                    ret=True
-                    break
+            idx = args.index("-p")
+            if idx + 1 < len(args):
+                pn = args[idx + 1]
+                for i in sdata.procs:
+                    if pn in i.cmd:
+                        ret=True
+                        break
+            else:
+                print("test: missing argument after -p")
+                return
 
         if "-g" in args:
-            from machine import Pin            
-            v = Pin(int(args[1]), Pin.IN).value()
-            ret = True if v == 1 else False 
+            idx = args.index("-g")
+            if idx + 1 < len(args):
+                from machine import Pin            
+                v = Pin(int(args[idx + 1]), Pin.IN).value()
+                ret = True if v == 1 else False
+            else:
+                print("test: missing argument after -g")
+                return
 
         utls.outs(args, ret)
-

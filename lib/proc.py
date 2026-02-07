@@ -50,7 +50,7 @@ class Proc:
                     if len(self.args) > 0:
                         mod.__main__(self.args)
                     else:
-                        mod.__main__("") # TODO: no nice
+                        mod.__main__([])
 
             # External shell scripts
             elif ext=="sh":
@@ -90,8 +90,8 @@ class Proc:
         except Exception as e:
             self.rmmod=True
             print(f"Error executing {self.cmd}")
-            #if sdata.debug:
-            sys.print_exception(e)
+            if sdata.debug:
+                sys.print_exception(e)
         finally:
 
             # Check if multiple instances of a module are running

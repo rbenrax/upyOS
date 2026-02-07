@@ -1,8 +1,10 @@
 # Wifi management utility
 
 info = "Verify that your board has Wi-Fi, that it is loading the appropriate .board \nconfiguration file in /etc/init.sh, and that Wi-Fi support is enabled in it."
+_network_available = False
 try:
     import network
+    _network_available = True
 except ImportError as ie:
     print("Networking is not implemented on this platform")
     print(info)
@@ -15,7 +17,7 @@ import uos
 
 import sdata
 
-# <network> Class, functions & constant 
+# <network> Class, functions & constant
 
 #network.WLAN()
 #network.PPP()      'ppp = network.PPP(modem.uart)'
@@ -57,14 +59,16 @@ NETMODE = {1: "11B", 2: "11G", 4: "11N", 8: "LR"}
 #network.STAT_NO_AP_FOUND 201
 #network.STAT_WRONG_PASSWORD 202
 
-NETSTAT= {
-    network.STAT_IDLE : "no connection and no activity",
-    network.STAT_CONNECTING : "connecting in progress",
-    network.STAT_WRONG_PASSWORD : "failed due to incorrect password",
-    network.STAT_NO_AP_FOUND : "failed because no access point replied",
-    network.STAT_CONNECT_FAIL : "failed due to other problems",
-    network.STAT_GOT_IP : "connection successful"
-}
+NETSTAT = {}
+if _network_available:
+    NETSTAT = {
+        network.STAT_IDLE : "no connection and no activity",
+        network.STAT_CONNECTING : "connecting in progress",
+        network.STAT_WRONG_PASSWORD : "failed due to incorrect password",
+        network.STAT_NO_AP_FOUND : "failed because no access point replied",
+        network.STAT_CONNECT_FAIL : "failed due to other problems",
+        network.STAT_GOT_IP : "connection successful"
+    }
 
 # Old
 #NETSTAT = {203: "Association fail", 200: "Beacon timeout", 1001: "Connecting", 1010: "Got IP", \
