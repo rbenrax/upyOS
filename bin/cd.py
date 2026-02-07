@@ -3,7 +3,7 @@ import uos
 def __main__(args):
 
     if "--h" in args:
-        print("Chage current directory\nUsage: cd <path>")
+        print("Change current directory\nUsage: cd <path>")
         return
 
     if len(args) == 0:

@@ -19,15 +19,15 @@ def info(path="", mode="-l"):
     
     # Hidden files
     if not "a" in mode:
-        if filename[0] == ".": 
-            return 0
+        if filename[0] == ".":
+            return (0, False)
     
     # Call stat() only once and cache the result
     try:
         stat = uos.stat(path)
     except OSError:
         print("File not found")
-        return 0
+        return (0, False)
     
     # Extract stat fields
     stat_mode = stat[0]

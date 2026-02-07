@@ -10,12 +10,12 @@ def __main__(args):
 
     # Separate redirection args
     redirection_args = []
-    if ">" in args:
-        idx = args.index(">")
+    if ">>" in args:
+        idx = args.index(">>")
         redirection_args = args[idx:]
         args = args[:idx]
-    elif ">>" in args:
-        idx = args.index(">>")
+    elif ">" in args:
+        idx = args.index(">")
         redirection_args = args[idx:]
         args = args[:idx]
 

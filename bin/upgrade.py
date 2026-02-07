@@ -11,7 +11,7 @@ try:
     import urequests
     import usocket
     import ssl
-except:
+except ImportError:
     print("Try atupgrade with esp-at modem instead")
 
 url_base = f'https://raw.githubusercontent.com/rbenrax/upyOS/refs/heads'
@@ -256,7 +256,7 @@ def __main__(args):
             print("]OK\n100% Upgrade complete.")
             print(f"{cntup} Upgraded files")
         else:
-           print(f"]\nUpgrade not complete. {cont}/{ftu}")
+            print(f"]\nUpgrade not complete. {cont}/{ftu}")
             
         time.sleep(2)
         

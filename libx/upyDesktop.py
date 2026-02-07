@@ -214,7 +214,7 @@ def fs_list_handler(httpClient, httpResponse):
         if path == '': path = '/'
         
         # os.listdir in MicroPython/standard python
-        # We need to distiguish files and dirs. 
+        # We need to distinguish files and dirs.
         # In full Python os.scandir is better, but MicroPython os.listdir returns strings.
         # We'll use os.stat to check type.
         

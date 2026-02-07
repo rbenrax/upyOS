@@ -14,8 +14,10 @@ def __main__(args):
             print(f"Starting httpd service on port {dport}")
 
             routeHandlers = []
+            _upyDesktop = None
             try:
                 import upyDesktop
+                _upyDesktop = upyDesktop
                 routeHandlers += upyDesktop.routes
             except ImportError:
                 print("Could not import upyDesktop")
@@ -23,8 +25,8 @@ def __main__(args):
             mws = MicroWebSrv(proc, routeHandlers=routeHandlers, port=dport, bindIP='0.0.0.0', webPath="/www")
             
             # Hook Terminal WebSocket
-            if hasattr(upyDesktop, 'ws_accept_callback'):
-                 mws.AcceptWebSocketCallback = upyDesktop.ws_accept_callback
+            if _upyDesktop and hasattr(_upyDesktop, 'ws_accept_callback'):
+                 mws.AcceptWebSocketCallback = _upyDesktop.ws_accept_callback
                  
             mws.Start(threaded=True)
 
