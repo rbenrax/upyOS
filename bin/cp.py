@@ -39,17 +39,14 @@ def __main__(args):
             if not utls.isdir(spath):
                 cp(spath, dpath)
             else:
-                if utls.isdir(spath):
-                    if not spath[-1]=="/": spath +="/"
-                    
-                    if utls.isdir(dpath):
-                        if not dpath[-1]=="/": dpath +="/"
-                    
-                    tmp=uos.listdir(spath)
-                    for f in tmp: 
-                        cp(spath+f, dpath)
-                else:
-                    print("not a valid paths " + spath)
+                if not spath[-1]=="/": spath +="/"
+                
+                if utls.isdir(dpath):
+                    if not dpath[-1]=="/": dpath +="/"
+                
+                tmp=uos.listdir(spath)
+                for f in tmp:
+                    cp(spath+f, dpath)
                           
             
 

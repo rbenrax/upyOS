@@ -2,7 +2,7 @@ def hexdump(data):
     if isinstance(data, str):
         data = data.encode('utf-8')  # Asegurarse de que sea bytes
     elif not isinstance(data, (bytes, bytearray)):
-        raise TypeError("Los datos deben ser bytes, bytearray o str.")
+        raise TypeError("Data must be bytes, bytearray or str.")
 
     offset = 0
     length = len(data)

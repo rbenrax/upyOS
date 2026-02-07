@@ -55,7 +55,7 @@ class upyOS:
             sdata.sysconfig={"ver"    : 1.0,
                              "board"  : "/etc/default.board",
                              "pfiles" : ["/boot.py","/main.py"],
-                             "alias"  : {"": "", "": ""},
+                             "alias"  : {},
                              "env"    : {"TZ": "+1", "?": "", "0": ""},
                              "auth"   : {"user": "admin", "paswd": ""}
                             }
@@ -130,9 +130,7 @@ class upyOS:
         tmp = fcmd.split()
  
         for e in tmp:
-            if e[0]=="$":
-                #v=utls.getenv(e[1:])
-                #fcmd = fcmd.replace(e, v)
+            if e and e[0]=="$":
                 fcmd = fcmd.replace(e, '"' + str(utls.getenv(e[1:])) + '"' )
         if fcmd[:2]=="> ":
             self.run_py_code(fcmd[2:])
