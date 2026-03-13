@@ -270,15 +270,16 @@ def on_message_received(msg):
 def __main__(args):
 
     if len(args) == 0 or "--h" in args:
-        print("MQTT Library and command line utility - MicroPython Robust MQTT")
-        print("Usage:\t Connect with -h <host> [-p <port> -R <reconnect>]")
-        print("\t ATmqtt <pub> -t <topic> -m <message> [-r <retain> -q <qos> ]")
-        print("\t ATmqtt <lastwill> -t <topic> -m <message> [-r <retain> -q <qos> ]")
-        print("\t ATmqtt <sub> -t <topic> [-q <qos>]")
-        print("\t ATmqtt <listsub>")
-        print("\t ATmqtt <unsub> -t <topic>")
-        print("\t ATmqtt <ping> - check connection")
-        print("\t ATmqtt <close>")
+        print("MQTT Client - MicroPython Robust MQTT")
+        print("Usage:\t First connect with -h <host> [-p <port> -u <user> -P <password> -R <reconnect>]")
+        print("\t mqttc <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
+        print("\t mqttc <lastwill> -t <topic> -m <message> [-q <qos> -r <retain>]")
+        print("\t mqttc <sub> -t <topic> [-q <qos>]")
+        print("\t mqttc <listsub>")
+        print("\t mqttc <unsub> -t <topic>")
+        print("\t mqttc <ping>")
+        print("\t mqttc <listen> [-l]")
+        print("\t mqttc <close>")
         return
 
     def parse(mod):
@@ -289,8 +290,8 @@ def __main__(args):
             else:
                 return ""
         except Exception as ex:
-            print("ATmqtt modifier error, " + mod)
-            if mm.debug:
+            print("mqttc modifier error, " + mod)
+            if sdata.debug:
                 sys.print_exception(ex)
             return ""
 
@@ -314,9 +315,11 @@ def __main__(args):
     retain = retain.lower() == "true" or retain == "1"
 
     mm = None
-    
-    # Conectar si se especifica -h
-    if "-h" in args:
+
+    # Recover existing connection from sdata or connect if -h specified
+    if hasattr(sdata, "mqtt_client") and sdata.mqtt_client and not "-h" in args:
+        mm = sdata.mqtt_client
+    elif "-h" in args:
         mm = MqttManager(client_id=sdata.sid, server=host, port=port, user=user, password=passw)
         mm.set_callback(on_message_received)
         
@@ -328,11 +331,14 @@ def __main__(args):
         if not mm.ping():
             print("No connected")
             return
+
+        # Store in sdata for persistent connection
+        sdata.mqtt_client = mm
     else:
-        print("-h is required to connect")
+        print("-h required")
         return
 
-    # Comandos
+    # Commands
     if cmd == "pub":
         if not "-t" in args or topic == "":
             print("-t required")
@@ -355,9 +361,9 @@ def __main__(args):
             return        
         success = mm.mqtt_last_will(topic, messg, retain, qos)
         if success:
-            print("Last will message published")
+            print("Last will configured")
         else:
-            print("Publish failed")
+            print("Last will configuration failed")
 
     elif cmd == "sub":
         if not "-t" in args or topic == "":
@@ -366,7 +372,6 @@ def __main__(args):
         success = mm.mqtt_sub(topic, qos)
         if success:
             print(f"Subscribed to {topic}")
-            mm.msgs_loop(on_message_received)
         else:
             print("Subscribe failed")
         
@@ -377,14 +382,13 @@ def __main__(args):
         if not "-t" in args or topic == "":
             print("-t required")
             return
-        success = mm.mqtt_unsub(topic)
-        #if success:
-        print(f"Unsubscribe request sent for {topic}")
-        #else:
-        #    print("Unsubscribe may not be fully supported")
+        mm.mqtt_unsub(topic)
+        print(f"Unsubscribed from {topic}")
 
     elif cmd == "close":
         success = mm.mqtt_clean()
+        if hasattr(sdata, "mqtt_client"):
+            sdata.mqtt_client = None
         if success:
             print("MQTT closed")
         else:
@@ -393,11 +397,11 @@ def __main__(args):
     elif cmd == "ping":
         success = mm.ping()
         if success:
-            print("MQTT ping successful")
+            print("MQTT ping ok")
         else:
             print("MQTT ping failed")
         
-    elif cmd == "listen":
+    elif cmd == "listen" or "-l" in args:
         mm.msgs_loop(on_message_received)
         
     else:

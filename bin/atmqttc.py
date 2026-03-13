@@ -36,18 +36,18 @@ def on_message_received(msg):
 
 def __main__(args):
 
-    #TODO: add qos, reconnect and others parms
-
     if len(args) == 0 or "--h" in args:
-        print("MQTT Command line utility for AT-ESP serial modem")
-        print("Usage:\t First command executed connect with -h <host> [-p <port> -u <user> -P <pasword> -R <reconnect>]")
+        print("MQTT Client - AT-ESP serial modem")
+        print("Usage:\t First connect with -h <host> [-p <port> -u <user> -P <password> -R <reconnect>]")
         print("\t atmqttc <pub> -t <topic> -m <message> [-q <qos> -r <retain>]")
+        print("\t atmqttc <lastwill> -t <topic> -m <message> [-q <qos> -r <retain>]")
         print("\t atmqttc <sub> -t <topic> [-q <qos>]")
         print("\t atmqttc <listsub>")
-        print("\t atmqttc <unsub>")
+        print("\t atmqttc <unsub> -t <topic>")
+        print("\t atmqttc <ping>")
+        print("\t atmqttc <listen> [-l]")
         print("\t atmqttc <close>")
-        print("\t atmqttc <listen> or [-l], [-v] verbose, [-tm] timings")
-        print("\t Options: -M <modemname> (def: modem0)")
+        print("\t Options: [-v] verbose, [-tm] timings, [-M <modemname>] (def: modem0)")
         return
 
     def parse(mod):
@@ -146,21 +146,32 @@ def __main__(args):
             print("-m required")
             return
         if mm.mqtt_pub(topic, messg, qos, retain):
-            print(f"Message '{topic}': '{messg}' published")
+            print(f"Message published")
         else:
-            print(f"Publish '{topic}': '{messg}' failed")
-        
+            print(f"Publish failed")
+
+    elif cmd == "lastwill":
+        if not "-t" in args or topic == "":
+            print("-t required")
+            return
+        if not "-m" in args or messg == "":
+            print("-m required")
+            return
+        if mm.mqtt_conncfg(topic=topic, msg=messg, qos=qos, retain=retain):
+            print("Last will configured")
+        else:
+            print("Last will configuration failed")
+
     elif cmd == "sub":
         if not "-t" in args or topic == "":
             print("-t required")
             return
         if mm.mqtt_sub(topic, qos):
-            print(f"Subscription '{topic}' Ok")
+            print(f"Subscribed to {topic}")
         else:
-            print(f"Subscription '{topic}' failed")
+            print(f"Subscribe failed")
 
     elif cmd == "listsub":
-        # TODO: parse
         print(mm.mqtt_list_subs())
         
     elif cmd == "unsub":
@@ -168,33 +179,45 @@ def __main__(args):
             print("-t required")
             return
         if mm.mqtt_unsub(topic):
-            print(f"Unsubscription '{topic}' Ok")
+            print(f"Unsubscribed from {topic}")
         else:
-            print(f"Unsubscription '{topic}' failed")
+            print(f"Unsubscribe failed")
 
     elif cmd == "close":
         mm.mqtt_clean()
         utls.setenv("atmqttc", "")
         print("MQTT closed")
 
+    elif cmd == "ping":
+        # Check MQTT connection status via MQTTCONN?
+        sts, ret = mm.atCMD("AT+MQTTCONN?")
+        if sts and "+MQTTCONNECTED" in ret or "3" in ret:
+            print("MQTT ping ok")
+        else:
+            print("MQTT ping failed")
+
     elif cmd == "listen" or "-l" in args:
         print("Listening MQTT messages...")
-        while True:
-            
-            # Thread control
-            if proc and proc.sts=="S":break
+        print("Ctrl+C to stop")
+        try:
+            while True:
+                # Thread control
+                if proc and proc.sts=="S":break
 
-            if proc and proc.sts=="H":
-                time.sleep(1)
-                continue
-            
-            messages = mm.check_messages()
-            if messages:
-                for msg in messages:
-                    print(f"{msg['topic']}: {msg['data']}")
-            time.sleep(0.1)
+                if proc and proc.sts=="H":
+                    time.sleep(1)
+                    continue
+                
+                messages = mm.check_messages()
+                if messages:
+                    for msg in messages:
+                        print(f"{msg['topic']}: {msg['data']}")
+                time.sleep(0.1)
+        except KeyboardInterrupt:
+            print("\nStopped listening")
+
     else:
-       print(f"MQTT not valid subcommand {cmd}")            
+        print(f"Invalid subcommand {cmd}")            
 
     # Callback example
     #if "-ll" in args:
