@@ -11,7 +11,7 @@ Last-minute update:
 The goal is to provide a common, modular base for using microcontrollers in a **standalone** manner, moving away from monolithic programs, promoting **module reuse**, and making it fun to use.
 
 ---
-![At glance](media/info0.png)
+![At glance](media/info2.png)
 ## 🌟 Key Features at a Glance
 
 ### 🎯 Design Philosophy
