@@ -420,26 +420,26 @@ def purge_old_devices():
 
 def scan_loop():
     """Main scanning loop with LED feedback."""
-    # Pre-emptive stop: ensure any previous scan is stopped
-    try:
-        ble.gap_scan(None)
-    except:
-        pass
-    
-    # Small delay to let the stack settle
-    time.sleep_ms(200)
-
-    # Start continuous scan: duration=0, interval=100ms, window=100ms, active=True
-    # active=True is essential to receive scan responses (where names often live)
-    try:
-        ble.gap_scan(0, 100000, 100000, True)
-    except OSError as e:
-        if e.args[0] == -519:
-            print("BLE Busy (-519), retrying in 1s...")
-            time.sleep(1)
-            ble.gap_scan(0, 100000, 100000, True)
-        else:
-            raise e
+    # Retry loop for starting the scan (robust against -519 BTM_BUSY)
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            # Pre-emptive stop: ensure any previous scan is stopped
+            ble.gap_scan(None)
+            time.sleep_ms(100)
+            
+            # Start continuous scan
+            # Use 100ms interval and 80ms window (80% duty cycle) 
+            # to be kinder to the radio (especially on ESP32-C6 with WiFi)
+            ble.gap_scan(0, 100000, 80000, True)
+            break # Success!
+        except OSError as e:
+            if e.args[0] == -519 and attempt < max_retries - 1:
+                print(f"BLE Busy (-519), retry {attempt+1}/{max_retries}...")
+                time.sleep(1)
+            else:
+                print(f"Error starting BLE scan: {e}")
+                raise e
 
     last_display = 0
 
