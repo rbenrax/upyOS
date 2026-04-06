@@ -1,4 +1,4 @@
-# busca - BLE device finder with WS2812 proximity LED
+# ble_finder - BLE device finder with WS2812 proximity LED
 # Optimized for Xiaomi Buds 4 detection
 
 import bluetooth
@@ -27,6 +27,7 @@ devices = {}       # mac -> {name, rssi_buf, last_seen, manufacturer_match}
 target_mac = None  # optional: known MAC prefix/full to track
 target_keywords = DEFAULT_KEYWORDS[:]
 target_mfr_ids = DEFAULT_MFR_IDS[:]
+search_all = False
 ble = None
 np = None
 
@@ -34,6 +35,7 @@ np = None
 def decode_adv_fields(payload):
     """Parse all AD structures from BLE advertisement payload."""
     name = None
+    name_complete = False
     mfr_ids = []
     svc_uuids = []
 
@@ -50,19 +52,28 @@ def decode_adv_fields(payload):
         ad_type = payload[i + 1]
         ad_data = payload[i + 2:i + 1 + length]
 
-        # Complete / Shortened Local Name
-        if ad_type in (0x08, 0x09):
+        # Complete Local Name
+        if ad_type == 0x09:
             try:
-                name = ad_data.decode('utf-8')
+                name = ad_data.decode('utf-8').strip('\x00')
+                name_complete = True
             except Exception:
                 pass
 
-        # Manufacturer Specific Data (first 2 bytes = company ID, little-endian)
+        # Shortened Local Name (only if we don't have a complete name yet)
+        elif ad_type == 0x08 and not name_complete:
+            try:
+                name = ad_data.decode('utf-8').strip('\x00')
+                name_complete = False
+            except Exception:
+                pass
+
+        # Manufacturer Specific Data
         elif ad_type == 0xFF and len(ad_data) >= 2:
             company_id = ad_data[0] | (ad_data[1] << 8)
             mfr_ids.append(company_id)
 
-        # 16-bit Service UUIDs (complete/incomplete)
+        # 16-bit Service UUIDs
         elif ad_type in (0x02, 0x03) and len(ad_data) >= 2:
             for j in range(0, len(ad_data) - 1, 2):
                 uuid16 = ad_data[j] | (ad_data[j + 1] << 8)
@@ -70,11 +81,14 @@ def decode_adv_fields(payload):
 
         i += 1 + length
 
-    return name, mfr_ids, svc_uuids
+    return name, name_complete, mfr_ids, svc_uuids
 
 
 def is_target(name, mfr_ids):
     """Check if device matches filter criteria."""
+    if search_all:
+        return True
+
     # Match by manufacturer IDs
     for tid in target_mfr_ids:
         if tid in mfr_ids:
@@ -224,7 +238,7 @@ def bt_irq(event, data):
     if target_mac and not mac.startswith(target_mac):
         return
 
-    name, mfr_ids, svc_uuids = decode_adv_fields(adv_data)
+    name, name_complete, mfr_ids, svc_uuids = decode_adv_fields(adv_data)
 
     # Check for manufacturer match in IDs
     mfr_match = False
@@ -244,8 +258,12 @@ def bt_irq(event, data):
     if mac in devices:
         dev = devices[mac]
         # Update name if we got a better one
-        if name and not dev['name']:
-            dev['name'] = name
+        # Better = we didn't have one, or current is incomplete and new is complete
+        if name:
+            if not dev['name'] or (name_complete and not dev.get('nc', False)):
+                dev['name'] = name
+                dev['nc'] = name_complete
+
         if mfr_match:
             dev['mfr'] = True
         # Add RSSI to buffer
@@ -259,6 +277,7 @@ def bt_irq(event, data):
             'buf': [rssi],
             'seen': now,
             'mfr': mfr_match,
+            'nc': name_complete,
         }
 
 
@@ -292,8 +311,9 @@ def purge_old_devices():
 
 def scan_loop():
     """Main scanning loop with LED feedback."""
-    # Start continuous scan: duration=0 (indefinite), interval=100ms, window=100ms
-    ble.gap_scan(0, 100000, 100000)
+    # Start continuous scan: duration=0, interval=100ms, window=100ms, active=True
+    # active=True is essential to receive scan responses (where names often live)
+    ble.gap_scan(0, 100000, 100000, True)
 
     last_display = 0
 
@@ -374,10 +394,11 @@ def __main__(args):
     global ble, np, target_mac
 
     if "--h" in args:
-        print("busca - BLE headphone finder")
-        print("Usage: busca [MAC_PART] [-mfr ID1,ID2] [-key K1,K2] [-tx N] [-n FACTOR]")
+        print("ble_finder - BLE device finder")
+        print("Usage: ble_finder [MAC_PART] [-all] [-mfr ID1,ID2] [-key K1,K2] [-tx N] [-n FACTOR]")
         print()
         print("  MAC_PART     MAC address or prefix (e.g., AA:BB or AA:BB:CC:DD:EE:FF)")
+        print("  -all, -a     Search for all devices (bypass filters)")
         print("  -mfr ID      Manufacturer IDs in hex (default: 0x038F)")
         print("  -key WORD    Name keywords (default: buds,xiaomi,redmi)")
         print("  -tx N        RSSI power at 1m (default: -59)")
@@ -385,11 +406,12 @@ def __main__(args):
         print("  -gpio PIN    WS2812 LED GPIO (default: 8)")
         print("  --noled      Disable WS2812 LED")
         print()
-        print("Example: busca AA:BB:CC")
-        print("         busca -mfr 0x004C -key airpods")
+        print("Example: ble_finder -all")
+        print("         ble_finder AA:BB:CC")
+        print("         ble_finder -mfr 0x004C -key airpods")
         return
 
-    global TX_POWER, N_PATH_LOSS, LED_GPIO, target_keywords, target_mfr_ids
+    global TX_POWER, N_PATH_LOSS, LED_GPIO, target_keywords, target_mfr_ids, search_all
 
     use_led = True
 
@@ -416,6 +438,9 @@ def __main__(args):
         elif arg == "--noled":
             use_led = False
             i += 1
+        elif arg in ("-all", "-a"):
+            search_all = True
+            i += 1
         elif ":" in arg:
             # MAC address or prefix
             target_mac = arg.upper()
@@ -440,6 +465,8 @@ def __main__(args):
 
     if target_mac:
         print("Searching for MAC patterns:", target_mac)
+    elif search_all:
+        print("Searching for ALL BLE devices...")
     else:
         print("Searching for target devices...")
         print("Keywords:", ", ".join(target_keywords))
