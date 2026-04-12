@@ -1,4 +1,4 @@
-# ble_finder - BLE device finder with WS2812 proximity LED
+# busca - BLE device finder with WS2812 proximity LED
 # Optimized for Xiaomi Buds 4 detection
 
 import bluetooth
@@ -27,70 +27,15 @@ devices = {}       # mac -> {name, rssi_buf, last_seen, manufacturer_match}
 target_mac = None  # optional: known MAC prefix/full to track
 target_keywords = DEFAULT_KEYWORDS[:]
 target_mfr_ids = DEFAULT_MFR_IDS[:]
-search_all = False
-best_mac = None
 ble = None
 np = None
-
-
-def decode_appearance(value):
-    """Convert BLE appearance ID to human readable string."""
-    if value == 0x00: return "Unknown"
-    # Generic categories (Mask 0xFFC0)
-    cat = value & 0xFFC0
-    if cat == 0x0040: return "Phone"
-    if cat == 0x0080: return "Computer"
-    if cat == 0x00C0: return "Watch"
-    if cat == 0x0180: return "Thermometer"
-    if cat == 0x0200: return "Heart Rate Sensor"
-    if cat == 0x0340: return "Blood Pressure"
-    if cat == 0x0380: return "HID Device"
-    if cat == 0x0440: return "Glucose Meter"
-    if cat == 0x0480: return "Running/Walking"
-    if cat == 0x0500: return "Cycling"
-    if cat == 0x0940: return "Audio/Media"
-    
-    # Specific ones
-    if value == 0x03C1: return "🖱 Mouse"
-    if value == 0x03C2: return "🕹 Joystick"
-    if value == 0x03C3: return "🎮 Gamepad"
-    if value == 0x03C4: return "⌨ Keyboard"
-    if value == 0x0941: return "🎧 Headset"
-    if value == 0x0942: return "🎧 Headphones"
-    if value == 0x0944: return "🔊 Speaker"
-    
-    return f"Device ({hex(value)})"
-
-
-def decode_service_uuid(uuid_str):
-    """Map common BLE service UUIDs to names."""
-    known = {
-        "0X180D": "💓 Heart Rate",
-        "0X180F": "🔋 Battery",
-        "0X180A": "ℹ️ Device Info",
-        "0XFEE0": "⌚ Xiaomi Mi Band",
-        "0XFEE7": "📱 Xiaomi",
-        "0XFEF3": "🎧 Google Fast Pair",
-        "0XFD6F": "😷 Contact Tracing",
-        "0X004C": "🍎 Apple",
-        "0XFE9F": "🔍 Google",
-        "0XFCF1": "🏘️ Amazon Sidewalk",
-    }
-    # Handle prefixes from my code
-    clean_uuid = uuid_str.replace("SD:", "").upper()
-    if clean_uuid in known:
-        return f"{known[clean_uuid]} ({uuid_str})"
-    return uuid_str
 
 
 def decode_adv_fields(payload):
     """Parse all AD structures from BLE advertisement payload."""
     name = None
-    name_complete = False
     mfr_ids = []
     svc_uuids = []
-    appearance = 0
-    tx_power = None
 
     i = 0
     while i < len(payload):
@@ -105,89 +50,31 @@ def decode_adv_fields(payload):
         ad_type = payload[i + 1]
         ad_data = payload[i + 2:i + 1 + length]
 
-        # Complete Local Name
-        if ad_type == 0x09:
+        # Complete / Shortened Local Name
+        if ad_type in (0x08, 0x09):
             try:
-                name = bytes(ad_data).decode('utf-8').strip('\x00')
-                name_complete = True
-            except Exception as e:
-                print(f"DEBUG: Name decode (0x09) failed: {e} | Data: {bytes(ad_data).hex()}")
+                name = ad_data.decode('utf-8')
+            except Exception:
+                pass
 
-        # Shortened Local Name
-        elif ad_type == 0x08 and not name_complete:
-            try:
-                name = bytes(ad_data).decode('utf-8').strip('\x00')
-                name_complete = False
-            except Exception as e:
-                print(f"DEBUG: Name decode (0x08) failed: {e} | Data: {bytes(ad_data).hex()}")
-
-        # Manufacturer Specific Data
+        # Manufacturer Specific Data (first 2 bytes = company ID, little-endian)
         elif ad_type == 0xFF and len(ad_data) >= 2:
             company_id = ad_data[0] | (ad_data[1] << 8)
             mfr_ids.append(company_id)
 
-        # 16-bit Service UUIDs
+        # 16-bit Service UUIDs (complete/incomplete)
         elif ad_type in (0x02, 0x03) and len(ad_data) >= 2:
             for j in range(0, len(ad_data) - 1, 2):
                 uuid16 = ad_data[j] | (ad_data[j + 1] << 8)
-                svc_uuids.append(f"0x{uuid16:04X}")
-
-        # 128-bit Service UUIDs
-        elif ad_type in (0x06, 0x07) and len(ad_data) >= 16:
-            for j in range(0, len(ad_data) - 15, 16):
-                uuid128 = ad_data[j:j+16]
-                svc_uuids.append("..." + uuid128[-2:].hex().upper())
-
-        # Appearance
-        elif ad_type == 0x19 and len(ad_data) >= 2:
-            appearance = ad_data[0] | (ad_data[1] << 8)
-
-        # Service Data (16-bit UUID)
-        elif ad_type == 0x16 and len(ad_data) >= 2:
-            uuid16 = ad_data[0] | (ad_data[1] << 8)
-            svc_uuids.append(f"SD:0x{uuid16:04X}")
-            # Some devices put names here
-            try:
-                candidate = bytes(ad_data[2:]).decode('utf-8').strip('\x00')
-                if len(candidate) > 2:
-                    name = candidate
-                    name_complete = False
-            except:
-                pass
-
-        # TX Power Level
-        elif ad_type == 0x0A and len(ad_data) >= 1:
-            tx_power = ad_data[0]
-            if tx_power > 127: tx_power -= 256 # signed
+                svc_uuids.append(uuid16)
 
         i += 1 + length
 
-    # Final Fallback: search raw for ASCII strings if name still missing
-    if not name:
-        raw_bytes = bytes(payload)
-        for start in range(len(raw_bytes) - 4):
-            # Match only strings at least 5 chars long to avoid junk
-            # Focus on printable ASCII (Letters, numbers, spaces)
-            if all(32 <= b <= 126 for b in raw_bytes[start:start+5]):
-                end = start
-                while end < len(raw_bytes) and 32 <= raw_bytes[end] <= 126:
-                    end += 1
-                try:
-                    cand = raw_bytes[start:end].decode('ascii').strip()
-                    if len(cand) > 4:
-                        name = cand
-                        break
-                except:
-                    pass
-
-    return name, name_complete, mfr_ids, svc_uuids, appearance, tx_power
+    return name, mfr_ids, svc_uuids
 
 
 def is_target(name, mfr_ids):
     """Check if device matches filter criteria."""
-    if search_all:
-        return True
-
     # Match by manufacturer IDs
     for tid in target_mfr_ids:
         if tid in mfr_ids:
@@ -337,7 +224,7 @@ def bt_irq(event, data):
     if target_mac and not mac.startswith(target_mac):
         return
 
-    name, name_complete, mfr_ids, svc_uuids, appearance, tx_power = decode_adv_fields(adv_data)
+    name, mfr_ids, svc_uuids = decode_adv_fields(adv_data)
 
     # Check for manufacturer match in IDs
     mfr_match = False
@@ -353,25 +240,14 @@ def bt_irq(event, data):
         return
 
     now = time.ticks_ms()
-    global best_mac
+
     if mac in devices:
         dev = devices[mac]
         # Update name if we got a better one
-        if name:
-            if not dev['name'] or (name_complete and not dev.get('nc', False)):
-                dev['name'] = name
-                dev['nc'] = name_complete
-        
-        # Update other fields if found
-        if appearance: dev['app'] = appearance
-        if tx_power is not None: dev['tx'] = tx_power
-        if svc_uuids:
-            for u in svc_uuids:
-                if u not in dev['svcs']: dev['svcs'].append(u)
-
+        if name and not dev['name']:
+            dev['name'] = name
         if mfr_match:
             dev['mfr'] = True
-        
         # Add RSSI to buffer
         dev['buf'].append(rssi)
         if len(dev['buf']) > RSSI_BUFFER_SIZE:
@@ -383,10 +259,6 @@ def bt_irq(event, data):
             'buf': [rssi],
             'seen': now,
             'mfr': mfr_match,
-            'nc': name_complete,
-            'app': appearance,
-            'tx': tx_power,
-            'svcs': svc_uuids,
         }
 
 
@@ -420,26 +292,8 @@ def purge_old_devices():
 
 def scan_loop():
     """Main scanning loop with LED feedback."""
-    # Retry loop for starting the scan (robust against -519 BTM_BUSY)
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            # Pre-emptive stop: ensure any previous scan is stopped
-            ble.gap_scan(None)
-            time.sleep_ms(100)
-            
-            # Start continuous scan
-            # Use 100ms interval and 80ms window (80% duty cycle) 
-            # to be kinder to the radio (especially on ESP32-C6 with WiFi)
-            ble.gap_scan(0, 100000, 80000, True)
-            break # Success!
-        except OSError as e:
-            if e.args[0] == -519 and attempt < max_retries - 1:
-                print(f"BLE Busy (-519), retry {attempt+1}/{max_retries}...")
-                time.sleep(1)
-            else:
-                print(f"Error starting BLE scan: {e}")
-                raise e
+    # Start continuous scan: duration=0 (indefinite), interval=100ms, window=100ms
+    ble.gap_scan(0, 100000, 100000)
 
     last_display = 0
 
@@ -451,7 +305,6 @@ def scan_loop():
             purge_old_devices()
 
             # Find best target and update LED
-            global best_mac
             best_mac = find_best_target()
 
             if best_mac:
@@ -489,16 +342,8 @@ def scan_loop():
 
                         print(mac + marker)
                         print("  Name:", dev['name'] or "(no name)")
-                        if dev['app']:
-                            print("  Type:", decode_appearance(dev['app']))
                         if dev['mfr']:
-                            print("  Manufacturer: Xiaomi 0x038F" if dev['mfr'] else "")
-                        if dev['svcs']:
-                            named_svcs = [decode_service_uuid(u) for u in dev['svcs']]
-                            print("  Services:", ", ".join(named_svcs))
-                        if dev.get('tx') is not None:
-                            print("  TX Power:", dev['tx'], "dBm")
-                        
+                            print("  Manufacturer match found (ID)")
                         print("  RSSI:", rssi, rssi_bar(rssi), trend_sym)
                         print("  Samples:", len(dev['buf']))
                         print("  Distance:", dist, "m")
@@ -529,11 +374,10 @@ def __main__(args):
     global ble, np, target_mac
 
     if "--h" in args:
-        print("ble_finder - BLE device finder")
-        print("Usage: ble_finder [MAC_PART] [-all] [-mfr ID1,ID2] [-key K1,K2] [-tx N] [-n FACTOR]")
+        print("busca - BLE headphone finder")
+        print("Usage: busca [MAC_PART] [-mfr ID1,ID2] [-key K1,K2] [-tx N] [-n FACTOR]")
         print()
         print("  MAC_PART     MAC address or prefix (e.g., AA:BB or AA:BB:CC:DD:EE:FF)")
-        print("  -all, -a     Search for all devices (bypass filters)")
         print("  -mfr ID      Manufacturer IDs in hex (default: 0x038F)")
         print("  -key WORD    Name keywords (default: buds,xiaomi,redmi)")
         print("  -tx N        RSSI power at 1m (default: -59)")
@@ -541,12 +385,11 @@ def __main__(args):
         print("  -gpio PIN    WS2812 LED GPIO (default: 8)")
         print("  --noled      Disable WS2812 LED")
         print()
-        print("Example: ble_finder -all")
-        print("         ble_finder AA:BB:CC")
-        print("         ble_finder -mfr 0x004C -key airpods")
+        print("Example: busca AA:BB:CC")
+        print("         busca -mfr 0x004C -key airpods")
         return
 
-    global TX_POWER, N_PATH_LOSS, LED_GPIO, target_keywords, target_mfr_ids, search_all
+    global TX_POWER, N_PATH_LOSS, LED_GPIO, target_keywords, target_mfr_ids
 
     use_led = True
 
@@ -573,9 +416,6 @@ def __main__(args):
         elif arg == "--noled":
             use_led = False
             i += 1
-        elif arg in ("-all", "-a"):
-            search_all = True
-            i += 1
         elif ":" in arg:
             # MAC address or prefix
             target_mac = arg.upper()
@@ -586,7 +426,6 @@ def __main__(args):
     # Initialize BLE
     ble = bluetooth.BLE()
     ble.active(True)
-    time.sleep_ms(300) # Wait for controller to settle
     ble.irq(bt_irq)
 
     # Initialize WS2812 LED
@@ -601,8 +440,6 @@ def __main__(args):
 
     if target_mac:
         print("Searching for MAC patterns:", target_mac)
-    elif search_all:
-        print("Searching for ALL BLE devices...")
     else:
         print("Searching for target devices...")
         print("Keywords:", ", ".join(target_keywords))

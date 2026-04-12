@@ -6,7 +6,6 @@
 /bin/atmqttc.py,6417,2514b928f20698d3e6ca5729f0a0c4b94eecd8ad,
 /bin/atupgrade.py,8279,30bb6b1f5d3bce777a649074a0420bf1aa2e81db,
 /bin/atwget.py,1726,f29c51174fe4623ddf1fdcc818e76db4e9c37ad1,
-/bin/ble_finder.py,12993,0da2ef3f36d8011b33d19e3e93237b9372702752,
 /bin/cat.py,2052,5e2e1d9c9425972bbbf7e2e522b4c170dc55e95c,
 /bin/cd.py,332,d70e5da7daede0f72228955c1e838fcdf01a3275,
 /bin/clear.py,63,079be4ed19df5f15875a79633de80f38e6b7e19b,
@@ -110,4 +109,4 @@
 /www/index.html,3072,87e74a8ce8212c11fda996d15638412ac17498e0,
 /www/login.html,3147,13bd36d293e48f99e4294738ffd24da54ebb421f,
 /www/style.css,10057,687d931034916b4643cb11ecc8ed59a2be688232,
-#files,111
+#files,110
