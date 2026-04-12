@@ -31,7 +31,7 @@ def __main__(args):
             with open(dest, fm) as out:
                 for a in paths:
                     if not utls.file_exists(a) or utls.isdir(a):
-                        print(f"File does not exist {a}")
+                        print(f"File not found {a}")
                         continue
                     with open(a, 'r') as f:
                         while True:
@@ -41,7 +41,7 @@ def __main__(args):
         else:
             for a in paths:
                 if not utls.file_exists(a) or utls.isdir(a):
-                    print(f"File does not exist {a}")
+                    print(f"File not found {a}")
                     continue
                 lc=0
                 with open(a, 'r') as f:
