@@ -23,7 +23,7 @@ def __main__(args):
         if spath == "" or dpath=="": return
         
         if not utls.file_exists(spath):
-            print("File source not exists.")
+            print("Source file not found.")
             return
         
         if utls.protected(dpath):
