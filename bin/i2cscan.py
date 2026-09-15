@@ -21,7 +21,7 @@ def __main__(args):
 
                 i2c = machine.I2C(id=i2c_id, scl=machine.Pin(gpios["scl"]), sda=machine.Pin(gpios["sda"]))
 
-                print('Scan i2c bus...')
+                print('Scanning i2c bus...')
                 devices = i2c.scan()
 
                 if len(devices) == 0:
@@ -32,6 +32,6 @@ def __main__(args):
                     for device in devices:  
                         print("Decimal address: ", device, " | Hexa address: ", hex(device))
             else:
-                print(f"I2C bus {i2c_id} not exists in this board")
+                print(f"I2C bus {i2c_id} not found on this board")
         else:
-            print("This board seems has no I2C bus")
+            print("No I2C bus found")
